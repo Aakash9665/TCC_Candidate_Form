@@ -17,7 +17,7 @@
       padding: 30px;
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      max-width: 500px;
+      max-width: 600px;
       width: 100%;
     }
 
@@ -29,7 +29,7 @@
 
     label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       font-weight: 600;
       color: #555;
     }
@@ -37,10 +37,32 @@
     input, select, button {
       width: 100%;
       padding: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       border-radius: 8px;
       border: 1px solid #ccc;
       font-size: 15px;
+    }
+
+    .inline-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .inline-group input, .inline-group select {
+      flex: 1;
+      margin-bottom: 0;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-top: 6px;
+      margin-bottom: 18px;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      margin-right: 10px;
+      width: auto;
     }
 
     button {
@@ -63,120 +85,188 @@
 </head>
 <body>
 
-  <form id="jobForm">
-    <h2>Apply for a Position</h2>
+<form id="jobForm">
+  <h2>Apply for a Position</h2>
 
-    <label for="name">Full Name:</label>
-    <input type="text" id="name" name="name" placeholder="John Doe" required>
+  <label for="name">Full Name:</label>
+  <input type="text" id="name" name="name" placeholder="Enter Candidate's Name" required>
 
-    <label for="email">Email Address:</label>
-    <input type="email" id="email" name="email" placeholder="john@example.com" required>
+  <label for="email">Email Address:</label>
+  <input type="email" id="email" name="email" placeholder="His E-Mail Id" required>
 
-    <label for="contact">Contact Number:</label>
-    <input type="tel" id="contact" name="contact" placeholder="+91-9876543210" required>
+  <label for="contact">Contact Number:</label>
+  <input type="tel" id="contact" name="contact" placeholder="Candidate's Contact No" required>
 
-    <label for="currentCTC">Current CTC (in LPA):</label>
-    <input type="number" step="0.01" id="currentCTC" name="currentCTC" placeholder="e.g. 6.5" required>
-
-    <label for="expectedCTC">Expected CTC (in LPA):</label>
-    <input type="number" step="0.01" id="expectedCTC" name="expectedCTC" placeholder="e.g. 8.0" required>
-
-    <label for="experience">Experience (in years):</label>
-    <input type="number" step="0.1" id="experience" name="experience" placeholder="e.g. 3.5" required>
-
-    <label for="noticePeriod">Notice Period (in days):</label>
-    <input type="number" id="noticePeriod" name="noticePeriod" placeholder="e.g. 30" required>
-
-    <label for="company">Select Company:</label>
-    <select id="company" name="company" required>
-      <option value="">-- Choose Company --</option>
-      <option value="codemines">Codemines</option>
-      <option value="Saviesahome">Saviesa Home</option>
-      <option value="angelportal">Angel Portal</option>
+  <label for="currentCTC">Current CTC:</label>
+  <div class="inline-group">
+    <input type="number" id="currentCTC" name="currentCTC" placeholder="e.g 30 or 30,000" required>
+    <select id="currentCTCUnit" name="currentCTCUnit" required>
+      <option value="Yearly">LPA</option>
+      <option value="Monthly">Monthly</option>
     </select>
+  </div>
 
-    <div id="positionDiv">
-      <label for="position">Open Position:</label>
-      <select id="position" name="position" required>
-        <option value="">-- Choose Position --</option>
-      </select>
-    </div>
-
-    <label for="recruiter">Recruiter Email:</label>
-    <select id="recruiter" name="recruiter" required>
-      <option value="">-- Choose Recruiter --</option>
-      <option value="ruchi.mishra@talentconnectconsultancy.com">ruchi.mishra@talentconnectconsultancy.com</option>
-      <option value="aakashmishra510@gmail.com">aakashmishra510@gmail.com</option>
+  <label for="expectedCTC">Expected CTC:</label>
+  <div class="inline-group">
+    <input type="number" id="expectedCTC" name="expectedCTC" placeholder="e.g 40 or 40,000" required>
+    <select id="expectedCTCUnit" name="expectedCTCUnit" required>
+      <option value="Yearly">LPA</option>
+      <option value="Monthly">Monthly</option>
     </select>
+  </div>
+  <div class="checkbox-group">
+    <input type="checkbox" id="asPerCompany" name="asPerCompany">
+    <label for="asPerCompany">As Per Company</label>
+  </div>
 
-    <button type="submit">Submit</button>
-  </form>
+  <label for="experience">Experience:</label>
+  <div class="inline-group">
+    <input type="number" id="experience" name="experience" placeholder="e.g. 3">
+    <select id="experienceUnit" name="experienceUnit">
+      <option value="Years">Years</option>
+      <option value="Months">Months</option>
+    </select>
+  </div>
+  <div class="checkbox-group">
+    <input type="checkbox" id="isFresher" name="isFresher">
+    <label for="isFresher">Fresher</label>
+  </div>
 
-  <script>
-    const positionMap = {
-      codemines: ["Frontend Developer", "Backend Developer", "QA Engineer"],
-      Saviesahome: ["Site Engineer", "Interior Designer", "Architect"],
-      angelportal: ["Support Executive", "Onboarding Specialist", "Marketing Analyst"]
+  <label for="noticePeriod">Notice Period:</label>
+  <div class="inline-group">
+    <input type="number" id="noticePeriod" name="noticePeriod" placeholder="e.g. 30">
+    <select id="noticePeriodUnit" name="noticePeriodUnit">
+      <option value="Days">Days</option>
+      <option value="Months">Months</option>
+    </select>
+  </div>
+  <div class="checkbox-group">
+    <input type="checkbox" id="immediateJoiner" name="immediateJoiner">
+    <label for="immediateJoiner">Immediate Joiner</label>
+  </div>
+
+  <label for="company">Select Company:</label>
+  <select id="company" name="company" required>
+    <option value="">-- Choose Company --</option>
+    <option value="codemines">Codemines</option>
+    <option value="Saviesahome">Saviesa Home</option>
+    <option value="angelportal">Angel Portal</option>
+  </select>
+
+  <div id="positionDiv">
+    <label for="position">Open Position:</label>
+    <select id="position" name="position" required>
+      <option value="">-- Choose Position --</option>
+    </select>
+  </div>
+
+  <label for="recruiterEmail">Recruiter Email:</label>
+  <select id="recruiterEmail" name="recruiterEmail" required>
+    <option value="">-- Select Recruiter --</option>
+    <option value="ruchi.mishra@talentconnectconsultancy.com">ruchi.mishra@talentconnectconsultancy.com</option>
+    <option value="aakashmishra510@gmail.com">aakashmishra510@gmail.com</option>
+  </select>
+
+  <button type="submit">Submit</button>
+</form>
+
+<script>
+  const positionMap = {
+    codemines: ["Frontend Developer", "Backend Developer", "QA Engineer"],
+    Saviesahome: ["Interior Designer", "Sales Executive", "Architect"],
+    angelportal: ["Support Executive", "Onboarding Specialist", "Marketing Analyst"]
+  };
+
+  document.getElementById("company").addEventListener("change", function () {
+    const company = this.value;
+    const positionSelect = document.getElementById("position");
+    const positionDiv = document.getElementById("positionDiv");
+
+    positionSelect.innerHTML = '<option value="">-- Choose Position --</option>';
+    if (company && positionMap[company]) {
+      positionMap[company].forEach(pos => {
+        const option = document.createElement("option");
+        option.value = pos;
+        option.text = pos;
+        positionSelect.appendChild(option);
+      });
+      positionDiv.style.display = "block";
+    } else {
+      positionDiv.style.display = "none";
+    }
+  });
+
+  document.getElementById("immediateJoiner").addEventListener("change", function () {
+    const np = document.getElementById("noticePeriod");
+    const npUnit = document.getElementById("noticePeriodUnit");
+    np.disabled = this.checked;
+    npUnit.disabled = this.checked;
+  });
+
+  document.getElementById("isFresher").addEventListener("change", function () {
+    const exp = document.getElementById("experience");
+    const expUnit = document.getElementById("experienceUnit");
+    if (this.checked) {
+      exp.disabled = true;
+      expUnit.disabled = true;
+    } else {
+      exp.disabled = false;
+      expUnit.disabled = false;
+    }
+  });
+
+  document.getElementById("asPerCompany").addEventListener("change", function () {
+    const expCTC = document.getElementById("expectedCTC");
+    const expCTCUnit = document.getElementById("expectedCTCUnit");
+    if (this.checked) {
+      expCTC.disabled = true;
+      expCTCUnit.disabled = true;
+    } else {
+      expCTC.disabled = false;
+      expCTCUnit.disabled = false;
+    }
+  });
+
+  document.getElementById("jobForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const data = {
+      name: document.getElementById("name").value,
+      email: document.getElementById("email").value,
+      contact: document.getElementById("contact").value,
+      currentCTC: document.getElementById("currentCTC").value,
+      currentCTCUnit: document.getElementById("currentCTCUnit").value,
+      expectedCTC: document.getElementById("asPerCompany").checked ? "As Per Company" : document.getElementById("expectedCTC").value,
+      expectedCTCUnit: document.getElementById("asPerCompany").checked ? "" : document.getElementById("expectedCTCUnit").value,
+      experience: document.getElementById("isFresher").checked ? "Fresher" : document.getElementById("experience").value,
+      experienceUnit: document.getElementById("isFresher").checked ? "" : document.getElementById("experienceUnit").value,
+      noticePeriod: document.getElementById("immediateJoiner").checked ? "Immediate" : document.getElementById("noticePeriod").value,
+      noticePeriodUnit: document.getElementById("immediateJoiner").checked ? "" : document.getElementById("noticePeriodUnit").value,
+      company: document.getElementById("company").value,
+      position: document.getElementById("position").value,
+      recruiterEmail: document.getElementById("recruiterEmail").value
     };
 
-    document.getElementById("company").addEventListener("change", function () {
-      const company = this.value;
-      const positionSelect = document.getElementById("position");
-      const positionDiv = document.getElementById("positionDiv");
-
-      positionSelect.innerHTML = '<option value="">-- Choose Position --</option>';
-
-      if (company && positionMap[company]) {
-        positionMap[company].forEach(pos => {
-          const option = document.createElement("option");
-          option.value = pos;
-          option.text = pos;
-          positionSelect.appendChild(option);
-        });
-        positionDiv.style.display = "block";
+    fetch("https://prod-30.centralindia.logic.azure.com:443/workflows/54210cf2969a42458623aa9427690ce1/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ZND7fpFK-bj6HXWxqBMGlFl3_W7vSKTmAUxU8uFwzzU", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    })
+    .then(res => {
+      if (res.ok) {
+        alert("Your details has been submitted and JD sent to candidate");
+        document.getElementById("jobForm").reset();
+        document.getElementById("positionDiv").style.display = "none";
       } else {
-        positionDiv.style.display = "none";
-      }
-    });
-
-    document.getElementById("jobForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      const data = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        contact: document.getElementById("contact").value,
-        currentCTC: document.getElementById("currentCTC").value,
-        expectedCTC: document.getElementById("expectedCTC").value,
-        experience: document.getElementById("experience").value,
-        noticePeriod: document.getElementById("noticePeriod").value,
-        company: document.getElementById("company").value,
-        position: document.getElementById("position").value,
-        recruiter: document.getElementById("recruiter").value
-      };
-
-      fetch("https://prod-30.centralindia.logic.azure.com:443/workflows/54210cf2969a42458623aa9427690ce1/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ZND7fpFK-bj6HXWxqBMGlFl3_W7vSKTmAUxU8uFwzzU", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-      })
-      .then(response => {
-        if (response.ok) {
-          alert("Form submitted successfully!");
-          document.getElementById("jobForm").reset();
-          document.getElementById("positionDiv").style.display = "none";
-        } else {
-          alert("Failed to submit form.");
-        }
-      })
-      .catch(error => {
-        console.error("Error:", error);
         alert("Error submitting form.");
-      });
+      }
+    })
+    .catch(err => {
+      alert("Failed to connect to Power Automate.");
+      console.error(err);
     });
-  </script>
+  });
+</script>
 
 </body>
 </html>
