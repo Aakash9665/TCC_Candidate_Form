@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Job Application Form</title>
+  <meta charset="UTF-8">
+  <title>Company Job Form</title>
   <style>
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -56,7 +56,8 @@
       background-color: #005fa3;
     }
 
-    #positionDiv {
+    #positionDiv,
+    #recruiterDiv {
       display: none;
     }
   </style>
@@ -67,13 +68,13 @@
     <h2>Apply for a Position</h2>
 
     <label for="name">Full Name:</label>
-    <input type="text" id="name" name="name" placeholder="John Doe" required />
+    <input type="text" id="name" name="name" placeholder="John Doe" required>
 
     <label for="email">Email Address:</label>
-    <input type="email" id="email" name="email" placeholder="john@example.com" required />
+    <input type="email" id="email" name="email" placeholder="john@example.com" required>
 
     <label for="contact">Contact Number:</label>
-    <input type="tel" id="contact" name="contact" placeholder="+91-9876543210" required />
+    <input type="tel" id="contact" name="contact" placeholder="+91-9876543210" required>
 
     <label for="company">Select Company:</label>
     <select id="company" name="company" required>
@@ -90,6 +91,15 @@
       </select>
     </div>
 
+    <div id="recruiterDiv">
+      <label for="recruiter">Recruiter Email:</label>
+      <select id="recruiter" name="recruiter" required>
+        <option value="">-- Select Recruiter --</option>
+        <option value="aakashmishra510@gmail.com">aakashmishra510@gmail.com</option>
+        <option value="ruchi.mishra@talentconnectconsultancy.com">ruchi.mishra@talentconnectconsultancy.com</option>
+      </select>
+    </div>
+
     <button type="submit">Submit</button>
   </form>
 
@@ -100,11 +110,13 @@
       angelportal: ["Support Executive", "Onboarding Specialist", "Marketing Analyst"]
     };
 
-    document.getElementById("company").addEventListener("change", function () {
-      const company = this.value;
-      const positionSelect = document.getElementById("position");
-      const positionDiv = document.getElementById("positionDiv");
+    const companySelect = document.getElementById("company");
+    const positionDiv = document.getElementById("positionDiv");
+    const recruiterDiv = document.getElementById("recruiterDiv");
+    const positionSelect = document.getElementById("position");
 
+    companySelect.addEventListener("change", function () {
+      const company = this.value;
       positionSelect.innerHTML = '<option value="">-- Choose Position --</option>';
 
       if (company && positionMap[company]) {
@@ -115,15 +127,23 @@
           positionSelect.appendChild(option);
         });
         positionDiv.style.display = "block";
+        recruiterDiv.style.display = "block";
       } else {
         positionDiv.style.display = "none";
+        recruiterDiv.style.display = "none";
       }
     });
 
     document.getElementById("jobForm").addEventListener("submit", function (e) {
       e.preventDefault();
-      alert("Form submitted!"); // Replace this with actual logic if needed
+      alert("Form submitted!");
+
+      // Reset the form
+      this.reset();
+      positionDiv.style.display = "none";
+      recruiterDiv.style.display = "none";
     });
   </script>
+
 </body>
 </html>
