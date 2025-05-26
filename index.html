@@ -75,6 +75,18 @@
     <label for="contact">Contact Number:</label>
     <input type="tel" id="contact" name="contact" placeholder="+91-9876543210" required>
 
+    <label for="currentCTC">Current CTC (in LPA):</label>
+    <input type="number" step="0.01" id="currentCTC" name="currentCTC" placeholder="e.g. 6.5" required>
+
+    <label for="expectedCTC">Expected CTC (in LPA):</label>
+    <input type="number" step="0.01" id="expectedCTC" name="expectedCTC" placeholder="e.g. 8.0" required>
+
+    <label for="experience">Experience (in years):</label>
+    <input type="number" step="0.1" id="experience" name="experience" placeholder="e.g. 3.5" required>
+
+    <label for="noticePeriod">Notice Period (in days):</label>
+    <input type="number" id="noticePeriod" name="noticePeriod" placeholder="e.g. 30" required>
+
     <label for="company">Select Company:</label>
     <select id="company" name="company" required>
       <option value="">-- Choose Company --</option>
@@ -89,6 +101,13 @@
         <option value="">-- Choose Position --</option>
       </select>
     </div>
+
+    <label for="recruiter">Recruiter Email:</label>
+    <select id="recruiter" name="recruiter" required>
+      <option value="">-- Choose Recruiter --</option>
+      <option value="ruchi.mishra@talentconnectconsultancy.com">ruchi.mishra@talentconnectconsultancy.com</option>
+      <option value="aakashmishra510@gmail.com">aakashmishra510@gmail.com</option>
+    </select>
 
     <button type="submit">Submit</button>
   </form>
@@ -127,11 +146,16 @@
         name: document.getElementById("name").value,
         email: document.getElementById("email").value,
         contact: document.getElementById("contact").value,
+        currentCTC: document.getElementById("currentCTC").value,
+        expectedCTC: document.getElementById("expectedCTC").value,
+        experience: document.getElementById("experience").value,
+        noticePeriod: document.getElementById("noticePeriod").value,
         company: document.getElementById("company").value,
-        position: document.getElementById("position").value
+        position: document.getElementById("position").value,
+        recruiter: document.getElementById("recruiter").value
       };
 
-      fetch("https://prod-30.centralindia.logic.azure.com:443/workflows/54210cf2969a42458623aa9427690ce1/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ZND7fpFK-bj6HXWxqBMGlFl3_W7vSKTmAUxU8uFwzzU", {
+      fetch("YOUR_POWER_AUTOMATE_WEBHOOK_URL_HERE", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
