@@ -19,6 +19,7 @@
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
       max-width: 600px;
       width: 100%;
+      position: relative;
     }
 
     h2 {
@@ -80,6 +81,72 @@
 
     #positionDiv {
       display: none;
+    }
+
+    /* Popup styles */
+    .popup-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+    }
+
+    .popup {
+      background-color: #fff;
+      padding: 25px 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 0 12px rgba(0,0,0,0.25);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .popup img {
+      width: 60px;
+      margin-bottom: 15px;
+    }
+
+    .popup h3 {
+      margin-bottom: 10px;
+    }
+
+    .popup button {
+      margin: 10px 5px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    #sendBtn {
+      background-color: #25D366;
+      color: white;
+    }
+
+    #sendBtn:hover {
+      background-color: #1ebe5b;
+    }
+
+    #cancelBtn {
+      background-color: #eee;
+      color: #333;
+    }
+
+    #cancelBtn:hover {
+      background-color: #ddd;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -168,6 +235,16 @@
   </select>
 
   <button type="submit">Submit</button>
+
+  <div class="popup-overlay" id="popupOverlay">
+    <div class="popup">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Logo">
+      <h3>Send Details via WhatsApp?</h3>
+      <p>Click send to open WhatsApp with candidate details.</p>
+      <button id="sendBtn">Send via WhatsApp</button>
+      <button id="cancelBtn">Cancel</button>
+    </div>
+  </div>
 </form>
 
 <script>
@@ -197,35 +274,24 @@
   });
 
   document.getElementById("immediateJoiner").addEventListener("change", function () {
-    const np = document.getElementById("noticePeriod");
-    const npUnit = document.getElementById("noticePeriodUnit");
-    np.disabled = this.checked;
-    npUnit.disabled = this.checked;
+    document.getElementById("noticePeriod").disabled = this.checked;
+    document.getElementById("noticePeriodUnit").disabled = this.checked;
   });
 
   document.getElementById("isFresher").addEventListener("change", function () {
-    const exp = document.getElementById("experience");
-    const expUnit = document.getElementById("experienceUnit");
-    if (this.checked) {
-      exp.disabled = true;
-      expUnit.disabled = true;
-    } else {
-      exp.disabled = false;
-      expUnit.disabled = false;
-    }
+    document.getElementById("experience").disabled = this.checked;
+    document.getElementById("experienceUnit").disabled = this.checked;
   });
 
   document.getElementById("asPerCompany").addEventListener("change", function () {
-    const expCTC = document.getElementById("expectedCTC");
-    const expCTCUnit = document.getElementById("expectedCTCUnit");
-    if (this.checked) {
-      expCTC.disabled = true;
-      expCTCUnit.disabled = true;
-    } else {
-      expCTC.disabled = false;
-      expCTCUnit.disabled = false;
-    }
+    document.getElementById("expectedCTC").disabled = this.checked;
+    document.getElementById("expectedCTCUnit").disabled = this.checked;
   });
+
+  const popup = document.getElementById("popupOverlay");
+  const sendBtn = document.getElementById("sendBtn");
+  const cancelBtn = document.getElementById("cancelBtn");
+  let whatsappLink = "";
 
   document.getElementById("jobForm").addEventListener("submit", function (e) {
     e.preventDefault();
@@ -254,9 +320,10 @@
     })
     .then(res => {
       if (res.ok) {
-        alert("Your details has been submitted and JD sent to candidate");
-        document.getElementById("jobForm").reset();
-        document.getElementById("positionDiv").style.display = "none";
+        const msg = `Candidate Details:\nName: ${data.name}\nEmail: ${data.email}\nContact: ${data.contact}\nCurrent CTC: ${data.currentCTC} ${data.currentCTCUnit}\nExpected CTC: ${data.expectedCTC} ${data.expectedCTCUnit}\nExperience: ${data.experience} ${data.experienceUnit}\nNotice Period: ${data.noticePeriod} ${data.noticePeriodUnit}\nCompany: ${data.company}\nPosition: ${data.position}\nRecruiter: ${data.recruiterEmail}`;
+        whatsappLink = `https://wa.me/${data.contact}?text=${encodeURIComponent(msg)}`;
+        document.getElementById("sendBtn").textContent = `Send via WhatsApp to ${data.name}`;
+        popup.style.display = "flex";
       } else {
         alert("Error submitting form.");
       }
@@ -265,6 +332,19 @@
       alert("Failed to connect to Power Automate.");
       console.error(err);
     });
+  });
+
+  sendBtn.addEventListener("click", () => {
+    popup.style.display = "none";
+    window.open(whatsappLink, "_blank");
+    document.getElementById("jobForm").reset();
+    document.getElementById("positionDiv").style.display = "none";
+  });
+
+  cancelBtn.addEventListener("click", () => {
+    popup.style.display = "none";
+    document.getElementById("jobForm").reset();
+    document.getElementById("positionDiv").style.display = "none";
   });
 </script>
 
