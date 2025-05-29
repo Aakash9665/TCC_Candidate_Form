@@ -320,8 +320,8 @@
     })
     .then(res => {
       if (res.ok) {
-        const msg = `Candidate Details:\nName: ${data.name}\nEmail: ${data.email}\nContact: ${data.contact}\nCurrent CTC: ${data.currentCTC} ${data.currentCTCUnit}\nExpected CTC: ${data.expectedCTC} ${data.expectedCTCUnit}\nExperience: ${data.experience} ${data.experienceUnit}\nNotice Period: ${data.noticePeriod} ${data.noticePeriodUnit}\nCompany: ${data.company}\nPosition: ${data.position}\nRecruiter: ${data.recruiterEmail}`;
-        whatsappLink = `https://wa.me/${data.contact}?text=${encodeURIComponent(msg)}`;
+        const msg = `Hi ${data.name},\n\nAs per our recent discussion regarding the position of ${data.position}, we have successfully submitted your profile for shortlisting to our client, ${data.company}, with the following details:\n\nCurrent CTC: ${data.currentCTC} ${data.currentCTCUnit}\nExpected CTC: ${data.expectedCTC} ${data.expectedCTCUnit}\nNotice Period: ${data.noticePeriod} ${data.noticePeriodUnit}\n\nWe have also shared the job description with you via email at ${data.email}.\n\nBest regards,\n${yourName}\nTalent Connect Consultancy`;
+        whatsappLink = `https://wa.me/91${data.contact}?text=${encodeURIComponent(msg)}`;
         document.getElementById("sendBtn").textContent = `Send via WhatsApp to ${data.name}`;
         popup.style.display = "flex";
       } else {
