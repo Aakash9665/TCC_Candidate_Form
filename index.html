@@ -313,6 +313,10 @@
       recruiterEmail: document.getElementById("recruiterEmail").value
     };
 
+    const recruiterParts = data.recruiterEmail.split(",");
+    const recruiterName = recruiterParts[1] ? recruiterParts[1].trim() : "Recruiter";
+    const recruiterContact = recruiterParts[2] ? recruiterParts[2].trim() : "";
+
     fetch("https://prod-30.centralindia.logic.azure.com:443/workflows/54210cf2969a42458623aa9427690ce1/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ZND7fpFK-bj6HXWxqBMGlFl3_W7vSKTmAUxU8uFwzzU", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -320,7 +324,7 @@
     })
     .then(res => {
       if (res.ok) {
-        const msg = `*Hi ${data.name}*,\n\nAs per our recent discussion regarding the position of *${data.position}*, we have successfully submitted your profile for shortlisting to our client, *${data.company}*, with the following details:\n\n*Current CTC : ${data.currentCTC} ${data.currentCTCUnit}*\n*Expected CTC : ${data.expectedCTC}* ${data.expectedCTCUnit}\n*Notice Period : ${data.noticePeriod}* ${data.noticePeriodUnit}\n\nWe have also shared the *Job Description* with you via email at ${data.email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n name\n*Talent Connect Consultancy*`;
+        const msg = `*Hi ${data.name}*,\n\nAs per our recent discussion regarding the position of *${data.position}*, we have successfully submitted your profile for shortlisting to our client, *${data.company}*, with the following details:\n\n*Current CTC : ${data.currentCTC} ${data.currentCTCUnit}*\n*Expected CTC : ${data.expectedCTC}* ${data.expectedCTCUnit}\n*Notice Period : ${data.noticePeriod}* ${data.noticePeriodUnit}\n\nWe have also shared the *Job Description* with you via email at ${data.email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
         whatsappLink = `https://wa.me/91${data.contact}?text=${encodeURIComponent(msg)}`;
         document.getElementById("sendBtn").textContent = `Send to ${data.name}`;
         popup.style.display = "flex";
