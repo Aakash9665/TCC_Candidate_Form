@@ -144,6 +144,22 @@
       background-color: #ddd;
     }
 
+    /* Small accent buttons inside manage popup */
+    .danger {
+      background-color: #e74c3c;
+      color: #fff;
+    }
+    .danger:hover {
+      background-color: #c0392b;
+    }
+    .secondary {
+      background-color: #eee;
+      color: #333;
+    }
+    .secondary:hover {
+      background-color: #ddd;
+    }
+
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -220,6 +236,9 @@
     <option value="angelportal">Angel Portal</option>
   </select>
 
+  <!-- NEW: Manage Companies Button -->
+  <button type="button" id="manageCompanyBtn" class="secondary" style="margin-top:-6px;">+ Add / Manage Company</button>
+
   <div id="positionDiv">
     <label for="position">Open Position:</label>
     <select id="position" name="position" required>
@@ -237,31 +256,70 @@
 
   <button type="submit">Submit</button>
 
+  <!-- Existing WhatsApp Popup -->
   <div class="popup-overlay" id="popupOverlay">
     <div class="popup">
       <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Logo">
       <h3>Send Details via WhatsApp?</h3>
       <p>Click send to open WhatsApp with Pre-filled details.</p>
       <button id="sendBtn">Send via WhatsApp</button>
-      <button id="cancelBtn">Cancel</button>
+      <button id="cancelBtn" class="secondary">Cancel</button>
     </div>
   </div>
+
+  <!-- NEW: Manage Companies Popup -->
+  <div class="popup-overlay" id="manageOverlay">
+    <div class="popup" style="text-align:left">
+      <h3 style="text-align:center">Add / Manage Companies</h3>
+
+      <!-- Add New Company -->
+      <label for="newCompanyName">New Company Name</label>
+      <input type="text" id="newCompanyName" placeholder="e.g. Acme Corp">
+      <label for="newCompanyPositions">Positions (comma-separated, optional)</label>
+      <input type="text" id="newCompanyPositions" placeholder="e.g. Developer, QA Engineer">
+      <button type="button" id="addCompanyConfirm">➕ Add Company</button>
+
+      <hr style="margin:16px 0; border:none; border-top:1px solid #eee">
+
+      <!-- Manage Existing -->
+      <label for="existingCompanySelect">Existing Company</label>
+      <select id="existingCompanySelect">
+        <option value="">-- Select Company --</option>
+      </select>
+
+      <label for="addPositionsInput">Add Positions (comma-separated)</label>
+      <input type="text" id="addPositionsInput" placeholder="e.g. Product Manager, Data Analyst">
+      <button type="button" id="addPositionsBtn">➕ Add Positions</button>
+
+      <label for="existingPositionSelect" style="margin-top:10px">Existing Positions</label>
+      <select id="existingPositionSelect">
+        <option value="">-- Select Position --</option>
+      </select>
+      <button type="button" id="deletePositionBtn" class="danger">🗑️ Delete Position</button>
+
+      <button type="button" id="deleteCompanyBtn" class="danger">🗑️ Delete Company</button>
+      <button type="button" id="manageCloseBtn" class="secondary" style="float:right">Close</button>
+    </div>
+  </div>
+
 </form>
 
 <script>
-  const positionMap = {
+  // Make this mutable so we can add/delete
+  let positionMap = {
     TecoreLabs: ["Full Stack Developer", "PostgreSQL Database Administrator"],
     Saviesahome: ["Interior Designer"],
     angelportal: ["Hr Recruiter", "Content Writer", "Relationship Manager", "Python Developer", "SEO and Social Media Manager", "Visa Manager", "Sales Manager - Online Course"]
   };
 
-  document.getElementById("company").addEventListener("change", function () {
-    const company = this.value;
-    const positionSelect = document.getElementById("position");
-    const positionDiv = document.getElementById("positionDiv");
+  const companySelect = document.getElementById("company");
+  const positionSelect = document.getElementById("position");
+  const positionDiv = document.getElementById("positionDiv");
 
+  function populatePositionsForSelectedCompany() {
+    const company = companySelect.value;
     positionSelect.innerHTML = '<option value="">-- Choose Position --</option>';
-    if (company && positionMap[company]) {
+    if (company && positionMap[company] && positionMap[company].length) {
       positionMap[company].forEach(pos => {
         const option = document.createElement("option");
         option.value = pos;
@@ -272,7 +330,9 @@
     } else {
       positionDiv.style.display = "none";
     }
-  });
+  }
+
+  document.getElementById("company").addEventListener("change", populatePositionsForSelectedCompany);
 
   document.getElementById("immediateJoiner").addEventListener("change", function () {
     document.getElementById("noticePeriod").disabled = this.checked;
@@ -350,6 +410,157 @@
     popup.style.display = "none";
     document.getElementById("jobForm").reset();
     document.getElementById("positionDiv").style.display = "none";
+  });
+
+  /* =========================
+     Manage Companies Popup JS
+     ========================= */
+  const manageOverlay = document.getElementById("manageOverlay");
+  const manageBtn = document.getElementById("manageCompanyBtn");
+  const manageCloseBtn = document.getElementById("manageCloseBtn");
+
+  const existingCompanySelect = document.getElementById("existingCompanySelect");
+  const existingPositionSelect = document.getElementById("existingPositionSelect");
+  const addCompanyConfirm = document.getElementById("addCompanyConfirm");
+  const newCompanyName = document.getElementById("newCompanyName");
+  const newCompanyPositions = document.getElementById("newCompanyPositions");
+  const addPositionsInput = document.getElementById("addPositionsInput");
+  const addPositionsBtn = document.getElementById("addPositionsBtn");
+  const deletePositionBtn = document.getElementById("deletePositionBtn");
+  const deleteCompanyBtn = document.getElementById("deleteCompanyBtn");
+
+  function refreshExistingCompanyDropdown() {
+    existingCompanySelect.innerHTML = '<option value="">-- Select Company --</option>';
+    Object.keys(positionMap).forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c;
+      opt.text = c;
+      existingCompanySelect.appendChild(opt);
+    });
+    refreshExistingPositionsDropdown();
+  }
+
+  function refreshExistingPositionsDropdown() {
+    existingPositionSelect.innerHTML = '<option value="">-- Select Position --</option>';
+    const comp = existingCompanySelect.value;
+    if (!comp || !positionMap[comp]) return;
+    positionMap[comp].forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p;
+      opt.text = p;
+      existingPositionSelect.appendChild(opt);
+    });
+  }
+
+  function addOptionToCompanySelect(name) {
+    // Avoid duplicates
+    const exists = Array.from(companySelect.options).some(o => o.value === name);
+    if (!exists) {
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.text = name;
+      companySelect.appendChild(opt);
+    }
+  }
+
+  function removeOptionFromCompanySelect(name) {
+    Array.from(companySelect.options).forEach(o => {
+      if (o.value === name) o.remove();
+    });
+  }
+
+  function updateMainPositionsIfAffected(companyName) {
+    if (companySelect.value === companyName) {
+      populatePositionsForSelectedCompany();
+    }
+  }
+
+  manageBtn.addEventListener("click", () => {
+    refreshExistingCompanyDropdown();
+    manageOverlay.style.display = "flex";
+  });
+
+  manageCloseBtn.addEventListener("click", () => {
+    manageOverlay.style.display = "none";
+  });
+
+  existingCompanySelect.addEventListener("change", refreshExistingPositionsDropdown);
+
+  // Add new company
+  addCompanyConfirm.addEventListener("click", () => {
+    const name = (newCompanyName.value || "").trim();
+    if (!name) { alert("Enter a company name"); return; }
+    if (positionMap[name]) { alert("Company already exists"); return; }
+
+    const positions = (newCompanyPositions.value || "")
+      .split(",")
+      .map(p => p.trim())
+      .filter(p => p.length);
+
+    positionMap[name] = positions;
+
+    addOptionToCompanySelect(name);
+    refreshExistingCompanyDropdown();
+
+    // Clear fields
+    newCompanyName.value = "";
+    newCompanyPositions.value = "";
+
+    alert(`Company "${name}" added${positions.length ? " with positions" : ""}.`);
+  });
+
+  // Add positions to existing company
+  addPositionsBtn.addEventListener("click", () => {
+    const comp = existingCompanySelect.value;
+    if (!comp) { alert("Select a company"); return; }
+    const entries = (addPositionsInput.value || "")
+      .split(",")
+      .map(p => p.trim())
+      .filter(p => p.length);
+    if (!entries.length) { alert("Enter at least one position"); return; }
+
+    // Deduplicate
+    const current = new Set(positionMap[comp] || []);
+    entries.forEach(p => current.add(p));
+    positionMap[comp] = Array.from(current);
+
+    addPositionsInput.value = "";
+    refreshExistingPositionsDropdown();
+    updateMainPositionsIfAffected(comp);
+    alert("Positions added.");
+  });
+
+  // Delete one position
+  deletePositionBtn.addEventListener("click", () => {
+    const comp = existingCompanySelect.value;
+    const pos = existingPositionSelect.value;
+    if (!comp) { alert("Select a company"); return; }
+    if (!pos) { alert("Select a position to delete"); return; }
+
+    positionMap[comp] = (positionMap[comp] || []).filter(p => p !== pos);
+
+    refreshExistingPositionsDropdown();
+    updateMainPositionsIfAffected(comp);
+    alert(`Deleted position "${pos}" from "${comp}".`);
+  });
+
+  // Delete entire company
+  deleteCompanyBtn.addEventListener("click", () => {
+    const comp = existingCompanySelect.value;
+    if (!comp) { alert("Select a company"); return; }
+    if (!confirm(`Delete company "${comp}" and all its positions?`)) return;
+
+    delete positionMap[comp];
+    removeOptionFromCompanySelect(comp);
+    refreshExistingCompanyDropdown();
+
+    // If the deleted company was selected in main form, clear positions
+    if (companySelect.value === comp) {
+      companySelect.value = "";
+      populatePositionsForSelectedCompany();
+    }
+
+    alert(`Company "${comp}" deleted.`);
   });
 </script>
 
