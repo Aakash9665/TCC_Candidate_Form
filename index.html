@@ -2,207 +2,538 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Company Job Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TCC Candidate Registration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
+    :root {
+      --primary-color: #2563eb;
+      --primary-dark: #1e40af;
+      --primary-light: #3b82f6;
+      --primary-extra-light: #dbeafe;
+      --secondary-color: #64748b;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --error-color: #ef4444;
+      --whatsapp-color: #25D366;
+      --background-primary: #f8fafc;
+      --background-secondary: #ffffff;
+      --background-tertiary: #f1f5f9;
+      --text-primary: #0f172a;
+      --text-secondary: #64748b;
+      --text-tertiary: #94a3b8;
+      --border-color: #e2e8f0;
+      --border-light: #f1f5f9;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+      --gradient-whatsapp: linear-gradient(135deg, var(--whatsapp-color) 0%, #128C7E 100%);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
     body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f5f7fa;
-      padding: 40px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--background-primary) 0%, #e0f2fe 100%);
+      color: var(--text-primary);
+      line-height: 1.5;
+      font-size: 14px;
+      min-height: 100vh;
+      padding: 24px;
       display: flex;
       justify-content: center;
+      align-items: flex-start;
     }
 
     form {
-      background-color: #fff;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-      max-width: 600px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px) saturate(180%);
+      padding: 32px;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      max-width: 700px;
       width: 100%;
       position: relative;
+      animation: formSlideUp 0.6s ease-out;
+    }
+
+    @keyframes formSlideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    form::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 20px;
-      color: #333;
+      margin-bottom: 28px;
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text-primary);
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
 
     label {
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       font-weight: 600;
-      color: #555;
+      color: var(--text-primary);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     input, select, button {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 18px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 15px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--border-color);
+      font-size: 14px;
+      background: var(--background-secondary);
+      color: var(--text-primary);
+      font-weight: 400;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.95);
     }
 
     .inline-group {
-      display: flex;
-      gap: 10px;
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
     }
 
     .inline-group input, .inline-group select {
-      flex: 1;
       margin-bottom: 0;
     }
 
     .checkbox-group {
       display: flex;
       align-items: center;
-      margin-top: 6px;
-      margin-bottom: 18px;
+      margin-top: -8px;
+      margin-bottom: 20px;
+      padding: 12px 16px;
+      background: rgba(37, 99, 235, 0.04);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(37, 99, 235, 0.1);
     }
 
     .checkbox-group input[type="checkbox"] {
-      margin-right: 10px;
-      width: auto;
+      margin-right: 12px;
+      margin-bottom: 0;
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary-color);
+      cursor: pointer;
+    }
+
+    .checkbox-group label {
+      margin-bottom: 0;
+      font-weight: 500;
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: normal;
+      color: var(--text-primary);
     }
 
     button {
-      background-color: #0078d7;
+      background: var(--gradient-primary);
       color: white;
-      font-weight: bold;
+      font-weight: 600;
       border: none;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
     }
 
-    button:hover {
-      background-color: #005fa3;
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    button:hover::before {
+      left: 100%;
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .secondary {
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--text-primary);
+      border: 1.5px solid var(--border-color);
+      backdrop-filter: blur(10px);
+    }
+
+    .secondary:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.95);
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
+    }
+
+    .danger {
+      background: linear-gradient(135deg, var(--error-color), #dc2626);
+      color: white;
+    }
+
+    .danger:hover:not(:disabled) {
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
     }
 
     #positionDiv {
       display: none;
+      animation: slideDown 0.3s ease-out;
     }
 
-    /* Popup styles */
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Loading Spinner */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s ease-in-out infinite;
+      margin-right: 8px;
+    }
+
+    /* Premium Popup Styles */
     .popup-overlay {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.6);
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px) saturate(180%);
       display: none;
       align-items: center;
       justify-content: center;
-      border-radius: 12px;
+      border-radius: var(--radius-xl);
+      animation: overlayFadeIn 0.3s ease-out;
+    }
+
+    @keyframes overlayFadeIn {
+      from { opacity: 0; backdrop-filter: blur(0px); }
+      to { opacity: 1; backdrop-filter: blur(20px) saturate(180%); }
     }
 
     .popup {
-      background-color: #fff;
-      padding: 25px 30px;
-      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(40px) saturate(200%);
+      padding: 28px 32px;
+      border-radius: var(--radius-xl);
       width: 90%;
-      max-width: 400px;
+      max-width: 450px;
       text-align: center;
-      box-shadow: 0 0 12px rgba(0,0,0,0.25);
-      animation: fadeIn 0.3s ease;
+      box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      animation: popupSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .popup::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--gradient-whatsapp);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+
+    @keyframes popupSlideUp {
+      from { opacity: 0; transform: translateY(40px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .popup img {
-      width: 60px;
-      margin-bottom: 15px;
+      width: 64px;
+      margin-bottom: 16px;
+      filter: drop-shadow(0 4px 8px rgba(37, 211, 102, 0.3));
     }
 
     .popup h3 {
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .popup p {
+      margin-bottom: 24px;
+      color: var(--text-secondary);
+      font-size: 14px;
     }
 
     .popup button {
-      margin: 10px 5px;
-      padding: 10px 20px;
-      border-radius: 8px;
+      margin: 8px 6px;
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
       border: none;
-      font-size: 15px;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
+      min-width: 120px;
     }
 
     #sendBtn {
-      background-color: #25D366;
+      background: var(--gradient-whatsapp);
       color: white;
+      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
     }
 
     #sendBtn:hover {
-      background-color: #1ebe5b;
+      background: linear-gradient(135deg, #128C7E, var(--whatsapp-color));
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
     }
 
     #cancelBtn {
-      background-color: #eee;
-      color: #333;
+      background: rgba(255, 255, 255, 0.8);
+      color: var(--text-secondary);
+      border: 1.5px solid var(--border-color);
     }
 
     #cancelBtn:hover {
-      background-color: #ddd;
+      background: rgba(255, 255, 255, 0.95);
+      color: var(--text-primary);
+      border-color: var(--primary-color);
+      transform: translateY(-2px);
     }
 
-    /* Small accent buttons inside manage popup */
-    .danger {
-      background-color: #e74c3c;
-      color: #fff;
-    }
-    .danger:hover {
-      background-color: #c0392b;
-    }
-    .secondary {
-      background-color: #eee;
-      color: #333;
-    }
-    .secondary:hover {
-      background-color: #ddd;
+    /* Manage Popup Specific Styles */
+    .popup.manage-popup {
+      text-align: left;
+      max-width: 520px;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .popup.manage-popup::before {
+      background: var(--gradient-primary);
+    }
+
+    .popup.manage-popup h3 {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .popup.manage-popup label {
+      margin-top: 12px;
+    }
+
+    .popup.manage-popup input,
+    .popup.manage-popup select {
+      margin-bottom: 16px;
+    }
+
+    .popup.manage-popup hr {
+      margin: 20px 0;
+      border: none;
+      border-top: 1px solid rgba(37, 99, 235, 0.1);
+    }
+
+    .popup.manage-popup .button-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .popup.manage-popup .button-group button {
+      flex: 1;
+      margin: 0;
+    }
+
+    .close-button {
+      float: right;
+      margin-top: 16px;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      body {
+        padding: 16px;
+      }
+
+      form {
+        padding: 24px;
+      }
+
+      h2 {
+        font-size: 24px;
+      }
+
+      .inline-group {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .popup {
+        padding: 20px 24px;
+        margin: 16px;
+      }
+
+      .popup.manage-popup {
+        max-width: 95vw;
+      }
+
+      .popup.manage-popup .button-group {
+        flex-direction: column;
+      }
+
+      .close-button {
+        float: none;
+        width: 100%;
+      }
+    }
+
+    /* Premium Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--background-tertiary);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary-color);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
     }
   </style>
 </head>
 <body>
-
 <form id="jobForm">
-  <h2>Candidate Details Form</h2>
-
-  <label for="name">Full Name:</label>
-  <input type="text" id="name" name="name" placeholder="Enter Candidate's Name" required>
-
-  <label for="email">Email Address:</label>
-  <input type="email" id="email" name="email" placeholder="His E-Mail Id" required>
-
-  <label for="contact">Contact Number:</label>
-  <input type="tel" id="contact" name="contact" placeholder="Candidate's Contact No" required>
-
-  <label for="currentCTC">Current CTC:</label>
+  <h2>
+    <i class="fas fa-user-plus"></i>
+    Candidate Registration
+  </h2>
+  
+  <label for="name"><i class="fas fa-user"></i> Full Name</label>
+  <input type="text" id="name" name="name" placeholder="Enter candidate's full name" required>
+  
+  <label for="email"><i class="fas fa-envelope"></i> Email Address</label>
+  <input type="email" id="email" name="email" placeholder="candidate@email.com" required>
+  
+  <label for="contact"><i class="fas fa-phone"></i> Contact Number</label>
+  <input type="tel" id="contact" name="contact" placeholder="Enter 10-digit mobile number" required>
+  
+  <label for="currentCTC"><i class="fas fa-rupee-sign"></i> Current CTC</label>
   <div class="inline-group">
-    <input type="number" Step="any" id="currentCTC" name="currentCTC" placeholder="e.g 30 or 30,000" required>
+    <input type="number" Step="any" id="currentCTC" name="currentCTC" placeholder="e.g. 5.5 or 45000" required>
     <select id="currentCTCUnit" name="currentCTCUnit" required>
       <option value="LPA">LPA</option>
       <option value="Monthly">Monthly</option>
     </select>
   </div>
-
-  <label for="expectedCTC">Expected CTC:</label>
+  
+  <label for="expectedCTC"><i class="fas fa-chart-line"></i> Expected CTC</label>
   <div class="inline-group">
-    <input type="number" Step="any" id="expectedCTC" name="expectedCTC" placeholder="e.g 40 or 40,000" required>
+    <input type="number" Step="any" id="expectedCTC" name="expectedCTC" placeholder="e.g. 7.0 or 60000" required>
     <select id="expectedCTCUnit" name="expectedCTCUnit" required>
       <option value="LPA">LPA</option>
       <option value="Monthly">Monthly</option>
     </select>
   </div>
+  
   <div class="checkbox-group">
     <input type="checkbox" id="asPerCompany" name="asPerCompany">
-    <label for="asPerCompany">As Per Company</label>
+    <label for="asPerCompany">
+      <i class="fas fa-handshake"></i>
+      Negotiate as per company budget
+    </label>
   </div>
-
-  <label for="experience">Experience:</label>
+  
+  <label for="experience"><i class="fas fa-briefcase"></i> Total Experience</label>
   <div class="inline-group">
     <input type="number" id="experience" name="experience" placeholder="e.g. 3">
     <select id="experienceUnit" name="experienceUnit">
@@ -210,12 +541,16 @@
       <option value="Months">Months</option>
     </select>
   </div>
+  
   <div class="checkbox-group">
     <input type="checkbox" id="isFresher" name="isFresher">
-    <label for="isFresher">Fresher</label>
+    <label for="isFresher">
+      <i class="fas fa-graduation-cap"></i>
+      Fresh Graduate (No Experience)
+    </label>
   </div>
-
-  <label for="noticePeriod">Notice Period:</label>
+  
+  <label for="noticePeriod"><i class="fas fa-calendar-alt"></i> Notice Period</label>
   <div class="inline-group">
     <input type="number" id="noticePeriod" name="noticePeriod" placeholder="e.g. 30">
     <select id="noticePeriodUnit" name="noticePeriodUnit">
@@ -223,84 +558,119 @@
       <option value="Months">Months</option>
     </select>
   </div>
+  
   <div class="checkbox-group">
     <input type="checkbox" id="immediateJoiner" name="immediateJoiner">
-    <label for="immediateJoiner">Immediate Joiner</label>
+    <label for="immediateJoiner">
+      <i class="fas fa-rocket"></i>
+      Available to join immediately
+    </label>
   </div>
-
-  <label for="company">Select Company:</label>
+  
+  <label for="company"><i class="fas fa-building"></i> Select Company</label>
   <select id="company" name="company" required>
     <option value="">-- Choose Company --</option>
     <option value="TecoreLabs">Tecore Labs</option>
     <option value="Saviesahome">Saviesa Home</option>
     <option value="angelportal">Angel Portal</option>
   </select>
-
+  
   <div id="positionDiv">
-    <label for="position">Open Position:</label>
+    <label for="position"><i class="fas fa-user-tie"></i> Open Position</label>
     <select id="position" name="position" required>
       <option value="">-- Choose Position --</option>
     </select>
   </div>
-
-  <label for="recruiterEmail">Recruiter Name:</label>
+  
+  <label for="recruiterEmail"><i class="fas fa-user-check"></i> Recruiter Name</label>
   <select id="recruiterEmail" name="recruiterEmail" required>
     <option value="">-- Select Recruiter --</option>
     <option value="ruchi.mishra@talentconnectconsultancy.com,Ruchi Mishra,8600550467">Ruchi Mishra</option>
     <option value="aakashmishra510@gmail.com,Aakash Mishra,9665385022">Aakash Mishra</option>
   </select>
-
-  <button type="submit">Submit</button>
   
-   <!-- NEW: Manage Companies Button -->
-  <button type="button" id="manageCompanyBtn" class="secondary" style="margin-top:-6px;">+ Add / Manage Company</button>
+  <button type="submit" id="submitBtn">
+    <i class="fas fa-paper-plane"></i>
+    <span class="btn-text">Submit Application</span>
+  </button>
+  
+  <button type="button" id="manageCompanyBtn" class="secondary" style="margin-top: 8px;">
+    <i class="fas fa-cogs"></i>
+    Manage Companies & Positions
+  </button>
 
-  <!-- Existing WhatsApp Popup -->
+  <!-- WhatsApp Popup -->
   <div class="popup-overlay" id="popupOverlay">
     <div class="popup">
       <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Logo">
-      <h3>Send Details via WhatsApp?</h3>
-      <p>Click send to open WhatsApp with Pre-filled details.</p>
-      <button id="sendBtn">Send via WhatsApp</button>
-      <button id="cancelBtn" class="secondary">Cancel</button>
+      <h3><i class="fab fa-whatsapp"></i> Send via WhatsApp</h3>
+      <p>Click send to open WhatsApp with candidate details pre-filled.</p>
+      <button id="sendBtn">
+        <i class="fab fa-whatsapp"></i>
+        Send to Candidate
+      </button>
+      <button id="cancelBtn" class="secondary">
+        <i class="fas fa-times"></i>
+        Cancel
+      </button>
     </div>
   </div>
 
-  <!-- NEW: Manage Companies Popup -->
+  <!-- Manage Companies Popup -->
   <div class="popup-overlay" id="manageOverlay">
-    <div class="popup" style="text-align:left">
-      <h3 style="text-align:center">Add / Manage Companies</h3>
-
-      <!-- Add New Company -->
-      <label for="newCompanyName">New Company Name</label>
-      <input type="text" id="newCompanyName" placeholder="e.g. Acme Corp">
-      <label for="newCompanyPositions">Positions (comma-separated, optional)</label>
-      <input type="text" id="newCompanyPositions" placeholder="e.g. Developer, QA Engineer">
-      <button type="button" id="addCompanyConfirm">➕ Add Company</button>
-
-      <hr style="margin:16px 0; border:none; border-top:1px solid #eee">
-
-      <!-- Manage Existing -->
-      <label for="existingCompanySelect">Existing Company</label>
+    <div class="popup manage-popup">
+      <h3><i class="fas fa-building"></i> Company Management</h3>
+      
+      <!-- Add New Company Section -->
+      <label for="newCompanyName"><i class="fas fa-plus-circle"></i> New Company Name</label>
+      <input type="text" id="newCompanyName" placeholder="e.g. Acme Corporation">
+      
+      <label for="newCompanyPositions"><i class="fas fa-list"></i> Initial Positions (Optional)</label>
+      <input type="text" id="newCompanyPositions" placeholder="e.g. Developer, QA Engineer, Manager">
+      
+      <button type="button" id="addCompanyConfirm">
+        <i class="fas fa-plus"></i>
+        Add New Company
+      </button>
+      
+      <hr>
+      
+      <!-- Manage Existing Section -->
+      <label for="existingCompanySelect"><i class="fas fa-building"></i> Select Existing Company</label>
       <select id="existingCompanySelect">
         <option value="">-- Select Company --</option>
       </select>
-
-      <label for="addPositionsInput">Add Positions (comma-separated)</label>
+      
+      <label for="addPositionsInput"><i class="fas fa-briefcase"></i> Add New Positions</label>
       <input type="text" id="addPositionsInput" placeholder="e.g. Product Manager, Data Analyst">
-      <button type="button" id="addPositionsBtn">➕ Add Positions</button>
-
-      <label for="existingPositionSelect" style="margin-top:10px">Existing Positions</label>
+      
+      <button type="button" id="addPositionsBtn">
+        <i class="fas fa-plus"></i>
+        Add Positions
+      </button>
+      
+      <label for="existingPositionSelect" style="margin-top: 12px;"><i class="fas fa-list-ul"></i> Existing Positions</label>
       <select id="existingPositionSelect">
         <option value="">-- Select Position --</option>
       </select>
-      <button type="button" id="deletePositionBtn" class="danger">🗑️ Delete Position</button>
-
-      <button type="button" id="deleteCompanyBtn" class="danger">🗑️ Delete Company</button>
-      <button type="button" id="manageCloseBtn" class="secondary" style="float:right">Close</button>
+      
+      <div class="button-group">
+        <button type="button" id="deletePositionBtn" class="danger">
+          <i class="fas fa-trash"></i>
+          Delete Position
+        </button>
+        <button type="button" id="deleteCompanyBtn" class="danger">
+          <i class="fas fa-trash-alt"></i>
+          Delete Company
+        </button>
+      </div>
+      
+      <button type="button" id="manageCloseBtn" class="secondary close-button">
+        <i class="fas fa-times"></i>
+        Close
+      </button>
     </div>
   </div>
-
 </form>
 
 <script>
@@ -310,11 +680,32 @@
     Saviesahome: ["Interior Designer"],
     angelportal: ["Hr Recruiter", "Account Executive", "Content Writer", "Relationship Manager", "Python Developer", "SEO and Social Media Manager", "Visa Manager", "Sales Manager - Online Course"]
   };
-
+  
   const companySelect = document.getElementById("company");
   const positionSelect = document.getElementById("position");
   const positionDiv = document.getElementById("positionDiv");
-
+  
+  // Enhanced button loading state
+  function setButtonLoading(buttonId, isLoading, loadingText = "Processing...") {
+    const button = document.getElementById(buttonId);
+    if (!button) return;
+    
+    const btnText = button.querySelector('.btn-text');
+    const icon = button.querySelector('i');
+    
+    if (isLoading) {
+      button.disabled = true;
+      if (btnText) btnText.textContent = loadingText;
+      if (icon && !icon.classList.contains('loading-spinner')) {
+        icon.className = 'loading-spinner';
+      }
+    } else {
+      button.disabled = false;
+      if (btnText) btnText.textContent = 'Submit Application';
+      if (icon) icon.className = 'fas fa-paper-plane';
+    }
+  }
+  
   function populatePositionsForSelectedCompany() {
     const company = companySelect.value;
     positionSelect.innerHTML = '<option value="">-- Choose Position --</option>';
@@ -330,32 +721,34 @@
       positionDiv.style.display = "none";
     }
   }
-
+  
   document.getElementById("company").addEventListener("change", populatePositionsForSelectedCompany);
-
+  
   document.getElementById("immediateJoiner").addEventListener("change", function () {
     document.getElementById("noticePeriod").disabled = this.checked;
     document.getElementById("noticePeriodUnit").disabled = this.checked;
   });
-
+  
   document.getElementById("isFresher").addEventListener("change", function () {
     document.getElementById("experience").disabled = this.checked;
     document.getElementById("experienceUnit").disabled = this.checked;
   });
-
+  
   document.getElementById("asPerCompany").addEventListener("change", function () {
     document.getElementById("expectedCTC").disabled = this.checked;
     document.getElementById("expectedCTCUnit").disabled = this.checked;
   });
-
+  
   const popup = document.getElementById("popupOverlay");
   const sendBtn = document.getElementById("sendBtn");
   const cancelBtn = document.getElementById("cancelBtn");
   let whatsappLink = "";
-
+  
   document.getElementById("jobForm").addEventListener("submit", function (e) {
     e.preventDefault();
-
+    
+    setButtonLoading('submitBtn', true, 'Submitting...');
+    
     const data = {
       name: document.getElementById("name").value,
       email: document.getElementById("email").value,
@@ -372,52 +765,57 @@
       position: document.getElementById("position").value,
       recruiterEmail: document.getElementById("recruiterEmail").value
     };
-
+    
     const recruiterParts = data.recruiterEmail.split(",");
     const recruiterName = recruiterParts[1] ? recruiterParts[1].trim() : "Recruiter";
     const recruiterContact = recruiterParts[2] ? recruiterParts[2].trim() : "";
-
+    
     fetch("https://prod-30.centralindia.logic.azure.com:443/workflows/54210cf2969a42458623aa9427690ce1/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ZND7fpFK-bj6HXWxqBMGlFl3_W7vSKTmAUxU8uFwzzU", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     })
     .then(res => {
-      if (res.ok) {
-        const msg = `*Hi ${data.name}*,\n\nAs per our recent discussion regarding the position of *${data.position}*, we have successfully submitted your profile for shortlisting to our client, *${data.company}*, with the following details:\n\n*Current CTC : ${data.currentCTC} ${data.currentCTCUnit}*\n*Expected CTC : ${data.expectedCTC}* ${data.expectedCTCUnit}\n*Notice Period : ${data.noticePeriod}* ${data.noticePeriodUnit}\n\nWe have also shared the *Job Description* with you via email at ${data.email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
-        whatsappLink = `https://wa.me/91${data.contact}?text=${encodeURIComponent(msg)}`;
-        document.getElementById("sendBtn").textContent = `Send to ${data.name}`;
-        popup.style.display = "flex";
-      } else {
-        alert("Error submitting form.");
-      }
+      setTimeout(() => {
+        setButtonLoading('submitBtn', false);
+        if (res.ok) {
+          const msg = `*Hi ${data.name}*,\n\nAs per our recent discussion regarding the position of *${data.position}*, we have successfully submitted your profile for shortlisting to our client, *${data.company}*, with the following details:\n\n*Current CTC : ${data.currentCTC} ${data.currentCTCUnit}*\n*Expected CTC : ${data.expectedCTC}* ${data.expectedCTCUnit}\n*Notice Period : ${data.noticePeriod}* ${data.noticePeriodUnit}\n\nWe have also shared the *Job Description* with you via email at ${data.email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
+          whatsappLink = `https://wa.me/91${data.contact}?text=${encodeURIComponent(msg)}`;
+          document.getElementById("sendBtn").innerHTML = `<i class="fab fa-whatsapp"></i> Send to ${data.name}`;
+          popup.style.display = "flex";
+        } else {
+          alert("Error submitting form. Please try again.");
+        }
+      }, 1000);
     })
     .catch(err => {
-      alert("Failed to connect to Power Automate.");
-      console.error(err);
+      setTimeout(() => {
+        setButtonLoading('submitBtn', false);
+        alert("Failed to connect to server. Please check your internet connection.");
+        console.error(err);
+      }, 1000);
     });
   });
-
+  
   sendBtn.addEventListener("click", () => {
     popup.style.display = "none";
     window.open(whatsappLink, "_blank");
     document.getElementById("jobForm").reset();
     document.getElementById("positionDiv").style.display = "none";
   });
-
+  
   cancelBtn.addEventListener("click", () => {
     popup.style.display = "none";
     document.getElementById("jobForm").reset();
     document.getElementById("positionDiv").style.display = "none";
   });
-
+  
   /* =========================
      Manage Companies Popup JS
      ========================= */
   const manageOverlay = document.getElementById("manageOverlay");
   const manageBtn = document.getElementById("manageCompanyBtn");
   const manageCloseBtn = document.getElementById("manageCloseBtn");
-
   const existingCompanySelect = document.getElementById("existingCompanySelect");
   const existingPositionSelect = document.getElementById("existingPositionSelect");
   const addCompanyConfirm = document.getElementById("addCompanyConfirm");
@@ -427,7 +825,7 @@
   const addPositionsBtn = document.getElementById("addPositionsBtn");
   const deletePositionBtn = document.getElementById("deletePositionBtn");
   const deleteCompanyBtn = document.getElementById("deleteCompanyBtn");
-
+  
   function refreshExistingCompanyDropdown() {
     existingCompanySelect.innerHTML = '<option value="">-- Select Company --</option>';
     Object.keys(positionMap).forEach(c => {
@@ -438,7 +836,7 @@
     });
     refreshExistingPositionsDropdown();
   }
-
+  
   function refreshExistingPositionsDropdown() {
     existingPositionSelect.innerHTML = '<option value="">-- Select Position --</option>';
     const comp = existingCompanySelect.value;
@@ -450,7 +848,7 @@
       existingPositionSelect.appendChild(opt);
     });
   }
-
+  
   function addOptionToCompanySelect(name) {
     // Avoid duplicates
     const exists = Array.from(companySelect.options).some(o => o.value === name);
@@ -461,107 +859,95 @@
       companySelect.appendChild(opt);
     }
   }
-
+  
   function removeOptionFromCompanySelect(name) {
     Array.from(companySelect.options).forEach(o => {
       if (o.value === name) o.remove();
     });
   }
-
+  
   function updateMainPositionsIfAffected(companyName) {
     if (companySelect.value === companyName) {
       populatePositionsForSelectedCompany();
     }
   }
-
+  
   manageBtn.addEventListener("click", () => {
     refreshExistingCompanyDropdown();
     manageOverlay.style.display = "flex";
   });
-
+  
   manageCloseBtn.addEventListener("click", () => {
     manageOverlay.style.display = "none";
   });
-
+  
   existingCompanySelect.addEventListener("change", refreshExistingPositionsDropdown);
-
+  
   // Add new company
   addCompanyConfirm.addEventListener("click", () => {
     const name = (newCompanyName.value || "").trim();
-    if (!name) { alert("Enter a company name"); return; }
+    if (!name) { alert("Please enter a company name"); return; }
     if (positionMap[name]) { alert("Company already exists"); return; }
-
     const positions = (newCompanyPositions.value || "")
       .split(",")
       .map(p => p.trim())
       .filter(p => p.length);
-
     positionMap[name] = positions;
-
     addOptionToCompanySelect(name);
     refreshExistingCompanyDropdown();
-
     // Clear fields
     newCompanyName.value = "";
     newCompanyPositions.value = "";
-
-    alert(`Company "${name}" added${positions.length ? " with positions" : ""}.`);
+    alert(`Company "${name}" added successfully${positions.length ? " with positions" : ""}.`);
   });
-
+  
   // Add positions to existing company
   addPositionsBtn.addEventListener("click", () => {
     const comp = existingCompanySelect.value;
-    if (!comp) { alert("Select a company"); return; }
+    if (!comp) { alert("Please select a company first"); return; }
     const entries = (addPositionsInput.value || "")
       .split(",")
       .map(p => p.trim())
       .filter(p => p.length);
-    if (!entries.length) { alert("Enter at least one position"); return; }
-
+    if (!entries.length) { alert("Please enter at least one position"); return; }
     // Deduplicate
     const current = new Set(positionMap[comp] || []);
     entries.forEach(p => current.add(p));
     positionMap[comp] = Array.from(current);
-
     addPositionsInput.value = "";
     refreshExistingPositionsDropdown();
     updateMainPositionsIfAffected(comp);
-    alert("Positions added.");
+    alert("Positions added successfully.");
   });
-
+  
   // Delete one position
   deletePositionBtn.addEventListener("click", () => {
     const comp = existingCompanySelect.value;
     const pos = existingPositionSelect.value;
-    if (!comp) { alert("Select a company"); return; }
-    if (!pos) { alert("Select a position to delete"); return; }
-
+    if (!comp) { alert("Please select a company first"); return; }
+    if (!pos) { alert("Please select a position to delete"); return; }
+    if (!confirm(`Are you sure you want to delete the position "${pos}"?`)) return;
     positionMap[comp] = (positionMap[comp] || []).filter(p => p !== pos);
-
     refreshExistingPositionsDropdown();
     updateMainPositionsIfAffected(comp);
-    alert(`Deleted position "${pos}" from "${comp}".`);
+    alert(`Position "${pos}" deleted successfully.`);
   });
-
+  
   // Delete entire company
   deleteCompanyBtn.addEventListener("click", () => {
     const comp = existingCompanySelect.value;
-    if (!comp) { alert("Select a company"); return; }
-    if (!confirm(`Delete company "${comp}" and all its positions?`)) return;
-
+    if (!comp) { alert("Please select a company first"); return; }
+    if (!confirm(`Are you sure you want to delete company "${comp}" and all its positions?`)) return;
     delete positionMap[comp];
     removeOptionFromCompanySelect(comp);
     refreshExistingCompanyDropdown();
-
     // If the deleted company was selected in main form, clear positions
     if (companySelect.value === comp) {
       companySelect.value = "";
       populatePositionsForSelectedCompany();
     }
-
-    alert(`Company "${comp}" deleted.`);
+    alert(`Company "${comp}" deleted successfully.`);
   });
 </script>
-
 </body>
 </html>
