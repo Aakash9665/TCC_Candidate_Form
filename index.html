@@ -36,14 +36,12 @@
       --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
       --gradient-whatsapp: linear-gradient(135deg, var(--whatsapp-color) 0%, #128C7E 100%);
     }
-
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: linear-gradient(135deg, var(--background-primary) 0%, #e0f2fe 100%);
@@ -56,7 +54,6 @@
       justify-content: center;
       align-items: flex-start;
     }
-
     form {
       background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(20px) saturate(180%);
@@ -69,12 +66,10 @@
       position: relative;
       animation: formSlideUp 0.6s ease-out;
     }
-
     @keyframes formSlideUp {
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     form::before {
       content: '';
       position: absolute;
@@ -85,7 +80,6 @@
       background: var(--gradient-primary);
       border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     }
-
     h2 {
       text-align: center;
       margin-bottom: 28px;
@@ -101,7 +95,6 @@
       justify-content: center;
       gap: 10px;
     }
-
     label {
       display: block;
       margin-bottom: 8px;
@@ -111,7 +104,6 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-
     input, select, button {
       width: 100%;
       padding: 12px 16px;
@@ -124,7 +116,6 @@
       font-weight: 400;
       transition: all 0.3s ease;
     }
-
     input:focus, select:focus {
       outline: none;
       border-color: var(--primary-color);
@@ -132,18 +123,15 @@
       transform: translateY(-1px);
       background: rgba(255, 255, 255, 0.95);
     }
-
     .inline-group {
       display: grid;
       grid-template-columns: 2fr 1fr;
       gap: 12px;
       margin-bottom: 20px;
     }
-
     .inline-group input, .inline-group select {
       margin-bottom: 0;
     }
-
     .checkbox-group {
       display: flex;
       align-items: center;
@@ -154,7 +142,6 @@
       border-radius: var(--radius-md);
       border: 1px solid rgba(37, 99, 235, 0.1);
     }
-
     .checkbox-group input[type="checkbox"] {
       margin-right: 12px;
       margin-bottom: 0;
@@ -163,7 +150,6 @@
       accent-color: var(--primary-color);
       cursor: pointer;
     }
-
     .checkbox-group label {
       margin-bottom: 0;
       font-weight: 500;
@@ -172,7 +158,6 @@
       letter-spacing: normal;
       color: var(--text-primary);
     }
-
     button {
       background: var(--gradient-primary);
       color: white;
@@ -187,7 +172,6 @@
       overflow: hidden;
       box-shadow: var(--shadow-md);
     }
-
     button::before {
       content: '';
       position: absolute;
@@ -198,59 +182,44 @@
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
       transition: left 0.5s;
     }
-
     button:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: var(--shadow-lg);
     }
-
     button:hover::before {
       left: 100%;
     }
-
     button:disabled {
       opacity: 0.7;
       cursor: not-allowed;
       transform: none;
     }
-
     .secondary {
       background: rgba(255, 255, 255, 0.8);
       color: var(--text-primary);
       border: 1.5px solid var(--border-color);
       backdrop-filter: blur(10px);
     }
-
     .secondary:hover:not(:disabled) {
       background: rgba(255, 255, 255, 0.95);
       border-color: var(--primary-color);
       transform: translateY(-2px);
     }
-
     .danger {
       background: linear-gradient(135deg, var(--error-color), #dc2626);
       color: white;
     }
-
     .danger:hover:not(:disabled) {
       background: linear-gradient(135deg, #dc2626, #b91c1c);
     }
-
     #positionDiv {
       display: none;
       animation: slideDown 0.3s ease-out;
     }
-
     @keyframes slideDown {
       from { opacity: 0; transform: translateY(-10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
-    /* Loading Spinner */
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
     .loading-spinner {
       display: inline-block;
       width: 16px;
@@ -261,8 +230,9 @@
       animation: spin 0.8s ease-in-out infinite;
       margin-right: 8px;
     }
-
-    /* Premium Popup Styles */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
     .popup-overlay {
       position: absolute;
       top: 0;
@@ -277,12 +247,10 @@
       border-radius: var(--radius-xl);
       animation: overlayFadeIn 0.3s ease-out;
     }
-
     @keyframes overlayFadeIn {
       from { opacity: 0; backdrop-filter: blur(0px); }
       to { opacity: 1; backdrop-filter: blur(20px) saturate(180%); }
     }
-
     .popup {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(40px) saturate(200%);
@@ -299,7 +267,6 @@
       animation: popupSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
       position: relative;
     }
-
     .popup::before {
       content: '';
       position: absolute;
@@ -310,31 +277,26 @@
       background: var(--gradient-whatsapp);
       border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     }
-
     @keyframes popupSlideUp {
       from { opacity: 0; transform: translateY(40px) scale(0.9); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
-
     .popup img {
       width: 64px;
       margin-bottom: 16px;
       filter: drop-shadow(0 4px 8px rgba(37, 211, 102, 0.3));
     }
-
     .popup h3 {
       margin-bottom: 12px;
       font-size: 20px;
       font-weight: 700;
       color: var(--text-primary);
     }
-
     .popup p {
       margin-bottom: 24px;
       color: var(--text-secondary);
       font-size: 14px;
     }
-
     .popup button {
       margin: 8px 6px;
       padding: 12px 24px;
@@ -345,149 +307,155 @@
       cursor: pointer;
       min-width: 120px;
     }
-
     #sendBtn {
       background: var(--gradient-whatsapp);
       color: white;
       box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
     }
-
     #sendBtn:hover {
       background: linear-gradient(135deg, #128C7E, var(--whatsapp-color));
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
     }
-
     #cancelBtn {
       background: rgba(255, 255, 255, 0.8);
       color: var(--text-secondary);
       border: 1.5px solid var(--border-color);
     }
-
     #cancelBtn:hover {
       background: rgba(255, 255, 255, 0.95);
       color: var(--text-primary);
       border-color: var(--primary-color);
       transform: translateY(-2px);
     }
-
-    /* Manage Popup Specific Styles */
     .popup.manage-popup {
       text-align: left;
-      max-width: 520px;
+      max-width: 620px;
     }
-
     .popup.manage-popup::before {
       background: var(--gradient-primary);
     }
-
     .popup.manage-popup h3 {
       text-align: center;
       margin-bottom: 24px;
     }
-
     .popup.manage-popup label {
       margin-top: 12px;
     }
-
     .popup.manage-popup input,
     .popup.manage-popup select {
       margin-bottom: 16px;
     }
-
     .popup.manage-popup hr {
       margin: 20px 0;
       border: none;
       border-top: 1px solid rgba(37, 99, 235, 0.1);
     }
-
     .popup.manage-popup .button-group {
       display: flex;
       gap: 8px;
       margin-top: 16px;
     }
-
     .popup.manage-popup .button-group button {
       flex: 1;
       margin: 0;
     }
-
     .close-button {
       float: right;
       margin-top: 16px;
     }
-
-    /* Responsive Design */
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    .file-upload-section {
+      background: rgba(16, 185, 129, 0.04);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .file-upload-section h4 {
+      margin-bottom: 12px;
+      color: var(--success-color);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .file-input-group {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 8px;
+      align-items: end;
+      margin-bottom: 8px;
+    }
+    .file-input {
+      display: none;
+    }
+    .file-input-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--success-color);
+      margin-bottom: 0;
+      text-transform: none;
+      letter-spacing: normal;
+      width: 100%;
+      min-height: 36px;
+    }
+    .file-input-label:hover {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: var(--success-color);
+    }
+    .file-status {
+      font-size: 11px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    .file-status.success {
+      color: var(--success-color);
+    }
+    .file-status.error {
+      color: var(--error-color);
+    }
     @media (max-width: 768px) {
       body {
         padding: 16px;
       }
-
       form {
         padding: 24px;
       }
-
       h2 {
         font-size: 24px;
       }
-
       .inline-group {
         grid-template-columns: 1fr;
         gap: 0;
       }
-
       .popup {
         padding: 20px 24px;
         margin: 16px;
       }
-
       .popup.manage-popup {
         max-width: 95vw;
       }
-
       .popup.manage-popup .button-group {
         flex-direction: column;
       }
-
       .close-button {
         float: none;
         width: 100%;
       }
-    }
-
-    /* Premium Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--background-tertiary);
-      border-radius: 3px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--primary-color);
-      border-radius: 3px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--primary-dark);
-    }
-
-    /* Accessibility */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
+      .file-input-group {
+        grid-template-columns: 1fr;
       }
-    }
-
-    button:focus-visible,
-    input:focus-visible,
-    select:focus-visible {
-      outline: 2px solid var(--primary-color);
-      outline-offset: 2px;
     }
   </style>
 </head>
@@ -497,16 +465,12 @@
     <i class="fas fa-user-plus"></i>
     Candidate Registration
   </h2>
-  
   <label for="name"><i class="fas fa-user"></i> Full Name</label>
   <input type="text" id="name" name="name" placeholder="Enter candidate's full name" required>
-  
   <label for="email"><i class="fas fa-envelope"></i> Email Address</label>
   <input type="email" id="email" name="email" placeholder="candidate@email.com" required>
-  
   <label for="contact"><i class="fas fa-phone"></i> Contact Number</label>
   <input type="tel" id="contact" name="contact" placeholder="Enter 10-digit mobile number" required>
-  
   <label for="currentCTC"><i class="fas fa-rupee-sign"></i> Current CTC</label>
   <div class="inline-group">
     <input type="number" Step="any" id="currentCTC" name="currentCTC" placeholder="e.g. 5.5 or 45000" required>
@@ -515,7 +479,6 @@
       <option value="Monthly">Monthly</option>
     </select>
   </div>
-  
   <label for="expectedCTC"><i class="fas fa-chart-line"></i> Expected CTC</label>
   <div class="inline-group">
     <input type="number" Step="any" id="expectedCTC" name="expectedCTC" placeholder="e.g. 7.0 or 60000" required>
@@ -524,7 +487,6 @@
       <option value="Monthly">Monthly</option>
     </select>
   </div>
-  
   <div class="checkbox-group">
     <input type="checkbox" id="asPerCompany" name="asPerCompany">
     <label for="asPerCompany">
@@ -532,7 +494,6 @@
       Negotiate as per company budget
     </label>
   </div>
-  
   <label for="experience"><i class="fas fa-briefcase"></i> Total Experience</label>
   <div class="inline-group">
     <input type="number" id="experience" name="experience" placeholder="e.g. 3">
@@ -541,7 +502,6 @@
       <option value="Months">Months</option>
     </select>
   </div>
-  
   <div class="checkbox-group">
     <input type="checkbox" id="isFresher" name="isFresher">
     <label for="isFresher">
@@ -549,7 +509,6 @@
       Fresh Graduate (No Experience)
     </label>
   </div>
-  
   <label for="noticePeriod"><i class="fas fa-calendar-alt"></i> Notice Period</label>
   <div class="inline-group">
     <input type="number" id="noticePeriod" name="noticePeriod" placeholder="e.g. 30">
@@ -558,7 +517,6 @@
       <option value="Months">Months</option>
     </select>
   </div>
-  
   <div class="checkbox-group">
     <input type="checkbox" id="immediateJoiner" name="immediateJoiner">
     <label for="immediateJoiner">
@@ -566,39 +524,31 @@
       Available to join immediately
     </label>
   </div>
-  
   <label for="company"><i class="fas fa-building"></i> Select Company</label>
   <select id="company" name="company" required>
     <option value="">-- Choose Company --</option>
-    <option value="TecoreLabs">Tecore Labs</option>
-    <option value="Saviesahome">Saviesa Home</option>
-    <option value="angelportal">Angel Portal</option>
   </select>
-  
   <div id="positionDiv">
     <label for="position"><i class="fas fa-user-tie"></i> Open Position</label>
     <select id="position" name="position" required>
       <option value="">-- Choose Position --</option>
     </select>
   </div>
-  
   <label for="recruiterEmail"><i class="fas fa-user-check"></i> Recruiter Name</label>
   <select id="recruiterEmail" name="recruiterEmail" required>
     <option value="">-- Select Recruiter --</option>
     <option value="ruchi.mishra@talentconnectconsultancy.com,Ruchi Mishra,8600550467">Ruchi Mishra</option>
     <option value="aakashmishra510@gmail.com,Aakash Mishra,9665385022">Aakash Mishra</option>
   </select>
-  
   <button type="submit" id="submitBtn">
     <i class="fas fa-paper-plane"></i>
     <span class="btn-text">Submit Application</span>
   </button>
-  
   <button type="button" id="manageCompanyBtn" class="secondary" style="margin-top: 8px;">
     <i class="fas fa-cogs"></i>
     Manage Companies & Positions
   </button>
-
+  
   <!-- WhatsApp Popup -->
   <div class="popup-overlay" id="popupOverlay">
     <div class="popup">
@@ -615,41 +565,49 @@
       </button>
     </div>
   </div>
-
+  
   <!-- Manage Companies Popup -->
   <div class="popup-overlay" id="manageOverlay">
     <div class="popup manage-popup">
-      <h3><i class="fas fa-building"></i> Company Management</h3>
+      <h3><i class="fas fa-building"></i> Company & JD Management</h3>
       
-      <!-- Add New Company Section -->
       <label for="newCompanyName"><i class="fas fa-plus-circle"></i> New Company Name</label>
       <input type="text" id="newCompanyName" placeholder="e.g. Acme Corporation">
       
-      <label for="newCompanyPositions"><i class="fas fa-list"></i> Initial Positions (Optional)</label>
-      <input type="text" id="newCompanyPositions" placeholder="e.g. Developer, QA Engineer, Manager">
+      <label for="newCompanyPositions"><i class="fas fa-list"></i> Initial Positions</label>
+      <input type="text" id="newCompanyPositions" placeholder="e.g. Developer, Manager (comma separated)">
       
-      <button type="button" id="addCompanyConfirm">
+      <div class="file-upload-section">
+        <h4><i class="fas fa-file-pdf"></i> Upload Job Descriptions (Optional)</h4>
+        <div id="newCompanyFileInputs"></div>
+      </div>
+      
+      <button type="button" id="addCompanyBtn">
         <i class="fas fa-plus"></i>
         Add New Company
       </button>
       
       <hr>
       
-      <!-- Manage Existing Section -->
-      <label for="existingCompanySelect"><i class="fas fa-building"></i> Select Existing Company</label>
+      <label for="existingCompanySelect"><i class="fas fa-building"></i> Select Company</label>
       <select id="existingCompanySelect">
         <option value="">-- Select Company --</option>
       </select>
       
-      <label for="addPositionsInput"><i class="fas fa-briefcase"></i> Add New Positions</label>
-      <input type="text" id="addPositionsInput" placeholder="e.g. Product Manager, Data Analyst">
+      <label for="addPositionsInput"><i class="fas fa-briefcase"></i> Add Positions</label>
+      <input type="text" id="addPositionsInput" placeholder="e.g. Product Manager, Data Analyst (comma separated)">
+      
+      <div class="file-upload-section">
+        <h4><i class="fas fa-file-pdf"></i> Upload Job Descriptions</h4>
+        <div id="existingCompanyFileInputs"></div>
+      </div>
       
       <button type="button" id="addPositionsBtn">
         <i class="fas fa-plus"></i>
         Add Positions
       </button>
       
-      <label for="existingPositionSelect" style="margin-top: 12px;"><i class="fas fa-list-ul"></i> Existing Positions</label>
+      <label for="existingPositionSelect"><i class="fas fa-list-ul"></i> Existing Positions</label>
       <select id="existingPositionSelect">
         <option value="">-- Select Position --</option>
       </select>
@@ -657,11 +615,11 @@
       <div class="button-group">
         <button type="button" id="deletePositionBtn" class="danger">
           <i class="fas fa-trash"></i>
-          Delete Position
+          Delete Position & JD
         </button>
         <button type="button" id="deleteCompanyBtn" class="danger">
           <i class="fas fa-trash-alt"></i>
-          Delete Company
+          Delete Company & All JDs
         </button>
       </div>
       
@@ -674,280 +632,490 @@
 </form>
 
 <script>
-  // Make this mutable so we can add/delete
-  let positionMap = {
-    TecoreLabs: ["Full Stack Developer", "PostgreSQL Database Administrator"],
-    Saviesahome: ["Interior Designer"],
-    angelportal: ["Hr Recruiter", "Account Executive", "Content Writer", "Relationship Manager", "Python Developer", "SEO and Social Media Manager", "Visa Manager", "Sales Manager - Online Course"]
-  };
-  
-  const companySelect = document.getElementById("company");
-  const positionSelect = document.getElementById("position");
-  const positionDiv = document.getElementById("positionDiv");
-  
-  // Enhanced button loading state
-  function setButtonLoading(buttonId, isLoading, loadingText = "Processing...") {
-    const button = document.getElementById(buttonId);
-    if (!button) return;
+// 🔥 IMPORTANT: REPLACE WITH YOUR ACTUAL GOOGLE APPS SCRIPT WEB APP URL
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxyo19lD_6WHXwCkpcIXrfV38pAobEjiO6sYhYBFh-nId-YWdGHNPJF_Rh9IQBchSd/exec';
+
+let companies = {};
+let newCompanyFiles = {};
+let existingCompanyFiles = {};
+
+// Call Google Apps Script
+async function callGoogleScript(action, data = {}) {
+  try {
+    const payload = { action, ...data };
+    console.log('Calling Google Script:', action);
     
-    const btnText = button.querySelector('.btn-text');
-    const icon = button.querySelector('i');
+    const response = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'text/plain',
+      },
+      body: JSON.stringify(payload)
+    });
     
-    if (isLoading) {
-      button.disabled = true;
-      if (btnText) btnText.textContent = loadingText;
-      if (icon && !icon.classList.contains('loading-spinner')) {
-        icon.className = 'loading-spinner';
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const text = await response.text();
+    const result = JSON.parse(text);
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Unknown error');
+    }
+    
+    return result;
+  } catch (error) {
+    console.error('Error calling Google Script:', error);
+    alert('Error: ' + error.message);
+    return null;
+  }
+}
+
+// Load data from Google Sheets
+async function loadData() {
+  try {
+    console.log('Loading data from Google Sheets...');
+    
+    const result = await callGoogleScript('getData');
+    if (result && result.success) {
+      companies = result.data || {};
+      console.log('Loaded companies:', companies);
+      populateCompanies();
+    } else {
+      console.error('Failed to load data');
+      companies = {};
+      populateCompanies();
+    }
+  } catch (error) {
+    console.error('Error loading data:', error);
+    companies = {};
+    populateCompanies();
+  }
+}
+
+// Populate company dropdown
+function populateCompanies() {
+  const companySelect = document.getElementById('company');
+  companySelect.innerHTML = '<option value="">-- Choose Company --</option>';
+  
+  Object.keys(companies).forEach(company => {
+    const option = document.createElement('option');
+    option.value = company;
+    option.textContent = company;
+    companySelect.appendChild(option);
+  });
+}
+
+// Populate positions
+function populatePositions() {
+  const company = document.getElementById('company').value;
+  const positionSelect = document.getElementById('position');
+  const positionDiv = document.getElementById('positionDiv');
+  
+  positionSelect.innerHTML = '<option value="">-- Choose Position --</option>';
+  
+  if (company && companies[company]) {
+    companies[company].forEach(position => {
+      const option = document.createElement('option');
+      option.value = position;
+      option.textContent = position;
+      positionSelect.appendChild(option);
+    });
+    positionDiv.style.display = 'block';
+  } else {
+    positionDiv.style.display = 'none';
+  }
+}
+
+// File handling
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
+
+function generateFileInput(position, containerId, filesObject) {
+  const container = document.getElementById(containerId);
+  
+  const fileInputGroup = document.createElement('div');
+  fileInputGroup.className = 'file-input-group';
+  fileInputGroup.innerHTML = `
+    <label class="file-input-label" for="file-${position.replace(/\s+/g, '-')}">
+      <i class="fas fa-file-pdf"></i>
+      <span>JD for ${position}</span>
+    </label>
+    <input type="file" id="file-${position.replace(/\s+/g, '-')}" class="file-input" accept=".pdf" data-position="${position}">
+    <div class="file-status" id="status-${position.replace(/\s+/g, '-')}">No file selected</div>
+  `;
+  
+  container.appendChild(fileInputGroup);
+  
+  const fileInput = fileInputGroup.querySelector('.file-input');
+  const statusDiv = fileInputGroup.querySelector('.file-status');
+  
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.type !== 'application/pdf') {
+        statusDiv.textContent = 'Only PDF files allowed';
+        statusDiv.className = 'file-status error';
+        return;
+      }
+      
+      if (file.size > 10 * 1024 * 1024) {
+        statusDiv.textContent = 'File too large (max 10MB)';
+        statusDiv.className = 'file-status error';
+        return;
+      }
+      
+      try {
+        statusDiv.textContent = 'Processing...';
+        statusDiv.className = 'file-status';
+        
+        const base64 = await fileToBase64(file);
+        filesObject[position] = {
+          position: position,
+          data: base64,
+          name: file.name
+        };
+        
+        statusDiv.textContent = `✓ ${file.name} selected`;
+        statusDiv.className = 'file-status success';
+      } catch (error) {
+        statusDiv.textContent = 'Error processing file';
+        statusDiv.className = 'file-status error';
       }
     } else {
-      button.disabled = false;
-      if (btnText) btnText.textContent = 'Submit Application';
-      if (icon) icon.className = 'fas fa-paper-plane';
+      delete filesObject[position];
+      statusDiv.textContent = 'No file selected';
+      statusDiv.className = 'file-status';
     }
-  }
+  });
+}
+
+function generateNewCompanyFileInputs() {
+  const positions = document.getElementById('newCompanyPositions').value
+    .split(',')
+    .map(p => p.trim())
+    .filter(p => p);
   
-  function populatePositionsForSelectedCompany() {
-    const company = companySelect.value;
-    positionSelect.innerHTML = '<option value="">-- Choose Position --</option>';
-    if (company && positionMap[company] && positionMap[company].length) {
-      positionMap[company].forEach(pos => {
-        const option = document.createElement("option");
-        option.value = pos;
-        option.text = pos;
-        positionSelect.appendChild(option);
-      });
-      positionDiv.style.display = "block";
+  const container = document.getElementById('newCompanyFileInputs');
+  container.innerHTML = '';
+  newCompanyFiles = {};
+  
+  positions.forEach(position => {
+    generateFileInput(position, 'newCompanyFileInputs', newCompanyFiles);
+  });
+}
+
+function generateExistingCompanyFileInputs() {
+  const positions = document.getElementById('addPositionsInput').value
+    .split(',')
+    .map(p => p.trim())
+    .filter(p => p);
+  
+  const container = document.getElementById('existingCompanyFileInputs');
+  container.innerHTML = '';
+  existingCompanyFiles = {};
+  
+  positions.forEach(position => {
+    generateFileInput(position, 'existingCompanyFileInputs', existingCompanyFiles);
+  });
+}
+
+// Event listeners
+document.getElementById('company').addEventListener('change', populatePositions);
+document.getElementById('newCompanyPositions').addEventListener('input', generateNewCompanyFileInputs);
+document.getElementById('addPositionsInput').addEventListener('input', generateExistingCompanyFileInputs);
+
+document.getElementById("immediateJoiner").addEventListener("change", function () {
+  document.getElementById("noticePeriod").disabled = this.checked;
+  document.getElementById("noticePeriodUnit").disabled = this.checked;
+});
+
+document.getElementById("isFresher").addEventListener("change", function () {
+  document.getElementById("experience").disabled = this.checked;
+  document.getElementById("experienceUnit").disabled = this.checked;
+});
+
+document.getElementById("asPerCompany").addEventListener("change", function () {
+  document.getElementById("expectedCTC").disabled = this.checked;
+  document.getElementById("expectedCTCUnit").disabled = this.checked;
+});
+
+// Form submission
+document.getElementById("jobForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  
+  const data = {
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    contact: document.getElementById("contact").value,
+    currentCTC: document.getElementById("currentCTC").value,
+    currentCTCUnit: document.getElementById("currentCTCUnit").value,
+    expectedCTC: document.getElementById("asPerCompany").checked ? "As Per Company" : document.getElementById("expectedCTC").value,
+    expectedCTCUnit: document.getElementById("asPerCompany").checked ? "" : document.getElementById("expectedCTCUnit").value,
+    experience: document.getElementById("isFresher").checked ? "Fresher" : document.getElementById("experience").value,
+    experienceUnit: document.getElementById("isFresher").checked ? "" : document.getElementById("experienceUnit").value,
+    noticePeriod: document.getElementById("immediateJoiner").checked ? "Immediate" : document.getElementById("noticePeriod").value,
+    noticePeriodUnit: document.getElementById("immediateJoiner").checked ? "" : document.getElementById("noticePeriodUnit").value,
+    company: document.getElementById("company").value,
+    position: document.getElementById("position").value,
+    recruiterEmail: document.getElementById("recruiterEmail").value
+  };
+  
+  const recruiterParts = data.recruiterEmail.split(",");
+  const recruiterName = recruiterParts[1] ? recruiterParts[1].trim() : "Recruiter";
+  
+  fetch("https://prod-30.centralindia.logic.azure.com:443/workflows/54210cf2969a42458623aa9427690ce1/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ZND7fpFK-bj6HXWxqBMGlFl3_W7vSKTmAUxU8uFwzzU", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  })
+  .then(res => {
+    if (res.ok) {
+      const msg = `*Hi ${data.name}*,\n\nAs per our recent discussion regarding the position of *${data.position}*, we have successfully submitted your profile for shortlisting to our client, *${data.company}*, with the following details:\n\n*Current CTC : ${data.currentCTC} ${data.currentCTCUnit}*\n*Expected CTC : ${data.expectedCTC}* ${data.expectedCTCUnit}\n*Notice Period : ${data.noticePeriod}* ${data.noticePeriodUnit}\n\nWe have also shared the *Job Description* with you via email at ${data.email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
+      const whatsappLink = `https://wa.me/91${data.contact}?text=${encodeURIComponent(msg)}`;
+      document.getElementById("sendBtn").innerHTML = `<i class="fab fa-whatsapp"></i> Send to ${data.name}`;
+      document.getElementById("sendBtn").onclick = () => {
+        document.getElementById("popupOverlay").style.display = "none";
+        window.open(whatsappLink, "_blank");
+        document.getElementById("jobForm").reset();
+        document.getElementById("positionDiv").style.display = "none";
+      };
+      document.getElementById("popupOverlay").style.display = "flex";
     } else {
-      positionDiv.style.display = "none";
+      alert("Error submitting form. Please try again.");
     }
-  }
+  })
+  .catch(err => {
+    alert("Failed to connect to server.");
+    console.error(err);
+  });
+});
+
+document.getElementById("cancelBtn").addEventListener("click", () => {
+  document.getElementById("popupOverlay").style.display = "none";
+  document.getElementById("jobForm").reset();
+  document.getElementById("positionDiv").style.display = "none";
+});
+
+// Management functions
+function refreshManagementDropdowns() {
+  const existingCompanySelect = document.getElementById('existingCompanySelect');
+  existingCompanySelect.innerHTML = '<option value="">-- Select Company --</option>';
   
-  document.getElementById("company").addEventListener("change", populatePositionsForSelectedCompany);
-  
-  document.getElementById("immediateJoiner").addEventListener("change", function () {
-    document.getElementById("noticePeriod").disabled = this.checked;
-    document.getElementById("noticePeriodUnit").disabled = this.checked;
+  Object.keys(companies).forEach(company => {
+    const option = document.createElement('option');
+    option.value = company;
+    option.textContent = company;
+    existingCompanySelect.appendChild(option);
   });
   
-  document.getElementById("isFresher").addEventListener("change", function () {
-    document.getElementById("experience").disabled = this.checked;
-    document.getElementById("experienceUnit").disabled = this.checked;
-  });
+  refreshPositionDropdown();
+}
+
+function refreshPositionDropdown() {
+  const company = document.getElementById('existingCompanySelect').value;
+  const positionSelect = document.getElementById('existingPositionSelect');
   
-  document.getElementById("asPerCompany").addEventListener("change", function () {
-    document.getElementById("expectedCTC").disabled = this.checked;
-    document.getElementById("expectedCTCUnit").disabled = this.checked;
-  });
+  positionSelect.innerHTML = '<option value="">-- Select Position --</option>';
   
-  const popup = document.getElementById("popupOverlay");
-  const sendBtn = document.getElementById("sendBtn");
-  const cancelBtn = document.getElementById("cancelBtn");
-  let whatsappLink = "";
-  
-  document.getElementById("jobForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    
-    setButtonLoading('submitBtn', true, 'Submitting...');
-    
-    const data = {
-      name: document.getElementById("name").value,
-      email: document.getElementById("email").value,
-      contact: document.getElementById("contact").value,
-      currentCTC: document.getElementById("currentCTC").value,
-      currentCTCUnit: document.getElementById("currentCTCUnit").value,
-      expectedCTC: document.getElementById("asPerCompany").checked ? "As Per Company" : document.getElementById("expectedCTC").value,
-      expectedCTCUnit: document.getElementById("asPerCompany").checked ? "" : document.getElementById("expectedCTCUnit").value,
-      experience: document.getElementById("isFresher").checked ? "Fresher" : document.getElementById("experience").value,
-      experienceUnit: document.getElementById("isFresher").checked ? "" : document.getElementById("experienceUnit").value,
-      noticePeriod: document.getElementById("immediateJoiner").checked ? "Immediate" : document.getElementById("noticePeriod").value,
-      noticePeriodUnit: document.getElementById("immediateJoiner").checked ? "" : document.getElementById("noticePeriodUnit").value,
-      company: document.getElementById("company").value,
-      position: document.getElementById("position").value,
-      recruiterEmail: document.getElementById("recruiterEmail").value
-    };
-    
-    const recruiterParts = data.recruiterEmail.split(",");
-    const recruiterName = recruiterParts[1] ? recruiterParts[1].trim() : "Recruiter";
-    const recruiterContact = recruiterParts[2] ? recruiterParts[2].trim() : "";
-    
-    fetch("https://prod-30.centralindia.logic.azure.com:443/workflows/54210cf2969a42458623aa9427690ce1/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ZND7fpFK-bj6HXWxqBMGlFl3_W7vSKTmAUxU8uFwzzU", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    })
-    .then(res => {
-      setTimeout(() => {
-        setButtonLoading('submitBtn', false);
-        if (res.ok) {
-          const msg = `*Hi ${data.name}*,\n\nAs per our recent discussion regarding the position of *${data.position}*, we have successfully submitted your profile for shortlisting to our client, *${data.company}*, with the following details:\n\n*Current CTC : ${data.currentCTC} ${data.currentCTCUnit}*\n*Expected CTC : ${data.expectedCTC}* ${data.expectedCTCUnit}\n*Notice Period : ${data.noticePeriod}* ${data.noticePeriodUnit}\n\nWe have also shared the *Job Description* with you via email at ${data.email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
-          whatsappLink = `https://wa.me/91${data.contact}?text=${encodeURIComponent(msg)}`;
-          document.getElementById("sendBtn").innerHTML = `<i class="fab fa-whatsapp"></i> Send to ${data.name}`;
-          popup.style.display = "flex";
-        } else {
-          alert("Error submitting form. Please try again.");
-        }
-      }, 1000);
-    })
-    .catch(err => {
-      setTimeout(() => {
-        setButtonLoading('submitBtn', false);
-        alert("Failed to connect to server. Please check your internet connection.");
-        console.error(err);
-      }, 1000);
-    });
-  });
-  
-  sendBtn.addEventListener("click", () => {
-    popup.style.display = "none";
-    window.open(whatsappLink, "_blank");
-    document.getElementById("jobForm").reset();
-    document.getElementById("positionDiv").style.display = "none";
-  });
-  
-  cancelBtn.addEventListener("click", () => {
-    popup.style.display = "none";
-    document.getElementById("jobForm").reset();
-    document.getElementById("positionDiv").style.display = "none";
-  });
-  
-  /* =========================
-     Manage Companies Popup JS
-     ========================= */
-  const manageOverlay = document.getElementById("manageOverlay");
-  const manageBtn = document.getElementById("manageCompanyBtn");
-  const manageCloseBtn = document.getElementById("manageCloseBtn");
-  const existingCompanySelect = document.getElementById("existingCompanySelect");
-  const existingPositionSelect = document.getElementById("existingPositionSelect");
-  const addCompanyConfirm = document.getElementById("addCompanyConfirm");
-  const newCompanyName = document.getElementById("newCompanyName");
-  const newCompanyPositions = document.getElementById("newCompanyPositions");
-  const addPositionsInput = document.getElementById("addPositionsInput");
-  const addPositionsBtn = document.getElementById("addPositionsBtn");
-  const deletePositionBtn = document.getElementById("deletePositionBtn");
-  const deleteCompanyBtn = document.getElementById("deleteCompanyBtn");
-  
-  function refreshExistingCompanyDropdown() {
-    existingCompanySelect.innerHTML = '<option value="">-- Select Company --</option>';
-    Object.keys(positionMap).forEach(c => {
-      const opt = document.createElement("option");
-      opt.value = c;
-      opt.text = c;
-      existingCompanySelect.appendChild(opt);
-    });
-    refreshExistingPositionsDropdown();
-  }
-  
-  function refreshExistingPositionsDropdown() {
-    existingPositionSelect.innerHTML = '<option value="">-- Select Position --</option>';
-    const comp = existingCompanySelect.value;
-    if (!comp || !positionMap[comp]) return;
-    positionMap[comp].forEach(p => {
-      const opt = document.createElement("option");
-      opt.value = p;
-      opt.text = p;
-      existingPositionSelect.appendChild(opt);
+  if (company && companies[company]) {
+    companies[company].forEach(position => {
+      const option = document.createElement('option');
+      option.value = position;
+      option.textContent = position;
+      positionSelect.appendChild(option);
     });
   }
-  
-  function addOptionToCompanySelect(name) {
-    // Avoid duplicates
-    const exists = Array.from(companySelect.options).some(o => o.value === name);
-    if (!exists) {
-      const opt = document.createElement("option");
-      opt.value = name;
-      opt.text = name;
-      companySelect.appendChild(opt);
-    }
+}
+
+function setManageLoading(isLoading) {
+  const popup = document.querySelector('.manage-popup');
+  if (isLoading) {
+    popup.classList.add('loading');
+  } else {
+    popup.classList.remove('loading');
+  }
+}
+
+// Management popup events
+document.getElementById('manageCompanyBtn').addEventListener('click', () => {
+  refreshManagementDropdowns();
+  document.getElementById('manageOverlay').style.display = 'flex';
+});
+
+document.getElementById('manageCloseBtn').addEventListener('click', () => {
+  document.getElementById('manageOverlay').style.display = 'none';
+  document.getElementById('newCompanyFileInputs').innerHTML = '';
+  document.getElementById('existingCompanyFileInputs').innerHTML = '';
+  newCompanyFiles = {};
+  existingCompanyFiles = {};
+});
+
+document.getElementById('existingCompanySelect').addEventListener('change', refreshPositionDropdown);
+
+// Add new company
+document.getElementById('addCompanyBtn').addEventListener('click', async () => {
+  const name = document.getElementById('newCompanyName').value.trim();
+  if (!name) {
+    alert('Please enter a company name');
+    return;
   }
   
-  function removeOptionFromCompanySelect(name) {
-    Array.from(companySelect.options).forEach(o => {
-      if (o.value === name) o.remove();
-    });
+  const positions = document.getElementById('newCompanyPositions').value
+    .split(',')
+    .map(p => p.trim())
+    .filter(p => p);
+  
+  setManageLoading(true);
+  
+  const files = Object.values(newCompanyFiles);
+  
+  const result = await callGoogleScript('addCompany', {
+    company: name,
+    positions: positions,
+    files: files
+  });
+  
+  setManageLoading(false);
+  
+  if (result && result.success) {
+    alert(result.message);
+    
+    companies[name] = positions;
+    populateCompanies();
+    refreshManagementDropdowns();
+    
+    document.getElementById('newCompanyName').value = '';
+    document.getElementById('newCompanyPositions').value = '';
+    document.getElementById('newCompanyFileInputs').innerHTML = '';
+    newCompanyFiles = {};
+  }
+});
+
+// Add positions
+document.getElementById('addPositionsBtn').addEventListener('click', async () => {
+  const company = document.getElementById('existingCompanySelect').value;
+  if (!company) {
+    alert('Please select a company first');
+    return;
   }
   
-  function updateMainPositionsIfAffected(companyName) {
-    if (companySelect.value === companyName) {
-      populatePositionsForSelectedCompany();
-    }
+  const positions = document.getElementById('addPositionsInput').value
+    .split(',')
+    .map(p => p.trim())
+    .filter(p => p);
+  
+  if (positions.length === 0) {
+    alert('Please enter at least one position');
+    return;
   }
   
-  manageBtn.addEventListener("click", () => {
-    refreshExistingCompanyDropdown();
-    manageOverlay.style.display = "flex";
+  setManageLoading(true);
+  
+  const files = Object.values(existingCompanyFiles);
+  
+  const result = await callGoogleScript('addPositions', {
+    company: company,
+    positions: positions,
+    files: files
   });
   
-  manageCloseBtn.addEventListener("click", () => {
-    manageOverlay.style.display = "none";
-  });
+  setManageLoading(false);
   
-  existingCompanySelect.addEventListener("change", refreshExistingPositionsDropdown);
-  
-  // Add new company
-  addCompanyConfirm.addEventListener("click", () => {
-    const name = (newCompanyName.value || "").trim();
-    if (!name) { alert("Please enter a company name"); return; }
-    if (positionMap[name]) { alert("Company already exists"); return; }
-    const positions = (newCompanyPositions.value || "")
-      .split(",")
-      .map(p => p.trim())
-      .filter(p => p.length);
-    positionMap[name] = positions;
-    addOptionToCompanySelect(name);
-    refreshExistingCompanyDropdown();
-    // Clear fields
-    newCompanyName.value = "";
-    newCompanyPositions.value = "";
-    alert(`Company "${name}" added successfully${positions.length ? " with positions" : ""}.`);
-  });
-  
-  // Add positions to existing company
-  addPositionsBtn.addEventListener("click", () => {
-    const comp = existingCompanySelect.value;
-    if (!comp) { alert("Please select a company first"); return; }
-    const entries = (addPositionsInput.value || "")
-      .split(",")
-      .map(p => p.trim())
-      .filter(p => p.length);
-    if (!entries.length) { alert("Please enter at least one position"); return; }
-    // Deduplicate
-    const current = new Set(positionMap[comp] || []);
-    entries.forEach(p => current.add(p));
-    positionMap[comp] = Array.from(current);
-    addPositionsInput.value = "";
-    refreshExistingPositionsDropdown();
-    updateMainPositionsIfAffected(comp);
-    alert("Positions added successfully.");
-  });
-  
-  // Delete one position
-  deletePositionBtn.addEventListener("click", () => {
-    const comp = existingCompanySelect.value;
-    const pos = existingPositionSelect.value;
-    if (!comp) { alert("Please select a company first"); return; }
-    if (!pos) { alert("Please select a position to delete"); return; }
-    if (!confirm(`Are you sure you want to delete the position "${pos}"?`)) return;
-    positionMap[comp] = (positionMap[comp] || []).filter(p => p !== pos);
-    refreshExistingPositionsDropdown();
-    updateMainPositionsIfAffected(comp);
-    alert(`Position "${pos}" deleted successfully.`);
-  });
-  
-  // Delete entire company
-  deleteCompanyBtn.addEventListener("click", () => {
-    const comp = existingCompanySelect.value;
-    if (!comp) { alert("Please select a company first"); return; }
-    if (!confirm(`Are you sure you want to delete company "${comp}" and all its positions?`)) return;
-    delete positionMap[comp];
-    removeOptionFromCompanySelect(comp);
-    refreshExistingCompanyDropdown();
-    // If the deleted company was selected in main form, clear positions
-    if (companySelect.value === comp) {
-      companySelect.value = "";
-      populatePositionsForSelectedCompany();
+  if (result && result.success) {
+    alert(result.message);
+    
+    await loadData();
+    refreshManagementDropdowns();
+    
+    if (document.getElementById('company').value === company) {
+      populatePositions();
     }
-    alert(`Company "${comp}" deleted successfully.`);
+    
+    document.getElementById('addPositionsInput').value = '';
+    document.getElementById('existingCompanyFileInputs').innerHTML = '';
+    existingCompanyFiles = {};
+  }
+});
+
+// Delete position
+document.getElementById('deletePositionBtn').addEventListener('click', async () => {
+  const company = document.getElementById('existingCompanySelect').value;
+  const position = document.getElementById('existingPositionSelect').value;
+  
+  if (!company || !position) {
+    alert('Please select both company and position');
+    return;
+  }
+  
+  if (!confirm(`Delete position "${position}" from "${company}" and its JD file?`)) return;
+  
+  setManageLoading(true);
+  
+  const result = await callGoogleScript('deletePosition', {
+    company: company,
+    position: position
   });
+  
+  setManageLoading(false);
+  
+  if (result && result.success) {
+    alert(result.message);
+    
+    await loadData();
+    refreshManagementDropdowns();
+    
+    if (document.getElementById('company').value === company) {
+      populatePositions();
+    }
+  }
+});
+
+// Delete company
+document.getElementById('deleteCompanyBtn').addEventListener('click', async () => {
+  const company = document.getElementById('existingCompanySelect').value;
+  
+  if (!company) {
+    alert('Please select a company');
+    return;
+  }
+  
+  if (!confirm(`Delete company "${company}" and ALL its positions and JD files?`)) return;
+  
+  setManageLoading(true);
+  
+  const result = await callGoogleScript('deleteCompany', {
+    company: company
+  });
+  
+  setManageLoading(false);
+  
+  if (result && result.success) {
+    alert(result.message);
+    
+    await loadData();
+    refreshManagementDropdowns();
+    
+    if (document.getElementById('company').value === company) {
+      document.getElementById('company').value = '';
+      populatePositions();
+    }
+  }
+});
+
+// Load data when page loads
+window.addEventListener('load', () => {
+  console.log('Page loaded, loading companies...');
+  loadData();
+});
 </script>
 </body>
 </html>
