@@ -881,7 +881,7 @@ document.getElementById("jobForm").addEventListener("submit", function (e) {
   .then(res => {
     if (res.ok) {
       const msg = `*Hi ${data.name}*,\n\nAs per our recent discussion regarding the position of *${data.position}*, we have successfully submitted your profile for shortlisting to our client, *${data.company}*, with the following details:\n\n*Current CTC : ${data.currentCTC} ${data.currentCTCUnit}*\n*Expected CTC : ${data.expectedCTC}* ${data.expectedCTCUnit}\n*Notice Period : ${data.noticePeriod}* ${data.noticePeriodUnit}\n\nWe have also shared the *Job Description* with you via email at ${data.email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
-      const whatsappLink = `https://wa.me/91${data.contact}?text=${encodeURIComponent(msg)}`;
+      const whatsappLink = `https://wa.me/+91${data.contact}?text=${encodeURIComponent(msg)}`;
       document.getElementById("sendBtn").innerHTML = `<i class="fab fa-whatsapp"></i> Send to ${data.name}`;
       document.getElementById("sendBtn").onclick = () => {
         document.getElementById("popupOverlay").style.display = "none";
