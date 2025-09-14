@@ -137,6 +137,30 @@
       margin: 2px 0 0 0;
     }
 
+    /* USER TYPE BADGE */
+    .user-type-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 8px;
+    }
+    
+    .user-type-admin {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error-color);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    
+    .user-type-user {
+      background: rgba(37, 99, 235, 0.1);
+      color: var(--primary-color);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+
     /* DASHBOARD STYLES - Mobile First */
     #dashboard {
       display: block;
@@ -819,7 +843,10 @@
   </button>
   <div class="header-content">
     <h2><i class="fas fa-calendar-check"></i> Scheduled Interviews</h2>
-    <p class="dashboard-subtitle">Manage all scheduled interviews</p>
+    <p class="dashboard-subtitle">
+      All scheduled interviews in chronological order
+      <span id="userTypeBadge" class="user-type-badge"></span>
+    </p>
   </div>
 </div>
 
@@ -918,7 +945,7 @@
 <!-- Candidate Options Popup -->
 <div class="popup-overlay" id="candidateOptionsPopup">
   <div class="popup-content compact">
-    <h3><i class="fas fa-user"></i>Select What's next?</h3>
+    <h3><i class="fas fa-user"></i> Candidate Actions</h3>
     
     <div style="text-align: center; margin-bottom: 20px;">
       <p id="popupCandidateNameDisplay" style="font-weight: bold; font-size: 14px; color: var(--text-primary);"></p>
@@ -931,7 +958,7 @@
       </button>
       <button class="btn btn-success" id="btnConnectWhatsapp">
         <i class="fab fa-whatsapp"></i>
-        Open WhatsApp
+        Connect WhatsApp
       </button>
     </div>
     
@@ -953,6 +980,7 @@
       <p><strong>Name:</strong> <span id="popupCandidateName"></span></p>
       <p><strong>Company:</strong> <span id="popupCompany"></span></p>
       <p><strong>Position:</strong> <span id="popupPosition"></span></p>
+      <p><strong>__powerappsid__:</strong> <span id="popup__powerappsid__"></span></p>
     </div>
     
     <div class="form-group">
@@ -1029,9 +1057,47 @@ window.addEventListener('load', function() {
     
     console.log('User data available globally as window.USER_DATA:', window.USER_DATA);
     
+    // Display user type badge
+    displayUserTypeBadge();
+    
     // Load scheduled interviews
     loadScheduledInterviews();
 });
+
+// Display user type badge
+function displayUserTypeBadge() {
+    const badge = document.getElementById('userTypeBadge');
+    const userType = sessionStorage.getItem('userType');
+    
+    if (badge && userType) {
+        const type = userType.toLowerCase();
+        badge.textContent = userType.toUpperCase();
+        
+        if (type === 'admin') {
+            badge.className = 'user-type-badge user-type-admin';
+        } else {
+            badge.className = 'user-type-badge user-type-user';
+        }
+    }
+}
+
+// NEW: Role-based candidate filtering function
+function filterCandidatesByUserType(data) {
+    const userData = {
+        userType: sessionStorage.getItem('userType'),
+        email: sessionStorage.getItem('userEmail')
+    };
+    
+    // If user is Admin, show all candidates
+    if (userData.userType && userData.userType.toLowerCase() === 'admin') {
+        console.log('✓ Admin user detected - showing ALL scheduled interviews');
+        return data;
+    } else {
+        // If user is regular User, show only their candidates
+        console.log('✓ Regular user detected - filtering by recruiter email');
+        return data.filter(c => (c.recruiter || "").toLowerCase() === (userData.email || "").toLowerCase());
+    }
+}
 
 // Global variables
 let loggedInEmail = "";
@@ -1397,6 +1463,7 @@ function renderInterviewTable() {
   updateStats();
 }
 
+// UPDATED: loadScheduledInterviews with role-based filtering
 function loadScheduledInterviews() {
   console.log("Loading scheduled interviews...");
   
@@ -1414,14 +1481,14 @@ function loadScheduledInterviews() {
       
       console.log("Raw data received:", data.length, "records");
       
-      // Filter for user's candidates that have interview_date
-      const userCandidates = data.filter(c => {
-        const hasRecruiter = (c.recruiter || "").toLowerCase() === loggedInEmail.toLowerCase();
+      // NEW: Apply role-based filtering first, then filter for interview dates
+      const roleFilteredCandidates = filterCandidatesByUserType(data);
+      const userCandidates = roleFilteredCandidates.filter(c => {
         const hasInterviewDate = c.interview_date && c.interview_date.trim() !== "";
-        return hasRecruiter && hasInterviewDate;
+        return hasInterviewDate;
       });
       
-      console.log("Filtered candidates with interview dates:", userCandidates.length);
+      console.log("Role-filtered candidates with interview dates:", userCandidates.length);
       
       // Sort by interview_date in ascending order
       allScheduledInterviews = userCandidates.sort((a, b) => {
@@ -1505,7 +1572,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-console.log('Scheduled Interviews page loaded with authentication integration and popup functionality');
+console.log('Scheduled Interviews page loaded with authentication integration, popup functionality, and role-based filtering');
 </script>
 </body>
 </html>
