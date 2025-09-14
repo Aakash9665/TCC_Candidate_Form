@@ -921,7 +921,7 @@
         <p><strong>Name:</strong> <span id="popupCandidateName"></span></p>
         <p><strong>Company:</strong> <span id="popupCompany"></span></p>
         <p><strong>Position:</strong> <span id="popupPosition"></span></p>
-        <p><strong>__PowerAppsId__:</strong> <span id="popup__PowerAppsId__"></span></p>
+        <p><strong>__powerappsid__:</strong> <span id="popup__powerappsid__"></span></p>
       </div>
       
       <div class="form-group">
@@ -1366,7 +1366,7 @@ function openPopup(candidate) {
     candidateName: getElement("popupCandidateName"),
     company: getElement("popupCompany"),
     position: getElement("popupPosition"),
-    powerAppsId: getElement("popup__PowerAppsId__"),
+    powerAppsId: getElement("popup__powerappsid__"),
     statusDropdown: getElement("statusDropdown"),
     finalStatusDropdown: getElement("finalStatusDropdown"),
     commentBox: getElement("commentBox"),
@@ -1376,7 +1376,7 @@ function openPopup(candidate) {
   if (elements.company) elements.company.textContent = candidate.company || "";
   if (elements.position) elements.position.textContent = candidate.position || "";
   if (elements.powerAppsId) {
-    elements.powerAppsId.textContent = candidate.__PowerAppsId__ || "Not Available";
+    elements.powerAppsId.textContent = candidate.__powerappsid__ || "";
   }
   if (elements.statusDropdown) elements.statusDropdown.value = "";
   if (elements.finalStatusDropdown) elements.finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
@@ -1631,7 +1631,7 @@ async function submitExtraPopup() {
     candidate_position: String(currentCandidate?.position || ""),
     recruiter: String(recruiterName || ""),
     interview_mode: String(mode || ""),
-    rowId: String(currentCandidate?.__PowerAppsId__ || ""),
+    rowId: String(currentCandidate?.__powerappsid__ || ""),
     interview_datetime: String(isoDt || "")
   };
   
