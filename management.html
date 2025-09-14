@@ -171,6 +171,30 @@
       font-size: 13px;
       font-weight: 400;
     }
+
+    /* USER TYPE BADGE */
+    .user-type-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-left: 8px;
+    }
+    
+    .user-type-admin {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error-color);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    
+    .user-type-user {
+      background: rgba(37, 99, 235, 0.1);
+      color: var(--primary-color);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
     
     /* COMPACT FILTERS */
     .filters-container {
@@ -655,7 +679,7 @@
       transform: translateY(-3px) scale(1.05);
       box-shadow: 0 15px 30px -10px rgba(37, 211, 102, 0.4);
     }
-    
+
     #waFloatBtn i {
       font-size: 14px;
     }
@@ -842,7 +866,10 @@
 <div id="dashboard">
   <div class="dashboard-header">
     <h2><i class="fas fa-users-cog"></i> TCC Candidate Management</h2>
-    <p class="dashboard-subtitle">Streamlined candidate tracking and communication</p>
+    <p class="dashboard-subtitle">
+      Streamlined candidate tracking and communication
+      <span id="userTypeBadge" class="user-type-badge"></span>
+    </p>
   </div>
   
   <div class="filters-container">
@@ -1089,9 +1116,29 @@ window.addEventListener('load', function() {
     
     console.log('Complete user data available globally as window.USER_DATA:', window.USER_DATA);
     
+    // Display user type badge
+    displayUserTypeBadge();
+    
     // Load dashboard with authenticated user's data
     loadDashboard();
 });
+
+// Display user type badge
+function displayUserTypeBadge() {
+    const badge = document.getElementById('userTypeBadge');
+    const userData = getUserData();
+    
+    if (badge && userData.userType) {
+        const userType = userData.userType.toLowerCase();
+        badge.textContent = userData.userType.toUpperCase();
+        
+        if (userType === 'admin') {
+            badge.className = 'user-type-badge user-type-admin';
+        } else {
+            badge.className = 'user-type-badge user-type-user';
+        }
+    }
+}
 
 // Global functions
 function logout() {
@@ -1124,6 +1171,21 @@ function getUserData() {
         userType: sessionStorage.getItem('userType'),
         loginTime: sessionStorage.getItem('loginTime')
     };
+}
+
+// NEW: Role-based candidate filtering function
+function filterCandidatesByUserType(data) {
+    const userData = getUserData();
+    
+    // If user is Admin, show all candidates
+    if (userData.userType && userData.userType.toLowerCase() === 'admin') {
+        console.log('✓ Admin user detected - showing ALL candidates');
+        return data;
+    } else {
+        // If user is regular User, show only their candidates
+        console.log('✓ Regular user detected - filtering by recruiter email');
+        return data.filter(c => (c.recruiter || "").toLowerCase() === loggedInEmail.toLowerCase());
+    }
 }
 
 // Original variables and functions (keeping existing logic intact)
@@ -1179,6 +1241,7 @@ function setButtonLoading(buttonId, isLoading, loadingText = "Processing...") {
   }
 }
 
+// UPDATED: loadDashboard with role-based filtering
 function loadDashboard() {
   fetch(dataURL)
     .then(res => {
@@ -1191,7 +1254,12 @@ function loadDashboard() {
       if (!Array.isArray(data)) {
         throw new Error("Expected array data");
       }
-      candidates = data.filter(c => (c.recruiter || "").toLowerCase() === loggedInEmail.toLowerCase());
+      
+      // ROLE-BASED FILTERING: Apply user type filtering
+      candidates = filterCandidatesByUserType(data);
+      
+      console.log(`✓ Loaded ${candidates.length} candidates for current user`);
+      
       loadCompanyOptions();
       loadStatusOptions();
       applyFilters();
@@ -1751,7 +1819,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-console.log('Management page loaded with authentication integration');
+console.log('Management page loaded with authentication integration and role-based filtering');
 </script>
 </body>
 </html>
