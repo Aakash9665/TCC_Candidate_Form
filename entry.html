@@ -743,7 +743,26 @@ window.addEventListener('load', function() {
     
     // Load companies after authentication is confirmed
     loadData();
+    
+    // NEW: Update manage button visibility based on user type
+    updateManageButtonVisibility();
 });
+
+// NEW: Function to show/hide manage button based on user type
+function updateManageButtonVisibility() {
+    const userType = sessionStorage.getItem('userType') || sessionStorage.getItem('User_Type') || '';
+    const isAdmin = userType.toLowerCase() === 'admin';
+    
+    console.log('User Type:', userType, '| Is Admin:', isAdmin);
+    
+    // Get the manage button
+    const manageBtn = document.getElementById('manageCompanyBtn');
+    
+    // Show/hide button based on user type
+    if (manageBtn) {
+        manageBtn.style.display = isAdmin ? 'inline-block' : 'none';
+    }
+}
 
 // Global functions
 function logout() {
@@ -1223,7 +1242,7 @@ document.getElementById('deleteCompanyBtn').addEventListener('click', async () =
   }
 });
 
-console.log('Candidate Entry page loaded with authentication');
+console.log('Candidate Entry page loaded with authentication and role-based management button visibility');
 </script>
 </body>
 </html>
