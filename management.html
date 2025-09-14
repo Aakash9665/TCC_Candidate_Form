@@ -103,42 +103,6 @@
       box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
     }
 
-    .user-info {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      color: white;
-      background: rgba(255, 255, 255, 0.15);
-      padding: 12px 20px;
-      border-radius: 25px;
-      font-size: 14px;
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      display: none;
-      z-index: 1000;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    }
-
-    .logout-btn {
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      color: white;
-      padding: 6px 12px;
-      border-radius: 18px;
-      margin-left: 12px;
-      cursor: pointer;
-      font-size: 12px;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .logout-btn:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: scale(1.05);
-      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
-    }
-    
     /* PREMIUM GLASSMORPHISM EFFECTS */
     .glass {
       backdrop-filter: blur(20px);
@@ -809,13 +773,6 @@
         font-size: 18px;
         border-radius: 22.5px;
       }
-      
-      .user-info {
-        top: 15px;
-        right: 15px;
-        font-size: 12px;
-        padding: 10px 15px;
-      }
     }
     
     @media (max-width: 480px) {
@@ -880,12 +837,6 @@
 <button class="home-button" onclick="goHome()" title="Home">
   🏠
 </button>
-
-<!-- User Info -->
-<div class="user-info" id="userInfo">
-  Logged in as: <span id="userName"></span>
-  <button class="logout-btn" onclick="logout()">Logout</button>
-</div>
 
 <!-- Dashboard -->
 <div id="dashboard">
@@ -1121,16 +1072,6 @@ window.addEventListener('load', function() {
         userType: userType,
         loginTime: loginTime
     });
-    
-    // Display user information
-    const userInfoElement = document.getElementById('userInfo');
-    if (userInfoElement) {
-        userInfoElement.style.display = 'block';
-        const userNameElement = document.getElementById('userName');
-        if (userNameElement) {
-            userNameElement.textContent = userName;
-        }
-    }
     
     // Set loggedInEmail to the authenticated user's email
     loggedInEmail = userEmail;
