@@ -36,6 +36,88 @@
       --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
       --gradient-whatsapp: linear-gradient(135deg, var(--whatsapp-color) 0%, #128C7E 100%);
     }
+
+    /* Home Button */
+    .home-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 50px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      border-radius: 25px;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      z-index: 1000;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .home-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .home-button:hover::before {
+      left: 100%;
+    }
+
+    .home-button:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
+    }
+
+    .user-info {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      color: white;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 12px 20px;
+      border-radius: 25px;
+      font-size: 14px;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: none;
+      z-index: 1000;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .logout-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 18px;
+      margin-left: 12px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -456,10 +538,36 @@
       .file-input-group {
         grid-template-columns: 1fr;
       }
+      .home-button {
+        top: 15px;
+        left: 15px;
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+        border-radius: 22.5px;
+      }
+      .user-info {
+        top: 15px;
+        right: 15px;
+        font-size: 12px;
+        padding: 10px 15px;
+      }
     }
   </style>
 </head>
 <body>
+
+<!-- Home Button -->
+<button class="home-button" onclick="goHome()" title="Home">
+  🏠
+</button>
+
+<!-- User Info -->
+<div class="user-info" id="userInfo">
+  Logged in as: <span id="userName"></span>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
 <form id="jobForm">
   <h2>
     <i class="fas fa-user-plus"></i>
@@ -534,13 +642,10 @@
       <option value="">-- Choose Position --</option>
     </select>
   </div>
-  <label for="recruiterEmail"><i class="fas fa-user-check"></i> Recruiter Name</label>
-  <select id="recruiterEmail" name="recruiterEmail" required>
-    <option value="">-- Select Recruiter --</option>
-    <option value="ruchi.mishra@talentconnectconsultancy.com,Ruchi Mishra,8600550467">Ruchi Mishra</option>
-    <option value="aakashmishra510@gmail.com,Aakash Mishra,9665385022">Aakash Mishra</option>
-    <option value="urmisona007@gmail.com,Urmila Sonawane,7874033191">Urmila Sonawane</option>
-  </select>
+  <label for="recruiterEmail"><i class="fas fa-user-check"></i> Recruiter</label>
+  <input type="text" id="recruiterDisplay" name="recruiterDisplay" readonly style="background: #f8f9fa; cursor: not-allowed;">
+  <input type="hidden" id="recruiterEmail" name="recruiterEmail">
+  
   <button type="submit" id="submitBtn">
     <i class="fas fa-paper-plane"></i>
     <span class="btn-text">Submit Application</span>
@@ -549,7 +654,6 @@
     <i class="fas fa-cogs"></i>
     Manage Companies & Positions
   </button>
-  
   <!-- WhatsApp Popup -->
   <div class="popup-overlay" id="popupOverlay">
     <div class="popup">
@@ -566,7 +670,6 @@
       </button>
     </div>
   </div>
-  
   <!-- Manage Companies Popup -->
   <div class="popup-overlay" id="manageOverlay">
     <div class="popup manage-popup">
@@ -633,9 +736,108 @@
 </form>
 
 <script>
+// Authentication and user data management
+window.addEventListener('load', function() {
+    console.log("Page loaded - checking authentication...");
+    
+    // Get all user data from sessionStorage
+    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+    const userEmail = sessionStorage.getItem('userEmail');
+    const userName = sessionStorage.getItem('userName');
+    const userContact = sessionStorage.getItem('userContact');
+    const userDesignation = sessionStorage.getItem('userDesignation');
+    const userType = sessionStorage.getItem('userType');
+    const loginTime = sessionStorage.getItem('loginTime');
+    
+    // Check if user is authenticated
+    if (isLoggedIn !== 'true') {
+        alert("Session expired or not logged in. Redirecting to login page.");
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    // User is authenticated - display user info
+    console.log('✓ User authenticated successfully');
+    console.log('Complete User Details:', {
+        name: userName,
+        email: userEmail,
+        contact: userContact,
+        designation: userDesignation,
+        userType: userType,
+        loginTime: loginTime
+    });
+    
+    // Display user information
+    const userInfoElement = document.getElementById('userInfo');
+    if (userInfoElement) {
+        userInfoElement.style.display = 'block';
+        const userNameElement = document.getElementById('userName');
+        if (userNameElement) {
+            userNameElement.textContent = userName;
+        }
+    }
+    
+    // Set recruiter information from logged-in user
+    const recruiterDisplay = document.getElementById('recruiterDisplay');
+    const recruiterEmail = document.getElementById('recruiterEmail');
+    
+    if (recruiterDisplay && recruiterEmail) {
+        recruiterDisplay.value = `${userName} (${userEmail})${userContact ? ' - ' + userContact : ''}`;
+        recruiterEmail.value = `${userEmail},${userName},${userContact || ''}`;
+    }
+    
+    // Store user data globally for easy access in your page scripts
+    window.USER_DATA = {
+        isLoggedIn: isLoggedIn === 'true',
+        email: userEmail,
+        name: userName,
+        contact: userContact,
+        designation: userDesignation,
+        userType: userType,
+        loginTime: loginTime
+    };
+    
+    console.log('Complete user data available globally as window.USER_DATA:', window.USER_DATA);
+    
+    // Load companies after authentication is confirmed
+    loadData();
+});
+
+// Global functions available on all pages
+function logout() {
+    // Clear all session data
+    sessionStorage.removeItem('isLoggedIn');
+    sessionStorage.removeItem('userEmail');
+    sessionStorage.removeItem('userName');
+    sessionStorage.removeItem('userContact');
+    sessionStorage.removeItem('userDesignation');
+    sessionStorage.removeItem('userType');
+    sessionStorage.removeItem('loginTime');
+    sessionStorage.removeItem('userRowIndex');
+    
+    alert("Logged out successfully");
+    window.location.href = 'index.html';
+}
+
+function goHome() {
+    window.location.href = 'index.html';
+}
+
+// Helper function to get complete user data on any page
+function getUserData() {
+    return {
+        isLoggedIn: sessionStorage.getItem('isLoggedIn') === 'true',
+        email: sessionStorage.getItem('userEmail'),
+        name: sessionStorage.getItem('userName'),
+        contact: sessionStorage.getItem('userContact'),
+        designation: sessionStorage.getItem('userDesignation'),
+        userType: sessionStorage.getItem('userType'),
+        loginTime: sessionStorage.getItem('loginTime')
+    };
+}
+
 // 🔥 IMPORTANT: REPLACE WITH YOUR ACTUAL GOOGLE APPS SCRIPT WEB APP URL
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxyo19lD_6WHXwCkpcIXrfV38pAobEjiO6sYhYBFh-nId-YWdGHNPJF_Rh9IQBchSd/exec';
-
 let companies = {};
 let newCompanyFiles = {};
 let existingCompanyFiles = {};
@@ -700,7 +902,6 @@ async function loadData() {
 function populateCompanies() {
   const companySelect = document.getElementById('company');
   companySelect.innerHTML = '<option value="">-- Choose Company --</option>';
-  
   Object.keys(companies).forEach(company => {
     const option = document.createElement('option');
     option.value = company;
@@ -714,9 +915,7 @@ function populatePositions() {
   const company = document.getElementById('company').value;
   const positionSelect = document.getElementById('position');
   const positionDiv = document.getElementById('positionDiv');
-  
   positionSelect.innerHTML = '<option value="">-- Choose Position --</option>';
-  
   if (company && companies[company]) {
     companies[company].forEach(position => {
       const option = document.createElement('option');
@@ -742,7 +941,6 @@ function fileToBase64(file) {
 
 function generateFileInput(position, containerId, filesObject) {
   const container = document.getElementById(containerId);
-  
   const fileInputGroup = document.createElement('div');
   fileInputGroup.className = 'file-input-group';
   fileInputGroup.innerHTML = `
@@ -753,12 +951,9 @@ function generateFileInput(position, containerId, filesObject) {
     <input type="file" id="file-${position.replace(/\s+/g, '-')}" class="file-input" accept=".pdf" data-position="${position}">
     <div class="file-status" id="status-${position.replace(/\s+/g, '-')}">No file selected</div>
   `;
-  
   container.appendChild(fileInputGroup);
-  
   const fileInput = fileInputGroup.querySelector('.file-input');
   const statusDiv = fileInputGroup.querySelector('.file-status');
-  
   fileInput.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -804,11 +999,9 @@ function generateNewCompanyFileInputs() {
     .split(',')
     .map(p => p.trim())
     .filter(p => p);
-  
   const container = document.getElementById('newCompanyFileInputs');
   container.innerHTML = '';
   newCompanyFiles = {};
-  
   positions.forEach(position => {
     generateFileInput(position, 'newCompanyFileInputs', newCompanyFiles);
   });
@@ -819,11 +1012,9 @@ function generateExistingCompanyFileInputs() {
     .split(',')
     .map(p => p.trim())
     .filter(p => p);
-  
   const container = document.getElementById('existingCompanyFileInputs');
   container.innerHTML = '';
   existingCompanyFiles = {};
-  
   positions.forEach(position => {
     generateFileInput(position, 'existingCompanyFileInputs', existingCompanyFiles);
   });
@@ -852,7 +1043,6 @@ document.getElementById("asPerCompany").addEventListener("change", function () {
 // Form submission
 document.getElementById("jobForm").addEventListener("submit", function (e) {
   e.preventDefault();
-  
   const data = {
     name: document.getElementById("name").value,
     email: document.getElementById("email").value,
@@ -888,6 +1078,10 @@ document.getElementById("jobForm").addEventListener("submit", function (e) {
         window.open(whatsappLink, "_blank");
         document.getElementById("jobForm").reset();
         document.getElementById("positionDiv").style.display = "none";
+        // Reset recruiter info after form reset
+        const userData = getUserData();
+        document.getElementById('recruiterDisplay').value = `${userData.name} (${userData.email})${userData.contact ? ' - ' + userData.contact : ''}`;
+        document.getElementById('recruiterEmail').value = `${userData.email},${userData.name},${userData.contact || ''}`;
       };
       document.getElementById("popupOverlay").style.display = "flex";
     } else {
@@ -904,29 +1098,29 @@ document.getElementById("cancelBtn").addEventListener("click", () => {
   document.getElementById("popupOverlay").style.display = "none";
   document.getElementById("jobForm").reset();
   document.getElementById("positionDiv").style.display = "none";
+  // Reset recruiter info after cancel
+  const userData = getUserData();
+  document.getElementById('recruiterDisplay').value = `${userData.name} (${userData.email})${userData.contact ? ' - ' + userData.contact : ''}`;
+  document.getElementById('recruiterEmail').value = `${userData.email},${userData.name},${userData.contact || ''}`;
 });
 
 // Management functions
 function refreshManagementDropdowns() {
   const existingCompanySelect = document.getElementById('existingCompanySelect');
   existingCompanySelect.innerHTML = '<option value="">-- Select Company --</option>';
-  
   Object.keys(companies).forEach(company => {
     const option = document.createElement('option');
     option.value = company;
     option.textContent = company;
     existingCompanySelect.appendChild(option);
   });
-  
   refreshPositionDropdown();
 }
 
 function refreshPositionDropdown() {
   const company = document.getElementById('existingCompanySelect').value;
   const positionSelect = document.getElementById('existingPositionSelect');
-  
   positionSelect.innerHTML = '<option value="">-- Select Position --</option>';
-  
   if (company && companies[company]) {
     companies[company].forEach(position => {
       const option = document.createElement('option');
@@ -969,24 +1163,18 @@ document.getElementById('addCompanyBtn').addEventListener('click', async () => {
     alert('Please enter a company name');
     return;
   }
-  
   const positions = document.getElementById('newCompanyPositions').value
     .split(',')
     .map(p => p.trim())
     .filter(p => p);
-  
   setManageLoading(true);
-  
   const files = Object.values(newCompanyFiles);
-  
   const result = await callGoogleScript('addCompany', {
     company: name,
     positions: positions,
     files: files
   });
-  
   setManageLoading(false);
-  
   if (result && result.success) {
     alert(result.message);
     
@@ -1008,29 +1196,22 @@ document.getElementById('addPositionsBtn').addEventListener('click', async () =>
     alert('Please select a company first');
     return;
   }
-  
   const positions = document.getElementById('addPositionsInput').value
     .split(',')
     .map(p => p.trim())
     .filter(p => p);
-  
   if (positions.length === 0) {
     alert('Please enter at least one position');
     return;
   }
-  
   setManageLoading(true);
-  
   const files = Object.values(existingCompanyFiles);
-  
   const result = await callGoogleScript('addPositions', {
     company: company,
     positions: positions,
     files: files
   });
-  
   setManageLoading(false);
-  
   if (result && result.success) {
     alert(result.message);
     
@@ -1051,23 +1232,17 @@ document.getElementById('addPositionsBtn').addEventListener('click', async () =>
 document.getElementById('deletePositionBtn').addEventListener('click', async () => {
   const company = document.getElementById('existingCompanySelect').value;
   const position = document.getElementById('existingPositionSelect').value;
-  
   if (!company || !position) {
     alert('Please select both company and position');
     return;
   }
-  
   if (!confirm(`Delete position "${position}" from "${company}" and its JD file?`)) return;
-  
   setManageLoading(true);
-  
   const result = await callGoogleScript('deletePosition', {
     company: company,
     position: position
   });
-  
   setManageLoading(false);
-  
   if (result && result.success) {
     alert(result.message);
     
@@ -1083,22 +1258,16 @@ document.getElementById('deletePositionBtn').addEventListener('click', async () 
 // Delete company
 document.getElementById('deleteCompanyBtn').addEventListener('click', async () => {
   const company = document.getElementById('existingCompanySelect').value;
-  
   if (!company) {
     alert('Please select a company');
     return;
   }
-  
   if (!confirm(`Delete company "${company}" and ALL its positions and JD files?`)) return;
-  
   setManageLoading(true);
-  
   const result = await callGoogleScript('deleteCompany', {
     company: company
   });
-  
   setManageLoading(false);
-  
   if (result && result.success) {
     alert(result.message);
     
@@ -1112,11 +1281,7 @@ document.getElementById('deleteCompanyBtn').addEventListener('click', async () =
   }
 });
 
-// Load data when page loads
-window.addEventListener('load', () => {
-  console.log('Page loaded, loading companies...');
-  loadData();
-});
+console.log('Candidate Entry page loaded with authentication');
 </script>
 </body>
 </html>
