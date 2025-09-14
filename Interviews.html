@@ -217,36 +217,38 @@
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
     }
 
-    /* MOBILE-OPTIMIZED STATS */
+    /* COMPACT MOBILE-OPTIMIZED STATS */
     .stats-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 8px;
+      margin-bottom: 16px;
     }
 
     .stat-card {
       background: var(--glass);
-      padding: 16px;
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-md);
+      padding: 10px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
       border: 1px solid rgba(255, 255, 255, 0.2);
       text-align: center;
     }
 
     .stat-number {
-      font-size: 24px;
+      font-size: 18px;
       font-weight: 800;
       color: var(--primary-color);
-      margin-bottom: 4px;
+      margin-bottom: 2px;
+      line-height: 1;
     }
 
     .stat-label {
-      font-size: 10px;
+      font-size: 9px;
       color: var(--text-secondary);
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.3px;
+      line-height: 1.2;
     }
 
     /* MOBILE-FRIENDLY TABLE */
@@ -451,15 +453,20 @@
 
       .stats-container {
         grid-template-columns: repeat(4, 1fr);
-        gap: 16px;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+
+      .stat-card {
+        padding: 12px;
       }
 
       .stat-number {
-        font-size: 26px;
+        font-size: 20px;
       }
 
       .stat-label {
-        font-size: 11px;
+        font-size: 10px;
       }
     }
 
@@ -493,6 +500,25 @@
 
       .filters-title {
         font-size: 15px;
+      }
+
+      .stats-container {
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .stat-card {
+        padding: 14px;
+        border-radius: var(--radius-lg);
+      }
+
+      .stat-number {
+        font-size: 22px;
+        margin-bottom: 3px;
+      }
+
+      .stat-label {
+        font-size: 11px;
       }
 
       .table-header {
@@ -791,7 +817,7 @@ function escapeHtml(unsafe) {
     .replace(/'/g, "&#039;");
 }
 
-// NEW: Load filter options
+// Load filter options
 function loadFilterOptions() {
   const companyFilter = getElement('companyFilter');
   const recruiterFilter = getElement('recruiterFilter');
@@ -819,7 +845,7 @@ function loadFilterOptions() {
   });
 }
 
-// NEW: Apply filters
+// Apply filters
 function applyFilters() {
   const companyFilter = getElement('companyFilter');
   const recruiterFilter = getElement('recruiterFilter');
