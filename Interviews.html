@@ -58,52 +58,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Home Button - Mobile Optimized */
-    .home-button {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      width: 45px;
-      height: 45px;
-      background: rgba(255, 255, 255, 0.15);
-      border: none;
-      border-radius: 22.5px;
-      color: white;
-      font-size: 18px;
-      cursor: pointer;
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      z-index: 1000;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      touch-action: manipulation;
-    }
-
-    .home-button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      transition: left 0.6s ease;
-    }
-
-    .home-button:hover::before {
-      left: 100%;
-    }
-
-    .home-button:hover {
-      background: rgba(255, 255, 255, 0.25);
-      transform: scale(1.1) rotate(5deg);
-      box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
-    }
-
     /* PREMIUM GLASSMORPHISM EFFECTS */
     .glass {
       backdrop-filter: blur(20px);
@@ -117,45 +71,84 @@
       border: 1px solid rgba(37, 99, 235, 0.2);
     }
 
+    /* INTEGRATED COMPACT HEADER */
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      margin: 12px;
+      margin-bottom: 16px;
+      background: var(--glass);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .home-button {
+      position: static;
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      touch-action: manipulation;
+      flex-shrink: 0;
+      margin: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .home-button:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
+    }
+
+    .header-content {
+      flex-grow: 1;
+      text-align: center;
+    }
+
+    .dashboard-header h2 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin: 0;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .dashboard-subtitle {
+      color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 400;
+      margin: 2px 0 0 0;
+    }
+
     /* DASHBOARD STYLES - Mobile First */
     #dashboard {
       display: block;
       animation: dashboardFadeIn 0.6s ease-out;
       max-width: 1600px;
       margin: 0 auto;
-      padding: 12px;
-      padding-top: 70px; /* Account for home button */
+      padding: 0 12px 12px 12px;
     }
     
     @keyframes dashboardFadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .dashboard-header {
-      text-align: center;
-      margin-bottom: 20px;
-      padding: 16px;
-      background: var(--glass);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-md);
-    }
-    
-    .dashboard-header h2 {
-      font-size: 20px;
-      font-weight: 800;
-      color: var(--text-primary);
-      margin-bottom: 4px;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .dashboard-subtitle {
-      color: var(--text-secondary);
-      font-size: 12px;
-      font-weight: 400;
     }
 
     /* MOBILE-FIRST FILTERS */
@@ -433,17 +426,28 @@
 
     /* TABLET AND DESKTOP IMPROVEMENTS */
     @media (min-width: 480px) {
-      #dashboard {
-        padding: 16px;
-        padding-top: 70px;
+      .dashboard-header {
+        padding: 14px 18px;
+        gap: 14px;
+        margin: 16px;
+      }
+
+      .home-button {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
       }
 
       .dashboard-header h2 {
-        font-size: 22px;
+        font-size: 20px;
       }
 
       .dashboard-subtitle {
-        font-size: 13px;
+        font-size: 12px;
+      }
+
+      #dashboard {
+        padding: 0 16px 16px 16px;
       }
 
       .filters {
@@ -471,22 +475,25 @@
     }
 
     @media (min-width: 768px) {
-      .home-button {
-        top: 20px;
-        left: 20px;
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-        border-radius: 25px;
+      .dashboard-header {
+        padding: 16px 20px;
+        gap: 16px;
+        margin: 20px;
+        margin-bottom: 20px;
       }
 
-      .dashboard-header {
-        padding: 20px;
-        margin-bottom: 24px;
+      .home-button {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
       }
 
       .dashboard-header h2 {
-        font-size: 24px;
+        font-size: 22px;
+      }
+
+      .dashboard-subtitle {
+        font-size: 13px;
       }
 
       .filters-container {
@@ -600,18 +607,19 @@
 </head>
 <body>
 
-<!-- Home Button -->
-<button class="home-button" onclick="goHome()" title="Home">
-  🏠
-</button>
-
-<!-- Dashboard -->
-<div id="dashboard">
-  <div class="dashboard-header">
+<!-- Integrated Compact Header -->
+<div class="dashboard-header">
+  <button class="home-button" onclick="goHome()" title="Home">
+    🏠
+  </button>
+  <div class="header-content">
     <h2><i class="fas fa-calendar-check"></i> Scheduled Interviews</h2>
     <p class="dashboard-subtitle">All scheduled interviews in chronological order</p>
   </div>
+</div>
 
+<!-- Dashboard -->
+<div id="dashboard">
   <!-- Filters -->
   <div class="filters-container">
     <h3 class="filters-title">
