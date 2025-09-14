@@ -363,6 +363,19 @@
       white-space: nowrap;
     }
 
+    /* CLICKABLE CANDIDATE NAMES */
+    .candidate-name-clickable {
+      cursor: pointer !important;
+      color: var(--primary-color) !important;
+      font-weight: 600 !important;
+      text-decoration: underline;
+      transition: color 0.2s ease;
+    }
+
+    .candidate-name-clickable:hover {
+      color: var(--primary-dark) !important;
+    }
+
     /* MOBILE-OPTIMIZED BADGES */
     .interview-badge {
       padding: 2px 6px;
@@ -409,6 +422,198 @@
     .mode-online {
       background: rgba(37, 99, 235, 0.1);
       color: var(--primary-color);
+    }
+
+    /* POPUP STYLES */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.15);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(20px) saturate(180%);
+      animation: overlayFadeIn 0.3s ease-out;
+      padding: 16px;
+    }
+    
+    @keyframes overlayFadeIn {
+      from { opacity: 0; backdrop-filter: blur(0px); }
+      to { opacity: 1; backdrop-filter: blur(20px) saturate(180%); }
+    }
+    
+    .popup-content {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(40px) saturate(200%);
+      padding: 24px;
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
+        0 0 0 1px rgba(255, 255, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      animation: popupSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      position: relative;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    
+    .popup-content.compact {
+      padding: 20px !important;
+      max-width: 380px !important;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(40px) saturate(200%);
+    }
+    
+    @keyframes popupSlideUp {
+      from { opacity: 0; transform: translateY(40px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    
+    .popup-content h3 {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      text-align: center;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .popup-info {
+      background: rgba(37, 99, 235, 0.08);
+      backdrop-filter: blur(10px);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      margin-bottom: 20px;
+      border: 1px solid rgba(37, 99, 235, 0.15);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    
+    .popup-info p {
+      margin-bottom: 6px;
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .popup-info strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+    
+    .popup-info span {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    }
+    
+    .popup-content select, 
+    .popup-content textarea, 
+    .popup-content input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid rgba(0, 0, 0, 0.1);
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+    
+    .popup-content select:focus, 
+    .popup-content textarea:focus, 
+    .popup-content input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    
+    .popup-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+    
+    .popup-buttons .btn {
+      backdrop-filter: blur(10px);
+      font-weight: 600;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      touch-action: manipulation;
+    }
+    
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success-color), #059669);
+      color: white;
+      box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+    }
+    
+    .btn-success:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--text-primary);
+      border: 1.5px solid rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+    }
+    
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--text-primary);
+      border-color: var(--primary-color);
     }
 
     /* LOADING STATES */
@@ -710,6 +915,81 @@
   </div>
 </div>
 
+<!-- Candidate Options Popup -->
+<div class="popup-overlay" id="candidateOptionsPopup">
+  <div class="popup-content compact">
+    <h3><i class="fas fa-user"></i> Candidate Actions</h3>
+    
+    <div style="text-align: center; margin-bottom: 20px;">
+      <p id="popupCandidateNameDisplay" style="font-weight: bold; font-size: 14px; color: var(--text-primary);"></p>
+    </div>
+    
+    <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;">
+      <button class="btn btn-primary" id="btnUpdateStatus">
+        <i class="fas fa-edit"></i>
+        Update Status
+      </button>
+      <button class="btn btn-success" id="btnConnectWhatsapp">
+        <i class="fab fa-whatsapp"></i>
+        Connect WhatsApp
+      </button>
+    </div>
+    
+    <div style="text-align: center;">
+      <button class="btn btn-secondary" onclick="closeCandidateOptionsPopup()">
+        <i class="fas fa-times"></i>
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Status Update Popup (same as management page) -->
+<div class="popup-overlay" id="popup">
+  <div class="popup-content">
+    <h3><i class="fas fa-edit"></i> Update Status</h3>
+    
+    <div class="popup-info">
+      <p><strong>Name:</strong> <span id="popupCandidateName"></span></p>
+      <p><strong>Company:</strong> <span id="popupCompany"></span></p>
+      <p><strong>Position:</strong> <span id="popupPosition"></span></p>
+      <p><strong>__powerappsid__:</strong> <span id="popup__powerappsid__"></span></p>
+    </div>
+    
+    <div class="form-group">
+      <label for="statusDropdown"><i class="fas fa-flag"></i> Status</label>
+      <select id="statusDropdown" onchange="updateFinalStatusOptions()">
+        <option value="">Select Status</option>
+        <option value="Selected">Selected</option>
+        <option value="Rejected">Rejected</option>
+        <option value="On Hold">On Hold</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="finalStatusDropdown"><i class="fas fa-check-circle"></i> Final Status</label>
+      <select id="finalStatusDropdown">
+        <option value="">Select Final Status</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="commentBox"><i class="fas fa-comment"></i> Comment</label>
+      <textarea id="commentBox" rows="2" placeholder="Optional comment..."></textarea>
+    </div>
+    
+    <div class="popup-buttons">
+      <button class="btn btn-secondary" onclick="closePopup()">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button class="btn btn-primary" id="statusSubmitButton" onclick="submitFinalStatusUpdate()">
+        <i class="fas fa-save"></i>
+        <span class="btn-text">Update</span>
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
 // Authentication and user data management
 window.addEventListener('load', function() {
@@ -758,7 +1038,10 @@ window.addEventListener('load', function() {
 let loggedInEmail = "";
 let allScheduledInterviews = []; // Store all interviews
 let filteredInterviews = []; // Store filtered interviews
+let currentCandidateForPopup = null; // For popup actions
+let currentEmail = ""; // For status updates
 const dataURL = "https://script.google.com/macros/s/AKfycbwhlc_lnb2OaC-W1g2WGI0X15H4VmzykIg_FejVvucVqtEc-mO65vU1_QOPY0YBQ1HU/exec";
+const postURL = "https://script.google.com/macros/s/AKfycbwAru_5iah71LYYqh5CNrdt13tNP2sWLy7yzhbnNel2Q1wsojRRTYgn_wawfLHttN9R/exec";
 
 // Helper functions
 function goHome() {
@@ -823,6 +1106,139 @@ function escapeHtml(unsafe) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+// Popup functions
+function openCandidateOptionsPopup(candidate) {
+  const popup = getElement('candidateOptionsPopup');
+  const nameDisplay = getElement('popupCandidateNameDisplay');
+  
+  if (!popup || !nameDisplay) return;
+
+  currentCandidateForPopup = candidate;
+  nameDisplay.textContent = candidate.name || "";
+  popup.style.display = 'flex';
+}
+
+function closeCandidateOptionsPopup() {
+  const popup = getElement('candidateOptionsPopup');
+  if (popup) popup.style.display = 'none';
+  currentCandidateForPopup = null;
+}
+
+// Status update functions (from management page)
+function openPopup(candidate) {
+  currentEmail = candidate.email;
+  const elements = {
+    candidateName: getElement("popupCandidateName"),
+    company: getElement("popupCompany"),
+    position: getElement("popupPosition"),
+    powerAppsId: getElement("popup__powerappsid__"),
+    statusDropdown: getElement("statusDropdown"),
+    finalStatusDropdown: getElement("finalStatusDropdown"),
+    commentBox: getElement("commentBox"),
+    popup: getElement("popup")
+  };
+  
+  if (elements.candidateName) elements.candidateName.textContent = candidate.name || "";
+  if (elements.company) elements.company.textContent = candidate.company || "";
+  if (elements.position) elements.position.textContent = candidate.position || "";
+  
+  if (elements.powerAppsId) {
+    elements.powerAppsId.textContent = candidate.__powerappsid__ || "Not Available";
+  }
+  
+  if (elements.statusDropdown) elements.statusDropdown.value = "";
+  if (elements.finalStatusDropdown) elements.finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
+  if (elements.commentBox) elements.commentBox.value = "";
+  if (elements.popup) elements.popup.style.display = "flex";
+}
+
+function closePopup() {
+  const popup = getElement("popup");
+  if (popup) popup.style.display = "none";
+}
+
+function updateFinalStatusOptions() {
+  const statusDropdown = getElement("statusDropdown");
+  const finalStatusDropdown = getElement("finalStatusDropdown");
+  if (!statusDropdown || !finalStatusDropdown) return;
+  
+  const status = statusDropdown.value;
+  finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
+  
+  const statusOptions = {
+    "Selected": ["Shortlisted", "L1 Selected", "L2 Selected", "L3 Selected", "Final Select"],
+    "Rejected": ["Not Shortlisted", "L1 Reject", "L2 Reject", "L3 Reject"],
+    "On Hold": ["Position On Hold", "Candidate On Hold"]
+  };
+  
+  (statusOptions[status] || []).forEach(s => {
+    const opt = document.createElement("option");
+    opt.value = s;
+    opt.textContent = s;
+    finalStatusDropdown.appendChild(opt);
+  });
+}
+
+function submitFinalStatusUpdate() {
+  const statusDropdown = getElement("statusDropdown");
+  const finalStatusDropdown = getElement("finalStatusDropdown");
+  const commentBox = getElement("commentBox");
+  
+  if (!statusDropdown || !finalStatusDropdown || !commentBox) {
+    alert("Form elements not found");
+    return;
+  }
+  
+  const status = statusDropdown.value;
+  const finalStatus = finalStatusDropdown.value;
+  const comment = commentBox.value;
+  
+  if (!currentEmail || !status || !finalStatus) {
+    alert("Please select both status and final status.");
+    return;
+  }
+  
+  // Show loading state
+  const submitButton = getElement('statusSubmitButton');
+  if (submitButton) {
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+  }
+  
+  fetch(postURL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ 
+      email: currentEmail, 
+      status, 
+      final_status: finalStatus, 
+      comment 
+    })
+  })
+  .then(() => {
+    setTimeout(() => {
+      alert("Status updated successfully!");
+      closePopup();
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<i class="fas fa-save"></i> <span class="btn-text">Update</span>';
+      }
+      loadScheduledInterviews(); // Reload data
+    }, 1000);
+  })
+  .catch(error => {
+    console.error("Fetch failed:", error);
+    setTimeout(() => {
+      alert("Update failed. Please try again.");
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<i class="fas fa-save"></i> <span class="btn-text">Update</span>';
+      }
+    }, 1000);
+  });
 }
 
 // Load filter options
@@ -935,7 +1351,7 @@ function renderInterviewTable() {
     return;
   }
   
-  filteredInterviews.forEach(interview => {
+  filteredInterviews.forEach((interview, index) => {
     const row = document.createElement("tr");
     const safeName = escapeHtml(interview.name || "");
     const interviewStatus = getInterviewStatus(interview.interview_date);
@@ -953,7 +1369,7 @@ function renderInterviewTable() {
     
     row.innerHTML = `
       <td title="${formatInterviewDateTime(interview.interview_date)}"><strong>${formatInterviewDateTime(interview.interview_date)}</strong></td>
-      <td title="${safeName}"><strong>${safeName}</strong></td>
+      <td title="${safeName}" class="candidate-name-clickable" data-index="${index}"><strong>${safeName}</strong></td>
       <td title="${escapeHtml(interview.email || '')}">${escapeHtml(interview.email || "")}</td>
       <td title="${escapeHtml(interview.position || '')}">${escapeHtml(interview.position || "")}</td>
       <td title="${escapeHtml(interview.company || '')}">${escapeHtml(interview.company || "")}</td>
@@ -964,6 +1380,18 @@ function renderInterviewTable() {
     `;
     
     tableBody.appendChild(row);
+  });
+  
+  // Add click handlers to candidate names
+  tableBody.querySelectorAll('.candidate-name-clickable').forEach(nameCell => {
+    nameCell.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const index = parseInt(event.currentTarget.getAttribute('data-index'));
+      const candidate = filteredInterviews[index];
+      if (candidate) {
+        openCandidateOptionsPopup(candidate);
+      }
+    });
   });
   
   // Update statistics
@@ -1028,7 +1456,57 @@ function loadScheduledInterviews() {
     });
 }
 
-console.log('Scheduled Interviews page loaded with authentication integration');
+// Initialize popup event handlers after DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  // Update Status button handler
+  const btnUpdateStatus = getElement('btnUpdateStatus');
+  if (btnUpdateStatus) {
+    btnUpdateStatus.addEventListener('click', () => {
+      if (!currentCandidateForPopup) {
+        alert('No candidate selected');
+        return;
+      }
+      openPopup(currentCandidateForPopup);
+      closeCandidateOptionsPopup();
+    });
+  }
+
+  // Connect WhatsApp button handler
+  const btnConnectWhatsapp = getElement('btnConnectWhatsapp');
+  if (btnConnectWhatsapp) {
+    btnConnectWhatsapp.addEventListener('click', () => {
+      if (!currentCandidateForPopup) {
+        alert('No candidate selected');
+        return;
+      }
+
+      // Get mobile number from candidate data
+      const mobileRaw = currentCandidateForPopup.Mobile || 
+                       currentCandidateForPopup.mobile || 
+                       currentCandidateForPopup.Phone || 
+                       currentCandidateForPopup.phone || '';
+      
+      if (!mobileRaw) {
+        alert('Mobile number not available for this candidate');
+        return;
+      }
+
+      // Extract digits only
+      const digitsOnly = mobileRaw.toString().replace(/\D/g, '');
+      if (!digitsOnly) {
+        alert('Invalid mobile number');
+        return;
+      }
+
+      // Open WhatsApp
+      const waUrl = `https://wa.me/91${digitsOnly}`;
+      window.open(waUrl, '_blank');
+      closeCandidateOptionsPopup();
+    });
+  }
+});
+
+console.log('Scheduled Interviews page loaded with authentication integration and popup functionality');
 </script>
 </body>
 </html>
