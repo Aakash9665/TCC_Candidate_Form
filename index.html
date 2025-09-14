@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCC Portal - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Premium Background Animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+            animation: backgroundFloat 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes backgroundFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-element:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation: float1 15s infinite ease-in-out;
+        }
+
+        .floating-element:nth-child(2) {
+            top: 60%;
+            right: 15%;
+            animation: float2 12s infinite ease-in-out;
+        }
+
+        .floating-element:nth-child(3) {
+            bottom: 30%;
+            left: 20%;
+            animation: float3 18s infinite ease-in-out;
+        }
+
+        @keyframes float1 {
+            0%, 100% { transform: translateY(0px) scale(1); opacity: 0.3; }
+            50% { transform: translateY(-100px) scale(1.5); opacity: 0.6; }
+        }
+
+        @keyframes float2 {
+            0%, 100% { transform: translateX(0px) scale(1); opacity: 0.4; }
+            50% { transform: translateX(-80px) scale(1.2); opacity: 0.8; }
+        }
+
+        @keyframes float3 {
+            0%, 100% { transform: translate(0px, 0px) scale(1); opacity: 0.2; }
+            33% { transform: translate(30px, -40px) scale(1.3); opacity: 0.5; }
+            66% { transform: translate(-20px, -80px) scale(0.8); opacity: 0.7; }
+        }
+
+        /* Home Button */
+        .home-button {
+            position: fixed !important;
+            top: 20px !important;
+            left: 20px !important;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1000 !important;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideInLeft 0.8s ease-out;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .home-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .home-button:hover::before {
+            left: 100%;
+        }
+
+        .home-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
+        }
+
+        .home-button:active {
+            transform: scale(1.05) rotate(2deg);
+            transition: transform 0.1s ease;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .user-info {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: white;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+            z-index: 1000;
+            animation: slideInRight 0.8s ease-out;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 18px;
+            margin-left: 12px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 50px 40px;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+            text-align: center;
+            max-width: 420px;
+            width: 100%;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            z-index: 10;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            border-radius: 25px;
+            pointer-events: none;
+        }
+
+        .logo {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            margin: 0 auto 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            animation: logoFloat 3s ease-in-out infinite;
+            box-shadow: 
+                0 10px 30px rgba(102, 126, 234, 0.3),
+                0 0 0 4px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            animation: logoShimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(2deg); }
+        }
+
+        @keyframes logoShimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            50% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #333, #666);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleSlideIn 1s ease-out 0.3s both;
+        }
+
+        @keyframes titleSlideIn {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 40px;
+            animation: subtitleSlideIn 1s ease-out 0.5s both;
+            font-weight: 400;
+        }
+
+        @keyframes subtitleSlideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Enhanced Login Form Styles */
+        .login-container {
+            display: block;
+        }
+
+        .main-container {
+            display: none;
+        }
+
+        .form-container {
+            animation: formSlideIn 1s ease-out 0.7s both;
+        }
+
+        @keyframes formSlideIn {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+            transition: color 0.3s ease;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid #e1e1e1;
+            border-radius: 15px;
+            font-size: 16px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(248, 249, 250, 0.8);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 10px 25px rgba(102, 126, 234, 0.1),
+                0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-group input:focus + .input-glow {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(-1px);
+            transition: transform 0.1s ease;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 20px;
+            display: none;
+            animation: errorShake 0.6s ease-in-out;
+            background: rgba(231, 76, 60, 0.1);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Enhanced Main Portal Styles */
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: buttonsSlideIn 1s ease-out 0.8s both;
+        }
+
+        @keyframes buttonsSlideIn {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 22px 35px;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: block;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .nav-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translateY(-50%) scale(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-button:hover::before {
+            left: 100%;
+        }
+
+        .nav-button:hover::after {
+            transform: translateY(-50%) scale(1);
+        }
+
+        .nav-button:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-button:active {
+            transform: translateY(-2px) scale(1.01);
+            transition: transform 0.1s ease;
+        }
+
+        .entry-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            animation: buttonSlideIn 0.8s ease-out 1s both;
+        }
+
+        .management-btn {
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            animation: buttonSlideIn 0.8s ease-out 1.2s both;
+        }
+
+        .interviews-btn {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            animation: buttonSlideIn 0.8s ease-out 1.4s both;
+        }
+
+        @keyframes buttonSlideIn {
+            from {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .entry-btn:hover {
+            box-shadow: 0 20px 40px rgba(76, 175, 80, 0.4);
+        }
+
+        .management-btn:hover {
+            box-shadow: 0 20px 40px rgba(33, 150, 243, 0.4);
+        }
+
+        .interviews-btn:hover {
+            box-shadow: 0 20px 40px rgba(255, 152, 0, 0.4);
+        }
+
+        .footer {
+            margin-top: 35px;
+            color: #888;
+            font-size: 12px;
+            animation: footerSlideIn 1s ease-out 1.6s both;
+            font-weight: 500;
+        }
+
+        @keyframes footerSlideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            position: relative;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Screen Transition Animation */
+        .fade-transition {
+            animation: fadeTransition 0.8s ease-in-out;
+        }
+
+        @keyframes fadeTransition {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Success Animation */
+        .success-checkmark {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #4CAF50;
+            margin-right: 10px;
+            position: relative;
+            animation: checkmarkBounce 0.6s ease-in-out;
+        }
+
+        .success-checkmark::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 6px;
+            width: 6px;
+            height: 10px;
+            border: solid #4CAF50;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            animation: checkmarkDraw 0.3s ease-in-out 0.3s both;
+        }
+
+        @keyframes checkmarkBounce {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes checkmarkDraw {
+            0% { height: 0; }
+            100% { height: 10px; }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 35px 25px;
+                margin: 10px;
+                border-radius: 20px;
+            }
+            
+            h1 {
+                font-size: 22px;
+            }
+            
+            .nav-button {
+                padding: 18px 30px;
+                font-size: 15px;
+            }
+
+            .user-info {
+                top: 15px;
+                right: 15px;
+                font-size: 12px;
+                padding: 10px 15px;
+            }
+
+            .home-button {
+                top: 15px !important;
+                left: 15px !important;
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+                border-radius: 22.5px;
+            }
+
+            .logo {
+                width: 70px;
+                height: 70px;
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+
+    <button class="home-button" onclick="goHome()" title="Home">
+        🏠
+    </button>
+
+    <div class="user-info" id="userInfo">
+        <span class="success-checkmark" style="display: none;" id="loginSuccess"></span>
+        Logged in as: <span id="userName"></span>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="container">
+        <!-- Login Screen -->
+        <div class="login-container" id="loginContainer">
+            <div class="logo">TCC</div>
+            <h1>Login to TCC Portal</h1>
+            <p class="subtitle">Enter your credentials to access the premium portal</p>
+            
+            <div class="form-container">
+                <form onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required>
+                    </div>
+                    
+                    <button type="submit" class="login-btn" id="loginBtn">
+                        <span id="loginText">Login to Portal</span>
+                    </button>
+                    <div class="error-message" id="errorMessage">
+                        Invalid email or password. Please try again.
+                    </div>
+                </form>
+            </div>
+            
+            <div class="footer">
+                TCC Portal v1.0 - Premium Edition
+            </div>
+        </div>
+
+        <!-- Main Portal Screen -->
+        <div class="main-container" id="mainContainer">
+            <div class="logo">TCC</div>
+            <h1>Welcome to TCC Portal</h1>
+            <p class="subtitle">Choose an option to continue your journey</p>
+            
+            <div class="button-container">
+                <button class="nav-button entry-btn" onclick="navigateToEntry()">
+                    📝 Candidates Entry
+                </button>
+                
+                <button class="nav-button management-btn" onclick="navigateToManagement()">
+                    👥 Candidates Management
+                </button>
+
+                <button class="nav-button interviews-btn" onclick="navigateToInterviews()">
+                    📅 Scheduled Interviews
+                </button>
+            </div>
+            
+            <div class="footer">
+                TCC Portal v1.0 - Premium Edition
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Google Apps Script Web App URL - Replace with your actual URL
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyppTAVxXAgMzB9vBp_FzS4ajl3A35roDgGoPY94ABBCTNjwfx0OxTv9-CUuOa44IUT/exec';
+
+        function goHome() {
+            console.log("Home button clicked");
+            
+            // Add button animation
+            const homeButton = document.querySelector('.home-button');
+            homeButton.style.transform = 'scale(0.9) rotate(10deg)';
+            
+            setTimeout(() => {
+                homeButton.style.transform = '';
+                
+                // Check if user is logged in
+                if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                    // User is logged in, show main portal
+                    document.querySelector('.container').classList.add('fade-transition');
+                    
+                    setTimeout(() => {
+                        document.getElementById('loginContainer').style.display = 'none';
+                        document.getElementById('mainContainer').style.display = 'block';
+                        document.getElementById('userInfo').style.display = 'block';
+                    }, 400);
+                } else {
+                    // User not logged in, refresh to show login screen
+                    window.location.reload();
+                }
+            }, 150);
+            
+            // Add haptic feedback
+            if (navigator.vibrate) {
+                navigator.vibrate(30);
+            }
+        }
+
+        // Updated handleLogin function with Google Sheets authentication
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const loginBtn = document.getElementById('loginBtn');
+            const loginText = document.getElementById('loginText');
+            
+            // Add loading state
+            loginBtn.classList.add('loading');
+            loginText.textContent = 'Authenticating...';
+            loginBtn.disabled = true;
+            
+            try {
+                // Make API call to Google Apps Script
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=login&username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                const result = await response.json();
+                console.log('Login response:', result);
+                
+                if (result.success) {
+                    // Login successful
+                    loginText.textContent = 'Success!';
+                    loginBtn.classList.remove('loading');
+                    
+                    setTimeout(() => {
+                        document.querySelector('.container').classList.add('fade-transition');
+                        
+                        setTimeout(() => {
+                            document.getElementById('loginContainer').style.display = 'none';
+                            document.getElementById('mainContainer').style.display = 'block';
+                            document.getElementById('userInfo').style.display = 'block';
+                            document.getElementById('loginSuccess').style.display = 'inline-block';
+                            document.getElementById('userName').textContent = result.user.name;
+                            
+                            // Clear form
+                            document.getElementById('email').value = '';
+                            document.getElementById('password').value = '';
+                            errorMessage.style.display = 'none';
+                            loginBtn.disabled = false;
+                            loginText.textContent = 'Login to Portal';
+                            
+                            // Store complete user information from Google Sheets
+                            sessionStorage.setItem('isLoggedIn', 'true');
+                            sessionStorage.setItem('userEmail', result.user.username || email);
+                            sessionStorage.setItem('userName', result.user.name || '');
+                            sessionStorage.setItem('userContact', result.user.contact || '');
+                            sessionStorage.setItem('userDesignation', result.user.designation || '');
+                            sessionStorage.setItem('userType', result.user.userType || '');
+                            sessionStorage.setItem('loginTime', result.user.loginTime || new Date().toISOString());
+                            sessionStorage.setItem('userRowIndex', result.user.rowIndex || '');
+                            
+                            console.log('Login successful with Google Sheets data:', {
+                                name: result.user.name,
+                                email: result.user.username,
+                                contact: result.user.contact,
+                                designation: result.user.designation,
+                                userType: result.user.userType
+                            });
+                        }, 400);
+                    }, 800);
+                } else {
+                    // Login failed
+                    loginBtn.classList.remove('loading');
+                    loginText.textContent = 'Login to Portal';
+                    loginBtn.disabled = false;
+                    errorMessage.textContent = result.message || 'Login failed';
+                    errorMessage.style.display = 'block';
+                    console.log('Login failed:', result.message);
+                }
+            } catch (error) {
+                // Network or other error
+                loginBtn.classList.remove('loading');
+                loginText.textContent = 'Login to Portal';
+                loginBtn.disabled = false;
+                
+                console.error('Login error:', error);
+                
+                // Show appropriate error message
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorMessage.textContent = 'Network error. Please check your connection and try again.';
+                } else if (error.message.includes('CORS')) {
+                    errorMessage.textContent = 'Authentication service unavailable. Please try again later.';
+                } else {
+                    errorMessage.textContent = 'Login failed. Please try again.';
+                }
+                
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            document.querySelector('.container').classList.add('fade-transition');
+            
+            setTimeout(() => {
+                document.getElementById('loginContainer').style.display = 'block';
+                document.getElementById('mainContainer').style.display = 'none';
+                document.getElementById('userInfo').style.display = 'none';
+                
+                // Clear all session data
+                sessionStorage.removeItem('isLoggedIn');
+                sessionStorage.removeItem('userEmail');
+                sessionStorage.removeItem('userName');
+                sessionStorage.removeItem('userContact');
+                sessionStorage.removeItem('userDesignation');
+                sessionStorage.removeItem('userType');
+                sessionStorage.removeItem('loginTime');
+                sessionStorage.removeItem('userRowIndex');
+                
+                console.log('User logged out - all session data cleared');
+            }, 400);
+        }
+
+        // Updated navigation functions for web hosting
+        function navigateToEntry() {
+            console.log("Entry button clicked");
+            const button = event.target;
+            button.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                button.style.transform = '';
+                
+                // Check if user is logged in
+                if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                    // Web hosting - redirect to entry page
+                    console.log('Navigating to entry.html with user data:', {
+                        email: sessionStorage.getItem('userEmail'),
+                        name: sessionStorage.getItem('userName'),
+                        designation: sessionStorage.getItem('userDesignation'),
+                        userType: sessionStorage.getItem('userType')
+                    });
+                    window.location.href = 'entry.html';
+                } else {
+                    alert("Please login first");
+                }
+            }, 150);
+        }
+
+        function navigateToManagement() {
+            console.log("Management button clicked");
+            const button = event.target;
+            button.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                button.style.transform = '';
+                
+                if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                    // Web hosting - redirect to management page
+                    console.log('Navigating to management.html with user data:', {
+                        email: sessionStorage.getItem('userEmail'),
+                        name: sessionStorage.getItem('userName'),
+                        designation: sessionStorage.getItem('userDesignation'),
+                        userType: sessionStorage.getItem('userType')
+                    });
+                    window.location.href = 'management.html';
+                } else {
+                    alert("Please login first");
+                }
+            }, 150);
+        }
+
+        function navigateToInterviews() {
+            console.log("Scheduled Interviews button clicked");
+            const button = event.target;
+            button.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                button.style.transform = '';
+                
+                if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                    // Web hosting - redirect to interviews page
+                    console.log('Navigating to interviews.html with user data:', {
+                        email: sessionStorage.getItem('userEmail'),
+                        name: sessionStorage.getItem('userName'),
+                        designation: sessionStorage.getItem('userDesignation'),
+                        userType: sessionStorage.getItem('userType')
+                    });
+                    window.location.href = 'interviews.html';
+                } else {
+                    alert("Please login first");
+                }
+            }, 150);
+        }
+
+        // Check login state on page load
+        window.addEventListener('load', function() {
+            console.log("Page loaded");
+            
+            // Check if user was previously logged in
+            if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                const userName = sessionStorage.getItem('userName');
+                const userEmail = sessionStorage.getItem('userEmail');
+                const userDesignation = sessionStorage.getItem('userDesignation');
+                const userType = sessionStorage.getItem('userType');
+                const loginTime = sessionStorage.getItem('loginTime');
+                
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('mainContainer').style.display = 'block';
+                document.getElementById('userInfo').style.display = 'block';
+                document.getElementById('userName').textContent = userName;
+                
+                console.log('User already logged in with Google Sheets data:', {
+                    name: userName,
+                    email: userEmail,
+                    designation: userDesignation,
+                    userType: userType,
+                    loginTime: loginTime
+                });
+            }
+            
+            // Enhanced entrance animation
+            document.querySelector('.container').style.opacity = '0';
+            document.querySelector('.container').style.transform = 'translateY(50px) scale(0.9)';
+            
+            setTimeout(() => {
+                document.querySelector('.container').style.transition = 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
+                document.querySelector('.container').style.opacity = '1';
+                document.querySelector('.container').style.transform = 'translateY(0) scale(1)';
+            }, 200);
+        });
+
+        // Enhanced touch feedback for mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.nav-button, .login-btn, .logout-btn, .home-button');
+            buttons.forEach(button => {
+                button.addEventListener('touchstart', function(e) {
+                    this.style.transform = 'scale(0.95)';
+                });
+                button.addEventListener('touchend', function(e) {
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 100);
+                });
+            });
+
+            // Add haptic feedback simulation
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    if (navigator.vibrate) {
+                        navigator.vibrate(50);
+                    }
+                });
+            });
+        });
+
+        // Add particle effect on button hover
+        function createParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.style.cssText = `
+                position: fixed;
+                width: 4px;
+                height: 4px;
+                background: rgba(255, 255, 255, 0.8);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 1000;
+                left: ${x}px;
+                top: ${y}px;
+            `;
+            
+            document.body.appendChild(particle);
+            
+            const animation = particle.animate([
+                { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                { transform: `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) scale(0)`, opacity: 0 }
+            ], {
+                duration: 1000,
+                easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+            });
+            
+            animation.onfinish = () => particle.remove();
+        }
+
+        // Helper functions for accessing user data globally
+        window.getUserData = function() {
+            return {
+                isLoggedIn: sessionStorage.getItem('isLoggedIn') === 'true',
+                email: sessionStorage.getItem('userEmail'),
+                name: sessionStorage.getItem('userName'),
+                contact: sessionStorage.getItem('userContact'),
+                designation: sessionStorage.getItem('userDesignation'),
+                userType: sessionStorage.getItem('userType'),
+                loginTime: sessionStorage.getItem('loginTime'),
+                rowIndex: sessionStorage.getItem('userRowIndex')
+            };
+        };
+
+        window.isUserLoggedIn = function() {
+            return sessionStorage.getItem('isLoggedIn') === 'true';
+        };
+    </script>
+</body>
+</html>
