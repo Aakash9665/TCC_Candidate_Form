@@ -520,12 +520,6 @@
   🏠
 </button>
 
-<!-- User Info -->
-<div class="user-info" id="userInfo">
-  Logged in as: <span id="userName"></span>
-  <button class="logout-btn" onclick="logout()">Logout</button>
-</div>
-
 <form id="jobForm">
   <h2>
     <i class="fas fa-user-plus"></i>
@@ -714,7 +708,7 @@ window.addEventListener('load', function() {
         return;
     }
     
-    // User is authenticated - display user info
+    // User is authenticated
     console.log('✓ User authenticated successfully');
     console.log('Complete User Details:', {
         name: userName,
@@ -724,7 +718,6 @@ window.addEventListener('load', function() {
         userType: userType,
         loginTime: loginTime
     });
-    }
     
     // Set recruiter information from logged-in user
     const recruiterDisplay = document.getElementById('recruiterDisplay');
@@ -735,7 +728,7 @@ window.addEventListener('load', function() {
         recruiterEmail.value = `${userEmail},${userName},${userContact || ''}`;
     }
     
-    // Store user data globally for easy access in your page scripts
+    // Store user data globally
     window.USER_DATA = {
         isLoggedIn: isLoggedIn === 'true',
         email: userEmail,
@@ -752,7 +745,7 @@ window.addEventListener('load', function() {
     loadData();
 });
 
-// Global functions available on all pages
+// Global functions
 function logout() {
     // Clear all session data
     sessionStorage.removeItem('isLoggedIn');
@@ -772,7 +765,7 @@ function goHome() {
     window.location.href = 'index.html';
 }
 
-// Helper function to get complete user data on any page
+// Helper function to get complete user data
 function getUserData() {
     return {
         isLoggedIn: sessionStorage.getItem('isLoggedIn') === 'true',
