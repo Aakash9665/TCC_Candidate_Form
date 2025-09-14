@@ -1365,6 +1365,7 @@ function openPopup(candidate) {
     candidateName: getElement("popupCandidateName"),
     company: getElement("popupCompany"),
     position: getElement("popupPosition"),
+    powerAppsId: getElement("popup__PowerAppsId__"),
     statusDropdown: getElement("statusDropdown"),
     finalStatusDropdown: getElement("finalStatusDropdown"),
     commentBox: getElement("commentBox"),
@@ -1373,6 +1374,7 @@ function openPopup(candidate) {
   if (elements.candidateName) elements.candidateName.textContent = candidate.name || "";
   if (elements.company) elements.company.textContent = candidate.company || "";
   if (elements.position) elements.position.textContent = candidate.position || "";
+  if (elements.powerAppsId) elements.powerAppsId.textContent = candidate.__PowerAppsId__ || "";
   if (elements.statusDropdown) elements.statusDropdown.value = "";
   if (elements.finalStatusDropdown) elements.finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
   if (elements.commentBox) elements.commentBox.value = "";
