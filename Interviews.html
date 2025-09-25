@@ -1232,9 +1232,9 @@ function updateFinalStatusOptions() {
   finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
   
   const statusOptions = {
-    "Selected": ["Shortlisted", "L1 Selected", "L2 Selected", "L3 Selected", "Final Select", "Joined"],
-    "Rejected": ["Not Shortlisted", "L1 Reject", "L2 Reject", "L3 Reject", "Not Joined],
-    "On Hold": ["Position On Hold", "Candidate On Hold", "Delayed by Candidate"]
+    "Selected": ["Shortlisted", "L1 Selected", "L2 Selected", "L3 Selected", "Final Select"],
+    "Rejected": ["Not Shortlisted", "L1 Reject", "L2 Reject", "L3 Reject"],
+    "On Hold": ["Position On Hold", "Candidate On Hold"]
   };
   
   (statusOptions[status] || []).forEach(s => {
