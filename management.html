@@ -1053,7 +1053,7 @@
           <th><i class="fas fa-check"></i></th>
           <th><i class="fas fa-clock"></i> Updated</th>
           <th><i class="fas fa-user"></i> Name</th>
-          <th><i class="fas fa-envelope"></i> Email</th>
+          <th><i class="fas fa-envelope"></i> Mobile No</th>
           <th><i class="fas fa-briefcase"></i> Position</th>
           <th><i class="fas fa-user-tie"></i> Recruiter</th>
           <th><i class="fas fa-building"></i> Company</th>
@@ -1703,7 +1703,7 @@ function renderTable(data) {
       <td><input type="checkbox" class="candidate-checkbox" ${isSelected ? 'checked' : ''} onchange="toggleCandidateSelection(${idx}, this.checked)" onclick="event.stopPropagation()"></td>
       <td title="${formatTimestamp(c.timestamp)}">${formatTimestamp(c.timestamp)}</td>
       <td title="${safeName}"><strong>${safeName}</strong></td>
-      <td title="${escapeHtml(c.email || '')}">${escapeHtml(c.email || "")}</td>
+      <td title="${escapeHtml(c.mobile || '')}">${escapeHtml(c.mobile || "")}</td>
       <td title="${escapeHtml(c.position || '')}">${escapeHtml(c.position || "")}</td>
       <td>${escapeHtml((c.recruiter || '').split("@")[0])}</td>
       <td title="${escapeHtml(c.company || '')}">${escapeHtml(c.company || "")}</td>
