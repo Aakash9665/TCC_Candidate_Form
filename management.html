@@ -35,14 +35,14 @@
       --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
       --gradient-secondary: linear-gradient(135deg, var(--background-secondary) 0%, var(--background-tertiary) 100%);
     }
-    
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       background: linear-gradient(135deg, var(--background-primary) 0%, #e0f2fe 100%);
@@ -52,7 +52,7 @@
       min-height: 100vh;
       animation: fadeInBody 0.6s ease-out;
     }
-    
+
     @keyframes fadeInBody {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -109,18 +109,18 @@
       background: rgba(255, 255, 255, 0.7);
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
-    
+
     .glass-dark {
       backdrop-filter: blur(20px);
       background: rgba(37, 99, 235, 0.1);
       border: 1px solid rgba(37, 99, 235, 0.2);
     }
-    
+
     /* LOADING SPINNER */
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-    
+
     .loading-spinner {
       display: inline-block;
       width: 16px;
@@ -131,7 +131,7 @@
       animation: spin 0.8s ease-in-out infinite;
       margin-right: 8px;
     }
-    
+
     /* COMPACT DASHBOARD STYLES */
     #dashboard {
       display: block;
@@ -140,12 +140,12 @@
       margin: 0 auto;
       padding: 16px;
     }
-    
+
     @keyframes dashboardFadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    
+
     .dashboard-header {
       text-align: center;
       margin-bottom: 24px;
@@ -154,7 +154,7 @@
       border-radius: var(--radius-xl);
       box-shadow: var(--shadow-md);
     }
-    
+
     .dashboard-header h2 {
       font-size: 24px;
       font-weight: 800;
@@ -165,7 +165,7 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    
+
     .dashboard-subtitle {
       color: var(--text-secondary);
       font-size: 13px;
@@ -183,19 +183,19 @@
       letter-spacing: 0.5px;
       margin-left: 8px;
     }
-    
+
     .user-type-admin {
       background: rgba(239, 68, 68, 0.1);
       color: var(--error-color);
       border: 1px solid rgba(239, 68, 68, 0.2);
     }
-    
+
     .user-type-user {
       background: rgba(37, 99, 235, 0.1);
       color: var(--primary-color);
       border: 1px solid rgba(37, 99, 235, 0.2);
     }
-    
+
     /* COMPACT FILTERS */
     .filters-container {
       background: var(--glass);
@@ -205,7 +205,7 @@
       margin-bottom: 20px;
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
-    
+
     .filters-title {
       font-size: 15px;
       font-weight: 700;
@@ -215,19 +215,19 @@
       align-items: center;
       gap: 6px;
     }
-    
+
     .filters-title i {
       color: var(--primary-color);
       font-size: 14px;
     }
-    
+
     .filters {
       display: grid;
       grid-template-columns: 2fr 1fr 1.5fr 1.5fr;
       gap: 16px;
       align-items: end;
     }
-    
+
     .filter-group label {
       display: block;
       font-size: 11px;
@@ -237,11 +237,11 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    
+
     .input-with-icon {
       position: relative;
     }
-    
+
     .input-with-icon i {
       position: absolute;
       left: 10px;
@@ -251,7 +251,7 @@
       z-index: 1;
       font-size: 12px;
     }
-    
+
     select, input[type="text"] {
       width: 100%;
       padding: 10px 12px;
@@ -262,17 +262,17 @@
       color: var(--text-primary);
       font-weight: 400;
     }
-    
+
     .input-with-icon input[type="text"] {
       padding-left: 32px;
     }
-    
+
     select:focus, input[type="text"]:focus {
       outline: none;
       border-color: var(--primary-color);
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
     }
-    
+
     .btn {
       padding: 10px 16px;
       font-size: 12px;
@@ -287,24 +287,67 @@
       overflow: hidden;
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
+
     .btn-primary {
       background: var(--gradient-primary);
       color: white;
       box-shadow: var(--shadow-sm);
     }
-    
+
     .btn-primary:hover:not(:disabled) {
       transform: translateY(-1px);
       box-shadow: var(--shadow-md);
     }
-    
+
     .btn-primary:disabled {
       opacity: 0.7;
       cursor: not-allowed;
       transform: none;
     }
-    
+
+    /* BULK UPDATE BUTTON */
+    .bulk-update-container {
+      margin: 16px 0;
+      text-align: center;
+    }
+
+    .bulk-update-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .bulk-update-btn.show {
+      display: inline-flex;
+      animation: bulkBtnShow 0.3s ease-out;
+    }
+
+    @keyframes bulkBtnShow {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .bulk-update-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .bulk-update-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     /* ULTRA COMPACT TABLE */
     .table-container {
       background: var(--glass);
@@ -313,13 +356,16 @@
       box-shadow: var(--shadow-lg);
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
-    
+
     .table-header {
       padding: 16px 20px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       background: var(--glass-dark);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    
+
     .table-title {
       font-size: 15px;
       font-weight: 700;
@@ -328,25 +374,56 @@
       align-items: center;
       gap: 6px;
     }
-    
+
     .table-title i {
       color: var(--primary-color);
       font-size: 14px;
     }
-    
+
+    /* SELECT ALL CHECKBOX IN HEADER */
+    .select-all-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .select-all-container input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary-color);
+      cursor: pointer;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 11px;
     }
-    
+
     th, td {
       padding: 8px 10px;
       text-align: left;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       vertical-align: middle;
     }
-    
+
+    /* CHECKBOX COLUMN STYLING */
+    th:first-child, td:first-child {
+      width: 40px;
+      text-align: center;
+      padding: 8px 5px;
+    }
+
+    .candidate-checkbox {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary-color);
+      cursor: pointer;
+    }
+
     th {
       background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
       color: white;
@@ -359,30 +436,39 @@
       z-index: 10;
       white-space: nowrap;
     }
-    
+
     th i {
       margin-right: 4px;
       font-size: 9px;
     }
-    
+
     tbody tr {
       cursor: pointer;
       transition: all 0.15s ease;
     }
-    
+
     tbody tr:hover {
       background: rgba(37, 99, 235, 0.04);
       transform: scale(1.002);
     }
-    
+
+    tbody tr.selected {
+      background: rgba(37, 99, 235, 0.08);
+      box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.2);
+    }
+
     tbody tr:nth-child(even) {
       background: rgba(248, 250, 252, 0.5);
     }
-    
+
     tbody tr:nth-child(even):hover {
       background: rgba(37, 99, 235, 0.04);
     }
-    
+
+    tbody tr:nth-child(even).selected {
+      background: rgba(37, 99, 235, 0.08);
+    }
+
     tbody td {
       font-size: 11px;
       color: var(--text-primary);
@@ -392,25 +478,25 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    
+
     .btn-sm {
       padding: 6px 10px;
       font-size: 10px;
       border-radius: var(--radius-sm);
       font-weight: 600;
     }
-    
+
     .btn-success {
       background: linear-gradient(135deg, var(--success-color), #059669);
       color: white;
       box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
     }
-    
+
     .btn-success:hover:not(:disabled) {
       transform: translateY(-1px);
       box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
     }
-    
+
     /* ENHANCED GLASSMORPHISM POPUP STYLES */
     .popup-overlay {
       position: fixed;
@@ -427,12 +513,12 @@
       animation: overlayFadeIn 0.3s ease-out;
       padding: 16px;
     }
-    
+
     @keyframes overlayFadeIn {
       from { opacity: 0; backdrop-filter: blur(0px); }
       to { opacity: 1; backdrop-filter: blur(20px) saturate(180%); }
     }
-    
+
     .popup-content {
       background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(40px) saturate(200%);
@@ -450,7 +536,7 @@
       max-height: 85vh;
       overflow-y: auto;
     }
-    
+
     .popup-content::before {
       content: '';
       position: absolute;
@@ -461,12 +547,12 @@
       background: var(--gradient-primary);
       border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     }
-    
+
     @keyframes popupSlideUp {
       from { opacity: 0; transform: translateY(40px) scale(0.9); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
-    
+
     .popup-content h3 {
       font-size: 18px;
       font-weight: 800;
@@ -478,7 +564,7 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    
+
     .popup-info {
       background: rgba(37, 99, 235, 0.08);
       backdrop-filter: blur(10px);
@@ -488,28 +574,60 @@
       border: 1px solid rgba(37, 99, 235, 0.15);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
-    
+
     .popup-info p {
       margin-bottom: 6px;
       color: var(--text-secondary);
       font-size: 12px;
       font-weight: 500;
     }
-    
+
     .popup-info strong {
       color: var(--text-primary);
       font-weight: 700;
     }
-    
+
     .popup-info span {
       color: var(--text-primary);
       font-weight: 600;
     }
-    
+
+    /* BULK UPDATE SPECIFIC STYLES */
+    .bulk-info {
+      background: rgba(16, 185, 129, 0.08);
+      backdrop-filter: blur(10px);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      margin-bottom: 20px;
+      border: 1px solid rgba(16, 185, 129, 0.15);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .bulk-candidates-list {
+      max-height: 150px;
+      overflow-y: auto;
+      margin-top: 8px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .bulk-candidate-item {
+      font-size: 11px;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      color: var(--text-primary);
+    }
+
+    .bulk-candidate-item:last-child {
+      border-bottom: none;
+    }
+
     .form-group {
       margin-bottom: 16px;
     }
-    
+
     .form-group label {
       display: block;
       font-size: 11px;
@@ -520,7 +638,7 @@
       letter-spacing: 0.5px;
       text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
     }
-    
+
     .popup-content select, 
     .popup-content textarea, 
     .popup-content input {
@@ -534,7 +652,7 @@
       color: var(--text-primary);
       font-weight: 500;
     }
-    
+
     .popup-content select:focus, 
     .popup-content textarea:focus, 
     .popup-content input:focus {
@@ -543,38 +661,38 @@
       background: rgba(255, 255, 255, 0.95);
       box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
-    
+
     .popup-buttons {
       display: flex;
       gap: 10px;
       justify-content: flex-end;
       margin-top: 24px;
     }
-    
+
     .popup-buttons .btn {
       backdrop-filter: blur(10px);
       font-weight: 600;
     }
-    
+
     .popup-buttons .btn-secondary {
       background: rgba(255, 255, 255, 0.7);
       color: var(--text-primary);
       border: 1.5px solid rgba(0, 0, 0, 0.1);
       backdrop-filter: blur(10px);
     }
-    
+
     .popup-buttons .btn-secondary:hover:not(:disabled) {
       background: rgba(255, 255, 255, 0.9);
       color: var(--text-primary);
       border-color: var(--primary-color);
     }
-    
+
     .popup-buttons .btn-primary {
       background: var(--gradient-primary);
       backdrop-filter: blur(10px);
       box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
     }
-    
+
     /* COMPACT POPUP ENHANCED GLASS */
     .popup-content.compact {
       padding: 20px !important;
@@ -582,14 +700,14 @@
       background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(40px) saturate(200%);
     }
-    
+
     .popup-content.compact h3 {
       font-size: 16px;
       margin-bottom: 16px;
       color: var(--text-primary);
       font-weight: 800;
     }
-    
+
     .compact-row {
       display: flex;
       align-items: center;
@@ -602,22 +720,22 @@
       border: 1px solid rgba(37, 99, 235, 0.1);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
     }
-    
+
     .compact-row strong {
       color: var(--text-primary);
       font-weight: 700;
     }
-    
+
     .compact-row span {
       color: var(--text-primary);
       font-weight: 600;
     }
-    
+
     .checkbox-group {
       display: flex;
       gap: 16px;
     }
-    
+
     .checkbox-item {
       display: flex;
       align-items: center;
@@ -628,7 +746,7 @@
       color: var(--text-primary);
       text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
     }
-    
+
     .checkbox-item input[type="checkbox"],
     .checkbox-item input[type="radio"] {
       width: 14px;
@@ -636,14 +754,14 @@
       accent-color: var(--primary-color);
       cursor: pointer;
     }
-    
+
     .popup-content.compact input[type="datetime-local"],
     .popup-content.compact input[type="url"],
     .popup-content.compact select {
       font-size: 11px !important;
       padding: 8px 10px !important;
     }
-    
+
     /* WHATSAPP BUTTON - HIDDEN BY DEFAULT */
     #waFloatBtn {
       position: fixed;
@@ -663,17 +781,17 @@
       align-items: center;
       gap: 6px;
     }
-    
+
     #waFloatBtn.show {
       display: flex !important;
       animation: whatsappSlideIn 0.5s ease-out;
     }
-    
+
     @keyframes whatsappSlideIn {
       from { opacity: 0; transform: translateY(20px) scale(0.8); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
-    
+
     #waFloatBtn:hover {
       background: linear-gradient(135deg, #128C7E, #25D366);
       transform: translateY(-3px) scale(1.05);
@@ -683,7 +801,7 @@
     #waFloatBtn i {
       font-size: 14px;
     }
-    
+
     /* STATUS BADGES - More Compact */
     .status-badge {
       padding: 2px 6px;
@@ -693,25 +811,25 @@
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    
+
     .status-selected {
       background: rgba(16, 185, 129, 0.1);
       color: var(--success-color);
       border: 1px solid rgba(16, 185, 129, 0.2);
     }
-    
+
     .status-rejected {
       background: rgba(239, 68, 68, 0.1);
       color: var(--error-color);
       border: 1px solid rgba(239, 68, 68, 0.2);
     }
-    
+
     .status-hold {
       background: rgba(245, 158, 11, 0.1);
       color: var(--warning-color);
       border: 1px solid rgba(245, 158, 11, 0.2);
     }
-    
+
     /* LOADING STATES */
     .loading {
       text-align: center;
@@ -719,12 +837,12 @@
       padding: 40px;
       animation: pulse 1.5s ease-in-out infinite alternate;
     }
-    
+
     @keyframes pulse {
       from { opacity: 0.6; }
       to { opacity: 1; }
     }
-    
+
     /* RESPONSIVE - More Compact */
     @media (max-width: 1200px) {
       .filters {
@@ -732,58 +850,58 @@
         gap: 12px;
       }
     }
-    
+
     @media (max-width: 768px) {
       #dashboard {
         padding: 12px;
       }
-      
+
       .filters {
         grid-template-columns: 1fr;
         gap: 10px;
       }
-      
+
       .dashboard-header {
         padding: 16px;
         margin-bottom: 16px;
       }
-      
+
       .dashboard-header h2 {
         font-size: 20px;
       }
-      
+
       .filters-container {
         padding: 16px;
         margin-bottom: 16px;
       }
-      
+
       .table-container {
         overflow-x: auto;
       }
-      
+
       table {
         min-width: 900px;
       }
-      
+
       th, td {
         padding: 6px 8px;
         font-size: 10px;
       }
-      
+
       .popup-content {
         margin: 12px;
         padding: 20px;
       }
-      
+
       .popup-content.compact {
         max-width: 95vw !important;
         padding: 16px !important;
       }
-      
+
       .popup-buttons {
         flex-direction: column;
       }
-      
+
       .btn {
         width: 100%;
         justify-content: center;
@@ -798,25 +916,25 @@
         border-radius: 22.5px;
       }
     }
-    
+
     @media (max-width: 480px) {
       .dashboard-header h2 {
         font-size: 18px;
       }
-      
+
       .table-header {
         padding: 12px 16px;
       }
-      
+
       .table-title {
         font-size: 13px;
       }
-      
+
       th, td {
         padding: 4px 6px;
       }
     }
-    
+
     /* ACCESSIBILITY */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
@@ -825,7 +943,7 @@
         transition-duration: 0.01ms !important;
       }
     }
-    
+
     /* FOCUS STYLES */
     button:focus-visible,
     input:focus-visible,
@@ -834,22 +952,22 @@
       outline: 2px solid var(--primary-color);
       outline-offset: 2px;
     }
-    
+
     /* PREMIUM SCROLLBAR */
     ::-webkit-scrollbar {
       width: 6px;
     }
-    
+
     ::-webkit-scrollbar-track {
       background: var(--background-tertiary);
       border-radius: 3px;
     }
-    
+
     ::-webkit-scrollbar-thumb {
       background: var(--primary-color);
       border-radius: 3px;
     }
-    
+
     ::-webkit-scrollbar-thumb:hover {
       background: var(--primary-dark);
     }
@@ -871,7 +989,7 @@
       <span id="userTypeBadge" class="user-type-badge"></span>
     </p>
   </div>
-  
+
   <div class="filters-container">
     <h3 class="filters-title">
       <i class="fas fa-filter"></i>
@@ -885,7 +1003,7 @@
           <input type="text" id="nameSearch" placeholder="Enter name..." />
         </div>
       </div>
-      
+
       <div class="filter-group">
         <label>&nbsp;</label>
         <button class="btn btn-primary" id="searchButton" onclick="applyFilters(true)">
@@ -893,14 +1011,14 @@
           <span class="btn-text">Search</span>
         </button>
       </div>
-      
+
       <div class="filter-group">
         <label>Company</label>
         <select id="companySelect" onchange="applyFilters()">
           <option value="">All Companies</option>
         </select>
       </div>
-      
+
       <div class="filter-group">
         <label>Status</label>
         <select id="statusSelect" onchange="applyFilters()">
@@ -909,17 +1027,30 @@
       </div>
     </div>
   </div>
-  
+
+  <!-- Bulk Update Button Container -->
+  <div class="bulk-update-container">
+    <button class="bulk-update-btn" id="bulkUpdateBtn" onclick="openBulkUpdatePopup()">
+      <i class="fas fa-edit"></i>
+      <span id="bulkUpdateText">Update Status for Selected Candidates</span>
+    </button>
+  </div>
+
   <div class="table-container">
     <div class="table-header">
       <h3 class="table-title">
         <i class="fas fa-table"></i>
         Candidate Database
       </h3>
+      <div class="select-all-container">
+        <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
+        <label for="selectAllCheckbox">Select All</label>
+      </div>
     </div>
     <table id="candidateTable">
       <thead>
         <tr>
+          <th><i class="fas fa-check"></i></th>
           <th><i class="fas fa-clock"></i> Updated</th>
           <th><i class="fas fa-user"></i> Name</th>
           <th><i class="fas fa-envelope"></i> Email</th>
@@ -931,25 +1062,33 @@
         </tr>
       </thead>
       <tbody>
-        <tr><td colspan="8" class="loading">
+        <tr><td colspan="9" class="loading">
           <i class="fas fa-spinner fa-spin"></i> 
           Loading candidates...
         </td></tr>
       </tbody>
     </table>
   </div>
-  
+
   <!-- Status Update Popup -->
   <div class="popup-overlay" id="popup">
     <div class="popup-content">
-      <h3><i class="fas fa-edit"></i> Update Status</h3>
-      
-      <div class="popup-info">
+      <h3 id="popupTitle"><i class="fas fa-edit"></i> Update Status</h3>
+
+      <!-- Single Candidate Info -->
+      <div class="popup-info" id="singleCandidateInfo">
         <p><strong>Name:</strong> <span id="popupCandidateName"></span></p>
         <p><strong>Company:</strong> <span id="popupCompany"></span></p>
         <p><strong>Position:</strong> <span id="popupPosition"></span></p>
       </div>
-      
+
+      <!-- Bulk Update Info -->
+      <div class="bulk-info" id="bulkUpdateInfo" style="display: none;">
+        <p><strong>Selected Candidates:</strong> <span id="bulkCandidateCount"></span></p>
+        <p><strong>Companies:</strong> <span id="bulkCompanies"></span></p>
+        <div class="bulk-candidates-list" id="bulkCandidatesList"></div>
+      </div>
+
       <div class="form-group">
         <label for="statusDropdown"><i class="fas fa-flag"></i> Status</label>
         <select id="statusDropdown" onchange="updateFinalStatusOptions()">
@@ -959,41 +1098,41 @@
           <option value="On Hold">On Hold</option>
         </select>
       </div>
-      
+
       <div class="form-group">
         <label for="finalStatusDropdown"><i class="fas fa-check-circle"></i> Final Status</label>
         <select id="finalStatusDropdown">
           <option value="">Select Final Status</option>
         </select>
       </div>
-      
+
       <div class="form-group">
         <label for="commentBox"><i class="fas fa-comment"></i> Comment</label>
         <textarea id="commentBox" rows="2" placeholder="Optional comment..."></textarea>
       </div>
-      
+
       <div class="popup-buttons">
         <button class="btn btn-secondary" onclick="closePopup()">
           <i class="fas fa-times"></i> Cancel
         </button>
-        <button class="btn btn-primary" id="statusSubmitButton" onclick="submitFinalStatusUpdate()">
+        <button class="btn btn-primary" id="statusSubmitButton" onclick="submitStatusUpdate()">
           <i class="fas fa-save"></i>
           <span class="btn-text">Update</span>
         </button>
       </div>
     </div>
   </div>
-  
+
   <!-- Interview Scheduling Popup -->
   <div class="popup-overlay" id="extraPopup">
     <div class="popup-content compact">
       <h3><i class="fas fa-calendar-plus"></i> Schedule Interview</h3>
-      
+
       <div class="compact-row">
         <strong><i class="fas fa-user"></i> Candidate:</strong>
         <span id="extraCandidateName"></span>
       </div>
-      
+
       <div class="compact-row">
         <span><i class="fas fa-paper-plane"></i> Send via:</span>
         <div class="checkbox-group">
@@ -1007,14 +1146,14 @@
           </label>
         </div>
       </div>
-      
+
       <div class="form-group">
         <label for="extraDateTime">
           <i class="fas fa-calendar-alt"></i> Date & Time
         </label>
         <input type="datetime-local" id="extraDateTime">
       </div>
-      
+
       <div class="compact-row">
         <span><i class="fas fa-map-marker-alt"></i> Mode:</span>
         <div class="checkbox-group">
@@ -1028,7 +1167,7 @@
           </label>
         </div>
       </div>
-      
+
       <div id="locationBox" style="display:none;">
         <div class="form-group">
           <label for="locationSelect">
@@ -1039,7 +1178,7 @@
           </select>
         </div>
       </div>
-      
+
       <div id="inviteBox" style="display:none;">
         <div class="form-group">
           <label for="inviteLink">
@@ -1048,7 +1187,7 @@
           <input type="url" id="inviteLink" placeholder="https://meet.google.com/xxx">
         </div>
       </div>
-      
+
       <div class="popup-buttons">
         <button class="btn btn-secondary" onclick="closeExtraPopup()">
           <i class="fas fa-times"></i> Cancel
@@ -1067,12 +1206,11 @@
   <i class="fab fa-whatsapp"></i>
   <span id="waButtonText">Send WhatsApp</span>
 </a>
-
 <script>
 // Authentication and user data management
 window.addEventListener('load', function() {
     console.log("Management page loaded - checking authentication...");
-    
+
     // Get all user data from sessionStorage
     const isLoggedIn = sessionStorage.getItem('isLoggedIn');
     const userEmail = sessionStorage.getItem('userEmail');
@@ -1081,14 +1219,14 @@ window.addEventListener('load', function() {
     const userDesignation = sessionStorage.getItem('userDesignation');
     const userType = sessionStorage.getItem('userType');
     const loginTime = sessionStorage.getItem('loginTime');
-    
+
     // Check if user is authenticated
     if (isLoggedIn !== 'true') {
         alert("Session expired or not logged in. Redirecting to login page.");
         window.location.href = 'index.html';
         return;
     }
-    
+
     // User is authenticated - display user info
     console.log('✓ User authenticated successfully');
     console.log('Complete User Details:', {
@@ -1099,10 +1237,10 @@ window.addEventListener('load', function() {
         userType: userType,
         loginTime: loginTime
     });
-    
+
     // Set loggedInEmail to the authenticated user's email
     loggedInEmail = userEmail;
-    
+
     // Store user data globally for easy access
     window.USER_DATA = {
         isLoggedIn: isLoggedIn === 'true',
@@ -1113,12 +1251,12 @@ window.addEventListener('load', function() {
         userType: userType,
         loginTime: loginTime
     };
-    
+
     console.log('Complete user data available globally as window.USER_DATA:', window.USER_DATA);
-    
+
     // Display user type badge
     displayUserTypeBadge();
-    
+
     // Load dashboard with authenticated user's data
     loadDashboard();
 });
@@ -1127,11 +1265,11 @@ window.addEventListener('load', function() {
 function displayUserTypeBadge() {
     const badge = document.getElementById('userTypeBadge');
     const userData = getUserData();
-    
+
     if (badge && userData.userType) {
         const userType = userData.userType.toLowerCase();
         badge.textContent = userData.userType.toUpperCase();
-        
+
         if (userType === 'admin') {
             badge.className = 'user-type-badge user-type-admin';
         } else {
@@ -1151,7 +1289,7 @@ function logout() {
     sessionStorage.removeItem('userType');
     sessionStorage.removeItem('loginTime');
     sessionStorage.removeItem('userRowIndex');
-    
+
     alert("Logged out successfully");
     window.location.href = 'index.html';
 }
@@ -1176,7 +1314,7 @@ function getUserData() {
 // NEW: Role-based candidate filtering function
 function filterCandidatesByUserType(data) {
     const userData = getUserData();
-    
+
     // If user is Admin, show all candidates
     if (userData.userType && userData.userType.toLowerCase() === 'admin') {
         console.log('✓ Admin user detected - showing ALL candidates');
@@ -1191,10 +1329,14 @@ function filterCandidatesByUserType(data) {
 // Original variables and functions (keeping existing logic intact)
 let loggedInEmail = "";
 let candidates = [];
+let filteredCandidates = []; // NEW: Store current filtered candidates
+let selectedCandidates = []; // NEW: Store selected candidates for bulk operations
 let currentEmail = "";
 let currentCandidate = null;
 let locationRows = [];
 let lastWhatsAppLink = "";
+let isBulkUpdate = false; // NEW: Flag to track if we're doing bulk update
+
 const postURL = "https://script.google.com/macros/s/AKfycbwAru_5iah71LYYqh5CNrdt13tNP2sWLy7yzhbnNel2Q1wsojRRTYgn_wawfLHttN9R/exec";
 const dataURL = "https://script.google.com/macros/s/AKfycbwhlc_lnb2OaC-W1g2WGI0X15H4VmzykIg_FejVvucVqtEc-mO65vU1_QOPY0YBQ1HU/exec";
 
@@ -1215,10 +1357,10 @@ const nameSearchInput = getElement("nameSearch");
 function setButtonLoading(buttonId, isLoading, loadingText = "Processing...") {
   const button = getElement(buttonId);
   if (!button) return;
-  
+
   const btnText = button.querySelector('.btn-text');
   const icon = button.querySelector('i');
-  
+
   if (isLoading) {
     button.disabled = true;
     if (btnText) btnText.textContent = loadingText;
@@ -1254,12 +1396,12 @@ function loadDashboard() {
       if (!Array.isArray(data)) {
         throw new Error("Expected array data");
       }
-      
+
       // ROLE-BASED FILTERING: Apply user type filtering
       candidates = filterCandidatesByUserType(data);
-      
+
       console.log(`✓ Loaded ${candidates.length} candidates for current user`);
-      
+
       loadCompanyOptions();
       loadStatusOptions();
       applyFilters();
@@ -1267,7 +1409,7 @@ function loadDashboard() {
     .catch(err => {
       console.error("Error loading dashboard:", err);
       if (tableBody) {
-        tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px;"><i class="fas fa-exclamation-triangle" style="color: var(--error-color);"></i><br>Error loading data. Please refresh.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 30px;"><i class="fas fa-exclamation-triangle" style="color: var(--error-color);"></i><br>Error loading data. Please refresh.</td></tr>';
       }
     });
 }
@@ -1298,15 +1440,15 @@ function loadStatusOptions() {
 
 function applyFilters(isNameSearch = false) {
   if (!companySelect || !statusSelect || !nameSearchInput) return;
-  
+
   if (isNameSearch) {
     setButtonLoading('searchButton', true, 'Searching...');
   }
-  
+
   const selectedCompany = companySelect.value;
   const selectedStatus = statusSelect.value;
   const nameQuery = nameSearchInput.value.toLowerCase().trim();
-  
+
   // Simulate search delay for better UX
   setTimeout(() => {
     const filtered = candidates.filter(c => {
@@ -1315,7 +1457,13 @@ function applyFilters(isNameSearch = false) {
       const matchName = isNameSearch ? (c.name || '').toLowerCase().includes(nameQuery) : true;
       return matchCompany && matchStatus && matchName;
     });
-    
+
+    // Store filtered candidates globally
+    filteredCandidates = filtered;
+
+    // Clear selections when applying new filters
+    clearAllSelections();
+
     renderTable(filtered);
     if (isNameSearch) {
       setButtonLoading('searchButton', false);
@@ -1323,12 +1471,150 @@ function applyFilters(isNameSearch = false) {
   }, isNameSearch ? 500 : 0);
 }
 
+// NEW: Checkbox and bulk update functions
+function toggleSelectAll() {
+  const selectAllCheckbox = getElement("selectAllCheckbox");
+  const candidateCheckboxes = document.querySelectorAll('.candidate-checkbox');
+
+  if (!selectAllCheckbox) return;
+
+  const isChecked = selectAllCheckbox.checked;
+
+  candidateCheckboxes.forEach((checkbox, index) => {
+    checkbox.checked = isChecked;
+    toggleCandidateSelection(index, isChecked);
+  });
+
+  updateBulkUpdateButton();
+}
+
+function toggleCandidateSelection(candidateIndex, isSelected) {
+  if (candidateIndex >= filteredCandidates.length) return;
+
+  const candidate = filteredCandidates[candidateIndex];
+  const row = tableBody.children[candidateIndex];
+
+  if (isSelected) {
+    // Add to selected candidates if not already present
+    if (!selectedCandidates.some(c => c.email === candidate.email)) {
+      selectedCandidates.push(candidate);
+    }
+    if (row) row.classList.add('selected');
+  } else {
+    // Remove from selected candidates
+    selectedCandidates = selectedCandidates.filter(c => c.email !== candidate.email);
+    if (row) row.classList.remove('selected');
+  }
+
+  updateSelectAllCheckbox();
+  updateBulkUpdateButton();
+}
+
+function updateSelectAllCheckbox() {
+  const selectAllCheckbox = getElement("selectAllCheckbox");
+  const candidateCheckboxes = document.querySelectorAll('.candidate-checkbox');
+
+  if (!selectAllCheckbox || candidateCheckboxes.length === 0) return;
+
+  const checkedCount = Array.from(candidateCheckboxes).filter(cb => cb.checked).length;
+
+  if (checkedCount === 0) {
+    selectAllCheckbox.indeterminate = false;
+    selectAllCheckbox.checked = false;
+  } else if (checkedCount === candidateCheckboxes.length) {
+    selectAllCheckbox.indeterminate = false;
+    selectAllCheckbox.checked = true;
+  } else {
+    selectAllCheckbox.indeterminate = true;
+  }
+}
+
+function updateBulkUpdateButton() {
+  const bulkUpdateBtn = getElement("bulkUpdateBtn");
+  const bulkUpdateText = getElement("bulkUpdateText");
+
+  if (!bulkUpdateBtn || !bulkUpdateText) return;
+
+  if (selectedCandidates.length > 0) {
+    bulkUpdateBtn.classList.add('show');
+    bulkUpdateText.textContent = `Update Status for ${selectedCandidates.length} Selected Candidate${selectedCandidates.length > 1 ? 's' : ''}`;
+  } else {
+    bulkUpdateBtn.classList.remove('show');
+  }
+}
+
+function clearAllSelections() {
+  selectedCandidates = [];
+  const selectAllCheckbox = getElement("selectAllCheckbox");
+  if (selectAllCheckbox) {
+    selectAllCheckbox.checked = false;
+    selectAllCheckbox.indeterminate = false;
+  }
+
+  // Clear visual selection from table rows
+  const rows = tableBody.querySelectorAll('tr');
+  rows.forEach(row => row.classList.remove('selected'));
+
+  updateBulkUpdateButton();
+}
+
+function openBulkUpdatePopup() {
+  if (selectedCandidates.length === 0) {
+    alert("Please select at least one candidate to update.");
+    return;
+  }
+
+  isBulkUpdate = true;
+
+  // Get unique companies from selected candidates
+  const uniqueCompanies = [...new Set(selectedCandidates.map(c => c.company).filter(Boolean))];
+
+  // Update popup title and show bulk info
+  const popupTitle = getElement("popupTitle");
+  const singleCandidateInfo = getElement("singleCandidateInfo");
+  const bulkUpdateInfo = getElement("bulkUpdateInfo");
+  const bulkCandidateCount = getElement("bulkCandidateCount");
+  const bulkCompanies = getElement("bulkCompanies");
+  const bulkCandidatesList = getElement("bulkCandidatesList");
+
+  if (popupTitle) popupTitle.innerHTML = '<i class="fas fa-edit"></i> Bulk Update Status';
+  if (singleCandidateInfo) singleCandidateInfo.style.display = "none";
+  if (bulkUpdateInfo) bulkUpdateInfo.style.display = "block";
+
+  if (bulkCandidateCount) bulkCandidateCount.textContent = selectedCandidates.length;
+  if (bulkCompanies) bulkCompanies.textContent = uniqueCompanies.join(", ");
+
+  // Populate candidates list
+  if (bulkCandidatesList) {
+    bulkCandidatesList.innerHTML = "";
+    selectedCandidates.forEach(candidate => {
+      const item = document.createElement("div");
+      item.className = "bulk-candidate-item";
+      item.innerHTML = `<strong>${candidate.name || 'N/A'}</strong> - ${candidate.company || 'N/A'} (${candidate.position || 'N/A'})`;
+      bulkCandidatesList.appendChild(item);
+    });
+  }
+
+  // Reset form fields
+  const statusDropdown = getElement("statusDropdown");
+  const finalStatusDropdown = getElement("finalStatusDropdown");
+  const commentBox = getElement("commentBox");
+
+  if (statusDropdown) statusDropdown.value = "";
+  if (finalStatusDropdown) finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
+  if (commentBox) commentBox.value = "";
+
+  // Show popup
+  const popup = getElement("popup");
+  if (popup) popup.style.display = "flex";
+}
+
 function formatTimestamp(ts) {
   if (!ts) return "N/A";
   try {
     const date = new Date(ts);
     if (isNaN(date.getTime())) return ts;
-    
+
     const dd = String(date.getDate()).padStart(2, '0');
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const yy = String(date.getFullYear()).slice(-2);
@@ -1336,7 +1622,7 @@ function formatTimestamp(ts) {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     const ampm = hours >= 12 ? 'PM' : 'AM';
     hours = hours % 12 || 12;
-    
+
     return `${dd}/${mm}/${yy}`;
   } catch (error) {
     console.error("Error formatting timestamp:", error);
@@ -1349,7 +1635,7 @@ function formatInterviewDT(dt) {
   try {
     const d = new Date(dt);
     if (isNaN(d.getTime())) return dt;
-    
+
     const dd = String(d.getDate()).padStart(2,'0');
     const mm = String(d.getMonth()+1).padStart(2,'0');
     const yy = String(d.getFullYear()).slice(-2);
@@ -1357,7 +1643,7 @@ function formatInterviewDT(dt) {
     const m = String(d.getMinutes()).padStart(2,'0');
     const ampm = h >= 12 ? 'PM' : 'AM';
     h = h % 12 || 12;
-    
+
     return `${dd}-${mm}-${yy} ${h}:${m} ${ampm}`;
   } catch (error) {
     console.error("Error formatting interview date:", error);
@@ -1386,7 +1672,7 @@ function getStatusBadge(status) {
   if (!status) return '';
   const lowerStatus = status.toLowerCase();
   let badgeClass = 'status-badge';
-  
+
   if (lowerStatus.includes('select') || lowerStatus.includes('shortlist')) {
     badgeClass += ' status-selected';
   } else if (lowerStatus.includes('reject')) {
@@ -1394,7 +1680,7 @@ function getStatusBadge(status) {
   } else if (lowerStatus.includes('hold')) {
     badgeClass += ' status-hold';
   }
-  
+
   return `<span class="${badgeClass}">${status}</span>`;
 }
 
@@ -1402,14 +1688,19 @@ function renderTable(data) {
   if (!tableBody) return;
   tableBody.innerHTML = "";
   if (data.length === 0) {
-    tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px;"><i class="fas fa-search" style="color: var(--text-tertiary);"></i><br>No candidates found</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 30px;"><i class="fas fa-search" style="color: var(--text-tertiary);"></i><br>No candidates found</td></tr>';
     return;
   }
+
   data.forEach((c, idx) => {
     const row = document.createElement("tr");
     const safeName = escapeHtml(c.name || "");
-    
+
+    // Check if this candidate is in selected candidates
+    const isSelected = selectedCandidates.some(selected => selected.email === c.email);
+
     row.innerHTML = `
+      <td><input type="checkbox" class="candidate-checkbox" ${isSelected ? 'checked' : ''} onchange="toggleCandidateSelection(${idx}, this.checked)" onclick="event.stopPropagation()"></td>
       <td title="${formatTimestamp(c.timestamp)}">${formatTimestamp(c.timestamp)}</td>
       <td title="${safeName}"><strong>${safeName}</strong></td>
       <td title="${escapeHtml(c.email || '')}">${escapeHtml(c.email || "")}</td>
@@ -1421,14 +1712,39 @@ function renderTable(data) {
         <i class="fas fa-phone"></i> Contact
       </button></td>
     `;
-    
-    row.addEventListener("click", () => openPopup(c));
+
+    // Add selected class if candidate is selected
+    if (isSelected) {
+      row.classList.add('selected');
+    }
+
+    row.addEventListener("click", (event) => {
+      // Don't open popup if clicking on checkbox or contact button
+      if (event.target.type === 'checkbox' || event.target.closest('button')) {
+        return;
+      }
+      openPopup(c);
+    });
     tableBody.appendChild(row);
   });
+
+  // Update select all checkbox state
+  updateSelectAllCheckbox();
 }
 
 function openPopup(candidate) {
+  isBulkUpdate = false;
   currentEmail = candidate.email;
+
+  // Show single candidate info, hide bulk info
+  const popupTitle = getElement("popupTitle");
+  const singleCandidateInfo = getElement("singleCandidateInfo");
+  const bulkUpdateInfo = getElement("bulkUpdateInfo");
+
+  if (popupTitle) popupTitle.innerHTML = '<i class="fas fa-edit"></i> Update Status';
+  if (singleCandidateInfo) singleCandidateInfo.style.display = "block";
+  if (bulkUpdateInfo) bulkUpdateInfo.style.display = "none";
+
   const elements = {
     candidateName: getElement("popupCandidateName"),
     company: getElement("popupCompany"),
@@ -1439,6 +1755,7 @@ function openPopup(candidate) {
     commentBox: getElement("commentBox"),
     popup: getElement("popup")
   };
+
   if (elements.candidateName) elements.candidateName.textContent = candidate.name || "";
   if (elements.company) elements.company.textContent = candidate.company || "";
   if (elements.position) elements.position.textContent = candidate.position || "";
@@ -1454,6 +1771,7 @@ function openPopup(candidate) {
 function closePopup() {
   const popup = getElement("popup");
   if (popup) popup.style.display = "none";
+  isBulkUpdate = false;
 }
 
 function updateFinalStatusOptions() {
@@ -1475,29 +1793,51 @@ function updateFinalStatusOptions() {
   });
 }
 
-function submitFinalStatusUpdate() {
+// UPDATED: submitStatusUpdate to handle both single and bulk updates
+function submitStatusUpdate() {
   const statusDropdown = getElement("statusDropdown");
   const finalStatusDropdown = getElement("finalStatusDropdown");
   const commentBox = getElement("commentBox");
+
   if (!statusDropdown || !finalStatusDropdown || !commentBox) {
     alert("Form elements not found");
     return;
   }
+
   const status = statusDropdown.value;
   const finalStatus = finalStatusDropdown.value;
   const comment = commentBox.value;
-  if (!currentEmail || !status || !finalStatus) {
+
+  if (!status || !finalStatus) {
     alert("Please select both status and final status.");
     return;
   }
-  
+
+  if (isBulkUpdate) {
+    if (selectedCandidates.length === 0) {
+      alert("No candidates selected for bulk update.");
+      return;
+    }
+
+    submitBulkStatusUpdate(status, finalStatus, comment);
+  } else {
+    if (!currentEmail) {
+      alert("No candidate selected for update.");
+      return;
+    }
+
+    submitSingleStatusUpdate(currentEmail, status, finalStatus, comment);
+  }
+}
+
+function submitSingleStatusUpdate(email, status, finalStatus, comment) {
   setButtonLoading('statusSubmitButton', true, 'Updating...');
-  
+
   fetch(postURL, {
     method: "POST",
     mode: "no-cors",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: currentEmail, status, final_status: finalStatus, comment })
+    body: JSON.stringify({ email: email, status, final_status: finalStatus, comment })
   })
   .then(() => {
     setTimeout(() => {
@@ -1516,6 +1856,54 @@ function submitFinalStatusUpdate() {
   });
 }
 
+function submitBulkStatusUpdate(status, finalStatus, comment) {
+  setButtonLoading('statusSubmitButton', true, `Updating ${selectedCandidates.length} candidates...`);
+
+  let completedUpdates = 0;
+  let failedUpdates = 0;
+
+  // Process each selected candidate
+  const updatePromises = selectedCandidates.map(candidate => {
+    return fetch(postURL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        email: candidate.email, 
+        status, 
+        final_status: finalStatus, 
+        comment 
+      })
+    })
+    .then(() => {
+      completedUpdates++;
+      console.log(`✓ Updated ${candidate.name} (${candidate.email})`);
+    })
+    .catch(error => {
+      failedUpdates++;
+      console.error(`✗ Failed to update ${candidate.name} (${candidate.email}):`, error);
+    });
+  });
+
+  // Wait for all updates to complete
+  Promise.allSettled(updatePromises)
+    .then(() => {
+      setTimeout(() => {
+        if (failedUpdates === 0) {
+          alert(`Successfully updated ${completedUpdates} candidate${completedUpdates > 1 ? 's' : ''}!`);
+        } else {
+          alert(`Updated ${completedUpdates} candidate${completedUpdates > 1 ? 's' : ''}.\n${failedUpdates} update${failedUpdates > 1 ? 's' : ''} failed. Please check console for details.`);
+        }
+
+        // Clear selections and refresh data
+        clearAllSelections();
+        closePopup();
+        setButtonLoading('statusSubmitButton', false);
+        loadDashboard();
+      }, 1000);
+    });
+}
+
 function toggleMode() {
   const mode = document.querySelector('input[name="interviewMode"]:checked')?.value;
   const locationBox = getElement("locationBox");
@@ -1532,7 +1920,7 @@ async function fetchLocations(candidateCompany) {
     locationRows = Array.isArray(data) ? data : [];
     const select = getElement("locationSelect");
     if (!select) return;
-    
+
     select.innerHTML = '<option value="">Select Location</option>';
     const want = (candidateCompany || "").toString().trim().toLowerCase();
     const vendorMatches = locationRows.filter(r => {
@@ -1572,24 +1960,15 @@ function openExtraPopup(idx) {
   const locationSelect = getElement("locationSelect");
   const inviteLink = getElement("inviteLink");
   const waBtn = getElement("waFloatBtn");
-  
+
   // Get candidate from current filtered list
-  const currentFilteredCandidates = candidates.filter(c => {
-    const selectedCompany = companySelect ? companySelect.value : "";
-    const selectedStatus = statusSelect ? statusSelect.value : "";
-    const nameQuery = nameSearchInput ? nameSearchInput.value.toLowerCase().trim() : "";
-    const matchCompany = !selectedCompany || c.company === selectedCompany;
-    const matchStatus = !selectedStatus || (c.final_status || '').toLowerCase() === selectedStatus;
-    const matchName = nameQuery ? (c.name || '').toLowerCase().includes(nameQuery) : true;
-    return matchCompany && matchStatus && matchName;
-  });
-  currentCandidate = currentFilteredCandidates[idx] || null;
+  currentCandidate = filteredCandidates[idx] || null;
   if (!currentCandidate) { 
     alert("Candidate not found."); 
     return; 
   }
   if (extraCandidateName) extraCandidateName.textContent = currentCandidate.name || "";
-  
+
   // Reset form
   if (sendEmail) sendEmail.checked = false;
   if (sendWhatsapp) sendWhatsapp.checked = false;
@@ -1601,14 +1980,14 @@ function openExtraPopup(idx) {
     waBtn.href = "#"; 
   }
   lastWhatsAppLink = "";
-  
+
   // Default to Physical mode
   const radios = document.querySelectorAll('input[name="interviewMode"]');
   radios.forEach(r => r.checked = false);
   const physicalRadio = Array.from(radios).find(r => r.value === "physical");
   if (physicalRadio) physicalRadio.checked = true;
   toggleMode();
-  
+
   // Fetch locations for candidate's company
   if (currentCandidate && currentCandidate.company) {
     fetchLocations(currentCandidate.company);
@@ -1657,15 +2036,15 @@ async function submitExtraPopup() {
       alert("Please select a physical location.");
       return;
     }
-    
+
     const normalize = str => (str || "").toString().trim().toLowerCase();
     const targetLocation = normalize(selectedLoc);
-    
+
     loc = (locationRows || []).find(r => {
       const locName = normalize(r.office_locations ?? r.Office_Locations ?? r.Location ?? "");
       return locName === targetLocation;
     });
-    
+
     if (!loc) {
       alert("Selected location not found in configuration. Please try again.");
       return;
@@ -1677,18 +2056,18 @@ async function submitExtraPopup() {
       return;
     }
   }
-  
+
   setButtonLoading('interviewSubmitButton', true, 'Sending...');
-  
+
   const mobile = onlyDigits(
     currentCandidate?.Mobile || currentCandidate?.mobile ||
     currentCandidate?.phone || currentCandidate?.Phone || ""
   );
-  
+
   // Use logged-in user's name instead of hardcoded recruiter
   const userData = getUserData();
   const recruiterName = userData.name || (loggedInEmail || "").split("@")[0] || "Recruiter";
-  
+
   // SAFE PAYLOAD - Ensure no undefined values
   const payload = {
     candidate_name: String(currentCandidate?.name || ""),
@@ -1701,7 +2080,7 @@ async function submitExtraPopup() {
     rowId: String(currentCandidate?.__powerappsid__ || ""),
     interview_datetime: String(isoDt || "")
   };
-  
+
   // Only add location fields if physical mode
   if (mode === "physical" && loc) {
     payload.location_company_name = String(loc?.Company_Name || loc?.company_name || "");
@@ -1710,12 +2089,12 @@ async function submitExtraPopup() {
     payload.location_address = String(loc?.Address || loc?.address || "");
     payload.location_google_map = String(loc?.Google_Map || loc?.google_map || "");
   }
-  
+
   // Only add invite link if online mode
   if (mode === "online") {
     payload.invite_link = String((inviteLink?.value || "").trim());
   }
-  
+
   // WhatsApp message (unchanged)
   if (whatsappChecked && mobile) {
     let msg = `*Hi ${currentCandidate?.name}*,\n\n` +
@@ -1723,7 +2102,7 @@ async function submitExtraPopup() {
               `*Interview Details:*\n` +
               `📅 *Date & Time:* ${formatInterviewDT(dt)}\n` +
               `💼 *Mode:* ${mode.toUpperCase()}\n\n`;
-    
+
     if (mode === "physical" && loc) {
       msg += `*Company Details:*\n` +
              `🏢 *Company:* ${getVal(loc,"Company_Name","company_name")}\n` +
@@ -1746,15 +2125,15 @@ async function submitExtraPopup() {
       waBtn.classList.add('show');
     }
   }
-  
+
   // Send to Power Automate
   if (emailChecked) {
     console.log("=== DEBUGGING POWER AUTOMATE CALL ===");
     console.log("Payload being sent:", JSON.stringify(payload, null, 2));
     console.log("Payload size:", JSON.stringify(payload).length, "bytes");
-    
+
     const url = "https://default95bfece3066c4fa7b1004902edfde1.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4acbeedd695b453c953eef63041723b6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=fMQ-vKxXAcsLpQJuoeyXaar8AN-RT-7xSx3c2nbdmN8";
-    
+
     try {
       const response = await fetch(url, {
         method: "POST",
@@ -1763,14 +2142,14 @@ async function submitExtraPopup() {
         },
         body: JSON.stringify(payload)
       });
-      
+
       const responseText = await response.text();
       console.log("=== POWER AUTOMATE RESPONSE ===");
       console.log("Status:", response.status);
       console.log("Status Text:", response.statusText);
       console.log("Response Headers:", [...response.headers.entries()]);
       console.log("Response Body:", responseText);
-      
+
       setTimeout(() => {
         if (!response.ok) {
           console.error("❌ Power Automate Error Details:");
@@ -1782,13 +2161,13 @@ async function submitExtraPopup() {
           setButtonLoading('interviewSubmitButton', false);
           return;
         }
-        
+
         console.log("✅ Email sent successfully");
         alert("Interview invitation sent successfully!");
         closeExtraPopup();
         setButtonLoading('interviewSubmitButton', false);
       }, 1200);
-      
+
     } catch (err) {
       console.error("❌ Network/CORS Error:", err);
       setTimeout(() => {
@@ -1819,7 +2198,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-console.log('Management page loaded with authentication integration and role-based filtering');
+console.log('Management page loaded with authentication integration, role-based filtering, and bulk update functionality');
 </script>
 </body>
 </html>
