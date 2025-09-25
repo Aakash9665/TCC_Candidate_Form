@@ -397,17 +397,19 @@
       cursor: pointer;
     }
 
-    table {
+        table {
       width: 100%;
       border-collapse: collapse;
       font-size: 11px;
+      table-layout: auto; /* Allow columns to auto-adjust */
     }
 
-    th, td {
+        th, td {
       padding: 8px 10px;
       text-align: left;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       vertical-align: middle;
+      word-wrap: break-word; /* Allow text wrapping */
     }
 
     /* CHECKBOX COLUMN STYLING */
@@ -469,15 +471,83 @@
       background: rgba(37, 99, 235, 0.08);
     }
 
-    tbody td {
+        tbody td {
       font-size: 11px;
       color: var(--text-primary);
       font-weight: 400;
-      max-width: 120px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      min-width: 80px; /* Minimum width for readability */
+      max-width: none; /* Remove max-width restriction */
+      overflow: visible; /* Show full content */
+      text-overflow: clip; /* Remove ellipsis */
+      white-space: normal; /* Allow text wrapping */
+      line-height: 1.4; /* Better line spacing */
     }
+    /* Enhanced column width distribution */
+    th:nth-child(1), td:nth-child(1) { /* Checkbox */
+      width: 40px;
+      min-width: 40px;
+      max-width: 40px;
+    }
+
+    th:nth-child(2), td:nth-child(2) { /* Updated */
+      width: 80px;
+      min-width: 80px;
+    }
+
+    th:nth-child(3), td:nth-child(3) { /* Name */
+      width: 150px;
+      min-width: 120px;
+    }
+
+    th:nth-child(4), td:nth-child(4) { /* Email */
+      width: 200px;
+      min-width: 150px;
+    }
+
+    th:nth-child(5), td:nth-child(5) { /* Position */
+      width: 150px;
+      min-width: 120px;
+    }
+
+    th:nth-child(6), td:nth-child(6) { /* Recruiter */
+      width: 100px;
+      min-width: 80px;
+    }
+
+    th:nth-child(7), td:nth-child(7) { /* Company */
+      width: 130px;
+      min-width: 100px;
+    }
+
+    th:nth-child(8), td:nth-child(8) { /* Status */
+      width: 120px;
+      min-width: 100px;
+    }
+
+    th:nth-child(9), td:nth-child(9) { /* Contact */
+      width: 100px;
+      min-width: 80px;
+    }
+
+    /* Better text display for important columns */
+    tbody td:nth-child(3) strong { /* Name column */
+      display: block;
+      font-weight: 600;
+    }
+
+    tbody td:nth-child(4) { /* Email column */
+      font-size: 10px;
+      word-break: break-all;
+    }
+
+    tbody td:nth-child(5) { /* Position column */
+      font-weight: 500;
+    }
+
+    tbody td:nth-child(7) { /* Company column */
+      font-weight: 500;
+    }
+
 
     .btn-sm {
       padding: 6px 10px;
@@ -879,14 +949,20 @@
         overflow-x: auto;
       }
 
-      table {
-        min-width: 900px;
-      }
+          table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      table-layout: auto; /* Allow columns to auto-adjust */
+    }
 
-      th, td {
-        padding: 6px 8px;
-        font-size: 10px;
-      }
+          th, td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      vertical-align: middle;
+      word-wrap: break-word; /* Allow text wrapping */
+    }
 
       .popup-content {
         margin: 12px;
@@ -930,9 +1006,13 @@
         font-size: 13px;
       }
 
-      th, td {
-        padding: 4px 6px;
-      }
+          th, td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      vertical-align: middle;
+      word-wrap: break-word; /* Allow text wrapping */
+    }
     }
 
     /* ACCESSIBILITY */
