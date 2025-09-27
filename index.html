@@ -532,6 +532,12 @@
             animation: buttonSlideIn 0.8s ease-out 1.4s both;
         }
 
+        .sourced-profiles-btn {
+            background: linear-gradient(135deg, #9C27B0, #7B1FA2);
+            animation: buttonSlideIn 0.8s ease-out 1.6s both;
+            display: none; /* Hidden by default */
+        }
+
         @keyframes buttonSlideIn {
             from {
                 transform: translateX(-50px);
@@ -555,11 +561,15 @@
             box-shadow: 0 20px 40px rgba(255, 152, 0, 0.4);
         }
 
+        .sourced-profiles-btn:hover {
+            box-shadow: 0 20px 40px rgba(156, 39, 176, 0.4);
+        }
+
         .footer {
             margin-top: 35px;
             color: #888;
             font-size: 12px;
-            animation: footerSlideIn 1s ease-out 1.6s both;
+            animation: footerSlideIn 1s ease-out 1.8s both;
             font-weight: 500;
         }
 
@@ -750,6 +760,10 @@
                 <button class="nav-button interviews-btn" onclick="navigateToInterviews()">
                     📅 Scheduled Interviews
                 </button>
+
+                <button class="nav-button sourced-profiles-btn" id="sourcedProfilesBtn" onclick="navigateToSourcedProfiles()">
+                    🔍 Sourced Profiles
+                </button>
             </div>
             
             <div class="footer">
@@ -781,6 +795,9 @@
                         document.getElementById('loginContainer').style.display = 'none';
                         document.getElementById('mainContainer').style.display = 'block';
                         document.getElementById('userInfo').style.display = 'block';
+                        
+                        // Check if user is admin and show/hide sourced profiles button
+                        checkAdminAccess();
                     }, 400);
                 } else {
                     // User not logged in, refresh to show login screen
@@ -791,6 +808,20 @@
             // Add haptic feedback
             if (navigator.vibrate) {
                 navigator.vibrate(30);
+            }
+        }
+
+        // Function to check admin access and show/hide sourced profiles button
+        function checkAdminAccess() {
+            const userType = sessionStorage.getItem('userType');
+            const sourcedProfilesBtn = document.getElementById('sourcedProfilesBtn');
+            
+            if (userType === 'Admin') {
+                sourcedProfilesBtn.style.display = 'block';
+                console.log('Admin user detected - Sourced Profiles button enabled');
+            } else {
+                sourcedProfilesBtn.style.display = 'none';
+                console.log('Non-admin user - Sourced Profiles button hidden');
             }
         }
 
@@ -851,6 +882,9 @@
                             sessionStorage.setItem('userType', result.user.userType || '');
                             sessionStorage.setItem('loginTime', result.user.loginTime || new Date().toISOString());
                             sessionStorage.setItem('userRowIndex', result.user.rowIndex || '');
+                            
+                            // Check admin access after login
+                            checkAdminAccess();
                             
                             console.log('Login successful with Google Sheets data:', {
                                 name: result.user.name,
@@ -984,6 +1018,36 @@
             }, 150);
         }
 
+        // New function for Sourced Profiles navigation
+        function navigateToSourcedProfiles() {
+            console.log("Sourced Profiles button clicked");
+            const button = event.target;
+            button.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                button.style.transform = '';
+                
+                if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                    const userType = sessionStorage.getItem('userType');
+                    
+                    if (userType === 'Admin') {
+                        // Web hosting - redirect to sourced profiles page
+                        console.log('Navigating to sourced_profile.html with admin user data:', {
+                            email: sessionStorage.getItem('userEmail'),
+                            name: sessionStorage.getItem('userName'),
+                            designation: sessionStorage.getItem('userDesignation'),
+                            userType: sessionStorage.getItem('userType')
+                        });
+                        window.location.href = 'sourced_profile.html';
+                    } else {
+                        alert("Access denied. This feature is only available for Admin users.");
+                    }
+                } else {
+                    alert("Please login first");
+                }
+            }, 150);
+        }
+
         // Check login state on page load
         window.addEventListener('load', function() {
             console.log("Page loaded");
@@ -1000,6 +1064,9 @@
                 document.getElementById('mainContainer').style.display = 'block';
                 document.getElementById('userInfo').style.display = 'block';
                 document.getElementById('userName').textContent = userName;
+                
+                // Check admin access on page load
+                checkAdminAccess();
                 
                 console.log('User already logged in with Google Sheets data:', {
                     name: userName,
@@ -1089,6 +1156,10 @@
 
         window.isUserLoggedIn = function() {
             return sessionStorage.getItem('isLoggedIn') === 'true';
+        };
+
+        window.isAdminUser = function() {
+            return sessionStorage.getItem('userType') === 'Admin';
         };
     </script>
 </body>
