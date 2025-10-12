@@ -82,6 +82,10 @@
       box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
     }
 
+    .home-button:active {
+      transform: scale(1.05) rotate(5deg);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -744,11 +748,11 @@ window.addEventListener('load', function() {
     // Load companies after authentication is confirmed
     loadData();
     
-    // NEW: Update manage button visibility based on user type
+    // Update manage button visibility based on user type
     updateManageButtonVisibility();
 });
 
-// NEW: Function to show/hide manage button based on user type
+// Function to show/hide manage button based on user type
 function updateManageButtonVisibility() {
     const userType = sessionStorage.getItem('userType') || sessionStorage.getItem('User_Type') || '';
     const isAdmin = userType.toLowerCase() === 'admin';
@@ -1001,9 +1005,17 @@ document.getElementById("asPerCompany").addEventListener("change", function () {
   document.getElementById("expectedCTCUnit").disabled = this.checked;
 });
 
-// Form submission
+// Form submission - UPDATED WITH SEPARATED RECRUITER FIELDS
 document.getElementById("jobForm").addEventListener("submit", function (e) {
   e.preventDefault();
+  
+  // Get recruiter information from hidden field
+  const recruiterInfo = document.getElementById("recruiterEmail").value;
+  const recruiterParts = recruiterInfo.split(",");
+  const recruiterEmail = recruiterParts[0] ? recruiterParts[0].trim() : "";
+  const recruiterName = recruiterParts[1] ? recruiterParts[1].trim() : "Recruiter";
+  const recruiterMobile = recruiterParts[2] ? recruiterParts[2].trim() : "";
+  
   const data = {
     name: document.getElementById("name").value,
     email: document.getElementById("email").value,
@@ -1018,11 +1030,10 @@ document.getElementById("jobForm").addEventListener("submit", function (e) {
     noticePeriodUnit: document.getElementById("immediateJoiner").checked ? "" : document.getElementById("noticePeriodUnit").value,
     company: document.getElementById("company").value,
     position: document.getElementById("position").value,
-    recruiterEmail: document.getElementById("recruiterEmail").value
+    recruiterEmail: recruiterEmail,
+    recruiterName: recruiterName,
+    recruiterMobile: recruiterMobile
   };
-  
-  const recruiterParts = data.recruiterEmail.split(",");
-  const recruiterName = recruiterParts[1] ? recruiterParts[1].trim() : "Recruiter";
   
   fetch("https://prod-30.centralindia.logic.azure.com:443/workflows/54210cf2969a42458623aa9427690ce1/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ZND7fpFK-bj6HXWxqBMGlFl3_W7vSKTmAUxU8uFwzzU", {
     method: "POST",
