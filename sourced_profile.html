@@ -355,7 +355,7 @@
         </div>
 
         <div id="loading" class="loading">
-            <div>🔄 Loading data from Google Sheets...</div>
+            <div>🔄 Loading Database...</div>
         </div>
 
         <div id="error" class="error">
@@ -457,7 +457,7 @@
                 updateLastUpdated();
 
                 if (candidateData.length === 0) {
-                    showToast('⚠️ No candidate data found in the spreadsheet');
+                    showToast('⚠️ No candidate data found');
                 } else {
                     showToast(`✅ Successfully loaded ${candidateData.length} candidates`);
                 }
