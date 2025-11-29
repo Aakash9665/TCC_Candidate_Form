@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Bulk Messenger</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-generate {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-generate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .table-container {
+            margin-top: 30px;
+        }
+
+        .campaign-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            margin-bottom: 0;
+        }
+
+        .campaign-header h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .campaign-header p {
+            font-size: 14px;
+            opacity: 0.95;
+            margin: 3px 0;
+        }
+
+        .campaign-header strong {
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 0 0 10px 10px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #333;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+            color: #333;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .btn-send {
+            padding: 8px 20px;
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-send:hover {
+            background: #20BA5A;
+        }
+
+        .btn-send::before {
+            content: "📱";
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 16px;
+        }
+
+        .helper-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .campaign-header h2 {
+                font-size: 18px;
+            }
+
+            .campaign-header p {
+                font-size: 13px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WhatsApp Bulk Messenger</h1>
+        
+        <div class="form-group">
+            <label for="mobileNumbers">Mobile Numbers</label>
+            <input 
+                type="text" 
+                id="mobileNumbers" 
+                placeholder="9876543210, 9123456789, 9988776655"
+            >
+            <div class="helper-text">Enter mobile numbers separated by commas (without +91)</div>
+        </div>
+
+        <div class="form-group">
+            <label for="company">Company</label>
+            <select id="company">
+                <option value="">Select Company</option>
+                <option value="Angel Portal">Angel Portal</option>
+                <option value="Savisa Homes">Savisa Homes</option>
+                <option value="Holy Family">Holy Family</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="position">Position</label>
+            <select id="position">
+                <option value="">Select Position</option>
+                <option value="Java Lead">Java Lead</option>
+                <option value="Technical Developer">Technical Developer</option>
+                <option value="Sales">Sales</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="jobLocation">Job Location</label>
+            <input 
+                type="text" 
+                id="jobLocation" 
+                placeholder="e.g., Mumbai, Bangalore, Remote"
+            >
+            <div class="helper-text">Enter the job location for this position</div>
+        </div>
+
+        <button class="btn-generate" onclick="generateTable()">Generate Contact List</button>
+
+        <div class="table-container" id="tableContainer">
+            <div class="no-data">Fill the form above and click "Generate Contact List"</div>
+        </div>
+    </div>
+
+    <script>
+        let contactData = [];
+        let campaignInfo = {};
+
+        function generateTable() {
+            const mobileInput = document.getElementById('mobileNumbers').value.trim();
+            const company = document.getElementById('company').value;
+            const position = document.getElementById('position').value;
+            const jobLocation = document.getElementById('jobLocation').value.trim();
+
+            // Validation
+            if (!mobileInput) {
+                alert('Please enter mobile numbers');
+                return;
+            }
+            if (!company) {
+                alert('Please select a company');
+                return;
+            }
+            if (!position) {
+                alert('Please select a position');
+                return;
+            }
+            if (!jobLocation) {
+                alert('Please enter job location');
+                return;
+            }
+
+            // Parse mobile numbers
+            const mobileNumbers = mobileInput.split(',').map(num => num.trim()).filter(num => num);
+
+            if (mobileNumbers.length === 0) {
+                alert('No valid mobile numbers found');
+                return;
+            }
+
+            // Store campaign info
+            campaignInfo = {
+                company: company,
+                position: position,
+                jobLocation: jobLocation
+            };
+
+            // Create contact data
+            contactData = mobileNumbers.map((mobile, index) => ({
+                id: Date.now() + index,
+                mobile: mobile
+            }));
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const container = document.getElementById('tableContainer');
+
+            if (contactData.length === 0) {
+                container.innerHTML = '<div class="no-data">No contacts to display</div>';
+                return;
+            }
+
+            let tableHTML = `
+                <div class="campaign-header">
+                    <h2>Campaign Details</h2>
+                    <p><strong>Position:</strong> ${campaignInfo.position}</p>
+                    <p><strong>Company:</strong> ${campaignInfo.company}</p>
+                    <p><strong>Location:</strong> ${campaignInfo.jobLocation}</p>
+                    <p><strong>Total Contacts:</strong> ${contactData.length}</p>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>S.No</th>
+                            <th>Mobile Number</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            contactData.forEach((contact, index) => {
+                tableHTML += `
+                    <tr id="row-${contact.id}">
+                        <td>${index + 1}</td>
+                        <td>${contact.mobile}</td>
+                        <td>
+                            <button class="btn-send" onclick="sendWhatsApp(${contact.id}, '${contact.mobile}')">
+                                Send
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = tableHTML;
+        }
+
+        function sendWhatsApp(id, mobile) {
+            // Create message template with location
+            const message = `Hi, I am messaging you regarding ${campaignInfo.position} position for ${campaignInfo.company} at ${campaignInfo.jobLocation}.`;
+            
+            // Clean mobile number (remove spaces, dashes, etc.)
+            const cleanMobile = mobile.replace(/D/g, '');
+            
+            // Add country code if not present
+            const fullMobile = cleanMobile.startsWith('91') ? cleanMobile : '91' + cleanMobile;
+            
+            // Create WhatsApp URL
+            const whatsappURL = `https://wa.me/${fullMobile}?text=${encodeURIComponent(message)}`;
+            
+            // Open WhatsApp
+            window.open(whatsappURL, '_blank');
+            
+            // Remove row after sending
+            setTimeout(() => {
+                contactData = contactData.filter(contact => contact.id !== id);
+                renderTable();
+            }, 500);
+        }
+    </script>
+</body>
+</html>
