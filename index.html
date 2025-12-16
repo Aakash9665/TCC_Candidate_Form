@@ -764,6 +764,10 @@
                 <button class="nav-button sourced-profiles-btn" id="sourcedProfilesBtn" onclick="navigateToSourcedProfiles()">
                     🔍 Sourced Profiles
                 </button>
+                
+                <button class="nav-button Whatsapp-btn" onclick="navigateToWhatsapp()">
+                    💬 WhatsApp Sender
+                </button>
             </div>
             
             <div class="footer">
@@ -1039,6 +1043,36 @@
                             userType: sessionStorage.getItem('userType')
                         });
                         window.location.href = 'sourced_profile.html';
+                    } else {
+                        alert("Access denied. This feature is only available for Admin users.");
+                    }
+                } else {
+                    alert("Please login first");
+                }
+            }, 150);
+        }
+        
+        // New function for Sourced Profiles navigation
+        function navigateToWhatsapp() {
+            console.log("Whatsapp button clicked");
+            const button = event.target;
+            button.style.transform = 'scale(0.95)';
+            
+            setTimeout(() => {
+                button.style.transform = '';
+                
+                if (sessionStorage.getItem('isLoggedIn') === 'true') {
+                    const userType = sessionStorage.getItem('userType');
+                    
+                    if (userType === 'Admin') {
+                        // Web hosting - redirect to sourced profiles page
+                        console.log('Navigating to Whatsapp_Sender.html with admin user data:', {
+                            email: sessionStorage.getItem('userEmail'),
+                            name: sessionStorage.getItem('userName'),
+                            designation: sessionStorage.getItem('userDesignation'),
+                            userType: sessionStorage.getItem('userType')
+                        });
+                        window.location.href = 'Whatsapp_Sender.html';
                     } else {
                         alert("Access denied. This feature is only available for Admin users.");
                     }
