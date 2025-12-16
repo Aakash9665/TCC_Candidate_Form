@@ -811,13 +811,21 @@
                         document.getElementById('userInfo').style.display = 'block';
                         
                         // Check if user is admin and show/hide sourced profiles button
-                        checkAdminAccess();
-                    }, 400);
-                } else {
-                    // User not logged in, refresh to show login screen
-                    window.location.reload();
-                }
-            }, 150);
+                        function checkAdminAccess() {
+    const userType = sessionStorage.getItem('userType');
+    const sourcedProfilesBtn = document.getElementById('sourcedProfilesBtn');
+    const whatsappBtn = document.querySelector('.Whatsapp-btn');
+
+    if (userType === 'Admin') {
+        sourcedProfilesBtn.style.display = 'block';
+        whatsappBtn.style.display = 'block';
+        console.log('Admin user detected - Admin features enabled');
+    } else {
+        sourcedProfilesBtn.style.display = 'none';
+        whatsappBtn.style.display = 'none';
+        console.log('Non-admin user - Admin features hidden');
+    }
+}
             
             // Add haptic feedback
             if (navigator.vibrate) {
