@@ -1035,7 +1035,7 @@ document.getElementById("jobForm").addEventListener("submit", function (e) {
     recruiterMobile: recruiterMobile
   };
   
-  fetch("https://prod-30.centralindia.logic.azure.com:443/workflows/54210cf2969a42458623aa9427690ce1/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ZND7fpFK-bj6HXWxqBMGlFl3_W7vSKTmAUxU8uFwzzU", {
+  fetch("https://default95bfece3066c4fa7b1004902edfde1.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/54210cf2969a42458623aa9427690ce1/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=p6yY_eBF3mEFGGYnnEUVIuAOi9aOt5JUmsyH5SF3hwM", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
