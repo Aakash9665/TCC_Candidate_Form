@@ -1,1201 +1,1225 @@
+```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TCC Portal - Login</title>
-<style>
-* {
-margin: 0;
-padding: 0;
-box-sizing: border-box;
-}
-
-body {
-font-family: 'Arial', sans-serif;
-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-min-height: 100vh;
-display: flex;
-flex-direction: column;
-justify-content: center;
-align-items: center;
-padding: 20px;
-overflow-x: hidden;
-position: relative;
-}
-
-/* Premium Background Animation */
-body::before {
-content: '';
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
-animation: backgroundFloat 20s ease-in-out infinite;
-pointer-events: none;
-z-index: 0;
-}
-
-@keyframes backgroundFloat {
-0%, 100% { transform: translateY(0px) rotate(0deg); }
-50% { transform: translateY(-20px) rotate(180deg); }
-}
-
-/* Floating Elements */
-.floating-element {
-position: fixed;
-width: 10px;
-height: 10px;
-background: rgba(255, 255, 255, 0.1);
-border-radius: 50%;
-pointer-events: none;
-z-index: 1;
-}
-
-.floating-element:nth-child(1) {
-top: 20%;
-left: 10%;
-animation: float1 15s infinite ease-in-out;
-}
-
-.floating-element:nth-child(2) {
-top: 60%;
-right: 15%;
-animation: float2 12s infinite ease-in-out;
-}
-
-.floating-element:nth-child(3) {
-bottom: 30%;
-left: 20%;
-animation: float3 18s infinite ease-in-out;
-}
-
-@keyframes float1 {
-0%, 100% { transform: translateY(0px) scale(1); opacity: 0.3; }
-50% { transform: translateY(-100px) scale(1.5); opacity: 0.6; }
-}
-
-@keyframes float2 {
-0%, 100% { transform: translateX(0px) scale(1); opacity: 0.4; }
-50% { transform: translateX(-80px) scale(1.2); opacity: 0.8; }
-}
-
-@keyframes float3 {
-0%, 100% { transform: translate(0px, 0px) scale(1); opacity: 0.2; }
-33% { transform: translate(30px, -40px) scale(1.3); opacity: 0.5; }
-66% { transform: translate(-20px, -80px) scale(0.8); opacity: 0.7; }
-}
-
-/* Home Button */
-.home-button {
-position: fixed !important;
-top: 20px !important;
-left: 20px !important;
-width: 50px;
-height: 50px;
-background: rgba(255, 255, 255, 0.15);
-border: none;
-border-radius: 25px;
-color: white;
-font-size: 20px;
-cursor: pointer;
-backdrop-filter: blur(20px);
-border: 1px solid rgba(255, 255, 255, 0.2);
-z-index: 1000 !important;
-transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-animation: slideInLeft 0.8s ease-out;
-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-display: flex;
-align-items: center;
-justify-content: center;
-overflow: hidden;
-}
-
-.home-button::before {
-content: '';
-position: absolute;
-top: 0;
-left: -100%;
-width: 100%;
-height: 100%;
-background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-transition: left 0.6s ease;
-}
-
-.home-button:hover::before {
-left: 100%;
-}
-
-.home-button:hover {
-background: rgba(255, 255, 255, 0.25);
-transform: scale(1.1) rotate(5deg);
-box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
-}
-
-.home-button:active {
-transform: scale(1.05) rotate(2deg);
-transition: transform 0.1s ease;
-}
-
-@keyframes slideInLeft {
-from {
-transform: translateX(-100px);
-opacity: 0;
-}
-to {
-transform: translateX(0);
-opacity: 1;
-}
-}
-
-.user-info {
-position: fixed;
-top: 20px;
-right: 20px;
-color: white;
-background: rgba(255, 255, 255, 0.15);
-padding: 12px 20px;
-border-radius: 25px;
-font-size: 14px;
-backdrop-filter: blur(20px);
-border: 1px solid rgba(255, 255, 255, 0.2);
-display: none;
-z-index: 1000;
-animation: slideInRight 0.8s ease-out;
-box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-@keyframes slideInRight {
-from {
-transform: translateX(100px);
-opacity: 0;
-}
-to {
-transform: translateX(0);
-opacity: 1;
-}
-}
-
-.logout-btn {
-background: rgba(255, 255, 255, 0.2);
-border: none;
-color: white;
-padding: 6px 12px;
-border-radius: 18px;
-margin-left: 12px;
-cursor: pointer;
-font-size: 12px;
-transition: all 0.3s ease;
-backdrop-filter: blur(10px);
-border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.logout-btn:hover {
-background: rgba(255, 255, 255, 0.3);
-transform: scale(1.05);
-box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
-}
-
-.container {
-background: rgba(255, 255, 255, 0.95);
-border-radius: 25px;
-padding: 50px 40px;
-box-shadow: 
-0 25px 50px rgba(0, 0, 0, 0.1),
-0 0 0 1px rgba(255, 255, 255, 0.2);
-text-align: center;
-max-width: 420px;
-width: 100%;
-transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-backdrop-filter: blur(20px);
-border: 1px solid rgba(255, 255, 255, 0.3);
-position: relative;
-z-index: 10;
-}
-
-.container::before {
-content: '';
-position: absolute;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-border-radius: 25px;
-pointer-events: none;
-}
-
-.logo {
-width: 90px;
-height: 90px;
-background: linear-gradient(135deg, #667eea, #764ba2);
-border-radius: 50%;
-margin: 0 auto 25px;
-display: flex;
-align-items: center;
-justify-content: center;
-color: white;
-font-size: 32px;
-font-weight: bold;
-animation: logoFloat 3s ease-in-out infinite;
-box-shadow: 
-0 10px 30px rgba(102, 126, 234, 0.3),
-0 0 0 4px rgba(255, 255, 255, 0.1);
-position: relative;
-overflow: hidden;
-}
-
-.logo::before {
-content: '';
-position: absolute;
-top: -50%;
-left: -50%;
-width: 200%;
-height: 200%;
-background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-transform: rotate(45deg);
-animation: logoShimmer 4s ease-in-out infinite;
-}
-
-@keyframes logoFloat {
-0%, 100% { transform: translateY(0px) rotate(0deg); }
-50% { transform: translateY(-10px) rotate(2deg); }
-}
-
-@keyframes logoShimmer {
-0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-50% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-}
-
-h1 {
-color: #333;
-font-size: 28px;
-margin-bottom: 15px;
-font-weight: 700;
-background: linear-gradient(135deg, #333, #666);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-background-clip: text;
-animation: titleSlideIn 1s ease-out 0.3s both;
-}
-
-@keyframes titleSlideIn {
-from {
-transform: translateY(30px);
-opacity: 0;
-}
-to {
-transform: translateY(0);
-opacity: 1;
-}
-}
-
-.subtitle {
-color: #666;
-font-size: 15px;
-margin-bottom: 40px;
-animation: subtitleSlideIn 1s ease-out 0.5s both;
-font-weight: 400;
-}
-
-@keyframes subtitleSlideIn {
-from {
-transform: translateY(20px);
-opacity: 0;
-}
-to {
-transform: translateY(0);
-opacity: 1;
-}
-}
-
-/* Enhanced Login Form Styles */
-.login-container {
-display: block;
-}
-
-.main-container {
-display: none;
-}
-
-.form-container {
-animation: formSlideIn 1s ease-out 0.7s both;
-}
-
-@keyframes formSlideIn {
-from {
-transform: translateY(30px);
-opacity: 0;
-}
-to {
-transform: translateY(0);
-opacity: 1;
-}
-}
-
-.input-group {
-margin-bottom: 25px;
-text-align: left;
-position: relative;
-}
-
-.input-group label {
-display: block;
-margin-bottom: 10px;
-color: #333;
-font-weight: 600;
-font-size: 14px;
-transition: color 0.3s ease;
-}
-
-.input-group input {
-width: 100%;
-padding: 18px 20px;
-border: 2px solid #e1e1e1;
-border-radius: 15px;
-font-size: 16px;
-transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-background: rgba(248, 249, 250, 0.8);
-backdrop-filter: blur(10px);
-position: relative;
-}
-
-.input-group input:focus {
-outline: none;
-border-color: #667eea;
-background: rgba(255, 255, 255, 0.95);
-transform: translateY(-2px);
-box-shadow: 
-0 10px 25px rgba(102, 126, 234, 0.1),
-0 0 0 4px rgba(102, 126, 234, 0.1);
-}
-
-.input-group input:focus + .input-glow {
-opacity: 1;
-transform: scale(1);
-}
-
-.login-btn {
-width: 100%;
-background: linear-gradient(135deg, #667eea, #764ba2);
-color: white;
-border: none;
-padding: 20px;
-border-radius: 15px;
-font-size: 16px;
-font-weight: 700;
-cursor: pointer;
-transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-margin-top: 15px;
-position: relative;
-overflow: hidden;
-box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-}
-
-.login-btn::before {
-content: '';
-position: absolute;
-top: 0;
-left: -100%;
-width: 100%;
-height: 100%;
-background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-transition: left 0.6s ease;
-}
-
-.login-btn:hover::before {
-left: 100%;
-}
-
-.login-btn:hover {
-transform: translateY(-3px);
-box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
-}
-
-.login-btn:active {
-transform: translateY(-1px);
-transition: transform 0.1s ease;
-}
-
-.error-message {
-color: #e74c3c;
-font-size: 14px;
-margin-top: 20px;
-display: none;
-animation: errorShake 0.6s ease-in-out;
-background: rgba(231, 76, 60, 0.1);
-padding: 12px;
-border-radius: 10px;
-border: 1px solid rgba(231, 76, 60, 0.2);
-}
-
-@keyframes errorShake {
-0%, 100% { transform: translateX(0); }
-25% { transform: translateX(-5px); }
-75% { transform: translateX(5px); }
-}
-
-/* Enhanced Main Portal Styles */
-.button-container {
-display: flex;
-flex-direction: column;
-gap: 20px;
-animation: buttonsSlideIn 1s ease-out 0.8s both;
-}
-
-@keyframes buttonsSlideIn {
-from {
-transform: translateY(40px);
-opacity: 0;
-}
-to {
-transform: translateY(0);
-opacity: 1;
-}
-}
-
-.nav-button {
-background: linear-gradient(135deg, #667eea, #764ba2);
-color: white;
-border: none;
-padding: 22px 35px;
-border-radius: 18px;
-font-size: 16px;
-font-weight: 700;
-cursor: pointer;
-transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-text-decoration: none;
-display: block;
-position: relative;
-overflow: hidden;
-box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
-border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.nav-button::before {
-content: '';
-position: absolute;
-top: 0;
-left: -100%;
-width: 100%;
-height: 100%;
-background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-transition: left 0.6s ease;
-}
-
-.nav-button::after {
-content: '';
-position: absolute;
-top: 50%;
-right: 20px;
-width: 20px;
-height: 20px;
-background: rgba(255, 255, 255, 0.2);
-border-radius: 50%;
-transform: translateY(-50%) scale(0);
-transition: transform 0.3s ease;
-}
-
-.nav-button:hover::before {
-left: 100%;
-}
-
-.nav-button:hover::after {
-transform: translateY(-50%) scale(1);
-}
-
-.nav-button:hover {
-transform: translateY(-5px) scale(1.02);
-box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
-}
-
-.nav-button:active {
-transform: translateY(-2px) scale(1.01);
-transition: transform 0.1s ease;
-}
-
-.entry-btn {
-background: linear-gradient(135deg, #4CAF50, #45a049);
-animation: buttonSlideIn 0.8s ease-out 1s both;
-}
-
-.management-btn {
-background: linear-gradient(135deg, #2196F3, #1976D2);
-animation: buttonSlideIn 0.8s ease-out 1.2s both;
-}
-
-.interviews-btn {
-background: linear-gradient(135deg, #FF9800, #F57C00);
-animation: buttonSlideIn 0.8s ease-out 1.4s both;
-}
-
-.sourced-profiles-btn {
-background: linear-gradient(135deg, #9C27B0, #7B1FA2);
-animation: buttonSlideIn 0.8s ease-out 1.6s both;
-display: none; /* Hidden by default */
-}
-
-@keyframes buttonSlideIn {
-from {
-transform: translateX(-50px);
-opacity: 0;
-}
-to {
-transform: translateX(0);
-opacity: 1;
-}
-}
-
-.entry-btn:hover {
-box-shadow: 0 20px 40px rgba(76, 175, 80, 0.4);
-}
-
-.management-btn:hover {
-box-shadow: 0 20px 40px rgba(33, 150, 243, 0.4);
-}
-
-.interviews-btn:hover {
-box-shadow: 0 20px 40px rgba(255, 152, 0, 0.4);
-}
-
-.sourced-profiles-btn:hover {
-box-shadow: 0 20px 40px rgba(156, 39, 176, 0.4);
-}
-
-.footer {
-margin-top: 35px;
-color: #888;
-font-size: 12px;
-animation: footerSlideIn 1s ease-out 1.8s both;
-font-weight: 500;
-}
-
-@keyframes footerSlideIn {
-from {
-transform: translateY(20px);
-opacity: 0;
-}
-to {
-transform: translateY(0);
-opacity: 1;
-}
-}
-
-/* Loading Animation */
-.loading {
-position: relative;
-}
-
-.loading::after {
-content: '';
-position: absolute;
-top: 50%;
-left: 50%;
-width: 20px;
-height: 20px;
-margin: -10px 0 0 -10px;
-border: 2px solid rgba(255, 255, 255, 0.3);
-border-top: 2px solid white;
-border-radius: 50%;
-animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-0% { transform: rotate(0deg); }
-100% { transform: rotate(360deg); }
-}
-
-/* Screen Transition Animation */
-.fade-transition {
-animation: fadeTransition 0.8s ease-in-out;
-}
-
-@keyframes fadeTransition {
-0% { opacity: 1; transform: scale(1); }
-50% { opacity: 0; transform: scale(0.95); }
-100% { opacity: 1; transform: scale(1); }
-}
-
-/* Success Animation */
-.success-checkmark {
-display: inline-block;
-width: 20px;
-height: 20px;
-border-radius: 50%;
-border: 2px solid #4CAF50;
-margin-right: 10px;
-position: relative;
-animation: checkmarkBounce 0.6s ease-in-out;
-}
-
-.success-checkmark::after {
-content: '';
-position: absolute;
-top: 3px;
-left: 6px;
-width: 6px;
-height: 10px;
-border: solid #4CAF50;
-border-width: 0 2px 2px 0;
-transform: rotate(45deg);
-animation: checkmarkDraw 0.3s ease-in-out 0.3s both;
-}
-
-@keyframes checkmarkBounce {
-0% { transform: scale(0); }
-50% { transform: scale(1.2); }
-100% { transform: scale(1); }
-}
-
-@keyframes checkmarkDraw {
-0% { height: 0; }
-100% { height: 10px; }
-}
-
-@media (max-width: 480px) {
-.container {
-padding: 35px 25px;
-margin: 10px;
-border-radius: 20px;
-}
-
-h1 {
-font-size: 22px;
-}
-
-.nav-button {
-padding: 18px 30px;
-font-size: 15px;
-}
-
-.user-info {
-top: 15px;
-right: 15px;
-font-size: 12px;
-padding: 10px 15px;
-}
-
-.home-button {
-top: 15px !important;
-left: 15px !important;
-width: 45px;
-height: 45px;
-font-size: 18px;
-border-radius: 22.5px;
-}
-
-.logo {
-width: 70px;
-height: 70px;
-font-size: 28px;
-}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>TCC Portal - Login & Workspace</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.25) 0%, transparent 45%),
+                     radial-gradient(circle at 85% 80%, rgba(168, 85, 247, 0.25) 0%, transparent 45%),
+                     radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.12) 0%, transparent 60%);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background-color 0.35s ease, color 0.35s ease;
+    }
+
+    .ambient-bg {
+      background-image: var(--bg-gradient);
+    }
+
+    /* Animated mesh orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+      animation: floatOrb 18s ease-in-out infinite alternate;
+    }
+
+    .orb-1 {
+      width: 340px;
+      height: 340px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      top: -80px;
+      left: -80px;
+    }
+
+    .orb-2 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      bottom: -60px;
+      right: -60px;
+      animation-delay: -6s;
+    }
+
+    .orb-3 {
+      width: 240px;
+      height: 240px;
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      top: 45%;
+      left: 55%;
+      animation-delay: -12s;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, -35px) scale(1.08); }
+      100% { transform: translate(-25px, 25px) scale(0.95); }
+    }
+
+    /* Glassmorphic Card */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.12);
+    }
+
+    .dark .glass-panel {
+      background: rgba(15, 23, 42, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+    }
+
+    /* Module Action Card */
+    .nav-button {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      text-align: left;
+    }
+
+    .nav-button::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+    }
+
+    .nav-button:hover::before {
+      transform: translateX(100%);
+    }
+
+    .nav-button:hover {
+      transform: translateY(-4px);
+    }
+
+    .nav-button:active {
+      transform: scale(0.98);
+    }
+
+    /* Loading Spinner inside Login Button */
+    .loading {
+      position: relative;
+      pointer-events: none;
+      opacity: 0.9;
+    }
+
+    .loading::after {
+      content: '';
+      width: 20px;
+      height: 20px;
+      border: 2.5px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .fade-transition {
+      animation: fadeTransition 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes fadeTransition {
+      0% { opacity: 1; transform: scale(1); }
+      45% { opacity: 0; transform: scale(0.97) translateY(8px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes shakeError {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .error-shake {
+      animation: shakeError 0.45s ease-in-out;
+    }
+  </style>
 </head>
-<body>
-<div class="floating-element"></div>
-<div class="floating-element"></div>
-<div class="floating-element"></div>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 ambient-bg flex flex-col min-h-screen justify-between relative selection:bg-indigo-500 selection:text-white">
 
-<button class="home-button" onclick="goHome()" title="Home">
-🏠
-</button>
+  <!-- Background Ambient Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="floating-element hidden"></div>
+  <div class="floating-element hidden"></div>
+  <div class="floating-element hidden"></div>
 
-<div class="user-info" id="userInfo">
-<span class="success-checkmark" style="display: none;" id="loginSuccess"></span>
-Welcome <span id="userName">!</span>
-<button class="logout-btn" onclick="logout()">Logout</button>
-</div>
+  <!-- Custom Toast Notification Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-[2000] flex flex-col gap-2.5 max-w-sm w-full px-4 pointer-events-none"></div>
 
-<div class="container">
-<!-- Login Screen -->
-<div class="login-container" id="loginContainer">
-<div class="logo">TCC</div>
-<h1>Login to TCC Portal</h1>
+  <!-- Top Floating Navigation Bar -->
+  <header class="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 z-30 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-2.5">
+      <!-- Home Button (Preserves .home-button and onclick="goHome()") -->
+      <button class="home-button w-11 h-11 sm:w-12 sm:h-12 rounded-2xl glass-panel flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:scale-105 active:scale-95 transition-all shadow-sm cursor-pointer" onclick="goHome()" title="Home">
+        <i class="fas fa-house text-lg"></i>
+      </button>
 
-<div class="form-container">
-<form onsubmit="handleLogin(event)">
-<div class="input-group">
-<label for="email">Email Address</label>
-<input type="email" id="email" name="email" required>
-</div>
+      <!-- Brand Pill -->
+      <div class="hidden sm:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl glass-panel">
+        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow">
+          TCC
+        </div>
+        <div>
+          <p class="text-xs font-bold tracking-tight leading-none">Talent Connect</p>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Consultancy Portal v2.5</p>
+        </div>
+      </div>
+    </div>
 
-<div class="input-group">
-<label for="password">Password</label>
-<input type="password" id="password" name="password" required>
-</div>
+    <!-- Right Controls: Theme Toggle, Quick Tools, & User Info Bar -->
+    <div class="flex items-center gap-2.5">
+      <!-- Quick CTC Calculator Trigger -->
+      <button onclick="toggleCalculatorModal(true)" class="w-11 h-11 rounded-2xl glass-panel flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all" title="Quick CTC & Hike Calculator">
+        <i class="fas fa-calculator text-sm"></i>
+      </button>
 
-<button type="submit" class="login-btn" id="loginBtn">
-<span id="loginText">Login</span>
-</button>
-<div class="error-message" id="errorMessage">
-Invalid email or password. Please try again.
-</div>
-</form>
-</div>
+      <!-- Theme Switcher -->
+      <button onclick="toggleTheme()" id="themeToggleBtn" class="w-11 h-11 rounded-2xl glass-panel flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all" title="Toggle Dark/Light Mode">
+        <i class="fas fa-sun text-sm hidden dark:inline-block text-amber-400"></i>
+        <i class="fas fa-moon text-sm inline-block dark:hidden text-slate-700"></i>
+      </button>
 
-<div class="footer">
-TCC Portal v2.1
-</div>
-</div>
+      <!-- User Info Bar (Preserves #userInfo, #loginSuccess, #userName, logout()) -->
+      <div class="user-info glass-panel px-3.5 py-2 rounded-2xl items-center gap-3 text-xs sm:text-sm font-medium" id="userInfo" style="display: none;">
+        <div class="inline-flex items-center gap-2">
+          <span class="success-checkmark w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse" style="display: none;" id="loginSuccess"></span>
+          <button onclick="toggleProfileModal(true)" class="inline-flex items-center gap-2 hover:opacity-80 transition-opacity text-left">
+            <span class="w-7 h-7 rounded-xl bg-indigo-500/15 dark:bg-indigo-500/25 text-indigo-600 dark:text-indigo-300 font-bold flex items-center justify-center text-xs" id="userAvatarInitials">U</span>
+            <span class="hidden md:inline text-slate-500 dark:text-slate-400">Welcome,</span>
+            <span id="userName" class="font-bold text-slate-800 dark:text-white max-w-[110px] sm:max-w-[160px] truncate">!</span>
+          </button>
+          <span id="roleBadgeHeader" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20">
+            Recruiter
+          </span>
+          <button class="logout-btn ml-1 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500 text-rose-600 dark:text-rose-400 hover:text-white border border-rose-500/20 text-xs font-semibold transition-all cursor-pointer" onclick="logout()">
+            <i class="fas fa-power-off sm:mr-1"></i>
+            <span class="hidden sm:inline">Logout</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
 
-<!-- Main Portal Screen -->
-<div class="main-container" id="mainContainer">
-<div class="logo">TCC</div>
-<h1>Welcome to TCC Portal</h1>
-<p class="subtitle">Select Action</p>
+  <!-- Main Content Wrapper (Preserves .container class for existing JS transitions) -->
+  <main class="flex-1 flex items-center justify-center px-4 sm:px-6 py-6 z-20">
+    <div class="container w-full max-w-4xl mx-auto transition-all duration-500">
 
-<div class="button-container">
-<button class="nav-button entry-btn" onclick="navigateToEntry()">
-📝 Candidates Entry
-</button>
+      <!-- ==================== LOGIN SCREEN (#loginContainer) ==================== -->
+      <div class="login-container max-w-md mx-auto glass-panel rounded-3xl p-6 sm:p-10 relative overflow-hidden" id="loginContainer">
+        <!-- Decorative Top Accent Bar -->
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
 
-<button class="nav-button management-btn" onclick="navigateToManagement()">
-👥 Candidates Management
-</button>
+        <!-- Logo & Heading -->
+        <div class="text-center mb-8">
+          <div class="logo w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 mx-auto mb-5 flex items-center justify-center text-white text-2xl font-extrabold shadow-xl shadow-indigo-500/30 ring-4 ring-indigo-500/15">
+            TCC
+          </div>
+          <h1 class="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">
+            Login to TCC Portal
+          </h1>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Sign in with your authorized recruiter credentials
+          </p>
+        </div>
 
-<button class="nav-button interviews-btn" onclick="navigateToInterviews()">
-📅 Scheduled Interviews
-</button>
+        <!-- Login Form (Preserves onsubmit="handleLogin(event)", #email, #password, #loginBtn, #loginText, #errorMessage) -->
+        <div class="form-container">
+          <form onsubmit="handleLogin(event)" class="space-y-5">
+            <div class="input-group text-left">
+              <label for="email" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
+                <i class="fas fa-envelope text-indigo-500 mr-1.5"></i>Email Address / Username
+              </label>
+              <div class="relative">
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="name@talentconnect.com"
+                  required
+                  autocomplete="username"
+                  class="w-full px-4 py-3.5 pl-11 rounded-2xl bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                >
+                <i class="fas fa-at absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+              </div>
+            </div>
 
-<button class="nav-button sourced-profiles-btn" id="sourcedProfilesBtn" onclick="navigateToSourcedProfiles()">
-🔍 Sourced Profiles
-</button>
-                
-                <button class="nav-button Whatsapp-btn" onclick="navigateToWhatsapp()">
-                    💬 WhatsApp Sender
+            <div class="input-group text-left">
+              <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
+                <i class="fas fa-lock text-indigo-500 mr-1.5"></i>Password
+              </label>
+              <div class="relative">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="••••••••••••"
+                  required
+                  autocomplete="current-password"
+                  class="w-full px-4 py-3.5 pl-11 pr-12 rounded-2xl bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                >
+                <i class="fas fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <button
+                  type="button"
+                  onclick="togglePasswordVisibility()"
+                  class="absolute right-3.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-indigo-500 transition-colors"
+                  title="Show / Hide Password"
+                >
+                  <i class="fas fa-eye text-sm" id="passwordEyeIcon"></i>
                 </button>
-</div>
+              </div>
+            </div>
 
-<div class="footer">
-TCC Portal v2.1
-</div>
-</div>
-</div>
+            <button
+              type="submit"
+              class="login-btn w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-sm sm:text-base shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center"
+              id="loginBtn"
+            >
+              <i class="fas fa-right-to-bracket mr-2"></i>
+              <span id="loginText">Login</span>
+            </button>
 
-<script>
-// Google Apps Script Web App URL - Replace with your actual URL
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyppTAVxXAgMzB9vBp_FzS4ajl3A35roDgGoPY94ABBCTNjwfx0OxTv9-CUuOa44IUT/exec';
+            <!-- Error Message Box -->
+            <div
+              class="error-message rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 px-4 py-3 text-xs sm:text-sm font-medium text-center"
+              id="errorMessage"
+              style="display: none;"
+            >
+              Invalid email or password. Please try again.
+            </div>
+          </form>
+        </div>
 
-function goHome() {
-console.log("Home button clicked");
+        <div class="footer mt-8 pt-5 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+          <span>TCC Portal v2.1</span>
+          <span class="inline-flex items-center gap-1.5 text-emerald-500 font-medium">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            Cloud Connected
+          </span>
+        </div>
+      </div>
 
-// Add button animation
-const homeButton = document.querySelector('.home-button');
-homeButton.style.transform = 'scale(0.9) rotate(10deg)';
+      <!-- ==================== MAIN PORTAL SCREEN (#mainContainer) ==================== -->
+      <div class="main-container glass-panel rounded-3xl p-5 sm:p-8 lg:p-10 relative overflow-hidden" id="mainContainer" style="display: none;">
+        <!-- Decorative Top Accent Bar -->
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-emerald-500 to-amber-500"></div>
 
-setTimeout(() => {
-homeButton.style.transform = '';
+        <!-- Dashboard Header Banner -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-slate-200/70 dark:border-slate-800/80">
+          <div class="flex items-center gap-4">
+            <div class="logo w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white text-xl sm:text-2xl font-extrabold shadow-lg shadow-indigo-500/25 shrink-0">
+              TCC
+            </div>
+            <div class="text-left">
+              <div class="inline-flex items-center gap-2 mb-1">
+                <span id="dynamicGreeting" class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                  Workspace Active
+                </span>
+                <span class="text-xs text-slate-400">•</span>
+                <span id="liveClock" class="text-xs font-medium text-slate-500 dark:text-slate-400"></span>
+              </div>
+              <h1 class="font-display text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                Welcome to TCC Portal
+              </h1>
+              <p class="subtitle text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5" id="userSubtitleInfo">
+                Select Action or use keyboard shortcuts (1-5) to launch a module
+              </p>
+            </div>
+          </div>
 
-// Check if user is logged in
-if (sessionStorage.getItem('isLoggedIn') === 'true') {
-// User is logged in, show main portal
-document.querySelector('.container').classList.add('fade-transition');
+          <!-- Quick Search / Filter & Direct WhatsApp Tool -->
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="relative flex-1 sm:w-56">
+              <input
+                type="text"
+                id="moduleSearchInput"
+                oninput="filterModules(this.value)"
+                placeholder="Filter modules..."
+                class="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+              <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            </div>
+            <button
+              type="button"
+              onclick="toggleQuickWaModal(true)"
+              class="px-3.5 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-bold transition-all flex items-center gap-1.5 shrink-0"
+              title="Quick WhatsApp Direct Chat"
+            >
+              <i class="fab fa-whatsapp text-sm"></i>
+              <span>Quick Chat</span>
+            </button>
+          </div>
+        </div>
 
-setTimeout(() => {
-document.getElementById('loginContainer').style.display = 'none';
-document.getElementById('mainContainer').style.display = 'block';
-document.getElementById('userInfo').style.display = 'block';
+        <!-- Module Cards Grid (Preserves .button-container and exact onclick handlers) -->
+        <div class="button-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="modulesGrid">
 
-// Check if user is admin and show/hide sourced profiles button
-checkAdminAccess();
-}, 400);
-} else {
-// User not logged in, refresh to show login screen
-window.location.reload();
-}
-}, 150);
+          <!-- 1. Candidates Entry -->
+          <button
+            class="nav-button entry-btn group p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent dark:from-emerald-500/15 dark:to-slate-900/60 border border-emerald-500/25 hover:border-emerald-500 flex flex-col justify-between min-h-[148px] shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 cursor-pointer"
+            onclick="navigateToEntry()"
+            data-module-title="candidates entry registration form add new"
+          >
+            <div class="flex items-start justify-between w-full mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-xl shadow-md shadow-emerald-500/25 group-hover:scale-110 transition-transform">
+                <i class="fas fa-user-plus"></i>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-600 dark:text-emerald-300">
+                Key: 1
+              </span>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center justify-between">
+                <span>Candidates Entry</span>
+                <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                Register new candidates, manage company JDs, and send instant WhatsApp acknowledgements.
+              </p>
+            </div>
+          </button>
 
-// Add haptic feedback
-if (navigator.vibrate) {
-navigator.vibrate(30);
-}
-}
+          <!-- 2. Candidates Management -->
+          <button
+            class="nav-button management-btn group p-5 rounded-2xl bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent dark:from-blue-500/15 dark:to-slate-900/60 border border-blue-500/25 hover:border-blue-500 flex flex-col justify-between min-h-[148px] shadow-sm hover:shadow-xl hover:shadow-blue-500/10 cursor-pointer"
+            onclick="navigateToManagement()"
+            data-module-title="candidates management pipeline database status"
+          >
+            <div class="flex items-start justify-between w-full mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-xl shadow-md shadow-blue-500/25 group-hover:scale-110 transition-transform">
+                <i class="fas fa-users-gear"></i>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-blue-500/15 text-blue-600 dark:text-blue-300">
+                Key: 2
+              </span>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors flex items-center justify-between">
+                <span>Candidates Management</span>
+                <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                Track applicant stages, update shortlisting statuses, and manage recruiter pipelines.
+              </p>
+            </div>
+          </button>
 
-// Function to check admin access and show/hide sourced profiles button
-function checkAdminAccess() {
-const userType = sessionStorage.getItem('userType');
-const sourcedProfilesBtn = document.getElementById('sourcedProfilesBtn');
+          <!-- 3. Scheduled Interviews -->
+          <button
+            class="nav-button interviews-btn group p-5 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent dark:from-amber-500/15 dark:to-slate-900/60 border border-amber-500/25 hover:border-amber-500 flex flex-col justify-between min-h-[148px] shadow-sm hover:shadow-xl hover:shadow-amber-500/10 cursor-pointer"
+            onclick="navigateToInterviews()"
+            data-module-title="scheduled interviews calendar lineup"
+          >
+            <div class="flex items-start justify-between w-full mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-xl shadow-md shadow-amber-500/25 group-hover:scale-110 transition-transform">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-600 dark:text-amber-300">
+                Key: 3
+              </span>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors flex items-center justify-between">
+                <span>Scheduled Interviews</span>
+                <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                Monitor upcoming candidate interviews, follow-ups, and client interview schedules.
+              </p>
+            </div>
+          </button>
 
-if (userType === 'Admin') {
-sourcedProfilesBtn.style.display = 'block';
-console.log('Admin user detected - Sourced Profiles button enabled');
-} else {
-sourcedProfilesBtn.style.display = 'none';
-console.log('Non-admin user - Sourced Profiles button hidden');
-}
-}
+          <!-- 4. Sourced Profiles (Admin Only - Preserves #sourcedProfilesBtn) -->
+          <button
+            class="nav-button sourced-profiles-btn group p-5 rounded-2xl bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent dark:from-purple-500/15 dark:to-slate-900/60 border border-purple-500/25 hover:border-purple-500 flex flex-col justify-between min-h-[148px] shadow-sm hover:shadow-xl hover:shadow-purple-500/10 cursor-pointer"
+            id="sourcedProfilesBtn"
+            onclick="navigateToSourcedProfiles()"
+            style="display: none;"
+            data-module-title="sourced profiles admin database talent pool"
+          >
+            <div class="flex items-start justify-between w-full mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-fuchsia-600 text-white flex items-center justify-center text-xl shadow-md shadow-purple-500/25 group-hover:scale-110 transition-transform">
+                <i class="fas fa-folder-tree"></i>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-purple-500/15 text-purple-600 dark:text-purple-300">
+                Admin • Key: 4
+              </span>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors flex items-center justify-between">
+                <span>Sourced Profiles</span>
+                <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                Review master talent pool, sourced candidate records, and admin analytics.
+              </p>
+            </div>
+          </button>
 
-// Updated handleLogin function with Google Sheets authentication
-async function handleLogin(event) {
-event.preventDefault();
+          <!-- 5. WhatsApp Sender (Preserves .Whatsapp-btn and navigateToWhatsapp()) -->
+          <button
+            class="nav-button Whatsapp-btn group p-5 rounded-2xl bg-gradient-to-br from-teal-500/10 via-teal-500/5 to-transparent dark:from-teal-500/15 dark:to-slate-900/60 border border-teal-500/25 hover:border-teal-500 flex flex-col justify-between min-h-[148px] shadow-sm hover:shadow-xl hover:shadow-teal-500/10 cursor-pointer"
+            onclick="navigateToWhatsapp()"
+            data-module-title="whatsapp sender bulk broadcast messages"
+          >
+            <div class="flex items-start justify-between w-full mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center text-xl shadow-md shadow-teal-500/25 group-hover:scale-110 transition-transform">
+                <i class="fab fa-whatsapp"></i>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-teal-500/15 text-teal-600 dark:text-teal-300">
+                Admin • Key: 5
+              </span>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors flex items-center justify-between">
+                <span>WhatsApp Sender</span>
+                <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                Automated candidate communication and bulk template messaging utility.
+              </p>
+            </div>
+          </button>
 
-const email = document.getElementById('email').value;
-const password = document.getElementById('password').value;
-const errorMessage = document.getElementById('errorMessage');
-const loginBtn = document.getElementById('loginBtn');
-const loginText = document.getElementById('loginText');
+          <!-- 6. Recruiter Toolkit Card (New Helpful Feature!) -->
+          <button
+            type="button"
+            onclick="toggleCalculatorModal(true)"
+            class="nav-button group p-5 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent dark:from-indigo-500/15 dark:to-slate-900/60 border border-indigo-500/25 hover:border-indigo-500 flex flex-col justify-between min-h-[148px] shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 cursor-pointer"
+            data-module-title="ctc hike calculator toolkit salary converter"
+          >
+            <div class="flex items-start justify-between w-full mb-4">
+              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center text-xl shadow-md shadow-indigo-500/25 group-hover:scale-110 transition-transform">
+                <i class="fas fa-chart-pie"></i>
+              </div>
+              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-indigo-500/15 text-indigo-600 dark:text-indigo-300">
+                Utility
+              </span>
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors flex items-center justify-between">
+                <span>CTC & Hike Calculator</span>
+                <i class="fas fa-up-right-from-square text-xs opacity-60 group-hover:opacity-100 transition-all"></i>
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                Instant Monthly ↔ LPA converter & expected salary hike % estimator for phone screens.
+              </p>
+            </div>
+          </button>
 
-// Add loading state
-loginBtn.classList.add('loading');
-loginText.textContent = 'Authenticating...';
-loginBtn.disabled = true;
+        </div>
 
-try {
-// Make API call to Google Apps Script
-const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=login&username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+        <!-- Session Status Footer Bar -->
+        <div class="footer mt-8 pt-5 border-t border-slate-200/70 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
+          <div class="flex items-center gap-3">
+            <span class="font-semibold text-slate-700 dark:text-slate-300">TCC Portal v2.1</span>
+            <span>•</span>
+            <button onclick="toggleProfileModal(true)" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+              View Session Profile
+            </button>
+          </div>
+          <div class="flex items-center gap-2">
+            <i class="fas fa-shield-halved text-emerald-500"></i>
+            <span id="sessionTimerDisplay">Session Active</span>
+          </div>
+        </div>
+      </div>
 
-if (!response.ok) {
-throw new Error('Network response was not ok');
-}
+    </div>
+  </main>
 
-const result = await response.json();
-console.log('Login response:', result);
+  <!-- ==================== USER PROFILE MODAL ==================== -->
+  <div id="profileModal" class="fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-panel rounded-3xl max-w-md w-full p-6 sm:p-7 relative animate-[fadeTransition_0.25s_ease-out]">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
+        <h3 class="font-display font-bold text-lg flex items-center gap-2">
+          <i class="fas fa-id-badge text-indigo-500"></i>
+          Active Recruiter Profile
+        </h3>
+        <button onclick="toggleProfileModal(false)" class="w-8 h-8 rounded-xl bg-slate-200/60 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="space-y-3 text-xs sm:text-sm">
+        <div class="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 flex justify-between">
+          <span class="text-slate-500">Full Name</span>
+          <span class="font-bold text-slate-900 dark:text-white" id="modalProfileName">-</span>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 flex justify-between">
+          <span class="text-slate-500">Email / Username</span>
+          <span class="font-semibold text-slate-900 dark:text-white" id="modalProfileEmail">-</span>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 flex justify-between">
+          <span class="text-slate-500">Contact Number</span>
+          <span class="font-semibold text-slate-900 dark:text-white" id="modalProfileContact">-</span>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 flex justify-between">
+          <span class="text-slate-500">Designation</span>
+          <span class="font-semibold text-slate-900 dark:text-white" id="modalProfileDesignation">-</span>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 flex justify-between">
+          <span class="text-slate-500">Access Role</span>
+          <span class="font-bold text-indigo-600 dark:text-indigo-400" id="modalProfileRole">-</span>
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end gap-2">
+        <button onclick="toggleProfileModal(false)" class="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-bold">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
 
-if (result.success) {
-// Login successful
-loginText.textContent = 'Success!';
-loginBtn.classList.remove('loading');
+  <!-- ==================== QUICK CTC & HIKE CALCULATOR MODAL ==================== -->
+  <div id="calculatorModal" class="fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-panel rounded-3xl max-w-md w-full p-6 sm:p-7 relative">
+      <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200 dark:border-slate-800">
+        <h3 class="font-display font-bold text-lg flex items-center gap-2">
+          <i class="fas fa-calculator text-indigo-500"></i>
+          Recruiter CTC & Hike Calculator
+        </h3>
+        <button onclick="toggleCalculatorModal(false)" class="w-8 h-8 rounded-xl bg-slate-200/60 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Current CTC (LPA)</label>
+          <input type="number" step="any" id="calcCurrentLpa" oninput="runCtcCalculation()" placeholder="e.g. 5.5" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Expected CTC (LPA)</label>
+          <input type="number" step="any" id="calcExpectedLpa" oninput="runCtcCalculation()" placeholder="e.g. 7.2" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm">
+        </div>
+        <div class="grid grid-cols-2 gap-3 pt-2">
+          <div class="p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-center">
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">Hike Percentage</p>
+            <p class="text-xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-0.5" id="calcHikeResult">0%</p>
+          </div>
+          <div class="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center">
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">Expected Monthly</p>
+            <p class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5" id="calcMonthlyResult">₹0</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-setTimeout(() => {
-document.querySelector('.container').classList.add('fade-transition');
+  <!-- ==================== QUICK WHATSAPP DIRECT CHAT MODAL ==================== -->
+  <div id="quickWaModal" class="fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-panel rounded-3xl max-w-md w-full p-6 sm:p-7 relative">
+      <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200 dark:border-slate-800">
+        <h3 class="font-display font-bold text-lg flex items-center gap-2">
+          <i class="fab fa-whatsapp text-emerald-500 text-xl"></i>
+          Quick WhatsApp Launcher
+        </h3>
+        <button onclick="toggleQuickWaModal(false)" class="w-8 h-8 rounded-xl bg-slate-200/60 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Candidate 10-Digit Mobile</label>
+          <input type="tel" id="quickWaNumber" placeholder="e.g. 9876543210" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm">
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Optional Message</label>
+          <textarea id="quickWaMessage" rows="3" placeholder="Hi, connecting from Talent Connect Consultancy regarding a job opportunity..." class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm"></textarea>
+        </div>
+        <button onclick="launchQuickWhatsApp()" class="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2">
+          <i class="fab fa-whatsapp text-base"></i>
+          Open WhatsApp Chat
+        </button>
+      </div>
+    </div>
+  </div>
 
-setTimeout(() => {
-document.getElementById('loginContainer').style.display = 'none';
-document.getElementById('mainContainer').style.display = 'block';
-document.getElementById('userInfo').style.display = 'block';
-document.getElementById('loginSuccess').style.display = 'inline-block';
-document.getElementById('userName').textContent = result.user.name;
+  <script>
+    // Google Apps Script Web App URL - Preserved exactly as provided
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyppTAVxXAgMzB9vBp_FzS4ajl3A35roDgGoPY94ABBCTNjwfx0OxTv9-CUuOa44IUT/exec';
 
-// Clear form
-document.getElementById('email').value = '';
-document.getElementById('password').value = '';
-errorMessage.style.display = 'none';
-loginBtn.disabled = false;
-loginText.textContent = 'Login to Portal';
+    // Non-blocking custom notification system (replaces browser alert)
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const colors = {
+        info: 'bg-slate-900 dark:bg-slate-800 text-white border-indigo-500/40',
+        error: 'bg-rose-600 text-white border-rose-400',
+        success: 'bg-emerald-600 text-white border-emerald-400'
+      };
+      const icons = {
+        info: 'fa-circle-info text-indigo-400',
+        error: 'fa-triangle-exclamation text-white',
+        success: 'fa-circle-check text-white'
+      };
+      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl border shadow-xl text-xs sm:text-sm font-semibold transition-all duration-300 ${colors[type] || colors.info}`;
+      toast.innerHTML = `
+        <i class="fas ${icons[type] || icons.info} text-base shrink-0"></i>
+        <span class="flex-1">${message}</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
 
-// Store complete user information from Google Sheets
-sessionStorage.setItem('isLoggedIn', 'true');
-sessionStorage.setItem('userEmail', result.user.username || email);
-sessionStorage.setItem('userName', result.user.name || '');
-sessionStorage.setItem('userContact', result.user.contact || '');
-sessionStorage.setItem('userDesignation', result.user.designation || '');
-sessionStorage.setItem('userType', result.user.userType || '');
-sessionStorage.setItem('loginTime', result.user.loginTime || new Date().toISOString());
-sessionStorage.setItem('userRowIndex', result.user.rowIndex || '');
+    // UI Enhancement Helpers
+    function toggleTheme() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+    }
 
-// Check admin access after login
-checkAdminAccess();
+    function togglePasswordVisibility() {
+      const pwd = document.getElementById('password');
+      const icon = document.getElementById('passwordEyeIcon');
+      if (pwd.type === 'password') {
+        pwd.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        pwd.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
 
-console.log('Login successful with Google Sheets data:', {
-name: result.user.name,
-email: result.user.username,
-contact: result.user.contact,
-designation: result.user.designation,
-userType: result.user.userType
-});
-}, 400);
-}, 800);
-} else {
-// Login failed
-loginBtn.classList.remove('loading');
-loginText.textContent = 'Login to Portal';
-loginBtn.disabled = false;
-errorMessage.textContent = result.message || 'Login failed';
-errorMessage.style.display = 'block';
-console.log('Login failed:', result.message);
-}
-} catch (error) {
-// Network or other error
-loginBtn.classList.remove('loading');
-loginText.textContent = 'Login to Portal';
-loginBtn.disabled = false;
+    function toggleProfileModal(show) {
+      const modal = document.getElementById('profileModal');
+      if (show) {
+        const data = window.getUserData();
+        document.getElementById('modalProfileName').textContent = data.name || '-';
+        document.getElementById('modalProfileEmail').textContent = data.email || '-';
+        document.getElementById('modalProfileContact').textContent = data.contact || '-';
+        document.getElementById('modalProfileDesignation').textContent = data.designation || '-';
+        document.getElementById('modalProfileRole').textContent = data.userType || 'Recruiter';
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
 
-console.error('Login error:', error);
+    function toggleCalculatorModal(show) {
+      const modal = document.getElementById('calculatorModal');
+      if (show) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
 
-// Show appropriate error message
-if (error.name === 'TypeError' && error.message.includes('fetch')) {
-errorMessage.textContent = 'Network error. Please check your connection and try again.';
-} else if (error.message.includes('CORS')) {
-errorMessage.textContent = 'Authentication service unavailable. Please try again later.';
-} else {
-errorMessage.textContent = 'Login failed. Please try again.';
-}
+    function runCtcCalculation() {
+      const cur = parseFloat(document.getElementById('calcCurrentLpa').value) || 0;
+      const exp = parseFloat(document.getElementById('calcExpectedLpa').value) || 0;
+      const hikeEl = document.getElementById('calcHikeResult');
+      const monthlyEl = document.getElementById('calcMonthlyResult');
 
-errorMessage.style.display = 'block';
-}
-}
+      if (cur > 0 && exp > 0) {
+        const pct = (((exp - cur) / cur) * 100).toFixed(1);
+        hikeEl.textContent = `${pct > 0 ? '+' : ''}${pct}%`;
+      } else {
+        hikeEl.textContent = '0%';
+      }
 
-function logout() {
-document.querySelector('.container').classList.add('fade-transition');
+      if (exp > 0) {
+        const monthly = Math.round((exp * 100000) / 12);
+        monthlyEl.textContent = '₹' + monthly.toLocaleString('en-IN');
+      } else {
+        monthlyEl.textContent = '₹0';
+      }
+    }
 
-setTimeout(() => {
-document.getElementById('loginContainer').style.display = 'block';
-document.getElementById('mainContainer').style.display = 'none';
-document.getElementById('userInfo').style.display = 'none';
+    function toggleQuickWaModal(show) {
+      const modal = document.getElementById('quickWaModal');
+      if (show) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
 
-// Clear all session data
-sessionStorage.removeItem('isLoggedIn');
-sessionStorage.removeItem('userEmail');
-sessionStorage.removeItem('userName');
-sessionStorage.removeItem('userContact');
-sessionStorage.removeItem('userDesignation');
-sessionStorage.removeItem('userType');
-sessionStorage.removeItem('loginTime');
-sessionStorage.removeItem('userRowIndex');
+    function launchQuickWhatsApp() {
+      const rawNum = (document.getElementById('quickWaNumber').value || '').replace(/\D/g, '').slice(-10);
+      if (rawNum.length !== 10) {
+        showToast('Please enter a valid 10-digit mobile number', 'error');
+        return;
+      }
+      const msg = document.getElementById('quickWaMessage').value || '';
+      const url = `https://wa.me/91${rawNum}${msg ? '?text=' + encodeURIComponent(msg) : ''}`;
+      window.open(url, '_blank');
+      toggleQuickWaModal(false);
+    }
 
-console.log('User logged out - all session data cleared');
-}, 400);
-}
+    function filterModules(query) {
+      const q = (query || '').toLowerCase().trim();
+      const cards = document.querySelectorAll('#modulesGrid .nav-button');
+      cards.forEach(card => {
+        if (card.id === 'sourcedProfilesBtn' && sessionStorage.getItem('userType') !== 'Admin') {
+          return;
+        }
+        const keywords = (card.getAttribute('data-module-title') || '') + ' ' + card.innerText.toLowerCase();
+        card.style.display = (!q || keywords.includes(q)) ? 'flex' : 'none';
+      });
+    }
 
-// Updated navigation functions for web hosting
-function navigateToEntry() {
-console.log("Entry button clicked");
-const button = event.target;
-button.style.transform = 'scale(0.95)';
+    function syncDashboardHeaderUI() {
+      const name = sessionStorage.getItem('userName') || 'User';
+      const designation = sessionStorage.getItem('userDesignation') || '';
+      const userType = sessionStorage.getItem('userType') || 'Recruiter';
 
-setTimeout(() => {
-button.style.transform = '';
+      const initialsEl = document.getElementById('userAvatarInitials');
+      if (initialsEl) {
+        initialsEl.textContent = name.trim().charAt(0).toUpperCase() || 'U';
+      }
 
-// Check if user is logged in
-if (sessionStorage.getItem('isLoggedIn') === 'true') {
-// Web hosting - redirect to entry page
-console.log('Navigating to entry.html with user data:', {
-email: sessionStorage.getItem('userEmail'),
-name: sessionStorage.getItem('userName'),
-designation: sessionStorage.getItem('userDesignation'),
-userType: sessionStorage.getItem('userType')
-});
-window.location.href = 'entry.html';
-} else {
-alert("Please login first");
-}
-}, 150);
-}
+      const roleBadge = document.getElementById('roleBadgeHeader');
+      if (roleBadge) {
+        roleBadge.textContent = userType;
+      }
 
-function navigateToManagement() {
-console.log("Management button clicked");
-const button = event.target;
-button.style.transform = 'scale(0.95)';
+      const subtitle = document.getElementById('userSubtitleInfo');
+      if (subtitle && designation) {
+        subtitle.textContent = `${designation} • ${userType} Access`;
+      }
 
-setTimeout(() => {
-button.style.transform = '';
+      const hour = new Date().getHours();
+      const greet = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
+      const greetEl = document.getElementById('dynamicGreeting');
+      if (greetEl) greetEl.textContent = `${greet}, ${name.split(' ')[0]}`;
+    }
 
-if (sessionStorage.getItem('isLoggedIn') === 'true') {
-// Web hosting - redirect to management page
-console.log('Navigating to management.html with user data:', {
-email: sessionStorage.getItem('userEmail'),
-name: sessionStorage.getItem('userName'),
-designation: sessionStorage.getItem('userDesignation'),
-userType: sessionStorage.getItem('userType')
-});
-window.location.href = 'management.html';
-} else {
-alert("Please login first");
-}
-}, 150);
-}
+    setInterval(() => {
+      const clockEl = document.getElementById('liveClock');
+      if (clockEl) {
+        clockEl.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+    }, 1000);
 
-function navigateToInterviews() {
-console.log("Scheduled Interviews button clicked");
-const button = event.target;
-button.style.transform = 'scale(0.95)';
+    // ==================== PRESERVED CORE FUNCTIONS ====================
+    function goHome() {
+      console.log("Home button clicked");
 
-setTimeout(() => {
-button.style.transform = '';
+      const homeButton = document.querySelector('.home-button');
+      homeButton.style.transform = 'scale(0.9) rotate(10deg)';
 
-if (sessionStorage.getItem('isLoggedIn') === 'true') {
-// Web hosting - redirect to interviews page
-console.log('Navigating to interviews.html with user data:', {
-email: sessionStorage.getItem('userEmail'),
-name: sessionStorage.getItem('userName'),
-designation: sessionStorage.getItem('userDesignation'),
-userType: sessionStorage.getItem('userType')
-});
-window.location.href = 'interviews.html';
-} else {
-alert("Please login first");
-}
-}, 150);
-}
+      setTimeout(() => {
+        homeButton.style.transform = '';
 
-// New function for Sourced Profiles navigation
-function navigateToSourcedProfiles() {
-console.log("Sourced Profiles button clicked");
-const button = event.target;
-button.style.transform = 'scale(0.95)';
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+          document.querySelector('.container').classList.add('fade-transition');
 
-setTimeout(() => {
-button.style.transform = '';
+          setTimeout(() => {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'block';
 
-if (sessionStorage.getItem('isLoggedIn') === 'true') {
-const userType = sessionStorage.getItem('userType');
+            checkAdminAccess();
+            syncDashboardHeaderUI();
+          }, 400);
+        } else {
+          window.location.reload();
+        }
+      }, 150);
 
-if (userType === 'Admin') {
-// Web hosting - redirect to sourced profiles page
-console.log('Navigating to sourced_profile.html with admin user data:', {
-email: sessionStorage.getItem('userEmail'),
-name: sessionStorage.getItem('userName'),
-designation: sessionStorage.getItem('userDesignation'),
-userType: sessionStorage.getItem('userType')
-});
-window.location.href = 'sourced_profile.html';
-} else {
-alert("Access denied. This feature is only available for Admin users.");
-}
-} else {
-alert("Please login first");
-}
-}, 150);
-}
-        
-        // New function for Sourced Profiles navigation
-        function navigateToWhatsapp() {
-            console.log("Whatsapp button clicked");
-            const button = event.target;
-            button.style.transform = 'scale(0.95)';
-            
-            setTimeout(() => {
-                button.style.transform = '';
-                
-                if (sessionStorage.getItem('isLoggedIn') === 'true') {
-                    const userType = sessionStorage.getItem('userType');
-                    
-                    if (userType === 'Admin') {
-                        // Web hosting - redirect to sourced profiles page
-                        console.log('Navigating to Whatsapp_Sender.html with admin user data:', {
-                            email: sessionStorage.getItem('userEmail'),
-                            name: sessionStorage.getItem('userName'),
-                            designation: sessionStorage.getItem('userDesignation'),
-                            userType: sessionStorage.getItem('userType')
-                        });
-                        window.location.href = 'Whatsapp_Sender.html';
-                    } else {
-                        alert("Access denied. This feature is only available for Admin users.");
-                    }
-                } else {
-                    alert("Please login first");
-                }
-            }, 150);
+      if (navigator.vibrate) {
+        navigator.vibrate(30);
+      }
+    }
+
+    // Function to check admin access and show/hide sourced profiles button
+    function checkAdminAccess() {
+      const userType = sessionStorage.getItem('userType');
+      const sourcedProfilesBtn = document.getElementById('sourcedProfilesBtn');
+
+      if (userType === 'Admin') {
+        sourcedProfilesBtn.style.display = 'flex';
+        console.log('Admin user detected - Sourced Profiles button enabled');
+      } else {
+        sourcedProfilesBtn.style.display = 'none';
+        console.log('Non-admin user - Sourced Profiles button hidden');
+      }
+    }
+
+    // Updated handleLogin function with Google Sheets authentication
+    async function handleLogin(event) {
+      event.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorMessage = document.getElementById('errorMessage');
+      const loginBtn = document.getElementById('loginBtn');
+      const loginText = document.getElementById('loginText');
+
+      // Add loading state
+      loginBtn.classList.add('loading');
+      loginText.textContent = 'Authenticating...';
+      loginBtn.disabled = true;
+      errorMessage.style.display = 'none';
+
+      try {
+        // Make API call to Google Apps Script
+        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=login&username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
         }
 
-// Check login state on page load
-window.addEventListener('load', function() {
-console.log("Page loaded");
+        const result = await response.json();
+        console.log('Login response:', result);
 
-// Check if user was previously logged in
-if (sessionStorage.getItem('isLoggedIn') === 'true') {
-const userName = sessionStorage.getItem('userName');
-const userEmail = sessionStorage.getItem('userEmail');
-const userDesignation = sessionStorage.getItem('userDesignation');
-const userType = sessionStorage.getItem('userType');
-const loginTime = sessionStorage.getItem('loginTime');
+        if (result.success) {
+          // Login successful
+          loginText.textContent = 'Success!';
+          loginBtn.classList.remove('loading');
 
-document.getElementById('loginContainer').style.display = 'none';
-document.getElementById('mainContainer').style.display = 'block';
-document.getElementById('userInfo').style.display = 'block';
-document.getElementById('userName').textContent = userName;
+          setTimeout(() => {
+            document.querySelector('.container').classList.add('fade-transition');
 
-// Check admin access on page load
-checkAdminAccess();
+            setTimeout(() => {
+              document.getElementById('loginContainer').style.display = 'none';
+              document.getElementById('mainContainer').style.display = 'block';
+              document.getElementById('userInfo').style.display = 'block';
+              document.getElementById('loginSuccess').style.display = 'inline-block';
+              document.getElementById('userName').textContent = result.user.name;
 
-console.log('User already logged in with Google Sheets data:', {
-name: userName,
-email: userEmail,
-designation: userDesignation,
-userType: userType,
-loginTime: loginTime
-});
-}
+              // Clear form
+              document.getElementById('email').value = '';
+              document.getElementById('password').value = '';
+              errorMessage.style.display = 'none';
+              loginBtn.disabled = false;
+              loginText.textContent = 'Login to Portal';
 
-// Enhanced entrance animation
-document.querySelector('.container').style.opacity = '0';
-document.querySelector('.container').style.transform = 'translateY(50px) scale(0.9)';
+              // Store complete user information from Google Sheets
+              sessionStorage.setItem('isLoggedIn', 'true');
+              sessionStorage.setItem('userEmail', result.user.username || email);
+              sessionStorage.setItem('userName', result.user.name || '');
+              sessionStorage.setItem('userContact', result.user.contact || '');
+              sessionStorage.setItem('userDesignation', result.user.designation || '');
+              sessionStorage.setItem('userType', result.user.userType || '');
+              sessionStorage.setItem('loginTime', result.user.loginTime || new Date().toISOString());
+              sessionStorage.setItem('userRowIndex', result.user.rowIndex || '');
 
-setTimeout(() => {
-document.querySelector('.container').style.transition = 'all 1s cubic-bezier(0.4, 0, 0.2, 1)';
-document.querySelector('.container').style.opacity = '1';
-document.querySelector('.container').style.transform = 'translateY(0) scale(1)';
-}, 200);
-});
+              // Check admin access after login
+              checkAdminAccess();
+              syncDashboardHeaderUI();
 
-// Enhanced touch feedback for mobile
-document.addEventListener('DOMContentLoaded', function() {
-const buttons = document.querySelectorAll('.nav-button, .login-btn, .logout-btn, .home-button');
-buttons.forEach(button => {
-button.addEventListener('touchstart', function(e) {
-this.style.transform = 'scale(0.95)';
-});
-button.addEventListener('touchend', function(e) {
-setTimeout(() => {
-this.style.transform = '';
-}, 100);
-});
-});
+              console.log('Login successful with Google Sheets data:', {
+                name: result.user.name,
+                email: result.user.username,
+                contact: result.user.contact,
+                designation: result.user.designation,
+                userType: result.user.userType
+              });
+            }, 400);
+          }, 800);
+        } else {
+          // Login failed
+          loginBtn.classList.remove('loading');
+          loginText.textContent = 'Login to Portal';
+          loginBtn.disabled = false;
+          errorMessage.textContent = result.message || 'Login failed';
+          errorMessage.style.display = 'block';
+          errorMessage.classList.add('error-shake');
+          console.log('Login failed:', result.message);
+        }
+      } catch (error) {
+        // Network or other error
+        loginBtn.classList.remove('loading');
+        loginText.textContent = 'Login to Portal';
+        loginBtn.disabled = false;
 
-// Add haptic feedback simulation
-buttons.forEach(button => {
-button.addEventListener('click', function() {
-if (navigator.vibrate) {
-navigator.vibrate(50);
-}
-});
-});
-});
+        console.error('Login error:', error);
 
-// Add particle effect on button hover
-function createParticle(x, y) {
-const particle = document.createElement('div');
-particle.style.cssText = `
-               position: fixed;
-               width: 4px;
-               height: 4px;
-               background: rgba(255, 255, 255, 0.8);
-               border-radius: 50%;
-               pointer-events: none;
-               z-index: 1000;
-               left: ${x}px;
-               top: ${y}px;
-           `;
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+          errorMessage.textContent = 'Network error. Please check your connection and try again.';
+        } else if (error.message.includes('CORS')) {
+          errorMessage.textContent = 'Authentication service unavailable. Please try again later.';
+        } else {
+          errorMessage.textContent = 'Login failed. Please try again.';
+        }
 
-document.body.appendChild(particle);
+        errorMessage.style.display = 'block';
+      }
+    }
 
-const animation = particle.animate([
-{ transform: 'translate(0, 0) scale(1)', opacity: 1 },
-{ transform: `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) scale(0)`, opacity: 0 }
-], {
-duration: 1000,
-easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
-});
+    function logout() {
+      document.querySelector('.container').classList.add('fade-transition');
 
-animation.onfinish = () => particle.remove();
-}
+      setTimeout(() => {
+        document.getElementById('loginContainer').style.display = 'block';
+        document.getElementById('mainContainer').style.display = 'none';
+        document.getElementById('userInfo').style.display = 'none';
 
-// Helper functions for accessing user data globally
-window.getUserData = function() {
-return {
-isLoggedIn: sessionStorage.getItem('isLoggedIn') === 'true',
-email: sessionStorage.getItem('userEmail'),
-name: sessionStorage.getItem('userName'),
-contact: sessionStorage.getItem('userContact'),
-designation: sessionStorage.getItem('userDesignation'),
-userType: sessionStorage.getItem('userType'),
-loginTime: sessionStorage.getItem('loginTime'),
-rowIndex: sessionStorage.getItem('userRowIndex')
-};
-};
+        // Clear all session data
+        sessionStorage.removeItem('isLoggedIn');
+        sessionStorage.removeItem('userEmail');
+        sessionStorage.removeItem('userName');
+        sessionStorage.removeItem('userContact');
+        sessionStorage.removeItem('userDesignation');
+        sessionStorage.removeItem('userType');
+        sessionStorage.removeItem('loginTime');
+        sessionStorage.removeItem('userRowIndex');
 
-window.isUserLoggedIn = function() {
-return sessionStorage.getItem('isLoggedIn') === 'true';
-};
+        showToast('Logged out safely', 'info');
+        console.log('User logged out - all session data cleared');
+      }, 400);
+    }
 
-window.isAdminUser = function() {
-return sessionStorage.getItem('userType') === 'Admin';
-};
-</script>
+    // Updated navigation functions for web hosting
+    function navigateToEntry() {
+      console.log("Entry button clicked");
+      const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.querySelector('.entry-btn');
+      if (button) button.style.transform = 'scale(0.95)';
+
+      setTimeout(() => {
+        if (button) button.style.transform = '';
+
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+          console.log('Navigating to entry.html with user data:', {
+            email: sessionStorage.getItem('userEmail'),
+            name: sessionStorage.getItem('userName'),
+            designation: sessionStorage.getItem('userDesignation'),
+            userType: sessionStorage.getItem('userType')
+          });
+          window.location.href = 'entry.html';
+        } else {
+          showToast("Please login first", "error");
+        }
+      }, 150);
+    }
+
+    function navigateToManagement() {
+      console.log("Management button clicked");
+      const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.querySelector('.management-btn');
+      if (button) button.style.transform = 'scale(0.95)';
+
+      setTimeout(() => {
+        if (button) button.style.transform = '';
+
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+          console.log('Navigating to management.html with user data:', {
+            email: sessionStorage.getItem('userEmail'),
+            name: sessionStorage.getItem('userName'),
+            designation: sessionStorage.getItem('userDesignation'),
+            userType: sessionStorage.getItem('userType')
+          });
+          window.location.href = 'management.html';
+        } else {
+          showToast("Please login first", "error");
+        }
+      }, 150);
+    }
+
+    function navigateToInterviews() {
+      console.log("Scheduled Interviews button clicked");
+      const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.querySelector('.interviews-btn');
+      if (button) button.style.transform = 'scale(0.95)';
+
+      setTimeout(() => {
+        if (button) button.style.transform = '';
+
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+          console.log('Navigating to interviews.html with user data:', {
+            email: sessionStorage.getItem('userEmail'),
+            name: sessionStorage.getItem('userName'),
+            designation: sessionStorage.getItem('userDesignation'),
+            userType: sessionStorage.getItem('userType')
+          });
+          window.location.href = 'interviews.html';
+        } else {
+          showToast("Please login first", "error");
+        }
+      }, 150);
+    }
+
+    function navigateToSourcedProfiles() {
+      console.log("Sourced Profiles button clicked");
+      const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.getElementById('sourcedProfilesBtn');
+      if (button) button.style.transform = 'scale(0.95)';
+
+      setTimeout(() => {
+        if (button) button.style.transform = '';
+
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+          const userType = sessionStorage.getItem('userType');
+
+          if (userType === 'Admin') {
+            console.log('Navigating to sourced_profile.html with admin user data:', {
+              email: sessionStorage.getItem('userEmail'),
+              name: sessionStorage.getItem('userName'),
+              designation: sessionStorage.getItem('userDesignation'),
+              userType: sessionStorage.getItem('userType')
+            });
+            window.location.href = 'sourced_profile.html';
+          } else {
+            showToast("Access denied. This feature is only available for Admin users.", "error");
+          }
+        } else {
+          showToast("Please login first", "error");
+        }
+      }, 150);
+    }
+
+    function navigateToWhatsapp() {
+      console.log("Whatsapp button clicked");
+      const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.querySelector('.Whatsapp-btn');
+      if (button) button.style.transform = 'scale(0.95)';
+
+      setTimeout(() => {
+        if (button) button.style.transform = '';
+
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+          const userType = sessionStorage.getItem('userType');
+
+          if (userType === 'Admin') {
+            console.log('Navigating to Whatsapp_Sender.html with admin user data:', {
+              email: sessionStorage.getItem('userEmail'),
+              name: sessionStorage.getItem('userName'),
+              designation: sessionStorage.getItem('userDesignation'),
+              userType: sessionStorage.getItem('userType')
+            });
+            window.location.href = 'Whatsapp_Sender.html';
+          } else {
+            showToast("Access denied. This feature is only available for Admin users.", "error");
+          }
+        } else {
+          showToast("Please login first", "error");
+        }
+      }, 150);
+    }
+
+    // Keyboard shortcuts (1-5) when logged in
+    window.addEventListener('keydown', function(e) {
+      if (sessionStorage.getItem('isLoggedIn') !== 'true') return;
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+      if (e.key === '1') navigateToEntry();
+      if (e.key === '2') navigateToManagement();
+      if (e.key === '3') navigateToInterviews();
+      if (e.key === '4' && sessionStorage.getItem('userType') === 'Admin') navigateToSourcedProfiles();
+      if (e.key === '5' && sessionStorage.getItem('userType') === 'Admin') navigateToWhatsapp();
+    });
+
+    // Check login state on page load
+    window.addEventListener('load', function() {
+      console.log("Page loaded");
+
+      if (sessionStorage.getItem('isLoggedIn') === 'true') {
+        const userName = sessionStorage.getItem('userName');
+        const userEmail = sessionStorage.getItem('userEmail');
+        const userDesignation = sessionStorage.getItem('userDesignation');
+        const userType = sessionStorage.getItem('userType');
+        const loginTime = sessionStorage.getItem('loginTime');
+
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('mainContainer').style.display = 'block';
+        document.getElementById('userInfo').style.display = 'block';
+        document.getElementById('userName').textContent = userName;
+
+        checkAdminAccess();
+        syncDashboardHeaderUI();
+
+        console.log('User already logged in with Google Sheets data:', {
+          name: userName,
+          email: userEmail,
+          designation: userDesignation,
+          userType: userType,
+          loginTime: loginTime
+        });
+      }
+
+      // Entrance animation
+      const container = document.querySelector('.container');
+      container.style.opacity = '0';
+      container.style.transform = 'translateY(25px) scale(0.98)';
+
+      setTimeout(() => {
+        container.style.transition = 'all 0.7s cubic-bezier(0.22, 1, 0.36, 1)';
+        container.style.opacity = '1';
+        container.style.transform = 'translateY(0) scale(1)';
+      }, 100);
+    });
+
+    // Helper functions for accessing user data globally
+    window.getUserData = function() {
+      return {
+        isLoggedIn: sessionStorage.getItem('isLoggedIn') === 'true',
+        email: sessionStorage.getItem('userEmail'),
+        name: sessionStorage.getItem('userName'),
+        contact: sessionStorage.getItem('userContact'),
+        designation: sessionStorage.getItem('userDesignation'),
+        userType: sessionStorage.getItem('userType'),
+        loginTime: sessionStorage.getItem('loginTime'),
+        rowIndex: sessionStorage.getItem('userRowIndex')
+      };
+    };
+
+    window.isUserLoggedIn = function() {
+      return sessionStorage.getItem('isLoggedIn') === 'true';
+    };
+
+    window.isAdminUser = function() {
+      return sessionStorage.getItem('userType') === 'Admin';
+    };
+  </script>
 </body>
 </html>
-</html>
+```
