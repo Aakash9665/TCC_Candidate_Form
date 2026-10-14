@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>TCC Candidate Registration</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS Client SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <script>
@@ -223,7 +225,7 @@
             </span>
           </div>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-            Submit candidate profile to Power Automate & trigger WhatsApp confirmation
+            Submit candidate profile to Supabase + Power Automate & trigger WhatsApp confirmation
           </p>
         </div>
       </div>
@@ -616,6 +618,16 @@ We have also shared the *Job Description* with you via email.
   </main>
 
   <script>
+    // ==================== SUPABASE CONFIGURATION ====================
+    const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0'; // Paste your Supabase anon/public key here
+
+    // Initialize Supabase Client
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // PRESERVED GOOGLE APPS SCRIPT WEB APP URL (Used strictly for Google Drive JD PDF file uploads/deletions)
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxyo19lD_6WHXwCkpcIXrfV38pAobEjiO6sYhYBFh-nId-YWdGHNPJF_Rh9IQBchSd/exec';
+
     // Custom non-blocking toast notification (replaces native alert)
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
@@ -801,14 +813,6 @@ We have also shared the *Job Description* with you via email.
 
       // User is authenticated
       console.log('✓ User authenticated successfully');
-      console.log('Complete User Details:', {
-        name: userName,
-        email: userEmail,
-        contact: userContact,
-        designation: userDesignation,
-        userType: userType,
-        loginTime: loginTime
-      });
 
       // Set recruiter information from logged-in user
       const recruiterDisplay = document.getElementById('recruiterDisplay');
@@ -830,9 +834,7 @@ We have also shared the *Job Description* with you via email.
         loginTime: loginTime
       };
 
-      console.log('Complete user data available globally as window.USER_DATA:', window.USER_DATA);
-
-      // Load companies after authentication is confirmed
+      // Load companies from Supabase after authentication is confirmed
       loadData();
 
       // Update manage button visibility based on user type
@@ -844,8 +846,6 @@ We have also shared the *Job Description* with you via email.
     function updateManageButtonVisibility() {
       const userType = sessionStorage.getItem('userType') || sessionStorage.getItem('User_Type') || '';
       const isAdmin = userType.toLowerCase() === 'admin';
-
-      console.log('User Type:', userType, '| Is Admin:', isAdmin);
 
       const manageBtn = document.getElementById('manageCompanyBtn');
       if (manageBtn) {
@@ -885,17 +885,15 @@ We have also shared the *Job Description* with you via email.
       };
     }
 
-    // PRESERVED GOOGLE APPS SCRIPT WEB APP URL
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxyo19lD_6WHXwCkpcIXrfV38pAobEjiO6sYhYBFh-nId-YWdGHNPJF_Rh9IQBchSd/exec';
     let companies = {};
     let newCompanyFiles = {};
     let existingCompanyFiles = {};
 
-    // Call Google Apps Script
+    // Call Google Apps Script (Strictly for Google Drive JD PDF uploads & Drive cleanup)
     async function callGoogleScript(action, data = {}) {
       try {
         const payload = { action, ...data };
-        console.log('Calling Google Script:', action);
+        console.log('Calling Google Drive Script:', action);
 
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
@@ -919,29 +917,40 @@ We have also shared the *Job Description* with you via email.
 
         return result;
       } catch (error) {
-        console.error('Error calling Google Script:', error);
-        showToast('Error: ' + error.message, 'error');
+        console.error('Error calling Google Drive Script:', error);
+        showToast('Drive Sync Warning: ' + error.message, 'error');
         return null;
       }
     }
 
-    // Load data from Google Sheets
+    // ==================== SUPABASE DATA LOADING (COMPANIES & POSITIONS) ====================
     async function loadData() {
       try {
-        console.log('Loading data from Google Sheets...');
+        console.log('Loading companies & positions from Supabase...');
 
-        const result = await callGoogleScript('getData');
-        if (result && result.success) {
-          companies = result.data || {};
-          console.log('Loaded companies:', companies);
-          populateCompanies();
-        } else {
-          console.error('Failed to load data');
-          companies = {};
-          populateCompanies();
+        const { data: rows, error } = await supabaseClient
+          .from('companies')
+          .select('company_name, positions')
+          .order('company_name', { ascending: true });
+
+        if (error) {
+          throw error;
         }
+
+        companies = {};
+        if (Array.isArray(rows)) {
+          rows.forEach(row => {
+            if (row.company_name) {
+              companies[row.company_name] = Array.isArray(row.positions) ? row.positions : [];
+            }
+          });
+        }
+
+        console.log('Loaded companies from Supabase:', companies);
+        populateCompanies();
       } catch (error) {
-        console.error('Error loading data:', error);
+        console.error('Error loading companies from Supabase:', error);
+        showToast('Failed to load companies from Supabase: ' + error.message, 'error');
         companies = {};
         populateCompanies();
       }
@@ -979,7 +988,7 @@ We have also shared the *Job Description* with you via email.
       updateLivePreviewAndProgress();
     }
 
-    // File handling
+    // File handling for JD PDFs
     function fileToBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -1093,8 +1102,8 @@ We have also shared the *Job Description* with you via email.
       updateLivePreviewAndProgress();
     });
 
-    // Form submission - PRESERVED EXACT POWER AUTOMATE WORKFLOW & PAYLOAD
-    document.getElementById("jobForm").addEventListener("submit", function (e) {
+    // ==================== FORM SUBMISSION (SUPABASE INSERT + POWER AUTOMATE JD EMAIL) ====================
+    document.getElementById("jobForm").addEventListener("submit", async function (e) {
       e.preventDefault();
 
       const submitBtn = document.getElementById("submitBtn");
@@ -1110,9 +1119,9 @@ We have also shared the *Job Description* with you via email.
       const recruiterMobile = recruiterParts[2] ? recruiterParts[2].trim() : "";
 
       const data = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        contact: document.getElementById("contact").value,
+        name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        contact: document.getElementById("contact").value.trim(),
         currentCTC: document.getElementById("currentCTC").value,
         currentCTCUnit: document.getElementById("currentCTCUnit").value,
         expectedCTC: document.getElementById("asPerCompany").checked ? "As Per Company" : document.getElementById("expectedCTC").value,
@@ -1128,38 +1137,76 @@ We have also shared the *Job Description* with you via email.
         recruiterMobile: recruiterMobile
       };
 
-      fetch("https://default95bfece3066c4fa7b1004902edfde1.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/54210cf2969a42458623aa9427690ce1/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=p6yY_eBF3mEFGGYnnEUVIuAOi9aOt5JUmsyH5SF3hwM", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      })
-      .then(res => {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalBtnHTML;
+      // Format combined strings for downstream compatibility
+      const formattedCurrentCTC = `${data.currentCTC} ${data.currentCTCUnit}`.trim();
+      const formattedExpectedCTC = `${data.expectedCTC} ${data.expectedCTCUnit}`.trim();
+      const formattedExperience = `${data.experience} ${data.experienceUnit}`.trim();
+      const formattedNoticePeriod = `${data.noticePeriod} ${data.noticePeriodUnit}`.trim();
 
-        if (res.ok) {
-          const msg = `*Hi ${data.name}*,\n\nAs per our recent discussion regarding the position of *${data.position}*, we have successfully submitted your profile for shortlisting to our client, *${data.company}*, with the following details:\n\n*Current CTC : ${data.currentCTC} ${data.currentCTCUnit}*\n*Expected CTC : ${data.expectedCTC}* ${data.expectedCTCUnit}\n*Notice Period : ${data.noticePeriod}* ${data.noticePeriodUnit}\n\nWe have also shared the *Job Description* with you via email at ${data.email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
-          const whatsappLink = `https://wa.me/91${data.contact}?text=${encodeURIComponent(msg)}`;
+      try {
+        // 1. Insert candidate record into Supabase 'candidates' table
+        const { error: sbError } = await supabaseClient
+          .from('candidates')
+          .insert([{
+            name: data.name,
+            email: data.email,
+            mobile: data.contact,
+            current_ctc: formattedCurrentCTC,
+            current_ctc_unit: data.currentCTCUnit,
+            expected_ctc: formattedExpectedCTC,
+            expected_ctc_unit: data.expectedCTCUnit,
+            experience: formattedExperience,
+            experience_unit: data.experienceUnit,
+            notice_period: formattedNoticePeriod,
+            notice_period_unit: data.noticePeriodUnit,
+            company: data.company,
+            position: data.position,
+            recruiter: recruiterEmail,
+            recruiter_email: recruiterEmail,
+            recruiter_name: recruiterName,
+            recruiter_mobile: recruiterMobile,
+            status: 'Pending',
+            final_status: 'Submitted'
+          }]);
 
-          logSessionSubmission(data, whatsappLink);
-
-          document.getElementById("sendBtn").innerHTML = `<i class="fab fa-whatsapp"></i> Send to ${data.name}`;
-          document.getElementById("sendBtn").onclick = () => {
-            document.getElementById("popupOverlay").style.display = "none";
-            window.open(whatsappLink, "_blank");
-            resetCandidateFormClean();
-          };
-          document.getElementById("popupOverlay").style.display = "flex";
-        } else {
-          showToast("Error submitting form. Please try again.", "error");
+        if (sbError) {
+          throw new Error(sbError.message || 'Failed to save candidate to Supabase');
         }
-      })
-      .catch(err => {
+
+        // 2. Trigger Power Automate webhook to email the JD from Google Drive (non-blocking)
+        try {
+          await fetch("https://default95bfece3066c4fa7b1004902edfde1.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/54210cf2969a42458623aa9427690ce1/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=p6yY_eBF3mEFGGYnnEUVIuAOi9aOt5JUmsyH5SF3hwM", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+          });
+        } catch (paErr) {
+          console.warn("Power Automate JD email trigger warning:", paErr);
+        }
+
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalBtnHTML;
-        showToast("Failed to connect to server.", "error");
-        console.error(err);
-      });
+
+        const msg = `*Hi ${data.name}*,\n\nAs per our recent discussion regarding the position of *${data.position}*, we have successfully submitted your profile for shortlisting to our client, *${data.company}*, with the following details:\n\n*Current CTC : ${data.currentCTC} ${data.currentCTCUnit}*\n*Expected CTC : ${data.expectedCTC}* ${data.expectedCTCUnit}\n*Notice Period : ${data.noticePeriod}* ${data.noticePeriodUnit}\n\nWe have also shared the *Job Description* with you via email at ${data.email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
+        const whatsappLink = `https://wa.me/91${data.contact}?text=${encodeURIComponent(msg)}`;
+
+        logSessionSubmission(data, whatsappLink);
+        showToast("Candidate saved to Supabase!", "success");
+
+        document.getElementById("sendBtn").innerHTML = `<i class="fab fa-whatsapp"></i> Send to ${data.name}`;
+        document.getElementById("sendBtn").onclick = () => {
+          document.getElementById("popupOverlay").style.display = "none";
+          window.open(whatsappLink, "_blank");
+          resetCandidateFormClean();
+        };
+        document.getElementById("popupOverlay").style.display = "flex";
+
+      } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHTML;
+        showToast(err.message || "Failed to submit candidate.", "error");
+        console.error("Submission error:", err);
+      }
     });
 
     document.getElementById("cancelBtn").addEventListener("click", () => {
@@ -1167,7 +1214,7 @@ We have also shared the *Job Description* with you via email.
       resetCandidateFormClean();
     });
 
-    // Management functions
+    // ==================== COMPANY & JD MANAGEMENT (SUPABASE + DRIVE JD UPLOAD) ====================
     function refreshManagementDropdowns() {
       const existingCompanySelect = document.getElementById('existingCompanySelect');
       existingCompanySelect.innerHTML = '<option value="">-- Select Company --</option>';
@@ -1219,7 +1266,7 @@ We have also shared the *Job Description* with you via email.
 
     document.getElementById('existingCompanySelect').addEventListener('change', refreshPositionDropdown);
 
-    // Add new company
+    // 1. Add new company (Saves company & positions to Supabase + uploads JD PDFs to Google Drive)
     document.getElementById('addCompanyBtn').addEventListener('click', async () => {
       const name = document.getElementById('newCompanyName').value.trim();
       if (!name) {
@@ -1230,16 +1277,28 @@ We have also shared the *Job Description* with you via email.
         .split(',')
         .map(p => p.trim())
         .filter(p => p);
+
       setManageLoading(true);
-      const files = Object.values(newCompanyFiles);
-      const result = await callGoogleScript('addCompany', {
-        company: name,
-        positions: positions,
-        files: files
-      });
-      setManageLoading(false);
-      if (result && result.success) {
-        showToast(result.message, 'success');
+
+      try {
+        // A. Save Company & Positions to Supabase 'companies' table
+        const { error: sbError } = await supabaseClient
+          .from('companies')
+          .upsert({ company_name: name, positions: positions }, { onConflict: 'company_name' });
+
+        if (sbError) throw sbError;
+
+        // B. Upload JD PDFs to Google Drive via existing Apps Script (if any files attached or to sync folder)
+        const files = Object.values(newCompanyFiles);
+        if (files.length > 0) {
+          await callGoogleScript('addCompany', {
+            company: name,
+            positions: positions,
+            files: files
+          });
+        }
+
+        showToast(`Company "${name}" saved to Supabase!`, 'success');
 
         companies[name] = positions;
         populateCompanies();
@@ -1249,37 +1308,60 @@ We have also shared the *Job Description* with you via email.
         document.getElementById('newCompanyPositions').value = '';
         document.getElementById('newCompanyFileInputs').innerHTML = '';
         newCompanyFiles = {};
+      } catch (err) {
+        console.error('Error adding company:', err);
+        showToast('Error adding company: ' + err.message, 'error');
+      } finally {
+        setManageLoading(false);
       }
     });
 
-    // Add positions
+    // 2. Add positions to existing company (Updates Supabase array + uploads JD PDFs to Google Drive)
     document.getElementById('addPositionsBtn').addEventListener('click', async () => {
       const company = document.getElementById('existingCompanySelect').value;
       if (!company) {
         showToast('Please select a company first', 'error');
         return;
       }
-      const positions = document.getElementById('addPositionsInput').value
+      const newPositions = document.getElementById('addPositionsInput').value
         .split(',')
         .map(p => p.trim())
         .filter(p => p);
-      if (positions.length === 0) {
+
+      if (newPositions.length === 0) {
         showToast('Please enter at least one position', 'error');
         return;
       }
+
       setManageLoading(true);
-      const files = Object.values(existingCompanyFiles);
-      const result = await callGoogleScript('addPositions', {
-        company: company,
-        positions: positions,
-        files: files
-      });
-      setManageLoading(false);
-      if (result && result.success) {
-        showToast(result.message, 'success');
+
+      try {
+        const currentPositions = companies[company] || [];
+        const updatedPositions = [...new Set([...currentPositions, ...newPositions])];
+
+        // A. Update positions array in Supabase
+        const { error: sbError } = await supabaseClient
+          .from('companies')
+          .update({ positions: updatedPositions })
+          .eq('company_name', company);
+
+        if (sbError) throw sbError;
+
+        // B. Upload JD PDFs to Google Drive via existing Apps Script
+        const files = Object.values(existingCompanyFiles);
+        if (files.length > 0) {
+          await callGoogleScript('addPositions', {
+            company: company,
+            positions: newPositions,
+            files: files
+          });
+        }
+
+        showToast(`Added ${newPositions.length} position(s) to ${company}!`, 'success');
 
         await loadData();
-        refreshManagementDropdowns();
+        document.getElementById('existingCompanySelect').value = company;
+        refreshPositionDropdown();
 
         if (document.getElementById('company').value === company) {
           populatePositions();
@@ -1288,10 +1370,15 @@ We have also shared the *Job Description* with you via email.
         document.getElementById('addPositionsInput').value = '';
         document.getElementById('existingCompanyFileInputs').innerHTML = '';
         existingCompanyFiles = {};
+      } catch (err) {
+        console.error('Error adding positions:', err);
+        showToast('Error adding positions: ' + err.message, 'error');
+      } finally {
+        setManageLoading(false);
       }
     });
 
-    // Delete position
+    // 3. Delete position (Removes position from Supabase array + deletes JD file from Google Drive)
     document.getElementById('deletePositionBtn').addEventListener('click', async () => {
       const company = document.getElementById('existingCompanySelect').value;
       const position = document.getElementById('existingPositionSelect').value;
@@ -1303,24 +1390,42 @@ We have also shared the *Job Description* with you via email.
       if (!confirmed) return;
 
       setManageLoading(true);
-      const result = await callGoogleScript('deletePosition', {
-        company: company,
-        position: position
-      });
-      setManageLoading(false);
-      if (result && result.success) {
-        showToast(result.message, 'success');
+
+      try {
+        const updatedPositions = (companies[company] || []).filter(p => p !== position);
+
+        // A. Update Supabase
+        const { error: sbError } = await supabaseClient
+          .from('companies')
+          .update({ positions: updatedPositions })
+          .eq('company_name', company);
+
+        if (sbError) throw sbError;
+
+        // B. Delete JD file from Google Drive
+        await callGoogleScript('deletePosition', {
+          company: company,
+          position: position
+        });
+
+        showToast(`Deleted position "${position}" from ${company}`, 'success');
 
         await loadData();
-        refreshManagementDropdowns();
+        document.getElementById('existingCompanySelect').value = company;
+        refreshPositionDropdown();
 
         if (document.getElementById('company').value === company) {
           populatePositions();
         }
+      } catch (err) {
+        console.error('Error deleting position:', err);
+        showToast('Error deleting position: ' + err.message, 'error');
+      } finally {
+        setManageLoading(false);
       }
     });
 
-    // Delete company
+    // 4. Delete company (Deletes company row from Supabase + deletes JD folder/files from Google Drive)
     document.getElementById('deleteCompanyBtn').addEventListener('click', async () => {
       const company = document.getElementById('existingCompanySelect').value;
       if (!company) {
@@ -1331,12 +1436,22 @@ We have also shared the *Job Description* with you via email.
       if (!confirmed) return;
 
       setManageLoading(true);
-      const result = await callGoogleScript('deleteCompany', {
-        company: company
-      });
-      setManageLoading(false);
-      if (result && result.success) {
-        showToast(result.message, 'success');
+
+      try {
+        // A. Delete company from Supabase
+        const { error: sbError } = await supabaseClient
+          .from('companies')
+          .delete()
+          .eq('company_name', company);
+
+        if (sbError) throw sbError;
+
+        // B. Delete company JD files from Google Drive
+        await callGoogleScript('deleteCompany', {
+          company: company
+        });
+
+        showToast(`Deleted company "${company}"`, 'success');
 
         await loadData();
         refreshManagementDropdowns();
@@ -1345,10 +1460,15 @@ We have also shared the *Job Description* with you via email.
           document.getElementById('company').value = '';
           populatePositions();
         }
+      } catch (err) {
+        console.error('Error deleting company:', err);
+        showToast('Error deleting company: ' + err.message, 'error');
+      } finally {
+        setManageLoading(false);
       }
     });
 
-    console.log('Candidate Entry page loaded with authentication and role-based management button visibility');
+    console.log('Candidate Entry page loaded with Supabase database and Google Drive JD storage');
   </script>
 </body>
 </html>
