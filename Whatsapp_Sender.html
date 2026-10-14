@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>TCC WhatsApp Bulk Messenger</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS Client SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <script>
@@ -180,16 +182,16 @@
             </span>
           </div>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-            Clean contact lists, customize outreach templates, and launch rapid 1-click broadcasts
+            Clean contact lists, sync Supabase companies & roles, and launch rapid 1-click broadcasts
           </p>
         </div>
       </div>
 
       <!-- Right Action Controls -->
       <div class="flex items-center gap-2">
-        <button type="button" onclick="syncCloudCompanies()" class="px-3 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer" title="Load Companies & Roles from Google Sheets">
-          <i class="fas fa-cloud-arrow-down" id="cloudSyncIcon"></i>
-          <span class="hidden md:inline">Sync Cloud Roles</span>
+        <button type="button" onclick="syncCloudCompanies()" class="px-3 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer" title="Load Companies & Roles from Supabase">
+          <i class="fas fa-database" id="cloudSyncIcon"></i>
+          <span class="hidden md:inline">Sync Supabase Roles</span>
         </button>
 
         <button type="button" onclick="document.documentElement.classList.toggle('dark')" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer" title="Toggle Theme">
@@ -210,7 +212,7 @@
           <p class="font-display text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mt-0.5" id="statDetectedCount">0</p>
         </div>
         <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-sm">
-          <i class="fas fa-Hashtag"></i>
+          <i class="fas fa-hashtag"></i>
         </div>
       </div>
 
@@ -251,13 +253,16 @@
           </button>
         </div>
 
-        <!-- Mobile Numbers Input (#mobileNumbers) with Smart Cleaner & Deduplicator -->
+        <!-- Mobile Numbers Input (#mobileNumbers) with Smart Cleaner & Deduplicator + Pull from Supabase -->
         <div class="form-group mb-4">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
             <label for="mobileNumbers" class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
               <i class="fas fa-mobile-screen-button text-emerald-500 mr-1"></i> Mobile Numbers
             </label>
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button type="button" onclick="pullNumbersFromSupabaseCandidates()" class="px-2.5 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 text-[11px] font-bold transition-all cursor-pointer" title="Import candidate numbers from Supabase">
+                <i class="fas fa-cloud-arrow-down mr-1"></i> Import from Supabase
+              </button>
               <button type="button" onclick="cleanAndDeduplicateNumbers()" class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-[11px] font-bold transition-all cursor-pointer">
                 <i class="fas fa-wand-magic-sparkles mr-1"></i> Clean & Deduplicate
               </button>
@@ -422,15 +427,19 @@
   </main>
 
   <script>
+    // ==================== SUPABASE CONFIGURATION ====================
+    const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0'; // Paste your Supabase anon/public key here
+
+    // Initialize Supabase Client
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     // Preserved Global Variables
     let contactData = [];
     let campaignInfo = {};
     let sentHistory = [];
     let cloudCompanyMap = {};
     let pendingTargetSelectId = null;
-
-    // Cloud Script URL (Same as entry.html for optional 1-click company/role sync)
-    const CLOUD_COMPANY_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxyo19lD_6WHXwCkpcIXrfV38pAobEjiO6sYhYBFh-nId-YWdGHNPJF_Rh9IQBchSd/exec';
 
     // Non-blocking Toast Helper
     function showToast(message, type = 'info') {
@@ -456,7 +465,7 @@
       window.location.href = 'index.html';
     }
 
-    // Check if numbers were transferred from Sourced Profiles page
+    // Auto-load Supabase companies & check if numbers were transferred from Sourced Profiles page
     window.addEventListener('DOMContentLoaded', () => {
       const importedNumbers = sessionStorage.getItem('tcc_bulk_wa_numbers');
       const importedCompany = sessionStorage.getItem('tcc_bulk_wa_company');
@@ -476,6 +485,9 @@
         }
         showToast('Imported candidate numbers from Sourced Profiles!', 'success');
       }
+
+      // Automatically sync companies & positions from Supabase on load
+      syncCloudCompanies(true);
       updateLivePreviewAndCounts();
     });
 
@@ -490,31 +502,76 @@
       }
     }
 
-    // Optional Cloud Sync from Google Sheets
-    async function syncCloudCompanies() {
+    // Sync Companies & Roles directly from Supabase 'companies' table
+    async function syncCloudCompanies(silent = false) {
       const icon = document.getElementById('cloudSyncIcon');
       if (icon) icon.classList.add('fa-spin');
       try {
-        const response = await fetch(CLOUD_COMPANY_SCRIPT_URL, {
-          method: 'POST',
-          mode: 'cors',
-          headers: { 'Content-Type': 'text/plain' },
-          body: JSON.stringify({ action: 'getData' })
-        });
-        const result = await response.json();
-        if (result && result.success && result.data) {
-          cloudCompanyMap = result.data;
-          const compSelect = document.getElementById('company');
-          Object.keys(cloudCompanyMap).forEach(comp => {
-            addOptionIfNotExists(compSelect, comp);
+        const { data: rows, error } = await supabaseClient
+          .from('companies')
+          .select('company_name, positions')
+          .order('company_name', { ascending: true });
+
+        if (error) throw error;
+
+        cloudCompanyMap = {};
+        const compSelect = document.getElementById('company');
+        const posSelect = document.getElementById('position');
+
+        if (Array.isArray(rows)) {
+          rows.forEach(row => {
+            if (row.company_name) {
+              const posList = Array.isArray(row.positions) ? row.positions : [];
+              cloudCompanyMap[row.company_name] = posList;
+              addOptionIfNotExists(compSelect, row.company_name);
+              posList.forEach(p => addOptionIfNotExists(posSelect, p));
+            }
           });
-          showToast(`Synced ${Object.keys(cloudCompanyMap).length} companies from cloud`, 'success');
+        }
+
+        if (!silent) {
+          showToast(`Synced ${Object.keys(cloudCompanyMap).length} companies from Supabase`, 'success');
         }
       } catch (err) {
-        console.error('Error syncing cloud companies:', err);
-        showToast('Could not sync cloud roles right now', 'error');
+        console.error('Error syncing Supabase companies:', err);
+        if (!silent) {
+          showToast('Could not sync companies from Supabase: ' + err.message, 'error');
+        }
       } finally {
         if (icon) icon.classList.remove('fa-spin');
+      }
+    }
+
+    // Pull candidate mobile numbers directly from Supabase 'candidates' table (filtered by selected company if any)
+    async function pullNumbersFromSupabaseCandidates() {
+      const selectedCompany = document.getElementById('company')?.value || '';
+      try {
+        let query = supabaseClient.from('candidates').select('mobile, company');
+        if (selectedCompany) {
+          query = query.eq('company', selectedCompany);
+        }
+        const { data, error } = await query;
+        if (error) throw error;
+
+        const numbers = (data || [])
+          .map(r => (r.mobile || '').toString().replace(/\D/g, '').slice(-10))
+          .filter(n => n.length === 10);
+
+        const uniqueNumbers = [...new Set(numbers)];
+        if (uniqueNumbers.length === 0) {
+          showToast(selectedCompany ? `No mobile numbers found for ${selectedCompany}` : 'No mobile numbers found in Supabase', 'error');
+          return;
+        }
+
+        const input = document.getElementById('mobileNumbers');
+        const existing = parseRawNumbers(input.value);
+        const merged = [...new Set([...existing, ...uniqueNumbers])];
+        input.value = merged.join(', ');
+        updateLivePreviewAndCounts();
+        showToast(`Imported ${uniqueNumbers.length} number(s) from Supabase${selectedCompany ? ' (' + selectedCompany + ')' : ''}`, 'success');
+      } catch (err) {
+        console.error('Error importing numbers from Supabase:', err);
+        showToast('Failed to import numbers: ' + err.message, 'error');
       }
     }
 
