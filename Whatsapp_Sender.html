@@ -1,378 +1,856 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Bulk Messenger</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>TCC WhatsApp Bulk Messenger</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          }
         }
+      }
+    }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(circle at 12% 15%, rgba(16, 185, 129, 0.16) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(20, 184, 166, 0.15) 0%, transparent 45%);
+    }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            padding: 30px;
-        }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(226, 232, 240, 0.85);
+      box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.07);
+    }
 
-        h1 {
-            color: #333;
-            margin-bottom: 30px;
-            text-align: center;
-            font-size: 28px;
-        }
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+    }
 
-        .form-group {
-            margin-bottom: 25px;
-        }
+    .form-input {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 13px;
+      border: 1.5px solid rgba(148, 163, 184, 0.3);
+      background: rgba(248, 250, 252, 0.9);
+      color: #0f172a;
+      font-size: 13.5px;
+      transition: all 0.2s ease;
+    }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-            font-size: 14px;
-        }
+    .dark .form-input {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #f8fafc;
+    }
 
-        input[type="text"],
-        select {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
+    .form-input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.16);
+    }
 
-        input[type="text"]:focus,
-        select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+    /* Preserved Campaign Header & Table Styles */
+    .campaign-header {
+      background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+      color: white;
+      padding: 20px 24px;
+      border-radius: 20px 20px 0 0;
+    }
 
-        .btn-generate {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 13px;
+    }
 
-        .btn-generate:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
+    th {
+      background: rgba(241, 245, 249, 0.92);
+      color: #475569;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 13px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+    }
 
-        .table-container {
-            margin-top: 30px;
-        }
+    .dark th {
+      background: rgba(15, 23, 42, 0.95);
+      color: #94a3b8;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-        .campaign-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px 10px 0 0;
-            margin-bottom: 0;
-        }
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+      vertical-align: middle;
+    }
 
-        .campaign-header h2 {
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
+    .dark td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
 
-        .campaign-header p {
-            font-size: 14px;
-            opacity: 0.95;
-            margin: 3px 0;
-        }
+    tbody tr {
+      transition: all 0.2s ease;
+    }
 
-        .campaign-header strong {
-            font-weight: 600;
-        }
+    tbody tr:hover {
+      background: rgba(16, 185, 129, 0.06);
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 0 0 10px 10px;
-            overflow: hidden;
-        }
+    .dark tbody tr:hover {
+      background: rgba(16, 185, 129, 0.12);
+    }
 
-        th {
-            background: #f8f9fa;
-            color: #333;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 14px;
-            border-bottom: 2px solid #e0e0e0;
-        }
+    .btn-send {
+      padding: 8px 18px;
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      color: white;
+      border: none;
+      border-radius: 11px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 12.5px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
+    }
 
-        td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #e0e0e0;
-            font-size: 14px;
-            color: #333;
-        }
+    .btn-send:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37, 211, 102, 0.35);
+    }
 
-        tr:hover {
-            background: #f8f9fa;
-        }
-
-        .btn-send {
-            padding: 8px 20px;
-            background: #25D366;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            transition: background 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-send:hover {
-            background: #20BA5A;
-        }
-
-        .btn-send::before {
-            content: "📱";
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-            font-size: 16px;
-        }
-
-        .helper-text {
-            font-size: 12px;
-            color: #888;
-            margin-top: 5px;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 22px;
-            }
-
-            .campaign-header h2 {
-                font-size: 18px;
-            }
-
-            .campaign-header p {
-                font-size: 13px;
-            }
-
-            table {
-                font-size: 12px;
-            }
-
-            th, td {
-                padding: 10px 8px;
-            }
-        }
-    </style>
+    .no-data {
+      text-align: center;
+      padding: 40px 20px;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+  </style>
 </head>
-<body>
-    <div class="container">
-        <h1>WhatsApp Bulk Messenger</h1>
-        
-        <div class="form-group">
-            <label for="mobileNumbers">Mobile Numbers</label>
-            <input 
-                type="text" 
-                id="mobileNumbers" 
-                placeholder="9876543210, 9123456789, 9988776655"
-            >
-            <div class="helper-text">Enter mobile numbers separated by commas (without +91)</div>
-        </div>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 selection:bg-emerald-500 selection:text-white">
 
-        <div class="form-group">
-            <label for="company">Company</label>
-            <select id="company">
-                <option value="">Select Company</option>
-                <option value="Angel Portal">Angel Portal</option>
-                <option value="Savisa Homes">Savisa Homes</option>
-                <option value="Holy Family">Holy Family</option>
-            </select>
-        </div>
+  <!-- Non-Blocking Toast Notification Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-4 pointer-events-none"></div>
 
-        <div class="form-group">
-            <label for="position">Position</label>
-            <select id="position">
-                <option value="">Select Position</option>
-                <option value="Java Lead">Java Lead</option>
-                <option value="Technical Developer">Technical Developer</option>
-                <option value="Sales">Sales</option>
-            </select>
+  <!-- Sticky Top Navigation Bar -->
+  <header class="sticky top-0 z-40 glass-card border-b border-slate-200/70 dark:border-slate-800/80 px-4 sm:px-6 py-3">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <button onclick="goHome()" class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Back to Dashboard">
+          <i class="fas fa-house text-base"></i>
+        </button>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-display font-extrabold text-sm sm:text-lg text-slate-900 dark:text-white leading-tight flex items-center gap-2">
+              <i class="fab fa-whatsapp text-emerald-500 text-lg"></i>
+              <span>WhatsApp Bulk Messenger</span>
+            </h1>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              Campaign Studio
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
+            Clean contact lists, customize outreach templates, and launch rapid 1-click broadcasts
+          </p>
         </div>
+      </div>
 
-        <div class="form-group">
-            <label for="jobLocation">Job Location</label>
-            <input 
-                type="text" 
-                id="jobLocation" 
-                placeholder="e.g., Mumbai, Bangalore, Remote"
-            >
-            <div class="helper-text">Enter the job location for this position</div>
+      <!-- Right Action Controls -->
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="syncCloudCompanies()" class="px-3 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer" title="Load Companies & Roles from Google Sheets">
+          <i class="fas fa-cloud-arrow-down" id="cloudSyncIcon"></i>
+          <span class="hidden md:inline">Sync Cloud Roles</span>
+        </button>
+
+        <button type="button" onclick="document.documentElement.classList.toggle('dark')" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer" title="Toggle Theme">
+          <i class="fas fa-sun text-xs hidden dark:inline text-amber-400"></i>
+          <i class="fas fa-moon text-xs inline dark:hidden"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-5">
+
+    <!-- Live Campaign Stats Strip -->
+    <div class="grid grid-cols-3 gap-3 sm:gap-4 mb-5">
+      <div class="glass-card rounded-2xl p-4 flex items-center justify-between">
+        <div>
+          <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Detected Numbers</p>
+          <p class="font-display text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mt-0.5" id="statDetectedCount">0</p>
         </div>
-
-        <button class="btn-generate" onclick="generateTable()">Generate Contact List</button>
-
-        <div class="table-container" id="tableContainer">
-            <div class="no-data">Fill the form above and click "Generate Contact List"</div>
+        <div class="w-9 h-9 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-sm">
+          <i class="fas fa-Hashtag"></i>
         </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-4 flex items-center justify-between">
+        <div>
+          <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Remaining Queue</p>
+          <p class="font-display text-xl sm:text-2xl font-extrabold text-amber-600 dark:text-amber-400 mt-0.5" id="statRemainingCount">0</p>
+        </div>
+        <div class="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-sm">
+          <i class="fas fa-hourglass-half"></i>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-4 flex items-center justify-between">
+        <div>
+          <p class="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Sent in Session</p>
+          <p class="font-display text-xl sm:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5" id="statSentCount">0</p>
+        </div>
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-sm">
+          <i class="fas fa-check-double"></i>
+        </div>
+      </div>
     </div>
 
-    <script>
-        let contactData = [];
-        let campaignInfo = {};
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-        function generateTable() {
-            const mobileInput = document.getElementById('mobileNumbers').value.trim();
-            const company = document.getElementById('company').value;
-            const position = document.getElementById('position').value;
-            const jobLocation = document.getElementById('jobLocation').value.trim();
+      <!-- ==================== LEFT COLUMN: CAMPAIGN BUILDER (.container) ==================== -->
+      <div class="lg:col-span-7 container glass-card rounded-3xl p-5 sm:p-7 relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500"></div>
 
-            // Validation
-            if (!mobileInput) {
-                alert('Please enter mobile numbers');
-                return;
-            }
-            if (!company) {
-                alert('Please select a company');
-                return;
-            }
-            if (!position) {
-                alert('Please select a position');
-                return;
-            }
-            if (!jobLocation) {
-                alert('Please enter job location');
-                return;
-            }
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-slate-200/70 dark:border-slate-800">
+          <h2 class="font-display font-extrabold text-base sm:text-lg text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fas fa-bullhorn text-emerald-500"></i>
+            <span>1. Configure Broadcast Campaign</span>
+          </h2>
+          <button type="button" onclick="resetCampaignForm()" class="text-xs font-semibold text-slate-500 hover:text-rose-500 flex items-center gap-1 transition-colors">
+            <i class="fas fa-trash-can text-[10px]"></i> Clear All
+          </button>
+        </div>
 
-            // Parse mobile numbers
-            const mobileNumbers = mobileInput.split(',').map(num => num.trim()).filter(num => num);
+        <!-- Mobile Numbers Input (#mobileNumbers) with Smart Cleaner & Deduplicator -->
+        <div class="form-group mb-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+            <label for="mobileNumbers" class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+              <i class="fas fa-mobile-screen-button text-emerald-500 mr-1"></i> Mobile Numbers
+            </label>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="cleanAndDeduplicateNumbers()" class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-[11px] font-bold transition-all cursor-pointer">
+                <i class="fas fa-wand-magic-sparkles mr-1"></i> Clean & Deduplicate
+              </button>
+            </div>
+          </div>
 
-            if (mobileNumbers.length === 0) {
-                alert('No valid mobile numbers found');
-                return;
-            }
+          <textarea
+            id="mobileNumbers"
+            rows="3"
+            oninput="updateLivePreviewAndCounts()"
+            placeholder="9876543210, 9123456789, 9988776655 (Paste comma, space, or newline separated numbers)"
+            class="form-input font-mono text-xs sm:text-sm"
+          ></textarea>
+          <div class="helper-text text-[11px] text-slate-400 mt-1 flex items-center justify-between">
+            <span>Enter mobile numbers separated by commas, spaces, or new lines (without +91)</span>
+            <span id="liveValidNumbersBadge" class="font-semibold text-emerald-600 dark:text-emerald-400">0 numbers</span>
+          </div>
+        </div>
 
-            // Store campaign info
-            campaignInfo = {
-                company: company,
-                position: position,
-                jobLocation: jobLocation
-            };
+        <!-- Company & Position Selection Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <!-- Company (#company) -->
+          <div class="form-group">
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="company" class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                <i class="fas fa-building text-blue-500 mr-1"></i> Company
+              </label>
+              <button type="button" onclick="promptCustomOption('company', 'Enter Custom Company Name:')" class="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline">
+                + Add Custom
+              </button>
+            </div>
+            <select id="company" onchange="handleCompanySelectionChange()" class="form-input">
+              <option value="">Select Company</option>
+              <option value="Angel Portal">Angel Portal</option>
+              <option value="Savisa Homes">Savisa Homes</option>
+              <option value="Holy Family">Holy Family</option>
+            </select>
+          </div>
 
-            // Create contact data
-            contactData = mobileNumbers.map((mobile, index) => ({
-                id: Date.now() + index,
-                mobile: mobile
-            }));
+          <!-- Position (#position) -->
+          <div class="form-group">
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="position" class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                <i class="fas fa-briefcase text-indigo-500 mr-1"></i> Position
+              </label>
+              <button type="button" onclick="promptCustomOption('position', 'Enter Custom Position Title:')" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+                + Add Custom
+              </button>
+            </div>
+            <select id="position" onchange="updateLivePreviewAndCounts()" class="form-input">
+              <option value="">Select Position</option>
+              <option value="Java Lead">Java Lead</option>
+              <option value="Technical Developer">Technical Developer</option>
+              <option value="Sales">Sales</option>
+            </select>
+          </div>
+        </div>
 
-            renderTable();
+        <!-- Job Location (#jobLocation) -->
+        <div class="form-group mb-4">
+          <label for="jobLocation" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+            <i class="fas fa-location-dot text-rose-500 mr-1"></i> Job Location
+          </label>
+          <input
+            type="text"
+            id="jobLocation"
+            oninput="updateLivePreviewAndCounts()"
+            placeholder="e.g., Mumbai, Bangalore, Remote"
+            class="form-input"
+          >
+          <div class="helper-text text-[11px] text-slate-400 mt-1">Enter the job location for this position</div>
+        </div>
+
+        <!-- Message Template Preset Selector -->
+        <div class="form-group mb-5 p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <label for="templatePreset" class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+              <i class="fas fa-comment-dots text-emerald-500 mr-1"></i> Message Template Style
+            </label>
+            <span class="text-[10px] font-semibold text-slate-400">Uses {position}, {company}, {location}</span>
+          </div>
+          <select id="templatePreset" onchange="applyTemplatePreset()" class="form-input mb-2.5 text-xs">
+            <option value="default">Standard Outreach (Default Original)</option>
+            <option value="detailed">Detailed Recruiter Pitch (Bold Formatted)</option>
+            <option value="urgent">Urgent Requirement / Immediate Joiners</option>
+            <option value="custom">Custom Editable Template</option>
+          </select>
+          <textarea
+            id="customMessageTemplate"
+            rows="3"
+            oninput="updateLivePreviewAndCounts()"
+            class="form-input text-xs font-sans"
+          >Hi, I am messaging you regarding {position} position for {company} at {location}.</textarea>
+        </div>
+
+        <!-- Generate Button (.btn-generate) -->
+        <button class="btn-generate w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm sm:text-base shadow-lg shadow-emerald-600/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer" onclick="generateTable()">
+          <i class="fas fa-list-check"></i>
+          <span>Generate Contact List</span>
+        </button>
+      </div>
+
+      <!-- ==================== RIGHT COLUMN: LIVE WHATSAPP PREVIEW & QUEUE CONTROLS ==================== -->
+      <div class="lg:col-span-5 space-y-5">
+        <!-- Live WhatsApp Preview Card -->
+        <div class="glass-card rounded-3xl p-5 sm:p-6">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200/70 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center">
+                <i class="fab fa-whatsapp text-lg"></i>
+              </span>
+              <div>
+                <h3 class="font-display font-bold text-sm text-slate-900 dark:text-white">Live Message Preview</h3>
+                <p class="text-[11px] text-slate-500">Exact message sent to each contact</p>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-500">Live</span>
+          </div>
+
+          <div id="liveMessagePreview" class="p-4 rounded-2xl bg-[#e7ffdb] dark:bg-emerald-950/50 border border-emerald-500/20 text-slate-800 dark:text-slate-200 text-xs sm:text-sm leading-relaxed whitespace-pre-line shadow-inner">
+            Hi, I am messaging you regarding [Position] position for [Company] at [Location].
+          </div>
+
+          <!-- Rapid Queue Launcher Controls -->
+          <div class="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-800 flex flex-col gap-2">
+            <button type="button" onclick="sendNextInQueue()" id="btnSendNext" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:pointer-events-none text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer" disabled>
+              <i class="fas fa-bolt"></i>
+              <span>Send Next in Queue</span>
+            </button>
+            <div class="flex items-center justify-between gap-2">
+              <button type="button" onclick="exportQueueToCSV()" class="flex-1 py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
+                <i class="fas fa-file-csv text-emerald-500"></i> Export List
+              </button>
+              <button type="button" onclick="restoreSentContacts()" class="flex-1 py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all">
+                <i class="fas fa-rotate-left text-blue-500"></i> Restore Sent (<span id="restoreSentBadge">0</span>)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Prompt Modal (Replaces native prompt()) -->
+        <div id="customOptionModal" class="glass-card rounded-2xl p-4 hidden border-2 border-blue-500/40">
+          <p id="customOptionPromptTitle" class="text-xs font-bold text-slate-700 dark:text-slate-200 mb-2">Add New Item</p>
+          <div class="flex gap-2">
+            <input type="text" id="customOptionInput" class="form-input py-2 text-xs" placeholder="Type name...">
+            <button type="button" onclick="confirmCustomOption()" class="px-3.5 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold shrink-0">Add</button>
+            <button type="button" onclick="closeCustomOptionModal()" class="px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-semibold shrink-0">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== GENERATED CONTACT QUEUE TABLE (#tableContainer) ==================== -->
+    <div class="table-container glass-card rounded-3xl overflow-hidden mt-6" id="tableContainer">
+      <div class="no-data">
+        <i class="fab fa-whatsapp text-3xl text-emerald-500/50 mb-2 block"></i>
+        Fill the campaign details above and click <strong>"Generate Contact List"</strong>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Preserved Global Variables
+    let contactData = [];
+    let campaignInfo = {};
+    let sentHistory = [];
+    let cloudCompanyMap = {};
+    let pendingTargetSelectId = null;
+
+    // Cloud Script URL (Same as entry.html for optional 1-click company/role sync)
+    const CLOUD_COMPANY_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxyo19lD_6WHXwCkpcIXrfV38pAobEjiO6sYhYBFh-nId-YWdGHNPJF_Rh9IQBchSd/exec';
+
+    // Non-blocking Toast Helper
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const colors = {
+        info: 'bg-slate-900 dark:bg-slate-800 text-white border-emerald-500/40',
+        success: 'bg-emerald-600 text-white border-emerald-400',
+        error: 'bg-rose-600 text-white border-rose-400'
+      };
+      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl border shadow-xl text-xs sm:text-sm font-semibold transition-all duration-300 ${colors[type] || colors.info}`;
+      toast.innerHTML = `<i class="fas fa-circle-info shrink-0"></i><span class="flex-1">${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3400);
+    }
+
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+
+    // Check if numbers were transferred from Sourced Profiles page
+    window.addEventListener('DOMContentLoaded', () => {
+      const importedNumbers = sessionStorage.getItem('tcc_bulk_wa_numbers');
+      const importedCompany = sessionStorage.getItem('tcc_bulk_wa_company');
+      if (importedNumbers) {
+        const mobileInput = document.getElementById('mobileNumbers');
+        if (mobileInput) {
+          mobileInput.value = importedNumbers;
+          sessionStorage.removeItem('tcc_bulk_wa_numbers');
         }
-
-        function renderTable() {
-            const container = document.getElementById('tableContainer');
-
-            if (contactData.length === 0) {
-                container.innerHTML = '<div class="no-data">No contacts to display</div>';
-                return;
-            }
-
-            let tableHTML = `
-                <div class="campaign-header">
-                    <h2>Campaign Details</h2>
-                    <p><strong>Position:</strong> ${campaignInfo.position}</p>
-                    <p><strong>Company:</strong> ${campaignInfo.company}</p>
-                    <p><strong>Location:</strong> ${campaignInfo.jobLocation}</p>
-                    <p><strong>Total Contacts:</strong> ${contactData.length}</p>
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>S.No</th>
-                            <th>Mobile Number</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            contactData.forEach((contact, index) => {
-                tableHTML += `
-                    <tr id="row-${contact.id}">
-                        <td>${index + 1}</td>
-                        <td>${contact.mobile}</td>
-                        <td>
-                            <button class="btn-send" onclick="sendWhatsApp(${contact.id}, '${contact.mobile}')">
-                                Send
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            tableHTML += `
-                    </tbody>
-                </table>
-            `;
-
-            container.innerHTML = tableHTML;
+        if (importedCompany) {
+          const compSelect = document.getElementById('company');
+          if (compSelect) {
+            addOptionIfNotExists(compSelect, importedCompany);
+            compSelect.value = importedCompany;
+          }
+          sessionStorage.removeItem('tcc_bulk_wa_company');
         }
+        showToast('Imported candidate numbers from Sourced Profiles!', 'success');
+      }
+      updateLivePreviewAndCounts();
+    });
 
-        function sendWhatsApp(id, mobile) {
-            // Create message template with location
-            const message = `Hi, I am messaging you regarding ${campaignInfo.position} position for ${campaignInfo.company} at ${campaignInfo.jobLocation}.`;
-            
-            // Clean mobile number (remove spaces, dashes, etc.)
-            const cleanMobile = mobile.replace(/D/g, '');
-            
-            // Add country code if not present
-            const fullMobile = cleanMobile.startsWith('91') ? cleanMobile : '91' + cleanMobile;
-            
-            // Create WhatsApp URL
-            const whatsappURL = `https://wa.me/${fullMobile}?text=${encodeURIComponent(message)}`;
-            
-            // Open WhatsApp
-            window.open(whatsappURL, '_blank');
-            
-            // Remove row after sending
-            setTimeout(() => {
-                contactData = contactData.filter(contact => contact.id !== id);
-                renderTable();
-            }, 500);
+    function addOptionIfNotExists(selectEl, value) {
+      if (!selectEl || !value) return;
+      const exists = Array.from(selectEl.options).some(opt => opt.value === value);
+      if (!exists) {
+        const opt = document.createElement('option');
+        opt.value = value;
+        opt.textContent = value;
+        selectEl.appendChild(opt);
+      }
+    }
+
+    // Optional Cloud Sync from Google Sheets
+    async function syncCloudCompanies() {
+      const icon = document.getElementById('cloudSyncIcon');
+      if (icon) icon.classList.add('fa-spin');
+      try {
+        const response = await fetch(CLOUD_COMPANY_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action: 'getData' })
+        });
+        const result = await response.json();
+        if (result && result.success && result.data) {
+          cloudCompanyMap = result.data;
+          const compSelect = document.getElementById('company');
+          Object.keys(cloudCompanyMap).forEach(comp => {
+            addOptionIfNotExists(compSelect, comp);
+          });
+          showToast(`Synced ${Object.keys(cloudCompanyMap).length} companies from cloud`, 'success');
         }
-    </script>
+      } catch (err) {
+        console.error('Error syncing cloud companies:', err);
+        showToast('Could not sync cloud roles right now', 'error');
+      } finally {
+        if (icon) icon.classList.remove('fa-spin');
+      }
+    }
+
+    function handleCompanySelectionChange() {
+      const comp = document.getElementById('company').value;
+      const posSelect = document.getElementById('position');
+      if (comp && cloudCompanyMap[comp] && Array.isArray(cloudCompanyMap[comp])) {
+        cloudCompanyMap[comp].forEach(pos => addOptionIfNotExists(posSelect, pos));
+      }
+      updateLivePreviewAndCounts();
+    }
+
+    // Custom Option Modal Helpers
+    function promptCustomOption(selectId, title) {
+      pendingTargetSelectId = selectId;
+      document.getElementById('customOptionPromptTitle').textContent = title;
+      const input = document.getElementById('customOptionInput');
+      input.value = '';
+      document.getElementById('customOptionModal').classList.remove('hidden');
+      input.focus();
+    }
+
+    function closeCustomOptionModal() {
+      document.getElementById('customOptionModal').classList.add('hidden');
+      pendingTargetSelectId = null;
+    }
+
+    function confirmCustomOption() {
+      const val = document.getElementById('customOptionInput').value.trim();
+      if (val && pendingTargetSelectId) {
+        const selectEl = document.getElementById(pendingTargetSelectId);
+        addOptionIfNotExists(selectEl, val);
+        selectEl.value = val;
+        updateLivePreviewAndCounts();
+        showToast(`Added "${val}"`, 'success');
+      }
+      closeCustomOptionModal();
+    }
+
+    // Smart Number Cleaner & Deduplicator
+    function parseRawNumbers(rawText) {
+      if (!rawText) return [];
+      return rawText
+        .split(/[\n,;|\s]+/)
+        .map(item => item.trim())
+        .filter(Boolean);
+    }
+
+    function cleanAndDeduplicateNumbers() {
+      const input = document.getElementById('mobileNumbers');
+      if (!input || !input.value.trim()) {
+        showToast('Please enter or paste mobile numbers first', 'error');
+        return;
+      }
+      const rawTokens = parseRawNumbers(input.value);
+      const cleanedSet = new Set();
+
+      rawTokens.forEach(token => {
+        let digits = token.replace(/\D/g, '');
+        if (digits.length === 12 && digits.startsWith('91')) {
+          digits = digits.slice(2);
+        } else if (digits.length > 10) {
+          digits = digits.slice(-10);
+        }
+        if (digits.length >= 10) {
+          cleanedSet.add(digits);
+        }
+      });
+
+      const uniqueList = Array.from(cleanedSet);
+      input.value = uniqueList.join(', ');
+      updateLivePreviewAndCounts();
+      showToast(`Cleaned & deduplicated: ${uniqueList.length} valid number(s) ready`, 'success');
+    }
+
+    // Template Presets
+    function applyTemplatePreset() {
+      const preset = document.getElementById('templatePreset').value;
+      const templateBox = document.getElementById('customMessageTemplate');
+      const recruiterName = sessionStorage.getItem('userName') || 'Talent Connect Consultancy';
+
+      if (preset === 'default') {
+        templateBox.value = `Hi, I am messaging you regarding {position} position for {company} at {location}.`;
+      } else if (preset === 'detailed') {
+        templateBox.value = `*Hi Candidate*,\n\nGreetings from *Talent Connect Consultancy*! We have an exciting job opening for the *{position}* role with our client *{company}* based at *{location}*.\n\nPlease share your updated resume and current CTC details if interested.\n\n*Regards,*\n*${recruiterName}*`;
+      } else if (preset === 'urgent') {
+        templateBox.value = `*Urgent Hiring Alert!*\n\nWe are actively shortlisting candidates for *{position}* at *{company}* ({location}). Immediate/short notice joiners preferred.\n\nReply *YES* or share your CV to schedule an interview today!`;
+      }
+      updateLivePreviewAndCounts();
+    }
+
+    function buildFormattedMessage(pos, comp, loc) {
+      const rawTemplate = document.getElementById('customMessageTemplate')?.value ||
+        `Hi, I am messaging you regarding {position} position for {company} at {location}.`;
+      return rawTemplate
+        .replace(/\{position\}/gi, pos || '[Position]')
+        .replace(/\{company\}/gi, comp || '[Company]')
+        .replace(/\{location\}/gi, loc || '[Location]');
+    }
+
+    function updateLivePreviewAndCounts() {
+      const rawMobile = document.getElementById('mobileNumbers')?.value.trim() || '';
+      const company = document.getElementById('company')?.value || '';
+      const position = document.getElementById('position')?.value || '';
+      const jobLocation = document.getElementById('jobLocation')?.value.trim() || '';
+
+      const detectedList = parseRawNumbers(rawMobile);
+      const countBadge = document.getElementById('liveValidNumbersBadge');
+      const statDetected = document.getElementById('statDetectedCount');
+      const statRemaining = document.getElementById('statRemainingCount');
+      const statSent = document.getElementById('statSentCount');
+      const restoreBadge = document.getElementById('restoreSentBadge');
+      const btnSendNext = document.getElementById('btnSendNext');
+
+      if (countBadge) countBadge.textContent = `${detectedList.length} number${detectedList.length === 1 ? '' : 's'}`;
+      if (statDetected) statDetected.textContent = detectedList.length;
+      if (statRemaining) statRemaining.textContent = contactData.length;
+      if (statSent) statSent.textContent = sentHistory.length;
+      if (restoreBadge) restoreBadge.textContent = sentHistory.length;
+      if (btnSendNext) btnSendNext.disabled = contactData.length === 0;
+
+      const previewBox = document.getElementById('liveMessagePreview');
+      if (previewBox) {
+        previewBox.textContent = buildFormattedMessage(position, company, jobLocation);
+      }
+    }
+
+    function resetCampaignForm() {
+      document.getElementById('mobileNumbers').value = '';
+      document.getElementById('company').value = '';
+      document.getElementById('position').value = '';
+      document.getElementById('jobLocation').value = '';
+      contactData = [];
+      sentHistory = [];
+      renderTable();
+      updateLivePreviewAndCounts();
+      showToast('Campaign form cleared', 'info');
+    }
+
+    function sendNextInQueue() {
+      if (contactData.length === 0) {
+        showToast('No contacts remaining in queue', 'error');
+        return;
+      }
+      const nextContact = contactData[0];
+      sendWhatsApp(nextContact.id, nextContact.mobile);
+    }
+
+    function restoreSentContacts() {
+      if (sentHistory.length === 0) {
+        showToast('No sent contacts to restore', 'info');
+        return;
+      }
+      contactData = [...sentHistory, ...contactData];
+      sentHistory = [];
+      renderTable();
+      updateLivePreviewAndCounts();
+      showToast('Restored all sent contacts back to queue', 'success');
+    }
+
+    function exportQueueToCSV() {
+      const allContacts = [...contactData, ...sentHistory];
+      if (allContacts.length === 0) {
+        showToast('Generate a contact list first to export', 'error');
+        return;
+      }
+      const headers = ['S.No', 'Mobile Number', 'Company', 'Position', 'Location', 'Status'];
+      const rows = [
+        ...contactData.map((c, i) => [i + 1, c.mobile, `"${campaignInfo.company || ''}"`, `"${campaignInfo.position || ''}"`, `"${campaignInfo.jobLocation || ''}"`, 'Pending']),
+        ...sentHistory.map((c, i) => [contactData.length + i + 1, c.mobile, `"${campaignInfo.company || ''}"`, `"${campaignInfo.position || ''}"`, `"${campaignInfo.jobLocation || ''}"`, 'Sent'])
+      ];
+      const csv = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const link = document.createElement('a');
+      link.setAttribute('href', encodeURI(csv));
+      link.setAttribute('download', `TCC_WhatsApp_Campaign_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Campaign list exported to CSV', 'success');
+    }
+
+    // ==================== PRESERVED CORE FUNCTIONS ====================
+    function generateTable() {
+      const mobileInput = document.getElementById('mobileNumbers').value.trim();
+      const company = document.getElementById('company').value;
+      const position = document.getElementById('position').value;
+      const jobLocation = document.getElementById('jobLocation').value.trim();
+
+      // Validation
+      if (!mobileInput) {
+        showToast('Please enter mobile numbers', 'error');
+        return;
+      }
+      if (!company) {
+        showToast('Please select a company', 'error');
+        return;
+      }
+      if (!position) {
+        showToast('Please select a position', 'error');
+        return;
+      }
+      if (!jobLocation) {
+        showToast('Please enter job location', 'error');
+        return;
+      }
+
+      // Parse mobile numbers (supports commas, newlines, spaces)
+      const mobileNumbers = mobileInput
+        .split(/[\n,]+/)
+        .map(num => num.trim())
+        .filter(num => num);
+
+      if (mobileNumbers.length === 0) {
+        showToast('No valid mobile numbers found', 'error');
+        return;
+      }
+
+      // Store campaign info
+      campaignInfo = {
+        company: company,
+        position: position,
+        jobLocation: jobLocation
+      };
+
+      // Create contact data
+      contactData = mobileNumbers.map((mobile, index) => ({
+        id: Date.now() + index,
+        mobile: mobile
+      }));
+
+      sentHistory = [];
+      renderTable();
+      updateLivePreviewAndCounts();
+      showToast(`Generated queue with ${contactData.length} contact(s)`, 'success');
+    }
+
+    function renderTable() {
+      const container = document.getElementById('tableContainer');
+
+      if (contactData.length === 0) {
+        container.innerHTML = `
+          <div class="no-data">
+            <i class="fas fa-check-circle text-3xl text-emerald-500 mb-2 block"></i>
+            ${sentHistory.length > 0 ? `All ${sentHistory.length} contacts in this campaign have been messaged!` : 'No contacts to display'}
+          </div>`;
+        updateLivePreviewAndCounts();
+        return;
+      }
+
+      let tableHTML = `
+        <div class="campaign-header flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-display font-extrabold text-lg sm:text-xl flex items-center gap-2">
+              <i class="fab fa-whatsapp"></i> Campaign Details
+            </h2>
+            <div class="flex flex-wrap items-center gap-x-5 gap-y-1 mt-1 text-xs sm:text-sm">
+              <p><strong>Position:</strong> ${campaignInfo.position}</p>
+              <p><strong>Company:</strong> ${campaignInfo.company}</p>
+              <p><strong>Location:</strong> ${campaignInfo.jobLocation}</p>
+            </div>
+          </div>
+          <div class="bg-white/15 backdrop-blur-md px-4 py-2.5 rounded-2xl text-right shrink-0 border border-white/20">
+            <p class="text-[11px] uppercase tracking-wider font-bold opacity-85">Total Contacts</p>
+            <p class="font-display text-2xl font-extrabold leading-none mt-0.5">${contactData.length}</p>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th class="w-20">S.No</th>
+                <th>Mobile Number</th>
+                <th class="text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      contactData.forEach((contact, index) => {
+        const safeMobile = contact.mobile.replace(/'/g, "\\'");
+        tableHTML += `
+          <tr id="row-${contact.id}">
+            <td class="font-bold text-slate-400">#${index + 1}</td>
+            <td class="font-mono font-bold text-slate-900 dark:text-white text-sm">
+              <i class="fas fa-phone text-emerald-500 mr-2 text-xs"></i>${contact.mobile}
+            </td>
+            <td class="text-right">
+              <button class="btn-send" onclick="sendWhatsApp(${contact.id}, '${safeMobile}')">
+                <i class="fab fa-whatsapp text-sm"></i>
+                <span>Send</span>
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tableHTML += `
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      container.innerHTML = tableHTML;
+      updateLivePreviewAndCounts();
+    }
+
+    function sendWhatsApp(id, mobile) {
+      // Create message template with location (uses customizable template, which defaults to exact original message)
+      const message = buildFormattedMessage(
+        campaignInfo.position,
+        campaignInfo.company,
+        campaignInfo.jobLocation
+      );
+
+      // Clean mobile number (remove spaces, dashes, non-digits)
+      const cleanMobile = mobile.replace(/\D/g, '');
+
+      // Add country code if not present
+      const fullMobile = cleanMobile.startsWith('91') && cleanMobile.length > 10 ? cleanMobile : '91' + cleanMobile;
+
+      // Create WhatsApp URL
+      const whatsappURL = `https://wa.me/${fullMobile}?text=${encodeURIComponent(message)}`;
+
+      // Open WhatsApp
+      window.open(whatsappURL, '_blank');
+
+      // Remove row after sending & log to sentHistory
+      setTimeout(() => {
+        const sentItem = contactData.find(contact => contact.id === id);
+        if (sentItem) {
+          sentHistory.push(sentItem);
+        }
+        contactData = contactData.filter(contact => contact.id !== id);
+        renderTable();
+      }, 500);
+    }
+  </script>
 </body>
 </html>
