@@ -1,660 +1,933 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Today's Sourcing</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>TCC Sourced Profiles - Today's Sourcing</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          }
         }
+      }
+    }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f5f5f5;
-            padding: 20px;
-        }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(circle at 12% 15%, rgba(168, 85, 247, 0.16) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(59, 130, 246, 0.15) 0%, transparent 45%);
+    }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(226, 232, 240, 0.85);
+      box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.07);
+    }
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+    }
 
-        .header h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
+    .form-control-input {
+      width: 100%;
+      padding: 9px 13px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(148, 163, 184, 0.3);
+      background: rgba(248, 250, 252, 0.9);
+      color: #0f172a;
+      font-size: 12.5px;
+      transition: all 0.2s ease;
+    }
 
-        .header p {
-            opacity: 0.9;
-            font-size: 1rem;
-        }
+    .dark .form-control-input {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #f8fafc;
+    }
 
-        .controls {
-            display: flex;
-            gap: 15px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-            flex-wrap: wrap;
-            align-items: center;
-        }
+    .form-control-input:focus {
+      outline: none;
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.16);
+    }
 
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
+    /* Preserved Loading & Error States */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 48px 20px;
+      color: #8b5cf6;
+      font-size: 14px;
+      font-weight: 600;
+    }
 
-        .filter-group label {
-            font-weight: 600;
-            color: #495057;
-            font-size: 0.9rem;
-        }
+    .loading.show {
+      display: block;
+    }
 
-        .filter-group select {
-            padding: 8px 12px;
-            border: 2px solid #dee2e6;
-            border-radius: 5px;
-            font-size: 0.9rem;
-            background: white;
-            min-width: 150px;
-        }
+    .error {
+      display: none;
+      text-align: center;
+      padding: 16px 20px;
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      border-radius: 16px;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
 
-        .filter-group select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+    .error.show {
+      display: block;
+    }
 
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
+    /* Table Container & Preserved Column Semantic Classes */
+    .table-container {
+      overflow-x: auto;
+      max-height: 640px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
 
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 12.5px;
+    }
 
-        .btn-primary:hover {
-            background: #5a67d8;
-            transform: translateY(-2px);
-        }
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 15;
+    }
 
-        .btn-success {
-            background: #28a745;
-            color: white;
-        }
+    th {
+      background: rgba(241, 245, 249, 0.96);
+      color: #475569;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 13px 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+      white-space: nowrap;
+    }
 
-        .btn-success:hover {
-            background: #218838;
-            transform: translateY(-2px);
-        }
+    .dark th {
+      background: rgba(15, 23, 42, 0.96);
+      color: #94a3b8;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
 
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 190px;
+      vertical-align: middle;
+    }
 
-        .btn-secondary:hover {
-            background: #545b62;
-        }
+    .dark td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
 
-        .btn-info {
-            background: #17a2b8;
-            color: white;
-        }
+    tbody tr {
+      transition: background-color 0.15s ease;
+    }
 
-        .btn-info:hover {
-            background: #138496;
-        }
+    tbody tr:hover {
+      background-color: rgba(139, 92, 246, 0.06);
+    }
 
-        .stats {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            margin-left: auto;
-            font-size: 0.9rem;
-            color: #495057;
-        }
+    .dark tbody tr:hover {
+      background-color: rgba(139, 92, 246, 0.12);
+    }
 
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 40px;
-            color: #667eea;
-            font-size: 1.1rem;
-        }
+    .timestamp {
+      font-size: 11.5px;
+      color: #64748b;
+    }
 
-        .loading.show {
-            display: block;
-        }
+    .dark .timestamp {
+      color: #94a3b8;
+    }
 
-        .error {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            color: #dc3545;
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            border-radius: 5px;
-            margin: 20px;
-        }
+    .company {
+      font-weight: 700;
+      color: #1e293b;
+    }
 
-        .error.show {
-            display: block;
-        }
+    .dark .company {
+      color: #f1f5f9;
+    }
 
-        .table-container {
-            overflow-x: auto;
-            max-height: 600px;
-            overflow-y: auto;
-        }
+    .position {
+      color: #2563eb;
+      font-weight: 600;
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-        }
+    .dark .position {
+      color: #60a5fa;
+    }
 
-        thead {
-            background: #343a40;
-            color: white;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
+    .candidate-name {
+      font-weight: 700;
+      color: #059669;
+    }
 
-        th {
-            padding: 12px 8px;
-            text-align: left;
-            font-weight: 600;
-            border-right: 1px solid #495057;
-            white-space: nowrap;
-        }
+    .dark .candidate-name {
+      color: #34d399;
+    }
 
-        th:last-child {
-            border-right: none;
-        }
+    .mobile {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 600;
+    }
 
-        tbody tr {
-            border-bottom: 1px solid #dee2e6;
-            transition: background-color 0.2s ease;
-        }
+    .email {
+      color: #7c3aed;
+    }
 
-        tbody tr:hover {
-            background-color: #f8f9fa;
-        }
+    .dark .email {
+      color: #a78bfa;
+    }
 
-        tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
+    .ctc {
+      color: #d97706;
+      font-weight: 600;
+    }
 
-        td {
-            padding: 10px 8px;
-            border-right: 1px solid #dee2e6;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 150px;
-        }
+    .dark .ctc {
+      color: #fbbf24;
+    }
 
-        td:last-child {
-            border-right: none;
-        }
+    .experience {
+      color: #0d9488;
+      font-weight: 600;
+    }
 
-        .timestamp {
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
+    .dark .experience {
+      color: #2dd4bf;
+    }
 
-        .company {
-            font-weight: 600;
-            color: #495057;
-        }
+    .notice-period {
+      color: #e11d48;
+      font-weight: 600;
+    }
 
-        .position {
-            color: #007bff;
-            font-weight: 500;
-        }
+    .dark .notice-period {
+      color: #fb7185;
+    }
 
-        .candidate-name {
-            font-weight: 600;
-            color: #28a745;
-        }
+    .recruiter {
+      color: #64748b;
+      font-style: italic;
+    }
 
-        .mobile {
-            font-family: monospace;
-        }
+    .no-data {
+      text-align: center;
+      padding: 48px 20px;
+      color: #94a3b8;
+      font-size: 14px;
+    }
 
-        .email {
-            color: #6f42c1;
-        }
+    /* Preserved Toast Notification (#toast) */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      padding: 14px 20px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 15px 35px -5px rgba(16, 185, 129, 0.45);
+      transform: translateY(120px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 2500;
+    }
 
-        .ctc {
-            color: #fd7e14;
-            font-weight: 500;
-        }
-
-        .experience {
-            color: #20c997;
-            font-weight: 500;
-        }
-
-        .notice-period {
-            color: #dc3545;
-            font-weight: 500;
-        }
-
-        .recruiter {
-            color: #6c757d;
-            font-style: italic;
-        }
-
-        .no-data {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-            font-size: 1.1rem;
-        }
-
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #28a745;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 5px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-        }
-
-        .toast.show {
-            transform: translateX(0);
-        }
-
-        @media (max-width: 768px) {
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .stats {
-                margin-left: 0;
-                justify-content: center;
-            }
-
-            table {
-                font-size: 0.75rem;
-            }
-
-            th, td {
-                padding: 8px 4px;
-            }
-        }
-    </style>
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
 </head>
-<body>
-    <div class="container">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 selection:bg-purple-500 selection:text-white">
+
+  <!-- Sticky Top Header Bar -->
+  <header class="sticky top-0 z-40 glass-card border-b border-slate-200/70 dark:border-slate-800/80 px-4 sm:px-6 py-3">
+    <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <button onclick="goHome()" class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-purple-500/10 hover:bg-purple-600 text-purple-600 dark:text-purple-400 hover:text-white border border-purple-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Back to Dashboard">
+          <i class="fas fa-house text-base"></i>
+        </button>
+
         <div class="header">
-            <h1>📊 Today's Sourcing</h1>
-            <p>Candidate Data Management & Export</p>
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="font-display font-extrabold text-sm sm:text-lg text-slate-900 dark:text-white leading-tight flex items-center gap-2">
+              <i class="fas fa-chart-line text-purple-500"></i>
+              <span>Today's Sourcing & Master Pool</span>
+            </h1>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+              Admin Analytics
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
+            Candidate Data Management, Email-Ready Table Copy & WhatsApp Broadcast Export
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Action Buttons -->
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="refreshData()" class="px-3 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer" title="Refresh Google Sheets Data">
+          <i class="fas fa-arrows-rotate" id="syncSpinnerIcon"></i>
+          <span class="hidden md:inline">Refresh</span>
+        </button>
+
+        <button type="button" onclick="copyTableData()" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all cursor-pointer" title="Copy Email-Ready Table to Clipboard">
+          <i class="fas fa-copy"></i>
+          <span>Copy Table</span>
+        </button>
+
+        <button type="button" onclick="exportSourcedToCSV()" class="px-3 py-2 rounded-xl bg-purple-500/10 hover:bg-purple-600 text-purple-600 dark:text-purple-400 hover:text-white border border-purple-500/20 text-xs font-bold hidden sm:flex items-center gap-1.5 transition-all cursor-pointer" title="Download CSV">
+          <i class="fas fa-file-csv"></i>
+          <span class="hidden lg:inline">Export CSV</span>
+        </button>
+
+        <!-- View Mode Switcher (Table vs Cards) -->
+        <div class="hidden sm:flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          <button type="button" id="viewTableBtn" onclick="switchSourcedView('table')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-600 text-white shadow-sm transition-all" title="Table View">
+            <i class="fas fa-table"></i>
+          </button>
+          <button type="button" id="viewCardsBtn" onclick="switchSourcedView('cards')" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all" title="Cards View">
+            <i class="fas fa-grip"></i>
+          </button>
         </div>
 
-        <div class="controls">
-            <div class="filter-group">
-                <label for="dateFilter">Date Filter</label>
-                <select id="dateFilter">
-                    <option value="">All Dates</option>
-                    <option value="today">Today</option>
-                    <option value="yesterday">Yesterday</option>
-                    <option value="dayBeforeYesterday">Day Before Yesterday</option>
-                </select>
-            </div>
+        <button type="button" onclick="document.documentElement.classList.toggle('dark')" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer" title="Toggle Theme">
+          <i class="fas fa-sun text-xs hidden dark:inline text-amber-400"></i>
+          <i class="fas fa-moon text-xs inline dark:hidden"></i>
+        </button>
+      </div>
+    </div>
+  </header>
 
-            <div class="filter-group">
-                <label for="companyFilter">Company Filter</label>
-                <select id="companyFilter">
-                    <option value="">All Companies</option>
-                </select>
-            </div>
+  <div class="container max-w-[1600px] mx-auto px-4 sm:px-6 pt-5">
 
-            <button class="btn btn-info" onclick="refreshData()">🔄 Refresh</button>
-            <button class="btn btn-primary" onclick="applyFilters()">🔍 Apply Filters</button>
-            <button class="btn btn-secondary" onclick="clearFilters()">🔄 Clear Filters</button>
-            <button class="btn btn-success" onclick="copyTableData()">📋 Copy Table</button>
-
-            <div class="stats">
-                <span>Total Candidates: <strong id="totalCount">0</strong></span>
-                <span>|</span>
-                <span>Filtered: <strong id="filteredCount">0</strong></span>
-                <span>|</span>
-                <span>Last Updated: <strong id="lastUpdated">Loading...</strong></span>
-            </div>
+    <!-- Live KPI Summary Strip (Preserves #totalCount, #filteredCount, #lastUpdated) -->
+    <div class="stats grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-5">
+      <button type="button" onclick="quickSetDateFilter('')" class="glass-card rounded-2xl p-4 text-left hover:border-purple-500/40 transition-all cursor-pointer">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Candidates</span>
+          <span class="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center text-xs">
+            <i class="fas fa-database"></i>
+          </span>
         </div>
+        <strong id="totalCount" class="font-display text-2xl font-extrabold text-slate-900 dark:text-white block">0</strong>
+        <span class="text-[10px] text-slate-400">Master talent pool</span>
+      </button>
 
-        <div id="loading" class="loading">
-            <div>🔄 Loading Database...</div>
+      <div class="glass-card rounded-2xl p-4 text-left">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Filtered Results</span>
+          <span class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs">
+            <i class="fas fa-filter"></i>
+          </span>
         </div>
+        <strong id="filteredCount" class="font-display text-2xl font-extrabold text-blue-600 dark:text-blue-400 block">0</strong>
+        <span class="text-[10px] text-slate-400">Matching active criteria</span>
+      </div>
 
-        <div id="error" class="error">
-            <strong>❌ Error:</strong> <span id="errorMessage"></span>
+      <button type="button" onclick="quickSetDateFilter('today')" class="glass-card rounded-2xl p-4 text-left hover:border-emerald-500/40 transition-all cursor-pointer">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Today's Submissions</span>
+          <span class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs">
+            <i class="fas fa-bolt"></i>
+          </span>
         </div>
+        <strong id="todaySourcedCount" class="font-display text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 block">0</strong>
+        <span class="text-[10px] text-slate-400">Click to filter Today</span>
+      </button>
 
-        <div class="table-container">
-            <table id="candidateTable">
-                <thead>
-                    <tr>
-                        <th>Timestamp</th>
-                        <th>Company</th>
-                        <th>Position</th>
-                        <th>Candidate Name</th>
-                        <th>Mobile Number</th>
-                        <th>Email ID</th>
-                        <th>Current CTC</th>
-                        <th>Expected CTC</th>
-                        <th>Experience</th>
-                        <th>Notice Period</th>
-                        <th>Recruiter</th>
-                    </tr>
-                </thead>
-                <tbody id="candidateTableBody">
-                    <tr><td colspan="11" class="no-data">Loading candidate data from Google Sheets...</td></tr>
-                </tbody>
-            </table>
+      <div class="glass-card rounded-2xl p-4 text-left">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Last Updated</span>
+          <span class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs">
+            <i class="fas fa-clock"></i>
+          </span>
         </div>
+        <strong id="lastUpdated" class="font-display text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 block mt-1 truncate">Loading...</strong>
+        <span class="text-[10px] text-slate-400">Auto-refreshes every 10m</span>
+      </div>
     </div>
 
-    <div id="toast" class="toast">
-        <span id="toastMessage">Table data copied to clipboard!</span>
+    <!-- Filters & Action Controls Card (Preserves #dateFilter, #companyFilter + adds Search, Recruiter Filter, & Send to WhatsApp Bulk) -->
+    <div class="controls glass-card rounded-3xl p-4 sm:p-6 mb-5">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+        <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fas fa-sliders text-purple-500"></i>
+          <span>Filter & Export Sourced Profiles</span>
+        </h3>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="sendFilteredToWhatsAppSender()" class="px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer">
+            <i class="fab fa-whatsapp"></i>
+            <span>Send Filtered Numbers to Bulk WhatsApp</span>
+          </button>
+          <button type="button" onclick="clearFilters()" class="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1 ml-2">
+            <i class="fas fa-rotate-left text-[10px]"></i> Clear Filters
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3.5 items-end">
+        <!-- Instant Search Input -->
+        <div class="filter-group lg:col-span-3">
+          <label for="searchCandidateInput" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+            Search Candidate / Role
+          </label>
+          <div class="relative">
+            <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input
+              type="text"
+              id="searchCandidateInput"
+              oninput="applyFilters()"
+              placeholder="Name, position, mobile, email..."
+              class="form-control-input pl-9"
+            >
+          </div>
+        </div>
+
+        <!-- Date Filter (#dateFilter) -->
+        <div class="filter-group lg:col-span-2">
+          <label for="dateFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+            Date Filter
+          </label>
+          <select id="dateFilter" class="form-control-input">
+            <option value="">All Dates</option>
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="dayBeforeYesterday">Day Before Yesterday</option>
+          </select>
+        </div>
+
+        <!-- Company Filter (#companyFilter) -->
+        <div class="filter-group lg:col-span-3">
+          <label for="companyFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+            Company Filter
+          </label>
+          <select id="companyFilter" class="form-control-input">
+            <option value="">All Companies</option>
+          </select>
+        </div>
+
+        <!-- Recruiter Filter (#recruiterFilter) -->
+        <div class="filter-group lg:col-span-2">
+          <label for="recruiterFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+            Recruiter
+          </label>
+          <select id="recruiterFilter" onchange="applyFilters()" class="form-control-input">
+            <option value="">All Recruiters</option>
+          </select>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="lg:col-span-2 flex items-center gap-2">
+          <button class="btn btn-primary flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-purple-600/20 cursor-pointer" onclick="applyFilters()">
+            <i class="fas fa-filter mr-1"></i> Apply
+          </button>
+          <button class="btn btn-success py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-600/20 cursor-pointer" onclick="copyTableData()" title="Copy Formatted Table for Email">
+            <i class="fas fa-copy"></i>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <script>
-        // Global variables
-        let candidateData = [];
-        let filteredData = [];
+    <!-- Loading Indicator (#loading) -->
+    <div id="loading" class="loading glass-card rounded-3xl mb-5">
+      <i class="fas fa-circle-notch fa-spin text-2xl text-purple-500 mb-2 block"></i>
+      <div>Loading Sourced Candidate Database...</div>
+    </div>
 
-        // ⚙️ CONFIGURATION - Replace with your Google Apps Script Web App URL
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwb-SxWeOscvz-QCefKn1eK9L7K3gv-bBmjVNi-gsVROg96OKJZ_pq5m2GLGxVKPE3bOQ/exec';
+    <!-- Error Box (#error & #errorMessage) -->
+    <div id="error" class="error">
+      <strong><i class="fas fa-triangle-exclamation mr-1"></i> Error:</strong> <span id="errorMessage"></span>
+    </div>
 
-        // Initialize the application
-        function init() {
-            // Check if URL is configured
-            if (!WEB_APP_URL || WEB_APP_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
-                showError('Web App URL not configured. Please update the WEB_APP_URL constant in the script.');
-                return;
-            }
+    <!-- Table Container (.table-container & #candidateTable & #candidateTableBody) -->
+    <div id="tableViewWrapper" class="glass-card rounded-3xl overflow-hidden">
+      <div class="table-container">
+        <table id="candidateTable">
+          <thead>
+            <tr>
+              <th><i class="far fa-clock mr-1"></i> Timestamp</th>
+              <th><i class="fas fa-building mr-1"></i> Company</th>
+              <th><i class="fas fa-briefcase mr-1"></i> Position</th>
+              <th><i class="fas fa-user mr-1"></i> Candidate Name</th>
+              <th><i class="fas fa-phone mr-1"></i> Mobile Number</th>
+              <th><i class="fas fa-envelope mr-1"></i> Email ID</th>
+              <th><i class="fas fa-indian-rupee-sign mr-1"></i> Current CTC</th>
+              <th><i class="fas fa-chart-line mr-1"></i> Expected CTC</th>
+              <th><i class="fas fa-award mr-1"></i> Experience</th>
+              <th><i class="fas fa-calendar-day mr-1"></i> Notice Period</th>
+              <th><i class="fas fa-user-tie mr-1"></i> Recruiter</th>
+            </tr>
+          </thead>
+          <tbody id="candidateTableBody">
+            <tr><td colspan="11" class="no-data">Loading candidate data from Google Sheets...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-            // Auto-load data on page load
-            loadDataFromSheets();
+    <!-- Mobile / Responsive Cards Grid Container -->
+    <div id="cardsViewWrapper" class="hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2"></div>
+
+  </div>
+
+  <!-- Preserved Toast Notification (#toast & #toastMessage) -->
+  <div id="toast" class="toast">
+    <span id="toastMessage">Table data copied to clipboard!</span>
+  </div>
+
+  <script>
+    // Global variables
+    let candidateData = [];
+    let filteredData = [];
+
+    // PRESERVED GOOGLE APPS SCRIPT WEB APP URL
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwb-SxWeOscvz-QCefKn1eK9L7K3gv-bBmjVNi-gsVROg96OKJZ_pq5m2GLGxVKPE3bOQ/exec';
+
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+
+    function switchSourcedView(mode) {
+      const tableWrapper = document.getElementById('tableViewWrapper');
+      const cardsWrapper = document.getElementById('cardsViewWrapper');
+      const btnTable = document.getElementById('viewTableBtn');
+      const btnCards = document.getElementById('viewCardsBtn');
+
+      if (mode === 'cards') {
+        tableWrapper.classList.add('hidden');
+        cardsWrapper.classList.remove('hidden');
+        cardsWrapper.classList.add('grid');
+        if (btnCards) btnCards.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-600 text-white shadow-sm transition-all';
+        if (btnTable) btnTable.className = 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
+      } else {
+        tableWrapper.classList.remove('hidden');
+        cardsWrapper.classList.add('hidden');
+        cardsWrapper.classList.remove('grid');
+        if (btnTable) btnTable.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-600 text-white shadow-sm transition-all';
+        if (btnCards) btnCards.className = 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
+      }
+    }
+
+    function quickSetDateFilter(val) {
+      const df = document.getElementById('dateFilter');
+      if (df) {
+        df.value = val;
+        applyFilters();
+      }
+    }
+
+    function sendFilteredToWhatsAppSender() {
+      if (!filteredData || filteredData.length === 0) {
+        showToast('❌ No filtered candidates to send');
+        return;
+      }
+      const numbers = filteredData
+        .map(c => (c.mobile || '').toString().replace(/\D/g, '').slice(-10))
+        .filter(n => n.length === 10);
+      const uniqueNumbers = [...new Set(numbers)];
+      if (uniqueNumbers.length === 0) {
+        showToast('❌ No valid 10-digit mobile numbers found');
+        return;
+      }
+      sessionStorage.setItem('tcc_bulk_wa_numbers', uniqueNumbers.join(', '));
+      const selectedCompany = document.getElementById('companyFilter')?.value || '';
+      if (selectedCompany) {
+        sessionStorage.setItem('tcc_bulk_wa_company', selectedCompany);
+      }
+      window.location.href = 'Whatsapp_Sender.html';
+    }
+
+    function exportSourcedToCSV() {
+      if (!filteredData || filteredData.length === 0) {
+        showToast('❌ No data to export');
+        return;
+      }
+      const headers = ['Timestamp', 'Company', 'Position', 'Candidate Name', 'Mobile Number', 'Email ID', 'Current CTC', 'Expected CTC', 'Experience', 'Notice Period', 'Recruiter'];
+      const rows = filteredData.map(c => [
+        `"${formatTimestamp(c.timestamp).replace(/"/g, '""')}"`,
+        `"${(c.company || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.position || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.candidateName || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.mobile || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.email || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.currentCTC || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.expectedCTC || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.experience || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.noticePeriod || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.recruiter || '').toString().replace(/"/g, '""')}"`
+      ]);
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const link = document.createElement('a');
+      link.setAttribute('href', encodeURI(csvContent));
+      link.setAttribute('download', `TCC_Sourced_Profiles_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast(`✅ Exported ${filteredData.length} candidates to CSV`);
+    }
+
+    // ==================== PRESERVED CORE LOGIC & FUNCTIONS ====================
+    function init() {
+      if (!WEB_APP_URL || WEB_APP_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
+        showError('Web App URL not configured. Please update the WEB_APP_URL constant in the script.');
+        return;
+      }
+
+      loadDataFromSheets();
+    }
+
+    async function loadDataFromSheets() {
+      showLoading(true);
+      hideError();
+      const spinIcon = document.getElementById('syncSpinnerIcon');
+      if (spinIcon) spinIcon.classList.add('fa-spin');
+
+      try {
+        const url = `${WEB_APP_URL}?action=getCandidateData&timestamp=${Date.now()}`;
+
+        const response = await fetch(url, {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'Accept': 'application/json',
+          },
+          cache: 'no-cache'
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText || 'Unknown error'}`);
         }
 
-        // Load data from Google Sheets
-        async function loadDataFromSheets() {
-            showLoading(true);
-            hideError();
+        const textResponse = await response.text();
+        let data;
 
-            try {
-                const url = `${WEB_APP_URL}?action=getCandidateData&timestamp=${Date.now()}`;
-
-                const response = await fetch(url, {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: {
-                        'Accept': 'application/json',
-                    },
-                    cache: 'no-cache'
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText || 'Unknown error'}`);
-                }
-
-                const textResponse = await response.text();
-                let data;
-
-                try {
-                    data = JSON.parse(textResponse);
-                } catch (parseError) {
-                    throw new Error(`Invalid JSON response: ${textResponse.substring(0, 100)}...`);
-                }
-
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-
-                if (!Array.isArray(data)) {
-                    throw new Error('Invalid data format received from server - expected array');
-                }
-
-                candidateData = data;
-                filteredData = [...candidateData];
-
-                populateCompanyFilter();
-                displayTable(candidateData);
-                updateStats();
-                updateLastUpdated();
-
-                if (candidateData.length === 0) {
-                    showToast('⚠️ No candidate data found');
-                } else {
-                    showToast(`✅ Successfully loaded ${candidateData.length} candidates`);
-                }
-
-            } catch (error) {
-                console.error('Error loading data:', error);
-                showError(`Failed to load data: ${error.message}`);
-
-                const tbody = document.getElementById('candidateTableBody');
-                tbody.innerHTML = '<tr><td colspan="11" class="no-data">Failed to load data from Google Sheets. Please refresh to try again.</td></tr>';
-            } finally {
-                showLoading(false);
-            }
+        try {
+          data = JSON.parse(textResponse);
+        } catch (parseError) {
+          throw new Error(`Invalid JSON response: ${textResponse.substring(0, 100)}...`);
         }
 
-        // Refresh data manually
-        function refreshData() {
-            loadDataFromSheets();
+        if (data.error) {
+          throw new Error(data.error);
         }
 
-        // Show/hide loading indicator
-        function showLoading(show) {
-            const loading = document.getElementById('loading');
-            const tableContainer = document.querySelector('.table-container');
-
-            if (show) {
-                loading.classList.add('show');
-                tableContainer.style.display = 'none';
-            } else {
-                loading.classList.remove('show');
-                tableContainer.style.display = 'block';
-            }
+        if (!Array.isArray(data)) {
+          throw new Error('Invalid data format received from server - expected array');
         }
 
-        // Show/hide error message
-        function showError(message) {
-            const error = document.getElementById('error');
-            const errorMessage = document.getElementById('errorMessage');
-            errorMessage.textContent = message;
-            error.classList.add('show');
+        candidateData = data;
+        filteredData = [...candidateData];
+
+        populateCompanyFilter();
+        populateRecruiterFilter();
+        displayTable(candidateData);
+        updateStats();
+        updateLastUpdated();
+
+        if (candidateData.length === 0) {
+          showToast('⚠️ No candidate data found');
+        } else {
+          showToast(`✅ Successfully loaded ${candidateData.length} candidates`);
         }
 
-        function hideError() {
-            const error = document.getElementById('error');
-            error.classList.remove('show');
+      } catch (error) {
+        console.error('Error loading data:', error);
+        showError(`Failed to load data: ${error.message}`);
+
+        const tbody = document.getElementById('candidateTableBody');
+        tbody.innerHTML = '<tr><td colspan="11" class="no-data">Failed to load data from Google Sheets. Please refresh to try again.</td></tr>';
+      } finally {
+        showLoading(false);
+        if (spinIcon) spinIcon.classList.remove('fa-spin');
+      }
+    }
+
+    function refreshData() {
+      loadDataFromSheets();
+    }
+
+    function showLoading(show) {
+      const loading = document.getElementById('loading');
+      const tableContainer = document.querySelector('.table-container');
+
+      if (show) {
+        loading.classList.add('show');
+        if (tableContainer) tableContainer.style.display = 'none';
+      } else {
+        loading.classList.remove('show');
+        if (tableContainer) tableContainer.style.display = 'block';
+      }
+    }
+
+    function showError(message) {
+      const error = document.getElementById('error');
+      const errorMessage = document.getElementById('errorMessage');
+      errorMessage.textContent = message;
+      error.classList.add('show');
+    }
+
+    function hideError() {
+      const error = document.getElementById('error');
+      error.classList.remove('show');
+    }
+
+    function updateLastUpdated() {
+      const now = new Date();
+      const timeString = now.toLocaleString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+      document.getElementById('lastUpdated').textContent = timeString;
+    }
+
+    function populateCompanyFilter() {
+      const companyFilter = document.getElementById('companyFilter');
+      const companies = [...new Set(candidateData.map(item => item.company))].filter(Boolean);
+
+      companyFilter.innerHTML = '<option value="">All Companies</option>';
+
+      companies.forEach(company => {
+        const option = document.createElement('option');
+        option.value = company;
+        option.textContent = company;
+        companyFilter.appendChild(option);
+      });
+    }
+
+    function populateRecruiterFilter() {
+      const recruiterFilter = document.getElementById('recruiterFilter');
+      if (!recruiterFilter) return;
+      const recruiters = [...new Set(candidateData.map(item => item.recruiter))].filter(Boolean);
+      recruiterFilter.innerHTML = '<option value="">All Recruiters</option>';
+      recruiters.forEach(rec => {
+        const option = document.createElement('option');
+        option.value = rec;
+        option.textContent = rec;
+        recruiterFilter.appendChild(option);
+      });
+    }
+
+    function displayTable(data) {
+      const tbody = document.getElementById('candidateTableBody');
+      const cardsContainer = document.getElementById('cardsViewWrapper');
+
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" class="no-data">No candidates found matching the selected criteria</td></tr>';
+        if (cardsContainer) {
+          cardsContainer.innerHTML = '<div class="col-span-full glass-card rounded-3xl p-10 text-center text-slate-400">No candidates found matching the selected criteria</div>';
         }
+        return;
+      }
 
-        // Update last updated timestamp
-        function updateLastUpdated() {
-            const now = new Date();
-            const timeString = now.toLocaleString('en-IN', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-            });
-            document.getElementById('lastUpdated').textContent = timeString;
+      tbody.innerHTML = data.map(candidate => `
+        <tr>
+          <td class="timestamp" title="${formatTimestamp(candidate.timestamp)}">${formatTimestamp(candidate.timestamp)}</td>
+          <td class="company" title="${candidate.company || ''}">${candidate.company || ''}</td>
+          <td class="position" title="${candidate.position || ''}">${candidate.position || ''}</td>
+          <td class="candidate-name" title="${candidate.candidateName || ''}">${candidate.candidateName || ''}</td>
+          <td class="mobile">
+            <a href="https://wa.me/91${(candidate.mobile || '').toString().replace(/\D/g, '').slice(-10)}" target="_blank" class="hover:underline inline-flex items-center gap-1" title="Chat on WhatsApp">
+              <i class="fab fa-whatsapp text-emerald-500"></i> ${candidate.mobile || ''}
+            </a>
+          </td>
+          <td class="email" title="${candidate.email || ''}">${candidate.email || ''}</td>
+          <td class="ctc">${candidate.currentCTC || ''}</td>
+          <td class="ctc">${candidate.expectedCTC || ''}</td>
+          <td class="experience">${candidate.experience || ''}</td>
+          <td class="notice-period">${candidate.noticePeriod || ''}</td>
+          <td class="recruiter">${candidate.recruiter || ''}</td>
+        </tr>
+      `).join('');
+
+      if (cardsContainer) {
+        cardsContainer.innerHTML = data.map(candidate => {
+          const cleanMob = (candidate.mobile || '').toString().replace(/\D/g, '').slice(-10);
+          return `
+            <div class="glass-card rounded-2xl p-4 flex flex-col justify-between gap-3 border hover:border-purple-500/40 transition-all">
+              <div>
+                <div class="flex items-start justify-between gap-2 mb-2">
+                  <div>
+                    <h4 class="font-display font-bold text-base text-emerald-600 dark:text-emerald-400">${candidate.candidateName || 'N/A'}</h4>
+                    <p class="text-xs font-semibold text-blue-600 dark:text-blue-400">${candidate.position || ''} • <span class="text-slate-700 dark:text-slate-200">${candidate.company || ''}</span></p>
+                  </div>
+                  <span class="text-[10px] font-semibold text-slate-400">${formatTimestamp(candidate.timestamp)}</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 my-3 p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70 text-[11px]">
+                  <div><span class="text-slate-400 block">Current / Expected</span><strong class="text-amber-600 dark:text-amber-400">${candidate.currentCTC || '-'} → ${candidate.expectedCTC || '-'}</strong></div>
+                  <div><span class="text-slate-400 block">Exp / Notice</span><strong class="text-teal-600 dark:text-teal-400">${candidate.experience || '-'} • ${candidate.noticePeriod || '-'}</strong></div>
+                </div>
+                <div class="space-y-1 text-xs text-slate-500 dark:text-slate-400">
+                  <p class="truncate"><i class="fas fa-envelope w-4 text-purple-500"></i> ${candidate.email || '-'}</p>
+                  <p><i class="fas fa-user-tie w-4 text-slate-400"></i> Recruiter: ${candidate.recruiter || '-'}</p>
+                </div>
+              </div>
+              <div class="pt-3 border-t border-slate-200/70 dark:border-slate-800 flex items-center justify-between">
+                <span class="font-mono text-xs font-bold text-slate-700 dark:text-slate-300">${candidate.mobile || ''}</span>
+                <div class="flex items-center gap-2">
+                  ${cleanMob ? `<a href="tel:${cleanMob}" class="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold"><i class="fas fa-phone"></i></a>` : ''}
+                  ${cleanMob ? `<a href="https://wa.me/91${cleanMob}" target="_blank" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-1"><i class="fab fa-whatsapp"></i> Chat</a>` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function formatTimestamp(timestamp) {
+      if (!timestamp) return '';
+
+      try {
+        const date = new Date(timestamp);
+        if (isNaN(date.getTime())) return timestamp;
+
+        return date.toLocaleString('en-IN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+      } catch (error) {
+        return timestamp;
+      }
+    }
+
+    function matchesDateFilter(timestamp, filter) {
+      if (!filter || !timestamp) return true;
+
+      try {
+        const candidateDate = new Date(timestamp);
+        if (isNaN(candidateDate.getTime())) return true;
+
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const dayBeforeYesterday = new Date(today);
+        dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 2);
+
+        candidateDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+        yesterday.setHours(0, 0, 0, 0);
+        dayBeforeYesterday.setHours(0, 0, 0, 0);
+
+        switch (filter) {
+          case 'today':
+            return candidateDate.getTime() === today.getTime();
+          case 'yesterday':
+            return candidateDate.getTime() === yesterday.getTime();
+          case 'dayBeforeYesterday':
+            return candidateDate.getTime() === dayBeforeYesterday.getTime();
+          default:
+            return true;
         }
+      } catch (error) {
+        return true;
+      }
+    }
 
-        // Populate company filter dropdown
-        function populateCompanyFilter() {
-            const companyFilter = document.getElementById('companyFilter');
-            const companies = [...new Set(candidateData.map(item => item.company))].filter(Boolean);
+    function applyFilters() {
+      const dateFilter = document.getElementById('dateFilter').value;
+      const companyFilter = document.getElementById('companyFilter').value;
+      const recruiterFilter = document.getElementById('recruiterFilter')?.value || '';
+      const searchQuery = (document.getElementById('searchCandidateInput')?.value || '').toLowerCase().trim();
 
-            companyFilter.innerHTML = '<option value="">All Companies</option>';
+      filteredData = candidateData.filter(candidate => {
+        const matchesDate = matchesDateFilter(candidate.timestamp, dateFilter);
+        const matchesCompany = !companyFilter || candidate.company === companyFilter;
+        const matchesRecruiter = !recruiterFilter || candidate.recruiter === recruiterFilter;
+        const matchesSearch = !searchQuery ||
+          (candidate.candidateName || '').toLowerCase().includes(searchQuery) ||
+          (candidate.position || '').toLowerCase().includes(searchQuery) ||
+          (candidate.email || '').toLowerCase().includes(searchQuery) ||
+          (candidate.mobile || '').toString().toLowerCase().includes(searchQuery);
 
-            companies.forEach(company => {
-                const option = document.createElement('option');
-                option.value = company;
-                option.textContent = company;
-                companyFilter.appendChild(option);
-            });
-        }
+        return matchesDate && matchesCompany && matchesRecruiter && matchesSearch;
+      });
 
-        // Display table data
-        function displayTable(data) {
-            const tbody = document.getElementById('candidateTableBody');
+      displayTable(filteredData);
+      updateStats();
+    }
 
-            if (data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="11" class="no-data">No candidates found matching the selected criteria</td></tr>';
-                return;
-            }
+    function clearFilters() {
+      document.getElementById('dateFilter').value = '';
+      document.getElementById('companyFilter').value = '';
+      if (document.getElementById('recruiterFilter')) document.getElementById('recruiterFilter').value = '';
+      if (document.getElementById('searchCandidateInput')) document.getElementById('searchCandidateInput').value = '';
+      filteredData = [...candidateData];
+      displayTable(filteredData);
+      updateStats();
+    }
 
-            tbody.innerHTML = data.map(candidate => `
-                <tr>
-                    <td class="timestamp">${formatTimestamp(candidate.timestamp)}</td>
-                    <td class="company">${candidate.company || ''}</td>
-                    <td class="position">${candidate.position || ''}</td>
-                    <td class="candidate-name">${candidate.candidateName || ''}</td>
-                    <td class="mobile">${candidate.mobile || ''}</td>
-                    <td class="email">${candidate.email || ''}</td>
-                    <td class="ctc">${candidate.currentCTC || ''}</td>
-                    <td class="ctc">${candidate.expectedCTC || ''}</td>
-                    <td class="experience">${candidate.experience || ''}</td>
-                    <td class="notice-period">${candidate.noticePeriod || ''}</td>
-                    <td class="recruiter">${candidate.recruiter || ''}</td>
-                </tr>
-            `).join('');
-        }
+    function updateStats() {
+      document.getElementById('totalCount').textContent = candidateData.length;
+      document.getElementById('filteredCount').textContent = filteredData.length;
 
-        // Format timestamp for display
-        function formatTimestamp(timestamp) {
-            if (!timestamp) return '';
+      const todayEl = document.getElementById('todaySourcedCount');
+      if (todayEl) {
+        const todayCount = candidateData.filter(c => matchesDateFilter(c.timestamp, 'today')).length;
+        todayEl.textContent = todayCount;
+      }
+    }
 
-            try {
-                const date = new Date(timestamp);
-                if (isNaN(date.getTime())) return timestamp;
+    // Copy table data to clipboard - PRESERVED EXACT COLUMNS & EMAIL TABLE FORMATTING
+    function copyTableData() {
+      if (filteredData.length === 0) {
+        showToast('❌ No data to copy. Please load data first.');
+        return;
+      }
 
-                return date.toLocaleString('en-IN', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                });
-            } catch (error) {
-                return timestamp;
-            }
-        }
-
-        // Check if date matches filter criteria
-        function matchesDateFilter(timestamp, filter) {
-            if (!filter || !timestamp) return true;
-
-            try {
-                const candidateDate = new Date(timestamp);
-                if (isNaN(candidateDate.getTime())) return true;
-
-                const today = new Date();
-                const yesterday = new Date(today);
-                yesterday.setDate(yesterday.getDate() - 1);
-                const dayBeforeYesterday = new Date(today);
-                dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 2);
-
-                candidateDate.setHours(0, 0, 0, 0);
-                today.setHours(0, 0, 0, 0);
-                yesterday.setHours(0, 0, 0, 0);
-                dayBeforeYesterday.setHours(0, 0, 0, 0);
-
-                switch (filter) {
-                    case 'today':
-                        return candidateDate.getTime() === today.getTime();
-                    case 'yesterday':
-                        return candidateDate.getTime() === yesterday.getTime();
-                    case 'dayBeforeYesterday':
-                        return candidateDate.getTime() === dayBeforeYesterday.getTime();
-                    default:
-                        return true;
-                }
-            } catch (error) {
-                return true;
-            }
-        }
-
-        // Apply filters
-        function applyFilters() {
-            const dateFilter = document.getElementById('dateFilter').value;
-            const companyFilter = document.getElementById('companyFilter').value;
-
-            filteredData = candidateData.filter(candidate => {
-                const matchesDate = matchesDateFilter(candidate.timestamp, dateFilter);
-                const matchesCompany = !companyFilter || candidate.company === companyFilter;
-
-                return matchesDate && matchesCompany;
-            });
-
-            displayTable(filteredData);
-            updateStats();
-        }
-
-        // Clear all filters
-        function clearFilters() {
-            document.getElementById('dateFilter').value = '';
-            document.getElementById('companyFilter').value = '';
-            filteredData = [...candidateData];
-            displayTable(filteredData);
-            updateStats();
-        }
-
-        // Update statistics
-        function updateStats() {
-            document.getElementById('totalCount').textContent = candidateData.length;
-            document.getElementById('filteredCount').textContent = filteredData.length;
-        }
-
-        // Copy table data to clipboard - ONLY SPECIFIC COLUMNS
-        function copyTableData() {
-            if (filteredData.length === 0) {
-                showToast('❌ No data to copy. Please load data first.');
-                return;
-            }
-
-            // Create HTML table with ONLY the requested columns
-            let htmlTable = `
+      let htmlTable = `
 <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 12px;">
     <thead>
         <tr style="background-color: #4a5568; color: white;">
@@ -670,9 +943,9 @@
     </thead>
     <tbody>`;
 
-            filteredData.forEach((candidate, index) => {
-                const rowStyle = index % 2 === 0 ? 'background-color: #f9f9f9;' : 'background-color: white;';
-                htmlTable += `
+      filteredData.forEach((candidate, index) => {
+        const rowStyle = index % 2 === 0 ? 'background-color: #f9f9f9;' : 'background-color: white;';
+        htmlTable += `
         <tr style="${rowStyle}">
             <td style="border: 1px solid #000; padding: 8px; color: #007bff;">${candidate.position || ''}</td>
             <td style="border: 1px solid #000; padding: 8px; color: #28a745; font-weight: bold;">${candidate.candidateName || ''}</td>
@@ -683,110 +956,102 @@
             <td style="border: 1px solid #000; padding: 8px; color: #20c997; font-weight: bold;">${candidate.experience || ''}</td>
             <td style="border: 1px solid #000; padding: 8px; color: #dc3545; font-weight: bold;">${candidate.noticePeriod || ''}</td>
         </tr>`;
-            });
+      });
 
-            htmlTable += `
+      htmlTable += `
     </tbody>
 </table>`;
 
-            // Create tab-separated text with ONLY requested columns
-            let tabSeparatedText = "Position\tCandidate Name\tMobile Number\tEmail ID\tCurrent CTC\tExpected CTC\tExperience\tNotice Period\n";
+      let tabSeparatedText = "Position\tCandidate Name\tMobile Number\tEmail ID\tCurrent CTC\tExpected CTC\tExperience\tNotice Period\n";
 
-            filteredData.forEach(candidate => {
-                const row = [
-                    candidate.position || '',
-                    candidate.candidateName || '',
-                    candidate.mobile || '',
-                    candidate.email || '',
-                    candidate.currentCTC || '',
-                    candidate.expectedCTC || '',
-                    candidate.experience || '',
-                    candidate.noticePeriod || ''
-                ].join('\t');
+      filteredData.forEach(candidate => {
+        const row = [
+          candidate.position || '',
+          candidate.candidateName || '',
+          candidate.mobile || '',
+          candidate.email || '',
+          candidate.currentCTC || '',
+          candidate.expectedCTC || '',
+          candidate.experience || '',
+          candidate.noticePeriod || ''
+        ].join('\t');
 
-                tabSeparatedText += row + "\n";
-            });
+        tabSeparatedText += row + "\n";
+      });
 
-            // Copy to clipboard with multiple formats
-            try {
-                if (navigator.clipboard && navigator.clipboard.write) {
-                    const clipboardItems = [
-                        new ClipboardItem({
-                            'text/html': new Blob([htmlTable], { type: 'text/html' }),
-                            'text/plain': new Blob([tabSeparatedText], { type: 'text/plain' })
-                        })
-                    ];
+      try {
+        if (navigator.clipboard && navigator.clipboard.write) {
+          const clipboardItems = [
+            new ClipboardItem({
+              'text/html': new Blob([htmlTable], { type: 'text/html' }),
+              'text/plain': new Blob([tabSeparatedText], { type: 'text/plain' })
+            })
+          ];
 
-                    navigator.clipboard.write(clipboardItems).then(() => {
-                        showToast(`✅ ${filteredData.length} candidates copied! Ready to paste in emails.`);
-                    });
-                } else {
-                    // Fallback for older browsers
-                    copyToClipboardFallback(htmlTable, tabSeparatedText);
-                }
-            } catch (err) {
-                copyToClipboardFallback(htmlTable, tabSeparatedText);
-            }
+          navigator.clipboard.write(clipboardItems).then(() => {
+            showToast(`✅ ${filteredData.length} candidates copied! Ready to paste in emails.`);
+          });
+        } else {
+          copyToClipboardFallback(htmlTable, tabSeparatedText);
         }
+      } catch (err) {
+        copyToClipboardFallback(htmlTable, tabSeparatedText);
+      }
+    }
 
-        // Fallback copy method
-        function copyToClipboardFallback(htmlContent, textContent) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = htmlContent;
-            tempDiv.style.position = 'absolute';
-            tempDiv.style.left = '-9999px';
-            document.body.appendChild(tempDiv);
+    function copyToClipboardFallback(htmlContent, textContent) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = htmlContent;
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      document.body.appendChild(tempDiv);
 
-            try {
-                const range = document.createRange();
-                range.selectNodeContents(tempDiv);
-                const selection = window.getSelection();
-                selection.removeAllRanges();
-                selection.addRange(range);
+      try {
+        const range = document.createRange();
+        range.selectNodeContents(tempDiv);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
 
-                document.execCommand('copy');
-                showToast(`✅ ${filteredData.length} candidates copied! Ready to paste in emails.`);
+        document.execCommand('copy');
+        showToast(`✅ ${filteredData.length} candidates copied! Ready to paste in emails.`);
 
-                selection.removeAllRanges();
-            } catch (err) {
-                const textArea = document.createElement('textarea');
-                textArea.value = textContent;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                showToast('Candidates copied as text.');
-            }
+        selection.removeAllRanges();
+      } catch (err) {
+        const textArea = document.createElement('textarea');
+        textArea.value = textContent;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showToast('Candidates copied as text.');
+      }
 
-            document.body.removeChild(tempDiv);
-        }
+      document.body.removeChild(tempDiv);
+    }
 
-        // Show toast notification
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toastMessage');
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
 
-            toastMessage.textContent = message;
-            toast.classList.add('show');
+      toastMessage.textContent = message;
+      toast.classList.add('show');
 
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
 
-        // Add event listeners for real-time filtering
-        document.getElementById('dateFilter').addEventListener('change', applyFilters);
-        document.getElementById('companyFilter').addEventListener('change', applyFilters);
+    document.getElementById('dateFilter').addEventListener('change', applyFilters);
+    document.getElementById('companyFilter').addEventListener('change', applyFilters);
 
-        // Initialize the application when page loads
-        document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', init);
 
-        // Auto-refresh data every 10 minutes if data is loaded
-        setInterval(() => {
-            if (candidateData.length > 0) {
-                loadDataFromSheets();
-            }
-        }, 10 * 60 * 1000); // 10 minutes
-    </script>
+    setInterval(() => {
+      if (candidateData.length > 0) {
+        loadDataFromSheets();
+      }
+    }, 10 * 60 * 1000);
+  </script>
 </body>
 </html>
