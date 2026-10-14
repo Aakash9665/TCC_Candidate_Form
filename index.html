@@ -561,7 +561,8 @@
               </p>
             </div>
           </button>
-          <!-- 6. Recruiter Toolkit Card (New Helpful Feature!) -->
+
+          <!-- 7. Recruiter Toolkit Card -->
           <button
             type="button"
             onclick="toggleCalculatorModal(true)"
@@ -843,8 +844,9 @@
     function filterModules(query) {
       const q = (query || '').toLowerCase().trim();
       const cards = document.querySelectorAll('#modulesGrid .nav-button');
+      const isAdmin = (sessionStorage.getItem('userType') || '').toLowerCase() === 'admin';
       cards.forEach(card => {
-        if (card.id === 'sourcedProfilesBtn' && (sessionStorage.getItem('userType') || '').toLowerCase() !== 'admin') {
+        if ((card.id === 'sourcedProfilesBtn' || card.id === 'manageEmpLocationsBtn') && !isAdmin) {
           return;
         }
         const keywords = (card.getAttribute('data-module-title') || '') + ' ' + card.innerText.toLowerCase();
@@ -916,17 +918,20 @@
       }
     }
 
-    // Function to check admin access and show/hide sourced profiles button
+    // Function to check admin access and show/hide admin-only buttons
     function checkAdminAccess() {
       const userType = sessionStorage.getItem('userType') || '';
       const sourcedProfilesBtn = document.getElementById('sourcedProfilesBtn');
+      const manageEmpLocationsBtn = document.getElementById('manageEmpLocationsBtn');
 
       if (userType.toLowerCase() === 'admin') {
-        sourcedProfilesBtn.style.display = 'flex';
-        console.log('Admin user detected - Sourced Profiles button enabled');
+        if (sourcedProfilesBtn) sourcedProfilesBtn.style.display = 'flex';
+        if (manageEmpLocationsBtn) manageEmpLocationsBtn.style.display = 'flex';
+        console.log('Admin user detected - Sourced Profiles & Manage Emp/Locations buttons enabled');
       } else {
-        sourcedProfilesBtn.style.display = 'none';
-        console.log('Non-admin user - Sourced Profiles button hidden');
+        if (sourcedProfilesBtn) sourcedProfilesBtn.style.display = 'none';
+        if (manageEmpLocationsBtn) manageEmpLocationsBtn.style.display = 'none';
+        console.log('Non-admin user - Admin buttons hidden');
       }
     }
 
@@ -1167,7 +1172,35 @@
       }, 150);
     }
 
-    // Keyboard shortcuts (1-5) when logged in
+    function navigateToAdminManage() {
+      console.log("Manage Emp & Locations button clicked");
+      const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.getElementById('manageEmpLocationsBtn');
+      if (button) button.style.transform = 'scale(0.95)';
+
+      setTimeout(() => {
+        if (button) button.style.transform = '';
+
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+          const userType = sessionStorage.getItem('userType') || '';
+
+          if (userType.toLowerCase() === 'admin') {
+            console.log('Navigating to admin_manage.html with admin user data:', {
+              email: sessionStorage.getItem('userEmail'),
+              name: sessionStorage.getItem('userName'),
+              designation: sessionStorage.getItem('userDesignation'),
+              userType: sessionStorage.getItem('userType')
+            });
+            window.location.href = 'admin_manage.html';
+          } else {
+            showToast("Access denied. This feature is only available for Admin users.", "error");
+          }
+        } else {
+          showToast("Please login first", "error");
+        }
+      }, 150);
+    }
+
+    // Keyboard shortcuts (1-6) when logged in
     window.addEventListener('keydown', function(e) {
       if (sessionStorage.getItem('isLoggedIn') !== 'true') return;
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
