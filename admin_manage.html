@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>TCC Admin - Manage Employees & Locations</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS Client SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(circle at 12% 15%, rgba(244, 63, 94, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(59, 130, 246, 0.15) 0%, transparent 45%);
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(226, 232, 240, 0.85);
+      box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.07);
+    }
+
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 13px;
+      border: 1.5px solid rgba(148, 163, 184, 0.3);
+      background: rgba(248, 250, 252, 0.9);
+      color: #0f172a;
+      font-size: 13px;
+      transition: all 0.2s ease;
+    }
+
+    .dark .form-input {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #f8fafc;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #f43f5e;
+      box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15);
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 12.5px;
+    }
+
+    th {
+      background: rgba(241, 245, 249, 0.95);
+      color: #475569;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 13px 14px;
+      text-align: left;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+      white-space: nowrap;
+    }
+
+    .dark th {
+      background: rgba(15, 23, 42, 0.95);
+      color: #94a3b8;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+      vertical-align: middle;
+    }
+
+    .dark td {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    tbody tr {
+      transition: background-color 0.15s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(244, 63, 94, 0.05);
+    }
+
+    .dark tbody tr:hover {
+      background: rgba(244, 63, 94, 0.1);
+    }
+
+    .role-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .role-admin {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .role-user {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 selection:bg-rose-500 selection:text-white">
+
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-4 pointer-events-none"></div>
+
+  <!-- Custom Delete Confirmation Modal (No browser confirm()) -->
+  <div id="confirmDialogModal" class="fixed inset-0 z-[2100] bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-card rounded-3xl max-w-md w-full p-6 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-rose-500/15 text-rose-500 flex items-center justify-center mx-auto mb-4 text-xl">
+        <i class="fas fa-triangle-exclamation"></i>
+      </div>
+      <h4 class="font-display font-bold text-lg text-slate-900 dark:text-white mb-2" id="confirmDialogTitle">Confirm Deletion</h4>
+      <p id="confirmDialogText" class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-6"></p>
+      <div class="flex items-center gap-3">
+        <button type="button" id="confirmCancelBtn" class="flex-1 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm cursor-pointer">
+          Cancel
+        </button>
+        <button type="button" id="confirmAcceptBtn" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-rose-600/25 cursor-pointer">
+          Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <header class="sticky top-0 z-40 glass-card border-b border-slate-200/70 dark:border-slate-800/80 px-4 sm:px-6 py-3">
+    <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <button onclick="goHome()" class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-rose-500/10 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white border border-rose-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Back to Dashboard">
+          <i class="fas fa-house text-base"></i>
+        </button>
+
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <h1 class="font-display font-extrabold text-sm sm:text-lg text-slate-900 dark:text-white leading-tight flex items-center gap-2">
+              <i class="fas fa-building-user text-rose-500 hidden sm:inline"></i>
+              <span>Manage Employees & Locations</span>
+            </h1>
+            <span class="role-badge role-admin">
+              <i class="fas fa-shield-halved"></i> Admin Only
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
+            Add/Edit Recruiter Accounts & Configure Client Office Addresses for Interview Invitations (Supabase)
+          </p>
+        </div>
+      </div>
+
+      <!-- Right Action Controls -->
+      <div class="flex items-center gap-2">
+        <button type="button" onclick="syncAllAdminData()" class="px-3 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer" title="Refresh Employees & Locations">
+          <i class="fas fa-arrows-rotate" id="syncIcon"></i>
+          <span class="hidden md:inline">Sync All</span>
+        </button>
+
+        <button type="button" onclick="document.documentElement.classList.toggle('dark')" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer" title="Toggle Theme">
+          <i class="fas fa-sun text-xs hidden dark:inline text-amber-400"></i>
+          <i class="fas fa-moon text-xs inline dark:hidden"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-[1600px] mx-auto px-4 sm:px-6 pt-5">
+
+    <!-- KPI Summary Strip -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-5">
+      <button type="button" onclick="switchAdminTab('employees')" class="glass-card rounded-2xl p-4 text-left hover:border-rose-500/40 transition-all cursor-pointer">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Employees</span>
+          <span class="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center text-xs">
+            <i class="fas fa-users"></i>
+          </span>
+        </div>
+        <strong id="kpiTotalEmployees" class="font-display text-2xl font-extrabold text-slate-900 dark:text-white block">0</strong>
+        <span class="text-[10px] text-slate-400" id="kpiRoleBreakdown">0 Admins • 0 Users</span>
+      </button>
+
+      <button type="button" onclick="switchAdminTab('employees')" class="glass-card rounded-2xl p-4 text-left hover:border-blue-500/40 transition-all cursor-pointer">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Active Recruiters</span>
+          <span class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs">
+            <i class="fas fa-user-tie"></i>
+          </span>
+        </div>
+        <strong id="kpiRecruitersCount" class="font-display text-2xl font-extrabold text-blue-600 dark:text-blue-400 block">0</strong>
+        <span class="text-[10px] text-slate-400">Standard portal users</span>
+      </button>
+
+      <button type="button" onclick="switchAdminTab('locations')" class="glass-card rounded-2xl p-4 text-left hover:border-emerald-500/40 transition-all cursor-pointer">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Office Locations</span>
+          <span class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs">
+            <i class="fas fa-map-location-dot"></i>
+          </span>
+        </div>
+        <strong id="kpiTotalLocations" class="font-display text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 block">0</strong>
+        <span class="text-[10px] text-slate-400">For Extra Popup invites</span>
+      </button>
+
+      <button type="button" onclick="switchAdminTab('locations')" class="glass-card rounded-2xl p-4 text-left hover:border-amber-500/40 transition-all cursor-pointer">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Client Companies</span>
+          <span class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs">
+            <i class="fas fa-building"></i>
+          </span>
+        </div>
+        <strong id="kpiTotalCompanies" class="font-display text-2xl font-extrabold text-amber-600 dark:text-amber-400 block">0</strong>
+        <span class="text-[10px] text-slate-400">Synced from companies table</span>
+      </button>
+    </div>
+
+    <!-- Main Tab Switcher Bar -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+      <div class="inline-flex p-1.5 rounded-2xl glass-card">
+        <button
+          type="button"
+          id="tabBtnEmployees"
+          onclick="switchAdminTab('employees')"
+          class="px-5 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 bg-gradient-to-r from-rose-600 to-pink-600 text-white shadow-md shadow-rose-600/25 cursor-pointer"
+        >
+          <i class="fas fa-user-shield"></i>
+          <span>1. Manage Employees (Users)</span>
+        </button>
+        <button
+          type="button"
+          id="tabBtnLocations"
+          onclick="switchAdminTab('locations')"
+          class="px-5 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+        >
+          <i class="fas fa-location-dot"></i>
+          <span>2. Manage Company Locations (Interview Address)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ==================== TAB 1: MANAGE EMPLOYEES (#sectionEmployees) ==================== -->
+    <section id="sectionEmployees" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- Left Column: Add / Modify Employee Form -->
+      <div class="lg:col-span-4 glass-card rounded-3xl p-5 sm:p-7 relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-rose-500 via-pink-500 to-indigo-500"></div>
+
+        <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200/70 dark:border-slate-800">
+          <h2 id="empFormTitle" class="font-display font-extrabold text-base sm:text-lg text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fas fa-user-plus text-rose-500"></i>
+            <span>Add New Employee</span>
+          </h2>
+          <button type="button" onclick="resetEmployeeForm()" class="text-xs font-semibold text-slate-400 hover:text-rose-500 flex items-center gap-1 cursor-pointer">
+            <i class="fas fa-rotate-left text-[10px]"></i> Clear
+          </button>
+        </div>
+
+        <form id="employeeForm" onsubmit="handleEmployeeSubmit(event)" class="space-y-4">
+          <input type="hidden" id="empId" value="">
+
+          <div>
+            <label for="empName" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+              <i class="fas fa-user text-rose-500 mr-1"></i> Full Name *
+            </label>
+            <input type="text" id="empName" class="form-input" placeholder="e.g. Priya Sharma" required>
+          </div>
+
+          <div>
+            <label for="empEmail" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+              <i class="fas fa-envelope text-rose-500 mr-1"></i> Email Address (Login ID) *
+            </label>
+            <input type="email" id="empEmail" class="form-input" placeholder="priya@talentconnect.com" required>
+          </div>
+
+          <div>
+            <label for="empPassword" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+              <i class="fas fa-key text-rose-500 mr-1"></i> Portal Password *
+            </label>
+            <div class="relative">
+              <input type="password" id="empPassword" class="form-input pr-10" placeholder="Enter login password" required>
+              <button type="button" onclick="toggleEmpPassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500">
+                <i class="fas fa-eye text-xs" id="empPassEye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label for="empContact" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                <i class="fas fa-phone text-rose-500 mr-1"></i> Mobile Number
+              </label>
+              <input type="tel" id="empContact" class="form-input" placeholder="9876543210">
+            </div>
+
+            <div>
+              <label for="empRole" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                <i class="fas fa-shield-halved text-rose-500 mr-1"></i> Portal Role *
+              </label>
+              <select id="empRole" class="form-input" required>
+                <option value="User">User (Recruiter)</option>
+                <option value="Admin">Admin (Full Access)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label for="empDesignation" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+              <i class="fas fa-id-badge text-rose-500 mr-1"></i> Designation
+            </label>
+            <input type="text" id="empDesignation" class="form-input" placeholder="e.g. Senior HR Executive / Team Lead">
+          </div>
+
+          <div class="pt-2 flex flex-col sm:flex-row gap-2.5">
+            <button type="submit" id="empSubmitBtn" class="flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-rose-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all">
+              <i class="fas fa-floppy-disk"></i>
+              <span id="empSubmitBtnText">Add Employee</span>
+            </button>
+            <button type="button" id="empCancelEditBtn" onclick="resetEmployeeForm()" class="hidden py-3.5 px-4 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm cursor-pointer">
+              Cancel Edit
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Right Column: Employee Directory Table -->
+      <div class="lg:col-span-8 glass-card rounded-3xl overflow-hidden">
+        <div class="p-4 sm:p-5 border-b border-slate-200/70 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fas fa-users-gear text-rose-500"></i>
+              <span>Portal Employees Directory</span>
+            </h3>
+            <p class="text-[11px] text-slate-500">Click "Edit" on any employee to modify their credentials or role</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="relative w-full sm:w-56">
+              <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input
+                type="text"
+                id="empSearchInput"
+                oninput="filterEmployeesTable()"
+                placeholder="Search name, email, role..."
+                class="form-input pl-9 py-2 text-xs"
+              >
+            </div>
+            <select id="empRoleFilter" onchange="filterEmployeesTable()" class="form-input w-auto py-2 text-xs">
+              <option value="">All Roles</option>
+              <option value="admin">Admin</option>
+              <option value="user">User</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th><i class="fas fa-user mr-1"></i> Name & Designation</th>
+                <th><i class="fas fa-envelope mr-1"></i> Email / Login</th>
+                <th><i class="fas fa-phone mr-1"></i> Contact</th>
+                <th><i class="fas fa-key mr-1"></i> Password</th>
+                <th><i class="fas fa-shield mr-1"></i> Role</th>
+                <th class="text-right"><i class="fas fa-sliders mr-1"></i> Actions</th>
+              </tr>
+            </thead>
+            <tbody id="employeesTableBody">
+              <tr>
+                <td colspan="6" class="py-12 text-center text-slate-400">
+                  <i class="fas fa-spinner fa-spin text-rose-500 text-lg mb-2"></i><br>
+                  Loading employees from Supabase...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 2: MANAGE COMPANY LOCATIONS (#sectionLocations) ==================== -->
+    <section id="sectionLocations" class="hidden grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- Left Column: Add / Modify Office Location Form -->
+      <div class="lg:col-span-5 glass-card rounded-3xl p-5 sm:p-7 relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500"></div>
+
+        <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200/70 dark:border-slate-800">
+          <div>
+            <h2 id="locFormTitle" class="font-display font-extrabold text-base sm:text-lg text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fas fa-map-location-dot text-emerald-500"></i>
+              <span>Add Office Location</span>
+            </h2>
+            <p class="text-[11px] text-slate-500">Powers the Physical Interview dropdown in Management</p>
+          </div>
+          <button type="button" onclick="resetLocationForm()" class="text-xs font-semibold text-slate-400 hover:text-rose-500 flex items-center gap-1 cursor-pointer">
+            <i class="fas fa-rotate-left text-[10px]"></i> Clear
+          </button>
+        </div>
+
+        <form id="locationForm" onsubmit="handleLocationSubmit(event)" class="space-y-3.5">
+          <input type="hidden" id="locId" value="">
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label for="locCompanyCodeSelect" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                <i class="fas fa-building text-emerald-500 mr-1"></i> Select Existing Company *
+              </label>
+              <select id="locCompanyCodeSelect" onchange="handleCompanyCodeSelectChange()" class="form-input" required>
+                <option value="">-- Choose Company --</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="locCompanyName" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                <i class="fas fa-file-signature text-emerald-500 mr-1"></i> Full Company Name *
+              </label>
+              <input type="text" id="locCompanyName" oninput="updateLocationInvitePreview()" class="form-input" placeholder="e.g. Acme Corp Pvt Ltd" required>
+            </div>
+          </div>
+
+          <div>
+            <label for="locBranchName" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+              <i class="fas fa-location-crosshairs text-emerald-500 mr-1"></i> Office Location Label (Shown in Dropdown) *
+            </label>
+            <input type="text" id="locBranchName" oninput="updateLocationInvitePreview()" class="form-input" placeholder="e.g. Andheri East HQ / Mindspace Malad" required>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div>
+              <label for="locSpocName" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                <i class="fas fa-user-tie text-emerald-500 mr-1"></i> HR / SPOC Name *
+              </label>
+              <input type="text" id="locSpocName" oninput="updateLocationInvitePreview()" class="form-input" placeholder="e.g. Rahul Verma" required>
+            </div>
+
+            <div>
+              <label for="locSpocNumber" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                <i class="fas fa-phone text-emerald-500 mr-1"></i> HR Contact Number *
+              </label>
+              <input type="tel" id="locSpocNumber" oninput="updateLocationInvitePreview()" class="form-input" placeholder="e.g. 9876543210" required>
+            </div>
+          </div>
+
+          <div>
+            <label for="locAddress" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+              <i class="fas fa-map-pin text-emerald-500 mr-1"></i> Full Office Address *
+            </label>
+            <textarea id="locAddress" rows="2" oninput="updateLocationInvitePreview()" class="form-input" placeholder="Building, Floor, Landmark, City, PIN..." required></textarea>
+          </div>
+
+          <div>
+            <label for="locGoogleMap" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+              <i class="fas fa-map-location text-emerald-500 mr-1"></i> Google Maps Link
+            </label>
+            <input type="url" id="locGoogleMap" oninput="updateLocationInvitePreview()" class="form-input" placeholder="https://maps.app.goo.gl/...">
+          </div>
+
+          <!-- Live Preview of Extra Popup WhatsApp Message -->
+          <div class="p-3.5 rounded-2xl bg-[#e7ffdb] dark:bg-emerald-950/50 border border-emerald-500/20 text-slate-800 dark:text-slate-200 text-[11px] leading-relaxed whitespace-pre-line">
+            <span class="font-bold text-emerald-700 dark:text-emerald-400 block mb-1 uppercase tracking-wider text-[10px]">
+              <i class="fab fa-whatsapp"></i> Extra Popup Invite Preview:
+            </span>
+            <div id="locLivePreviewText">*Company Details:*
+🏢 *Company:* -
+👤 *HR Name:* -
+📞 *HR Contact:* +91 -
+📍 *Address:* -
+🗺 *Google Map:* -</div>
+          </div>
+
+          <div class="pt-2 flex flex-col sm:flex-row gap-2.5">
+            <button type="submit" id="locSubmitBtn" class="flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all">
+              <i class="fas fa-floppy-disk"></i>
+              <span id="locSubmitBtnText">Save Office Location</span>
+            </button>
+            <button type="button" id="locCancelEditBtn" onclick="resetLocationForm()" class="hidden py-3.5 px-4 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm cursor-pointer">
+              Cancel Edit
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Right Column: Configured Office Locations Table -->
+      <div class="lg:col-span-7 glass-card rounded-3xl overflow-hidden">
+        <div class="p-4 sm:p-5 border-b border-slate-200/70 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fas fa-building-circle-check text-emerald-500"></i>
+              <span>Configured Company Locations</span>
+            </h3>
+            <p class="text-[11px] text-slate-500">Used automatically in Management -> Schedule Physical Interview</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="relative w-full sm:w-48">
+              <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input
+                type="text"
+                id="locSearchInput"
+                oninput="filterLocationsTable()"
+                placeholder="Search location, SPOC..."
+                class="form-input pl-9 py-2 text-xs"
+              >
+            </div>
+            <select id="locCompanyFilter" onchange="filterLocationsTable()" class="form-input w-auto py-2 text-xs">
+              <option value="">All Companies</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th><i class="fas fa-building mr-1"></i> Company & Branch</th>
+                <th><i class="fas fa-user-tie mr-1"></i> HR SPOC</th>
+                <th><i class="fas fa-map-pin mr-1"></i> Address & Map</th>
+                <th class="text-right"><i class="fas fa-sliders mr-1"></i> Actions</th>
+              </tr>
+            </thead>
+            <tbody id="locationsTableBody">
+              <tr>
+                <td colspan="4" class="py-12 text-center text-slate-400">
+                  <i class="fas fa-spinner fa-spin text-emerald-500 text-lg mb-2"></i><br>
+                  Loading office locations from Supabase...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script>
+    // ==================== SUPABASE CONFIGURATION ====================
+    const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0'; // Paste your Supabase anon/public key here
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // State Arrays
+    let allEmployees = [];
+    let allLocations = [];
+    let allCompanies = [];
+
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+
+    // Non-blocking Toast Helper
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const styles = {
+        info: 'bg-slate-900 dark:bg-slate-800 text-white border-blue-500/40',
+        success: 'bg-emerald-600 text-white border-emerald-400',
+        error: 'bg-rose-600 text-white border-rose-400'
+      };
+      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl border shadow-xl text-xs sm:text-sm font-semibold transition-all duration-300 ${styles[type] || styles.info}`;
+      toast.innerHTML = `<i class="fas fa-circle-info shrink-0"></i><span class="flex-1">${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3600);
+    }
+
+    // Custom Confirmation Dialog Promise
+    function askConfirmation(title, message) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('confirmDialogModal');
+        document.getElementById('confirmDialogTitle').textContent = title;
+        document.getElementById('confirmDialogText').textContent = message;
+        const cancelBtn = document.getElementById('confirmCancelBtn');
+        const acceptBtn = document.getElementById('confirmAcceptBtn');
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        const cleanup = (result) => {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          cancelBtn.onclick = null;
+          acceptBtn.onclick = null;
+          resolve(result);
+        };
+
+        cancelBtn.onclick = () => cleanup(false);
+        acceptBtn.onclick = () => cleanup(true);
+      });
+    }
+
+    window.addEventListener('load', function() {
+      const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+      const userType = (sessionStorage.getItem('userType') || '').toLowerCase();
+
+      if (isLoggedIn !== 'true') {
+        showToast('Please login first. Redirecting...', 'error');
+        setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+        return;
+      }
+
+      if (userType !== 'admin') {
+        showToast('Access denied. Admin privileges required.', 'error');
+        setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+        return;
+      }
+
+      syncAllAdminData();
+    });
+
+    function switchAdminTab(tab) {
+      const secEmp = document.getElementById('sectionEmployees');
+      const secLoc = document.getElementById('sectionLocations');
+      const btnEmp = document.getElementById('tabBtnEmployees');
+      const btnLoc = document.getElementById('tabBtnLocations');
+
+      if (tab === 'locations') {
+        secEmp.classList.add('hidden');
+        secEmp.classList.remove('grid');
+        secLoc.classList.remove('hidden');
+        secLoc.classList.add('grid');
+
+        btnLoc.className = 'px-5 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/25 cursor-pointer';
+        btnEmp.className = 'px-5 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer';
+      } else {
+        secLoc.classList.add('hidden');
+        secLoc.classList.remove('grid');
+        secEmp.classList.remove('hidden');
+        secEmp.classList.add('grid');
+
+        btnEmp.className = 'px-5 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 bg-gradient-to-r from-rose-600 to-pink-600 text-white shadow-md shadow-rose-600/25 cursor-pointer';
+        btnLoc.className = 'px-5 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer';
+      }
+    }
+
+    async function syncAllAdminData() {
+      const icon = document.getElementById('syncIcon');
+      if (icon) icon.classList.add('fa-spin');
+      await Promise.all([
+        loadEmployees(),
+        loadCompaniesDropdown(),
+        loadLocations()
+      ]);
+      if (icon) icon.classList.remove('fa-spin');
+    }
+
+    function escapeHtml(unsafe) {
+      return (unsafe || '')
+        .toString()
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // ==================== 1. MANAGE EMPLOYEES (SUPABASE 'users' TABLE) ====================
+    function toggleEmpPassword() {
+      const input = document.getElementById('empPassword');
+      const eye = document.getElementById('empPassEye');
+      if (input.type === 'password') {
+        input.type = 'text';
+        eye.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        input.type = 'password';
+        eye.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+
+    async function loadEmployees() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('users')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        allEmployees = data || [];
+        updateEmployeeKPIs();
+        filterEmployeesTable();
+      } catch (err) {
+        console.error('Error loading employees:', err);
+        showToast('Failed to load employees: ' + err.message, 'error');
+        document.getElementById('employeesTableBody').innerHTML = `
+          <tr><td colspan="6" class="py-10 text-center text-rose-500">Error loading employees: ${escapeHtml(err.message)}</td></tr>
+        `;
+      }
+    }
+
+    function updateEmployeeKPIs() {
+      const total = allEmployees.length;
+      const admins = allEmployees.filter(e => (e.user_type || e.userType || '').toLowerCase() === 'admin').length;
+      const users = total - admins;
+
+      document.getElementById('kpiTotalEmployees').textContent = total;
+      document.getElementById('kpiRoleBreakdown').textContent = `${admins} Admin${admins === 1 ? '' : 's'} • ${users} User${users === 1 ? '' : 's'}`;
+      document.getElementById('kpiRecruitersCount').textContent = users;
+    }
+
+    function filterEmployeesTable() {
+      const query = (document.getElementById('empSearchInput')?.value || '').toLowerCase().trim();
+      const roleFilter = (document.getElementById('empRoleFilter')?.value || '').toLowerCase();
+
+      const filtered = allEmployees.filter(emp => {
+        const role = (emp.user_type || emp.userType || 'User').toLowerCase();
+        const matchRole = !roleFilter || role === roleFilter;
+        const matchSearch = !query ||
+          (emp.name || '').toLowerCase().includes(query) ||
+          (emp.email || '').toLowerCase().includes(query) ||
+          (emp.designation || '').toLowerCase().includes(query) ||
+          (emp.contact || '').toString().toLowerCase().includes(query);
+        return matchRole && matchSearch;
+      });
+
+      renderEmployeesTable(filtered);
+    }
+
+    function renderEmployeesTable(list) {
+      const tbody = document.getElementById('employeesTableBody');
+      if (!tbody) return;
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-12 text-center text-slate-400">No employees found matching criteria.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(emp => {
+        const role = emp.user_type || emp.userType || 'User';
+        const isAdmin = role.toLowerCase() === 'admin';
+        const badgeClass = isAdmin ? 'role-badge role-admin' : 'role-badge role-user';
+
+        return `
+          <tr>
+            <td>
+              <div class="font-bold text-slate-900 dark:text-white">${escapeHtml(emp.name || 'N/A')}</div>
+              <div class="text-[11px] text-slate-500">${escapeHtml(emp.designation || 'Recruiter')}</div>
+            </td>
+            <td class="font-medium text-blue-600 dark:text-blue-400">${escapeHtml(emp.email || '')}</td>
+            <td class="font-mono text-xs">${escapeHtml(emp.contact || '-')}</td>
+            <td>
+              <span class="font-mono text-xs px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                ${escapeHtml(emp.password || '')}
+              </span>
+            </td>
+            <td><span class="${badgeClass}">${escapeHtml(role)}</span></td>
+            <td class="text-right whitespace-nowrap">
+              <button
+                type="button"
+                onclick="editEmployee('${emp.id}')"
+                class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white text-xs font-bold transition-all mr-1 cursor-pointer"
+                title="Modify Employee"
+              >
+                <i class="fas fa-pen-to-square"></i> Edit
+              </button>
+              <button
+                type="button"
+                onclick="deleteEmployee('${emp.id}', '${escapeHtml(emp.name)}')"
+                class="px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white text-xs font-bold transition-all cursor-pointer"
+                title="Delete Employee"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function editEmployee(id) {
+      const emp = allEmployees.find(e => String(e.id) === String(id));
+      if (!emp) return;
+
+      document.getElementById('empId').value = emp.id;
+      document.getElementById('empName').value = emp.name || '';
+      document.getElementById('empEmail').value = emp.email || '';
+      document.getElementById('empPassword').value = emp.password || '';
+      document.getElementById('empContact').value = emp.contact || '';
+      document.getElementById('empDesignation').value = emp.designation || '';
+      document.getElementById('empRole').value = (emp.user_type || emp.userType || 'User').toLowerCase() === 'admin' ? 'Admin' : 'User';
+
+      document.getElementById('empFormTitle').innerHTML = `<i class="fas fa-user-pen text-blue-500"></i> <span>Modify Employee</span>`;
+      document.getElementById('empSubmitBtnText').textContent = 'Save Changes';
+      document.getElementById('empCancelEditBtn').classList.remove('hidden');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetEmployeeForm() {
+      document.getElementById('employeeForm').reset();
+      document.getElementById('empId').value = '';
+      document.getElementById('empFormTitle').innerHTML = `<i class="fas fa-user-plus text-rose-500"></i> <span>Add New Employee</span>`;
+      document.getElementById('empSubmitBtnText').textContent = 'Add Employee';
+      document.getElementById('empCancelEditBtn').classList.add('hidden');
+    }
+
+    async function handleEmployeeSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('empId').value.trim();
+      const name = document.getElementById('empName').value.trim();
+      const email = document.getElementById('empEmail').value.trim();
+      const password = document.getElementById('empPassword').value.trim();
+      const contact = document.getElementById('empContact').value.trim();
+      const designation = document.getElementById('empDesignation').value.trim();
+      const user_type = document.getElementById('empRole').value;
+
+      const btn = document.getElementById('empSubmitBtn');
+      btn.disabled = true;
+
+      try {
+        if (id) {
+          // Update existing employee
+          const { error } = await supabaseClient
+            .from('users')
+            .update({ name, email, password, contact, designation, user_type })
+            .eq('id', id);
+
+          if (error) throw error;
+          showToast(`Updated employee "${name}" successfully!`, 'success');
+        } else {
+          // Insert new employee
+          const { error } = await supabaseClient
+            .from('users')
+            .insert([{ name, email, password, contact, designation, user_type }]);
+
+          if (error) throw error;
+          showToast(`Added employee "${name}" successfully!`, 'success');
+        }
+
+        resetEmployeeForm();
+        await loadEmployees();
+      } catch (err) {
+        console.error('Error saving employee:', err);
+        showToast('Error saving employee: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function deleteEmployee(id, name) {
+      const confirmed = await askConfirmation(
+        'Delete Employee?',
+        `Are you sure you want to permanently remove "${name}" from portal access?`
+      );
+      if (!confirmed) return;
+
+      try {
+        const { error } = await supabaseClient
+          .from('users')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+        showToast(`Deleted employee "${name}"`, 'success');
+        if (document.getElementById('empId').value === String(id)) {
+          resetEmployeeForm();
+        }
+        await loadEmployees();
+      } catch (err) {
+        console.error('Error deleting employee:', err);
+        showToast('Failed to delete employee: ' + err.message, 'error');
+      }
+    }
+
+    // ==================== 2. MANAGE COMPANY LOCATIONS (SUPABASE 'office_locations' TABLE) ====================
+    async function loadCompaniesDropdown() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('companies')
+          .select('company_name')
+          .order('company_name', { ascending: true });
+
+        if (error) throw error;
+
+        allCompanies = (data || []).map(r => r.company_name).filter(Boolean);
+        document.getElementById('kpiTotalCompanies').textContent = allCompanies.length;
+
+        const selectEl = document.getElementById('locCompanyCodeSelect');
+        const currentVal = selectEl.value;
+        selectEl.innerHTML = '<option value="">-- Choose Company --</option>';
+
+        allCompanies.forEach(comp => {
+          const opt = document.createElement('option');
+          opt.value = comp;
+          opt.textContent = comp;
+          selectEl.appendChild(opt);
+        });
+
+        if (allCompanies.includes(currentVal)) {
+          selectEl.value = currentVal;
+        }
+      } catch (err) {
+        console.error('Error loading companies list:', err);
+      }
+    }
+
+    function handleCompanyCodeSelectChange() {
+      const selectedCode = document.getElementById('locCompanyCodeSelect').value;
+      const fullNameInput = document.getElementById('locCompanyName');
+      if (selectedCode && !fullNameInput.value.trim()) {
+        fullNameInput.value = selectedCode;
+      }
+      updateLocationInvitePreview();
+    }
+
+    function updateLocationInvitePreview() {
+      const compName = document.getElementById('locCompanyName')?.value.trim() || '-';
+      const spocName = document.getElementById('locSpocName')?.value.trim() || '-';
+      const spocNum = document.getElementById('locSpocNumber')?.value.trim() || '-';
+      const address = document.getElementById('locAddress')?.value.trim() || '-';
+      const mapUrl = document.getElementById('locGoogleMap')?.value.trim() || '-';
+
+      const previewEl = document.getElementById('locLivePreviewText');
+      if (previewEl) {
+        previewEl.textContent = `*Company Details:*\n🏢 *Company:* ${compName}\n👤 *HR Name:* ${spocName}\n📞 *HR Contact:* +91 ${spocNum}\n📍 *Address:* ${address}\n🗺 *Google Map:* ${mapUrl}`;
+      }
+    }
+
+    async function loadLocations() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('office_locations')
+          .select('*')
+          .order('company_code', { ascending: true });
+
+        if (error) throw error;
+
+        allLocations = data || [];
+        document.getElementById('kpiTotalLocations').textContent = allLocations.length;
+
+        // Populate filter dropdown
+        const filterSelect = document.getElementById('locCompanyFilter');
+        const prevFilter = filterSelect.value;
+        const uniqueCodes = [...new Set(allLocations.map(l => l.company_code || l.Company_code).filter(Boolean))];
+        filterSelect.innerHTML = '<option value="">All Companies</option>';
+        uniqueCodes.forEach(code => {
+          const opt = document.createElement('option');
+          opt.value = code;
+          opt.textContent = code;
+          filterSelect.appendChild(opt);
+        });
+        if (uniqueCodes.includes(prevFilter)) filterSelect.value = prevFilter;
+
+        // Also ensure any company_code in office_locations is present in the form dropdown
+        const formCompanySelect = document.getElementById('locCompanyCodeSelect');
+        uniqueCodes.forEach(code => {
+          const exists = Array.from(formCompanySelect.options).some(o => o.value === code);
+          if (!exists) {
+            const opt = document.createElement('option');
+            opt.value = code;
+            opt.textContent = code;
+            formCompanySelect.appendChild(opt);
+          }
+        });
+
+        filterLocationsTable();
+      } catch (err) {
+        console.error('Error loading office locations:', err);
+        showToast('Failed to load locations: ' + err.message, 'error');
+        document.getElementById('locationsTableBody').innerHTML = `
+          <tr><td colspan="4" class="py-10 text-center text-rose-500">Error loading locations: ${escapeHtml(err.message)}</td></tr>
+        `;
+      }
+    }
+
+    function filterLocationsTable() {
+      const query = (document.getElementById('locSearchInput')?.value || '').toLowerCase().trim();
+      const compFilter = document.getElementById('locCompanyFilter')?.value || '';
+
+      const filtered = allLocations.filter(loc => {
+        const code = loc.company_code || loc.Company_code || '';
+        const branch = loc.office_locations || loc.Office_Locations || '';
+        const spoc = loc.spoc_name || loc.Spoc_Name || '';
+        const addr = loc.address || loc.Address || '';
+
+        const matchComp = !compFilter || code === compFilter;
+        const matchQuery = !query ||
+          code.toLowerCase().includes(query) ||
+          branch.toLowerCase().includes(query) ||
+          spoc.toLowerCase().includes(query) ||
+          addr.toLowerCase().includes(query);
+
+        return matchComp && matchQuery;
+      });
+
+      renderLocationsTable(filtered);
+    }
+
+    function renderLocationsTable(list) {
+      const tbody = document.getElementById('locationsTableBody');
+      if (!tbody) return;
+
+      if (list.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-12 text-center text-slate-400">No office locations configured yet. Add one on the left!</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = list.map(loc => {
+        const code = loc.company_code || loc.Company_code || '';
+        const compName = loc.company_name || loc.Company_Name || '';
+        const branch = loc.office_locations || loc.Office_Locations || '';
+        const spocName = loc.spoc_name || loc.Spoc_Name || '-';
+        const spocNum = loc.spoc_number || loc.Spoc_Number || '-';
+        const addr = loc.address || loc.Address || '-';
+        const mapLink = loc.google_map || loc.Google_Map || '';
+
+        return `
+          <tr>
+            <td>
+              <div class="font-bold text-slate-900 dark:text-white">${escapeHtml(code)}</div>
+              <div class="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-md text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <i class="fas fa-location-dot text-[10px]"></i> ${escapeHtml(branch)}
+              </div>
+              <div class="text-[11px] text-slate-400 mt-0.5">${escapeHtml(compName)}</div>
+            </td>
+            <td>
+              <div class="font-semibold text-slate-800 dark:text-slate-200">${escapeHtml(spocName)}</div>
+              <div class="font-mono text-xs text-slate-500">${escapeHtml(spocNum)}</div>
+            </td>
+            <td class="max-w-xs">
+              <div class="text-xs text-slate-600 dark:text-slate-300 whitespace-normal line-clamp-2">${escapeHtml(addr)}</div>
+              ${mapLink ? `<a href="${escapeHtml(mapLink)}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline mt-1"><i class="fas fa-map-location-dot"></i> Open Map</a>` : ''}
+            </td>
+            <td class="text-right whitespace-nowrap">
+              <button
+                type="button"
+                onclick="editLocation('${loc.id}')"
+                class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white text-xs font-bold transition-all mr-1 cursor-pointer"
+                title="Modify Location"
+              >
+                <i class="fas fa-pen-to-square"></i> Edit
+              </button>
+              <button
+                type="button"
+                onclick="deleteLocation('${loc.id}', '${escapeHtml(branch)} (${escapeHtml(code)})')"
+                class="px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white text-xs font-bold transition-all cursor-pointer"
+                title="Delete Location"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function editLocation(id) {
+      const loc = allLocations.find(l => String(l.id) === String(id));
+      if (!loc) return;
+
+      const code = loc.company_code || loc.Company_code || '';
+      const compSelect = document.getElementById('locCompanyCodeSelect');
+      const exists = Array.from(compSelect.options).some(o => o.value === code);
+      if (!exists && code) {
+        const opt = document.createElement('option');
+        opt.value = code;
+        opt.textContent = code;
+        compSelect.appendChild(opt);
+      }
+
+      document.getElementById('locId').value = loc.id;
+      compSelect.value = code;
+      document.getElementById('locCompanyName').value = loc.company_name || loc.Company_Name || '';
+      document.getElementById('locBranchName').value = loc.office_locations || loc.Office_Locations || '';
+      document.getElementById('locSpocName').value = loc.spoc_name || loc.Spoc_Name || '';
+      document.getElementById('locSpocNumber').value = loc.spoc_number || loc.Spoc_Number || '';
+      document.getElementById('locAddress').value = loc.address || loc.Address || '';
+      document.getElementById('locGoogleMap').value = loc.google_map || loc.Google_Map || '';
+
+      document.getElementById('locFormTitle').innerHTML = `<i class="fas fa-pen-to-square text-blue-500"></i> <span>Modify Office Location</span>`;
+      document.getElementById('locSubmitBtnText').textContent = 'Save Location Changes';
+      document.getElementById('locCancelEditBtn').classList.remove('hidden');
+
+      updateLocationInvitePreview();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetLocationForm() {
+      document.getElementById('locationForm').reset();
+      document.getElementById('locId').value = '';
+      document.getElementById('locFormTitle').innerHTML = `<i class="fas fa-map-location-dot text-emerald-500"></i> <span>Add Office Location</span>`;
+      document.getElementById('locSubmitBtnText').textContent = 'Save Office Location';
+      document.getElementById('locCancelEditBtn').classList.add('hidden');
+      updateLocationInvitePreview();
+    }
+
+    async function handleLocationSubmit(e) {
+      e.preventDefault();
+
+      const id = document.getElementById('locId').value.trim();
+      const company_code = document.getElementById('locCompanyCodeSelect').value.trim();
+      const company_name = document.getElementById('locCompanyName').value.trim();
+      const office_locations = document.getElementById('locBranchName').value.trim();
+      const spoc_name = document.getElementById('locSpocName').value.trim();
+      const spoc_number = document.getElementById('locSpocNumber').value.trim();
+      const address = document.getElementById('locAddress').value.trim();
+      const google_map = document.getElementById('locGoogleMap').value.trim();
+
+      const btn = document.getElementById('locSubmitBtn');
+      btn.disabled = true;
+
+      try {
+        const payload = {
+          company_code,
+          company_name,
+          office_locations,
+          spoc_name,
+          spoc_number,
+          address,
+          google_map
+        };
+
+        if (id) {
+          const { error } = await supabaseClient
+            .from('office_locations')
+            .update(payload)
+            .eq('id', id);
+
+          if (error) throw error;
+          showToast(`Updated location "${office_locations}" for ${company_code}!`, 'success');
+        } else {
+          const { error } = await supabaseClient
+            .from('office_locations')
+            .insert([payload]);
+
+          if (error) throw error;
+          showToast(`Added location "${office_locations}" for ${company_code}!`, 'success');
+        }
+
+        resetLocationForm();
+        await loadLocations();
+      } catch (err) {
+        console.error('Error saving office location:', err);
+        showToast('Error saving location: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    async function deleteLocation(id, label) {
+      const confirmed = await askConfirmation(
+        'Delete Office Location?',
+        `Are you sure you want to delete "${label}"?`
+      );
+      if (!confirmed) return;
+
+      try {
+        const { error } = await supabaseClient
+          .from('office_locations')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+        showToast(`Deleted location "${label}"`, 'success');
+        if (document.getElementById('locId').value === String(id)) {
+          resetLocationForm();
+        }
+        await loadLocations();
+      } catch (err) {
+        console.error('Error deleting location:', err);
+        showToast('Failed to delete location: ' + err.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>
