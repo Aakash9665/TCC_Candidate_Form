@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>TCC Scheduled Interviews</title>
+  <title>TCC Sourced Profiles - Today's Sourcing</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Supabase JS Client SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -34,7 +34,7 @@
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
       background-image:
-        radial-gradient(circle at 12% 15%, rgba(245, 158, 11, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 12% 15%, rgba(168, 85, 247, 0.16) 0%, transparent 45%),
         radial-gradient(circle at 88% 85%, rgba(59, 130, 246, 0.15) 0%, transparent 45%);
     }
 
@@ -52,39 +52,14 @@
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
     }
 
-    /* User Type Badge Preserved Classes */
-    .user-type-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 10px;
-      border-radius: 9999px;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-    }
-
-    .user-type-admin {
-      background: rgba(239, 68, 68, 0.15);
-      color: #ef4444;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
-    .user-type-user {
-      background: rgba(59, 130, 246, 0.15);
-      color: #3b82f6;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-    }
-
-    /* Form Controls */
     .form-control-input {
       width: 100%;
-      padding: 10px 14px;
+      padding: 9px 13px;
       border-radius: 12px;
       border: 1.5px solid rgba(148, 163, 184, 0.3);
       background: rgba(248, 250, 252, 0.9);
       color: #0f172a;
-      font-size: 13px;
+      font-size: 12.5px;
       transition: all 0.2s ease;
     }
 
@@ -96,13 +71,45 @@
 
     .form-control-input:focus {
       outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.16);
     }
 
-    /* Table Styling */
-    .table-scroll {
+    /* Preserved Loading & Error States */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 48px 20px;
+      color: #8b5cf6;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .error {
+      display: none;
+      text-align: center;
+      padding: 16px 20px;
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      border-radius: 16px;
+      margin-bottom: 16px;
+      font-size: 13px;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    /* Table Container & Preserved Column Semantic Classes */
+    .table-container {
       overflow-x: auto;
+      max-height: 640px;
+      overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
 
@@ -113,33 +120,39 @@
       font-size: 12.5px;
     }
 
+    thead {
+      position: sticky;
+      top: 0;
+      z-index: 15;
+    }
+
     th {
-      background: rgba(241, 245, 249, 0.92);
+      background: rgba(241, 245, 249, 0.96);
       color: #475569;
       font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      padding: 13px 14px;
+      padding: 13px 12px;
       text-align: left;
       border-bottom: 1px solid rgba(226, 232, 240, 0.9);
       white-space: nowrap;
-      position: sticky;
-      top: 0;
-      z-index: 10;
     }
 
     .dark th {
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(15, 23, 42, 0.96);
       color: #94a3b8;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     td {
-      padding: 12px 14px;
+      padding: 11px 12px;
       border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 190px;
       vertical-align: middle;
-      transition: background-color 0.15s ease;
     }
 
     .dark td {
@@ -147,185 +160,178 @@
     }
 
     tbody tr {
-      transition: all 0.15s ease;
+      transition: background-color 0.15s ease;
     }
 
     tbody tr:hover {
-      background: rgba(59, 130, 246, 0.06);
+      background-color: rgba(139, 92, 246, 0.06);
     }
 
     .dark tbody tr:hover {
-      background: rgba(59, 130, 246, 0.12);
+      background-color: rgba(139, 92, 246, 0.12);
     }
 
-    /* Clickable Candidate Names Preserved Class */
-    .candidate-name-clickable {
-      cursor: pointer !important;
-      color: #2563eb !important;
-      font-weight: 700 !important;
-      transition: all 0.2s ease;
-    }
-
-    .dark .candidate-name-clickable {
-      color: #60a5fa !important;
-    }
-
-    .candidate-name-clickable:hover {
-      text-decoration: underline;
-      color: #1d4ed8 !important;
-    }
-
-    /* Interview Status Badges Preserved Classes */
-    .interview-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      border-radius: 9999px;
-      font-size: 10.5px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      white-space: nowrap;
-    }
-
-    .interview-upcoming {
-      background: rgba(59, 130, 246, 0.14);
-      color: #3b82f6;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-    }
-
-    .interview-today {
-      background: rgba(245, 158, 11, 0.16);
-      color: #f59e0b;
-      border: 1px solid rgba(245, 158, 11, 0.35);
-    }
-
-    .interview-overdue {
-      background: rgba(239, 68, 68, 0.14);
-      color: #ef4444;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
-    /* Mode Badges Preserved Classes */
-    .mode-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 9px;
-      border-radius: 8px;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      white-space: nowrap;
-      background: rgba(100, 116, 139, 0.12);
+    .timestamp {
+      font-size: 11.5px;
       color: #64748b;
     }
 
-    .mode-physical {
-      background: rgba(16, 185, 129, 0.14);
-      color: #10b981;
-      border: 1px solid rgba(16, 185, 129, 0.25);
+    .dark .timestamp {
+      color: #94a3b8;
     }
 
-    .mode-online {
-      background: rgba(139, 92, 246, 0.14);
-      color: #8b5cf6;
-      border: 1px solid rgba(139, 92, 246, 0.25);
+    .company {
+      font-weight: 700;
+      color: #1e293b;
     }
 
-    /* Popup Overlay Preserved Classes */
-    .popup-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(2, 6, 23, 0.65);
-      backdrop-filter: blur(12px);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1400;
-      padding: 16px;
-      overflow-y: auto;
+    .dark .company {
+      color: #f1f5f9;
     }
 
-    .popup-content {
-      width: 100%;
-      max-width: 460px;
-      border-radius: 24px;
-      padding: 26px;
-      position: relative;
-      max-height: 90vh;
-      overflow-y: auto;
-      animation: modalSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .popup-content.compact {
-      max-width: 420px;
-    }
-
-    @keyframes modalSlideUp {
-      from { opacity: 0; transform: translateY(20px) scale(0.96); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+    .position {
+      color: #2563eb;
       font-weight: 600;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease;
+    }
+
+    .dark .position {
+      color: #60a5fa;
+    }
+
+    .candidate-name {
+      font-weight: 700;
+      color: #059669;
+    }
+
+    .dark .candidate-name {
+      color: #34d399;
+    }
+
+    .mobile {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-weight: 600;
+    }
+
+    .email {
+      color: #7c3aed;
+    }
+
+    .dark .email {
+      color: #a78bfa;
+    }
+
+    .ctc {
+      color: #d97706;
+      font-weight: 600;
+    }
+
+    .dark .ctc {
+      color: #fbbf24;
+    }
+
+    .experience {
+      color: #0d9488;
+      font-weight: 600;
+    }
+
+    .dark .experience {
+      color: #2dd4bf;
+    }
+
+    .notice-period {
+      color: #e11d48;
+      font-weight: 600;
+    }
+
+    .dark .notice-period {
+      color: #fb7185;
+    }
+
+    .recruiter {
+      color: #64748b;
+      font-style: italic;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 48px 20px;
+      color: #94a3b8;
+      font-size: 14px;
+    }
+
+    /* Preserved Toast Notification (#toast) */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      padding: 14px 20px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 15px 35px -5px rgba(16, 185, 129, 0.45);
+      transform: translateY(120px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      z-index: 2500;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
     }
   </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 selection:bg-blue-500 selection:text-white">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 selection:bg-purple-500 selection:text-white">
 
-  <!-- Non-Blocking Toast Notification Container -->
-  <div id="toastContainer" class="fixed bottom-5 right-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-4 pointer-events-none"></div>
-
-  <!-- Sticky Top Header Bar (Preserves .dashboard-header, .home-button, #userTypeBadge) -->
-  <header class="dashboard-header sticky top-0 z-40 glass-card border-b border-slate-200/70 dark:border-slate-800/80 px-4 sm:px-6 py-3">
-    <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-3 w-full">
+  <!-- Sticky Top Header Bar -->
+  <header class="sticky top-0 z-40 glass-card border-b border-slate-200/70 dark:border-slate-800/80 px-4 sm:px-6 py-3">
+    <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <button class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-500/10 hover:bg-amber-500 text-amber-600 dark:text-amber-400 hover:text-white border border-amber-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0" onclick="goHome()" title="Home">
+        <button onclick="goHome()" class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-purple-500/10 hover:bg-purple-600 text-purple-600 dark:text-purple-400 hover:text-white border border-purple-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Back to Dashboard">
           <i class="fas fa-house text-base"></i>
         </button>
 
-        <div class="header-content text-left">
+        <div class="header">
           <div class="flex flex-wrap items-center gap-2">
-            <h2 class="font-display font-extrabold text-sm sm:text-lg text-slate-900 dark:text-white leading-tight flex items-center gap-2">
-              <i class="fas fa-calendar-check text-amber-500 hidden sm:inline"></i>
-              <span>Scheduled Interviews</span>
-            </h2>
-            <span id="userTypeBadge" class="user-type-badge"></span>
+            <h1 class="font-display font-extrabold text-sm sm:text-lg text-slate-900 dark:text-white leading-tight flex items-center gap-2">
+              <i class="fas fa-chart-line text-purple-500"></i>
+              <span>Today's Sourcing & Master Pool</span>
+            </h1>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+              Admin Analytics
+            </span>
           </div>
-          <p class="dashboard-subtitle text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-            Real-time interview lineup, status tracking, and instant WhatsApp follow-ups (Supabase)
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
+            Candidate Data Management, Email-Ready Table Copy & WhatsApp Broadcast Export (Supabase)
           </p>
         </div>
       </div>
 
-      <!-- Right Action Controls: Refresh, CSV Export, View Mode Switcher, Theme Toggle -->
+      <!-- Right Action Buttons -->
       <div class="flex items-center gap-2">
-        <button type="button" class="refresh-btn px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer" onclick="triggerRefreshInterviews()">
-          <i class="fas fa-sync-alt" id="syncIcon"></i>
+        <button type="button" onclick="refreshData()" class="px-3 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer" title="Refresh Supabase Data">
+          <i class="fas fa-arrows-rotate" id="syncSpinnerIcon"></i>
           <span class="hidden md:inline">Refresh</span>
         </button>
 
-        <button type="button" onclick="exportInterviewsToCSV()" class="px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer" title="Export Interviews to CSV">
-          <i class="fas fa-file-csv"></i>
-          <span class="hidden md:inline">Export CSV</span>
+        <button type="button" onclick="copyTableData()" class="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all cursor-pointer" title="Copy Email-Ready Table to Clipboard">
+          <i class="fas fa-copy"></i>
+          <span>Copy Table</span>
         </button>
 
-        <!-- Table / Card Timeline View Switcher -->
+        <button type="button" onclick="exportSourcedToCSV()" class="px-3 py-2 rounded-xl bg-purple-500/10 hover:bg-purple-600 text-purple-600 dark:text-purple-400 hover:text-white border border-purple-500/20 text-xs font-bold hidden sm:flex items-center gap-1.5 transition-all cursor-pointer" title="Download CSV">
+          <i class="fas fa-file-csv"></i>
+          <span class="hidden lg:inline">Export CSV</span>
+        </button>
+
+        <!-- View Mode Switcher (Table vs Cards) -->
         <div class="hidden sm:flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-          <button type="button" id="viewTableBtn" onclick="switchInterviewView('table')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all" title="Table View">
+          <button type="button" id="viewTableBtn" onclick="switchSourcedView('table')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-600 text-white shadow-sm transition-all" title="Table View">
             <i class="fas fa-table"></i>
           </button>
-          <button type="button" id="viewCardsBtn" onclick="switchInterviewView('cards')" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all" title="Timeline Cards View">
+          <button type="button" id="viewCardsBtn" onclick="switchSourcedView('cards')" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all" title="Cards View">
             <i class="fas fa-grip"></i>
           </button>
         </div>
@@ -338,97 +344,118 @@
     </div>
   </header>
 
-  <!-- ==================== MAIN DASHBOARD (#dashboard) ==================== -->
-  <div id="dashboard" class="max-w-[1600px] mx-auto px-4 sm:px-6 pt-5">
+  <div class="container max-w-[1600px] mx-auto px-4 sm:px-6 pt-5">
 
-    <!-- Stats Cards (Preserves #totalInterviews, #todayInterviews, #upcomingInterviews, #overdueInterviews) -->
-    <div class="stats-container grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-5">
-      <button type="button" onclick="quickFilterStatus('')" class="stat-card glass-card rounded-2xl p-4 text-left hover:border-blue-500/50 transition-all group cursor-pointer">
+    <!-- Live KPI Summary Strip (Preserves #totalCount, #filteredCount, #lastUpdated) -->
+    <div class="stats grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-5">
+      <button type="button" onclick="quickSetDateFilter('')" class="glass-card rounded-2xl p-4 text-left hover:border-purple-500/40 transition-all cursor-pointer">
         <div class="flex items-center justify-between mb-1">
-          <span class="stat-label text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Scheduled</span>
-          <span class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-            <i class="fas fa-calendar-alt"></i>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Candidates</span>
+          <span class="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center text-xs">
+            <i class="fas fa-database"></i>
           </span>
         </div>
-        <div class="stat-number font-display text-2xl font-extrabold text-slate-900 dark:text-white" id="totalInterviews">0</div>
-        <p class="text-[10px] text-slate-400 mt-0.5">Click to view all</p>
+        <strong id="totalCount" class="font-display text-2xl font-extrabold text-slate-900 dark:text-white block">0</strong>
+        <span class="text-[10px] text-slate-400">Master talent pool</span>
       </button>
 
-      <button type="button" onclick="quickFilterStatus('today')" class="stat-card glass-card rounded-2xl p-4 text-left hover:border-amber-500/50 transition-all group cursor-pointer">
+      <div class="glass-card rounded-2xl p-4 text-left">
         <div class="flex items-center justify-between mb-1">
-          <span class="stat-label text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Today's Interviews</span>
-          <span class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-            <i class="fas fa-bell"></i>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Filtered Results</span>
+          <span class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs">
+            <i class="fas fa-filter"></i>
           </span>
         </div>
-        <div class="stat-number font-display text-2xl font-extrabold text-amber-600 dark:text-amber-400" id="todayInterviews">0</div>
-        <p class="text-[10px] text-slate-400 mt-0.5">Happening today</p>
+        <strong id="filteredCount" class="font-display text-2xl font-extrabold text-blue-600 dark:text-blue-400 block">0</strong>
+        <span class="text-[10px] text-slate-400">Matching active criteria</span>
+      </div>
+
+      <button type="button" onclick="quickSetDateFilter('today')" class="glass-card rounded-2xl p-4 text-left hover:border-emerald-500/40 transition-all cursor-pointer">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Today's Submissions</span>
+          <span class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs">
+            <i class="fas fa-bolt"></i>
+          </span>
+        </div>
+        <strong id="todaySourcedCount" class="font-display text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 block">0</strong>
+        <span class="text-[10px] text-slate-400">Click to filter Today</span>
       </button>
 
-      <button type="button" onclick="quickFilterStatus('upcoming')" class="stat-card glass-card rounded-2xl p-4 text-left hover:border-emerald-500/50 transition-all group cursor-pointer">
+      <div class="glass-card rounded-2xl p-4 text-left">
         <div class="flex items-center justify-between mb-1">
-          <span class="stat-label text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Upcoming</span>
-          <span class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Last Updated</span>
+          <span class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs">
             <i class="fas fa-clock"></i>
           </span>
         </div>
-        <div class="stat-number font-display text-2xl font-extrabold text-emerald-600 dark:text-emerald-400" id="upcomingInterviews">0</div>
-        <p class="text-[10px] text-slate-400 mt-0.5">Future lineup</p>
-      </button>
-
-      <button type="button" onclick="quickFilterStatus('overdue')" class="stat-card glass-card rounded-2xl p-4 text-left hover:border-rose-500/50 transition-all group cursor-pointer">
-        <div class="flex items-center justify-between mb-1">
-          <span class="stat-label text-[11px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Overdue / Past</span>
-          <span class="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
-            <i class="fas fa-hourglass-end"></i>
-          </span>
-        </div>
-        <div class="stat-number font-display text-2xl font-extrabold text-rose-600 dark:text-rose-400" id="overdueInterviews">0</div>
-        <p class="text-[10px] text-slate-400 mt-0.5">Needs status update</p>
-      </button>
+        <strong id="lastUpdated" class="font-display text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 block mt-1 truncate">Loading...</strong>
+        <span class="text-[10px] text-slate-400">Auto-refreshes every 10m</span>
+      </div>
     </div>
 
-    <!-- Filters Card (Preserves #companyFilter, #recruiterFilter, #statusFilter + adds instant candidate search) -->
-    <div class="filters-container glass-card rounded-3xl p-4 sm:p-6 mb-5">
+    <!-- Filters & Action Controls Card (Preserves #dateFilter, #companyFilter + adds Search, Recruiter Filter, & Send to WhatsApp Bulk) -->
+    <div class="controls glass-card rounded-3xl p-4 sm:p-6 mb-5">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-        <h3 class="filters-title font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
-          <i class="fas fa-filter text-blue-500"></i>
-          <span>Filter Interview Lineup</span>
+        <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fas fa-sliders text-purple-500"></i>
+          <span>Filter & Export Sourced Profiles</span>
         </h3>
-        <button type="button" onclick="resetInterviewFilters()" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-          <i class="fas fa-rotate-left text-[10px]"></i>
-          Reset Filters
-        </button>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="sendFilteredToWhatsAppSender()" class="px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer">
+            <i class="fab fa-whatsapp"></i>
+            <span>Send Filtered Numbers to Bulk WhatsApp</span>
+          </button>
+          <button type="button" onclick="clearFilters()" class="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1 ml-2">
+            <i class="fas fa-rotate-left text-[10px]"></i> Clear Filters
+          </button>
+        </div>
       </div>
 
-      <div class="filters grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div class="filter-group">
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
-            Search Candidate
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3.5 items-end">
+        <!-- Instant Search Input -->
+        <div class="filter-group lg:col-span-3">
+          <label for="searchCandidateInput" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+            Search Candidate / Role
           </label>
           <div class="relative">
             <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
             <input
               type="text"
-              id="candidateSearchInput"
+              id="searchCandidateInput"
               oninput="applyFilters()"
-              placeholder="Search name, role, email..."
+              placeholder="Name, position, mobile, email..."
               class="form-control-input pl-9"
-            />
+            >
           </div>
         </div>
 
-        <div class="filter-group">
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
-            Company
+        <!-- Date Filter (#dateFilter) -->
+        <div class="filter-group lg:col-span-2">
+          <label for="dateFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+            Date Filter
           </label>
-          <select id="companyFilter" onchange="applyFilters()" class="form-control-input">
+          <select id="dateFilter" class="form-control-input">
+            <option value="">All Dates</option>
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="dayBeforeYesterday">Day Before Yesterday</option>
+          </select>
+        </div>
+
+        <!-- Company Filter (#companyFilter) -->
+        <div class="filter-group lg:col-span-3">
+          <label for="companyFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+            Company Filter
+          </label>
+          <select id="companyFilter" class="form-control-input">
             <option value="">All Companies</option>
           </select>
         </div>
 
-        <div class="filter-group">
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+        <!-- Recruiter Filter (#recruiterFilter) -->
+        <div class="filter-group lg:col-span-2">
+          <label for="recruiterFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
             Recruiter
           </label>
           <select id="recruiterFilter" onchange="applyFilters()" class="form-control-input">
@@ -436,166 +463,63 @@
           </select>
         </div>
 
-        <div class="filter-group">
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
-            Interview Timeline
-          </label>
-          <select id="statusFilter" onchange="applyFilters()" class="form-control-input">
-            <option value="">All Status</option>
-            <option value="today">Today</option>
-            <option value="upcoming">Upcoming</option>
-            <option value="overdue">Overdue</option>
-          </select>
+        <!-- Action Buttons -->
+        <div class="lg:col-span-2 flex items-center gap-2">
+          <button class="btn btn-primary flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-purple-600/20 cursor-pointer" onclick="applyFilters()">
+            <i class="fas fa-filter mr-1"></i> Apply
+          </button>
+          <button class="btn btn-success py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-600/20 cursor-pointer" onclick="copyTableData()" title="Copy Formatted Table for Email">
+            <i class="fas fa-copy"></i>
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- Interview Schedule Table Container (Preserves #interviewTable) -->
-    <div class="table-container glass-card rounded-3xl overflow-hidden" id="tableViewWrapper">
-      <div class="table-header px-5 py-4 border-b border-slate-200/70 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-3 bg-slate-100/50 dark:bg-slate-900/40">
-        <div class="flex items-center gap-2.5">
-          <h3 class="table-title font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
-            <i class="fas fa-clock text-amber-500"></i>
-            <span>Interview Schedule</span>
-          </h3>
-          <span class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline">
-            (Click any candidate name for quick actions)
-          </span>
-        </div>
+    <!-- Loading Indicator (#loading) -->
+    <div id="loading" class="loading glass-card rounded-3xl mb-5">
+      <i class="fas fa-circle-notch fa-spin text-2xl text-purple-500 mb-2 block"></i>
+      <div>Loading Sourced Candidate Database from Supabase...</div>
+    </div>
 
-        <button class="refresh-btn px-3 py-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer" onclick="triggerRefreshInterviews()">
-          <i class="fas fa-sync-alt"></i>
-          <span>Refresh</span>
-        </button>
-      </div>
+    <!-- Error Box (#error & #errorMessage) -->
+    <div id="error" class="error">
+      <strong><i class="fas fa-triangle-exclamation mr-1"></i> Error:</strong> <span id="errorMessage"></span>
+    </div>
 
-      <div class="table-scroll">
-        <table id="interviewTable">
+    <!-- Table Container (.table-container & #candidateTable & #candidateTableBody) -->
+    <div id="tableViewWrapper" class="glass-card rounded-3xl overflow-hidden">
+      <div class="table-container">
+        <table id="candidateTable">
           <thead>
             <tr>
-              <th><i class="fas fa-calendar mr-1"></i> Interview Date</th>
-              <th><i class="fas fa-user mr-1"></i> Candidate</th>
-              <th><i class="fas fa-envelope mr-1"></i> Email</th>
-              <th><i class="fas fa-briefcase mr-1"></i> Position</th>
+              <th><i class="far fa-clock mr-1"></i> Timestamp</th>
               <th><i class="fas fa-building mr-1"></i> Company</th>
+              <th><i class="fas fa-briefcase mr-1"></i> Position</th>
+              <th><i class="fas fa-user mr-1"></i> Candidate Name</th>
+              <th><i class="fas fa-phone mr-1"></i> Mobile Number</th>
+              <th><i class="fas fa-envelope mr-1"></i> Email ID</th>
+              <th><i class="fas fa-indian-rupee-sign mr-1"></i> Current CTC</th>
+              <th><i class="fas fa-chart-line mr-1"></i> Expected CTC</th>
+              <th><i class="fas fa-award mr-1"></i> Experience</th>
+              <th><i class="fas fa-calendar-day mr-1"></i> Notice Period</th>
               <th><i class="fas fa-user-tie mr-1"></i> Recruiter</th>
-              <th><i class="fas fa-map-marker-alt mr-1"></i> Mode</th>
-              <th><i class="fas fa-flag mr-1"></i> Status</th>
-              <th><i class="fas fa-info-circle mr-1"></i> Interview Status</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td colspan="9" class="loading py-12 text-center text-slate-400">
-                <i class="fas fa-spinner fa-spin text-blue-500 text-lg mb-2"></i><br>
-                Loading scheduled interviews from Supabase...
-              </td>
-            </tr>
+          <tbody id="candidateTableBody">
+            <tr><td colspan="11" class="no-data">Loading candidate data from Supabase...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- Mobile / Timeline Card View Container -->
+    <!-- Mobile / Responsive Cards Grid Container -->
     <div id="cardsViewWrapper" class="hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2"></div>
 
   </div>
 
-  <!-- ==================== CANDIDATE OPTIONS POPUP (#candidateOptionsPopup) ==================== -->
-  <div class="popup-overlay" id="candidateOptionsPopup">
-    <div class="popup-content compact glass-card text-center">
-      <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center mx-auto mb-3 text-lg">
-        <i class="fas fa-user-clock"></i>
-      </div>
-      <h3 class="font-display font-extrabold text-lg text-slate-900 dark:text-white mb-1">
-        Next Action?
-      </h3>
-      <p id="popupCandidateNameDisplay" class="font-bold text-sm text-blue-600 dark:text-blue-400 mb-1"></p>
-      <p id="popupCandidateMetaDisplay" class="text-xs text-slate-500 dark:text-slate-400 mb-5"></p>
-
-      <div class="flex flex-col gap-2.5 mb-4">
-        <button class="btn btn-primary w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs sm:text-sm shadow-md shadow-blue-600/20" id="btnUpdateStatus">
-          <i class="fas fa-edit"></i>
-          <span>Update Candidate Status</span>
-        </button>
-
-        <button class="btn btn-success w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs sm:text-sm shadow-md shadow-emerald-500/20" id="btnConnectWhatsapp">
-          <i class="fab fa-whatsapp text-base"></i>
-          <span>Open Direct WhatsApp</span>
-        </button>
-
-        <button type="button" onclick="sendWhatsAppInterviewReminder()" class="btn w-full py-2.5 px-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 text-xs font-bold">
-          <i class="fas fa-bell"></i>
-          <span>Send Pre-Filled Interview Reminder</span>
-        </button>
-      </div>
-
-      <button class="btn btn-secondary w-full py-2.5 px-4 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold" onclick="closeCandidateOptionsPopup()">
-        <i class="fas fa-times"></i>
-        <span>Cancel</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- ==================== STATUS UPDATE POPUP (#popup) ==================== -->
-  <div class="popup-overlay" id="popup">
-    <div class="popup-content glass-card">
-      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-200 dark:border-slate-800">
-        <h3 class="font-display font-extrabold text-lg text-slate-900 dark:text-white flex items-center gap-2">
-          <i class="fas fa-edit text-blue-500"></i> Update Status
-        </h3>
-        <button type="button" onclick="closePopup()" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-
-      <div class="popup-info p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 mb-4 space-y-1.5 text-xs">
-        <p class="flex justify-between"><strong class="text-slate-500 dark:text-slate-400">Name:</strong> <span id="popupCandidateName" class="font-bold text-slate-900 dark:text-white text-right"></span></p>
-        <p class="flex justify-between"><strong class="text-slate-500 dark:text-slate-400">Company:</strong> <span id="popupCompany" class="font-semibold text-slate-800 dark:text-slate-200 text-right"></span></p>
-        <p class="flex justify-between"><strong class="text-slate-500 dark:text-slate-400">Position:</strong> <span id="popupPosition" class="font-semibold text-blue-600 dark:text-blue-400 text-right"></span></p>
-        <span id="popup__powerappsid__" class="hidden"></span>
-      </div>
-
-      <div class="space-y-4">
-        <div class="form-group">
-          <label for="statusDropdown" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-            <i class="fas fa-flag text-blue-500 mr-1"></i> Status
-          </label>
-          <select id="statusDropdown" onchange="updateFinalStatusOptions()" class="form-control-input">
-            <option value="">Select Status</option>
-            <option value="Selected">Selected</option>
-            <option value="Rejected">Rejected</option>
-            <option value="On Hold">On Hold</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="finalStatusDropdown" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-            <i class="fas fa-check-circle text-emerald-500 mr-1"></i> Final Status
-          </label>
-          <select id="finalStatusDropdown" class="form-control-input">
-            <option value="">Select Final Status</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="commentBox" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-            <i class="fas fa-comment text-indigo-500 mr-1"></i> Comment
-          </label>
-          <textarea id="commentBox" rows="2" placeholder="Optional comment..." class="form-control-input"></textarea>
-        </div>
-      </div>
-
-      <div class="popup-buttons flex items-center justify-end gap-2.5 mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
-        <button class="btn btn-secondary px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold" onclick="closePopup()">
-          <i class="fas fa-times"></i> Cancel
-        </button>
-        <button class="btn btn-primary px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold shadow-lg shadow-blue-600/25" id="statusSubmitButton" onclick="submitFinalStatusUpdate()">
-          <i class="fas fa-save"></i>
-          <span class="btn-text">Update</span>
-        </button>
-      </div>
-    </div>
+  <!-- Preserved Toast Notification (#toast & #toastMessage) -->
+  <div id="toast" class="toast">
+    <span id="toastMessage">Table data copied to clipboard!</span>
   </div>
 
   <script>
@@ -606,33 +530,15 @@
     // Initialize Supabase Client
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Non-blocking Toast Notification Helper
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toastContainer');
-      if (!container) return;
-      const toast = document.createElement('div');
-      const colors = {
-        info: 'bg-slate-900 dark:bg-slate-800 text-white border-blue-500/40',
-        success: 'bg-emerald-600 text-white border-emerald-400',
-        error: 'bg-rose-600 text-white border-rose-400'
-      };
-      const icons = {
-        info: 'fa-circle-info text-blue-400',
-        success: 'fa-circle-check text-white',
-        error: 'fa-triangle-exclamation text-white'
-      };
-      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl border shadow-xl text-xs sm:text-sm font-semibold transition-all duration-300 ${colors[type] || colors.info}`;
-      toast.innerHTML = `<i class="fas ${icons[type] || icons.info} shrink-0"></i><span class="flex-1">${message}</span>`;
-      container.appendChild(toast);
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(8px)';
-        setTimeout(() => toast.remove(), 300);
-      }, 3600);
+    // Global variables
+    let candidateData = [];
+    let filteredData = [];
+
+    function goHome() {
+      window.location.href = 'index.html';
     }
 
-    // View Mode Toggle (Table vs Timeline Cards)
-    function switchInterviewView(mode) {
+    function switchSourcedView(mode) {
       const tableWrapper = document.getElementById('tableViewWrapper');
       const cardsWrapper = document.getElementById('cardsViewWrapper');
       const btnTable = document.getElementById('viewTableBtn');
@@ -642,694 +548,508 @@
         tableWrapper.classList.add('hidden');
         cardsWrapper.classList.remove('hidden');
         cardsWrapper.classList.add('grid');
-        if (btnCards) btnCards.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
+        if (btnCards) btnCards.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-600 text-white shadow-sm transition-all';
         if (btnTable) btnTable.className = 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
       } else {
         tableWrapper.classList.remove('hidden');
         cardsWrapper.classList.add('hidden');
         cardsWrapper.classList.remove('grid');
-        if (btnTable) btnTable.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
+        if (btnTable) btnTable.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-600 text-white shadow-sm transition-all';
         if (btnCards) btnCards.className = 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
       }
     }
 
-    function quickFilterStatus(statusValue) {
-      const statusFilter = document.getElementById('statusFilter');
-      if (statusFilter) {
-        statusFilter.value = statusValue;
+    function quickSetDateFilter(val) {
+      const df = document.getElementById('dateFilter');
+      if (df) {
+        df.value = val;
         applyFilters();
       }
     }
 
-    function resetInterviewFilters() {
-      const companyFilter = document.getElementById('companyFilter');
-      const recruiterFilter = document.getElementById('recruiterFilter');
-      const statusFilter = document.getElementById('statusFilter');
-      const searchInput = document.getElementById('candidateSearchInput');
-      if (companyFilter) companyFilter.value = '';
-      if (recruiterFilter) recruiterFilter.value = '';
-      if (statusFilter) statusFilter.value = '';
-      if (searchInput) searchInput.value = '';
-      applyFilters();
-      showToast('Filters cleared', 'info');
-    }
-
-    function triggerRefreshInterviews() {
-      const icon = document.getElementById('syncIcon');
-      if (icon) icon.classList.add('fa-spin');
-      loadScheduledInterviews().finally(() => {
-        if (icon) icon.classList.remove('fa-spin');
-        showToast('Interview schedule synced with Supabase', 'success');
-      });
-    }
-
-    function exportInterviewsToCSV() {
-      if (!filteredInterviews || filteredInterviews.length === 0) {
-        showToast('No scheduled interviews to export', 'error');
+    function sendFilteredToWhatsAppSender() {
+      if (!filteredData || filteredData.length === 0) {
+        showToast('❌ No filtered candidates to send');
         return;
       }
-      const headers = ['Interview Date', 'Candidate Name', 'Email', 'Position', 'Company', 'Recruiter', 'Mode', 'Final Status', 'Timeline Status'];
-      const rows = filteredInterviews.map(item => {
-        const st = getInterviewStatus(item.interview_date);
-        return [
-          `"${formatInterviewDateTime(item.interview_date).replace(/"/g, '""')}"`,
-          `"${(item.name || '').replace(/"/g, '""')}"`,
-          `"${(item.email || '').replace(/"/g, '""')}"`,
-          `"${(item.position || '').replace(/"/g, '""')}"`,
-          `"${(item.company || '').replace(/"/g, '""')}"`,
-          `"${(item.recruiter || item.recruiter_email || '').replace(/"/g, '""')}"`,
-          `"${(item.interview_mode || '').replace(/"/g, '""')}"`,
-          `"${(item.final_status || 'Pending').replace(/"/g, '""')}"`,
-          `"${st.text}"`
-        ];
-      });
+      const numbers = filteredData
+        .map(c => (c.mobile || '').toString().replace(/\D/g, '').slice(-10))
+        .filter(n => n.length === 10);
+      const uniqueNumbers = [...new Set(numbers)];
+      if (uniqueNumbers.length === 0) {
+        showToast('❌ No valid 10-digit mobile numbers found');
+        return;
+      }
+      sessionStorage.setItem('tcc_bulk_wa_numbers', uniqueNumbers.join(', '));
+      const selectedCompany = document.getElementById('companyFilter')?.value || '';
+      if (selectedCompany) {
+        sessionStorage.setItem('tcc_bulk_wa_company', selectedCompany);
+      }
+      window.location.href = 'Whatsapp_Sender.html';
+    }
+
+    function exportSourcedToCSV() {
+      if (!filteredData || filteredData.length === 0) {
+        showToast('❌ No data to export');
+        return;
+      }
+      const headers = ['Timestamp', 'Company', 'Position', 'Candidate Name', 'Mobile Number', 'Email ID', 'Current CTC', 'Expected CTC', 'Experience', 'Notice Period', 'Recruiter'];
+      const rows = filteredData.map(c => [
+        `"${formatTimestamp(c.timestamp).replace(/"/g, '""')}"`,
+        `"${(c.company || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.position || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.candidateName || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.mobile || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.email || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.currentCTC || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.expectedCTC || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.experience || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.noticePeriod || '').toString().replace(/"/g, '""')}"`,
+        `"${(c.recruiter || '').toString().replace(/"/g, '""')}"`
+      ]);
       const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
       const link = document.createElement('a');
       link.setAttribute('href', encodeURI(csvContent));
-      link.setAttribute('download', `TCC_Scheduled_Interviews_${new Date().toISOString().slice(0, 10)}.csv`);
+      link.setAttribute('download', `TCC_Sourced_Profiles_${new Date().toISOString().slice(0, 10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast(`Exported ${filteredInterviews.length} interviews to CSV`, 'success');
+      showToast(`✅ Exported ${filteredData.length} candidates to CSV`);
     }
 
-    function sendWhatsAppInterviewReminder() {
-      if (!currentCandidateForPopup) {
-        showToast('No candidate selected', 'error');
-        return;
-      }
-      const mobileRaw = currentCandidateForPopup.Mobile ||
-                        currentCandidateForPopup.mobile ||
-                        currentCandidateForPopup.Phone ||
-                        currentCandidateForPopup.phone || '';
-      const digitsOnly = mobileRaw.toString().replace(/\D/g, '');
-      if (!digitsOnly) {
-        showToast('Mobile number not available for this candidate', 'error');
-        return;
-      }
-      const recruiterName = sessionStorage.getItem('userName') || 'Recruiter';
-      const formattedDT = formatInterviewDateTime(currentCandidateForPopup.interview_date);
-      const modeStr = (currentCandidateForPopup.interview_mode || 'Scheduled').toUpperCase();
-      const msg = `*Hi ${currentCandidateForPopup.name || 'Candidate'}*,\n\nThis is a gentle reminder regarding your scheduled interview for the *${currentCandidateForPopup.position || 'Open'}* role at *${currentCandidateForPopup.company || 'our client'}*.\n\n📅 *Date & Time:* ${formattedDT}\n💼 *Mode:* ${modeStr}\n\nPlease confirm your availability. Wish you all the best!\n\n*Regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
-      window.open(`https://wa.me/91${digitsOnly}?text=${encodeURIComponent(msg)}`, '_blank');
-      closeCandidateOptionsPopup();
+    // ==================== SUPABASE CORE LOGIC & FUNCTIONS ====================
+    function init() {
+      loadDataFromSheets();
     }
 
-    // ==================== PRESERVED AUTHENTICATION & CORE LOGIC ====================
-    window.addEventListener('load', function() {
-      console.log("Scheduled Interviews page loaded - checking authentication...");
-
-      // Get all user data from sessionStorage
-      const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-      const userEmail = sessionStorage.getItem('userEmail');
-      const userName = sessionStorage.getItem('userName');
-      const userContact = sessionStorage.getItem('userContact');
-      const userDesignation = sessionStorage.getItem('userDesignation');
-      const userType = sessionStorage.getItem('userType');
-      const loginTime = sessionStorage.getItem('loginTime');
-
-      // Check if user is authenticated
-      if (isLoggedIn !== 'true') {
-        showToast("Session expired or not logged in. Redirecting to login page.", "error");
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 1000);
-        return;
-      }
-
-      // User is authenticated
-      console.log('✓ User authenticated successfully');
-
-      // Set loggedInEmail to the authenticated user's email
-      loggedInEmail = userEmail;
-
-      // Store user data globally for easy access
-      window.USER_DATA = {
-        isLoggedIn: isLoggedIn === 'true',
-        email: userEmail,
-        name: userName,
-        contact: userContact,
-        designation: userDesignation,
-        userType: userType,
-        loginTime: loginTime
-      };
-
-      // Display user type badge
-      displayUserTypeBadge();
-
-      // Load scheduled interviews from Supabase
-      loadScheduledInterviews();
-    });
-
-    // Display user type badge
-    function displayUserTypeBadge() {
-      const badge = document.getElementById('userTypeBadge');
-      const userType = sessionStorage.getItem('userType');
-
-      if (badge && userType) {
-        const type = userType.toLowerCase();
-        badge.textContent = userType.toUpperCase();
-
-        if (type === 'admin') {
-          badge.className = 'user-type-badge user-type-admin';
-        } else {
-          badge.className = 'user-type-badge user-type-user';
-        }
-      }
-    }
-
-    // Role-based candidate filtering function
-    function filterCandidatesByUserType(data) {
-      const userData = {
-        userType: sessionStorage.getItem('userType'),
-        email: sessionStorage.getItem('userEmail')
-      };
-
-      if (userData.userType && userData.userType.toLowerCase() === 'admin') {
-        console.log('✓ Admin user detected - showing ALL scheduled interviews');
-        return data;
-      } else {
-        console.log('✓ Regular user detected - filtering by recruiter email');
-        return data.filter(c => {
-          const recEmail = (c.recruiter || c.recruiter_email || "").toLowerCase();
-          return recEmail === (userData.email || "").toLowerCase();
-        });
-      }
-    }
-
-    // Global variables
-    let loggedInEmail = "";
-    let allScheduledInterviews = [];
-    let filteredInterviews = [];
-    let currentCandidateForPopup = null;
-    let currentEmail = "";
-    let currentCandidateId = "";
-
-    // Helper functions
-    function goHome() {
-      window.location.href = 'index.html';
-    }
-
-    function getElement(id) {
-      const element = document.getElementById(id);
-      if (!element) {
-        console.error(`Element with id '${id}' not found`);
-      }
-      return element;
-    }
-
-    function formatInterviewDateTime(dt) {
-      if (!dt) return "N/A";
-      try {
-        const d = new Date(dt);
-        if (isNaN(d.getTime())) return dt;
-
-        const options = {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true
-        };
-
-        return d.toLocaleDateString('en-IN', options);
-      } catch (error) {
-        console.error("Error formatting interview date:", error);
-        return dt;
-      }
-    }
-
-    function getInterviewStatus(interviewDate) {
-      if (!interviewDate) return { class: '', text: 'Not Scheduled' };
-
-      try {
-        const now = new Date();
-        const interview = new Date(interviewDate);
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const interviewDay = new Date(interview.getFullYear(), interview.getMonth(), interview.getDate());
-
-        if (interview < now) {
-          return { class: 'interview-overdue', text: 'Overdue' };
-        } else if (interviewDay.getTime() === today.getTime()) {
-          return { class: 'interview-today', text: 'Today' };
-        } else {
-          return { class: 'interview-upcoming', text: 'Upcoming' };
-        }
-      } catch (error) {
-        return { class: '', text: 'Invalid Date' };
-      }
-    }
-
-    function escapeHtml(unsafe) {
-      return (unsafe || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    // Popup functions
-    function openCandidateOptionsPopup(candidate) {
-      const popup = getElement('candidateOptionsPopup');
-      const nameDisplay = getElement('popupCandidateNameDisplay');
-      const metaDisplay = document.getElementById('popupCandidateMetaDisplay');
-
-      if (!popup || !nameDisplay) return;
-
-      currentCandidateForPopup = candidate;
-      nameDisplay.textContent = candidate.name || "";
-      if (metaDisplay) {
-        metaDisplay.textContent = `${candidate.position || ''} • ${candidate.company || ''} (${formatInterviewDateTime(candidate.interview_date)})`;
-      }
-      popup.style.display = 'flex';
-    }
-
-    function closeCandidateOptionsPopup() {
-      const popup = getElement('candidateOptionsPopup');
-      if (popup) popup.style.display = 'none';
-      currentCandidateForPopup = null;
-    }
-
-    // Status update functions
-    function openPopup(candidate) {
-      currentEmail = candidate.email;
-      currentCandidateId = candidate.id || "";
-
-      const elements = {
-        candidateName: getElement("popupCandidateName"),
-        company: getElement("popupCompany"),
-        position: getElement("popupPosition"),
-        powerAppsId: getElement("popup__powerappsid__"),
-        statusDropdown: getElement("statusDropdown"),
-        finalStatusDropdown: getElement("finalStatusDropdown"),
-        commentBox: getElement("commentBox"),
-        popup: getElement("popup")
-      };
-
-      if (elements.candidateName) elements.candidateName.textContent = candidate.name || "";
-      if (elements.company) elements.company.textContent = candidate.company || "";
-      if (elements.position) elements.position.textContent = candidate.position || "";
-
-      if (elements.powerAppsId) {
-        elements.powerAppsId.textContent = candidate.id || candidate.__powerappsid__ || "Not Available";
-      }
-
-      if (elements.statusDropdown) elements.statusDropdown.value = "";
-      if (elements.finalStatusDropdown) elements.finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
-      if (elements.commentBox) elements.commentBox.value = candidate.comment || "";
-      if (elements.popup) elements.popup.style.display = "flex";
-    }
-
-    function closePopup() {
-      const popup = getElement("popup");
-      if (popup) popup.style.display = "none";
-    }
-
-    function updateFinalStatusOptions() {
-      const statusDropdown = getElement("statusDropdown");
-      const finalStatusDropdown = getElement("finalStatusDropdown");
-      if (!statusDropdown || !finalStatusDropdown) return;
-
-      const status = statusDropdown.value;
-      finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
-
-      const statusOptions = {
-        "Selected": ["Shortlisted", "L1 Selected", "L2 Selected", "L3 Selected", "Final Select", "Joined"],
-        "Rejected": ["Not Shortlisted", "L1 Reject", "L2 Reject", "L3 Reject", "Not Joined"],
-        "On Hold": ["Position On Hold", "Candidate On Hold"]
-      };
-
-      (statusOptions[status] || []).forEach(s => {
-        const opt = document.createElement("option");
-        opt.value = s;
-        opt.textContent = s;
-        finalStatusDropdown.appendChild(opt);
-      });
-    }
-
-    // ==================== SUPABASE STATUS UPDATE ====================
-    async function submitFinalStatusUpdate() {
-      const statusDropdown = getElement("statusDropdown");
-      const finalStatusDropdown = getElement("finalStatusDropdown");
-      const commentBox = getElement("commentBox");
-
-      if (!statusDropdown || !finalStatusDropdown || !commentBox) {
-        showToast("Form elements not found", "error");
-        return;
-      }
-
-      const status = statusDropdown.value;
-      const finalStatus = finalStatusDropdown.value;
-      const comment = commentBox.value;
-
-      if ((!currentEmail && !currentCandidateId) || !status || !finalStatus) {
-        showToast("Please select both status and final status.", "error");
-        return;
-      }
-
-      const submitButton = getElement('statusSubmitButton');
-      if (submitButton) {
-        submitButton.disabled = true;
-        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
-      }
-
-      try {
-        let query = supabaseClient
-          .from('candidates')
-          .update({
-            status: status,
-            final_status: finalStatus,
-            comment: comment,
-            updated_at: new Date().toISOString()
-          });
-
-        if (currentCandidateId) {
-          query = query.eq('id', currentCandidateId);
-        } else {
-          query = query.eq('email', currentEmail);
-        }
-
-        const { error } = await query;
-        if (error) throw error;
-
-        showToast("Status updated in Supabase!", "success");
-        closePopup();
-        if (submitButton) {
-          submitButton.disabled = false;
-          submitButton.innerHTML = '<i class="fas fa-save"></i> <span class="btn-text">Update</span>';
-        }
-        await loadScheduledInterviews();
-      } catch (error) {
-        console.error("Supabase status update failed:", error);
-        showToast("Update failed: " + error.message, "error");
-        if (submitButton) {
-          submitButton.disabled = false;
-          submitButton.innerHTML = '<i class="fas fa-save"></i> <span class="btn-text">Update</span>';
-        }
-      }
-    }
-
-    // Load filter options
-    function loadFilterOptions() {
-      const companyFilter = getElement('companyFilter');
-      const recruiterFilter = getElement('recruiterFilter');
-
-      if (!companyFilter || !recruiterFilter) return;
-
-      const currentCompanyVal = companyFilter.value;
-      const currentRecVal = recruiterFilter.value;
-
-      const companies = [...new Set(allScheduledInterviews.map(interview => interview.company).filter(Boolean))];
-      companyFilter.innerHTML = '<option value="">All Companies</option>';
-      companies.forEach(company => {
-        const opt = document.createElement('option');
-        opt.value = company;
-        opt.textContent = company;
-        companyFilter.appendChild(opt);
-      });
-      if (companies.includes(currentCompanyVal)) companyFilter.value = currentCompanyVal;
-
-      const recruiters = [...new Set(allScheduledInterviews.map(interview => interview.recruiter).filter(Boolean))];
-      recruiterFilter.innerHTML = '<option value="">All Recruiters</option>';
-      recruiters.forEach(recruiter => {
-        const opt = document.createElement('option');
-        opt.value = recruiter;
-        opt.textContent = recruiter.split('@')[0];
-        recruiterFilter.appendChild(opt);
-      });
-      if (recruiters.includes(currentRecVal)) recruiterFilter.value = currentRecVal;
-    }
-
-    // Apply filters
-    function applyFilters() {
-      const companyFilter = getElement('companyFilter');
-      const recruiterFilter = getElement('recruiterFilter');
-      const statusFilter = getElement('statusFilter');
-      const searchInput = document.getElementById('candidateSearchInput');
-
-      const selectedCompany = companyFilter ? companyFilter.value : '';
-      const selectedRecruiter = recruiterFilter ? recruiterFilter.value : '';
-      const selectedStatus = statusFilter ? statusFilter.value : '';
-      const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : '';
-
-      filteredInterviews = allScheduledInterviews.filter(interview => {
-        const matchCompany = !selectedCompany || interview.company === selectedCompany;
-        const matchRecruiter = !selectedRecruiter || interview.recruiter === selectedRecruiter;
-
-        let matchStatus = true;
-        if (selectedStatus) {
-          const interviewStatus = getInterviewStatus(interview.interview_date);
-          matchStatus = interviewStatus.text.toLowerCase() === selectedStatus;
-        }
-
-        const matchSearch = !searchQuery ||
-          (interview.name || '').toLowerCase().includes(searchQuery) ||
-          (interview.email || '').toLowerCase().includes(searchQuery) ||
-          (interview.position || '').toLowerCase().includes(searchQuery);
-
-        return matchCompany && matchRecruiter && matchStatus && matchSearch;
-      });
-
-      renderInterviewTable();
-    }
-
-    function updateStats() {
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-      let totalInterviews = filteredInterviews.length;
-      let todayCount = 0;
-      let upcomingCount = 0;
-      let overdueCount = 0;
-
-      filteredInterviews.forEach(interview => {
-        if (!interview.interview_date) return;
-
-        try {
-          const interviewDate = new Date(interview.interview_date);
-          const interviewDay = new Date(interviewDate.getFullYear(), interviewDate.getMonth(), interviewDate.getDate());
-
-          if (interviewDate < now) {
-            overdueCount++;
-          } else if (interviewDay.getTime() === today.getTime()) {
-            todayCount++;
-          } else {
-            upcomingCount++;
-          }
-        } catch (error) {
-          console.error("Error processing interview date:", error);
-        }
-      });
-
-      const totalEl = getElement('totalInterviews');
-      const todayEl = getElement('todayInterviews');
-      const upcomingEl = getElement('upcomingInterviews');
-      const overdueEl = getElement('overdueInterviews');
-
-      if (totalEl) totalEl.textContent = totalInterviews;
-      if (todayEl) todayEl.textContent = todayCount;
-      if (upcomingEl) upcomingEl.textContent = upcomingCount;
-      if (overdueEl) overdueEl.textContent = overdueCount;
-    }
-
-    function renderInterviewTable() {
-      const tableBody = document.querySelector("#interviewTable tbody");
-      const cardsContainer = document.getElementById('cardsViewWrapper');
-      if (!tableBody) return;
-
-      tableBody.innerHTML = "";
-      if (cardsContainer) cardsContainer.innerHTML = "";
-
-      if (filteredInterviews.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="9" class="py-12 text-center text-slate-400"><i class="fas fa-calendar-times text-lg mb-2"></i><br>No scheduled interviews found</td></tr>';
-        if (cardsContainer) {
-          cardsContainer.innerHTML = '<div class="col-span-full glass-card rounded-3xl p-10 text-center text-slate-400">No scheduled interviews found matching current filters</div>';
-        }
-        updateStats();
-        return;
-      }
-
-      filteredInterviews.forEach((interview, index) => {
-        const row = document.createElement("tr");
-        const safeName = escapeHtml(interview.name || "");
-        const interviewStatus = getInterviewStatus(interview.interview_date);
-        const recDisplay = (interview.recruiter || interview.recruiter_email || '').split("@")[0];
-
-        let modeBadge = '<span class="mode-badge">Unknown</span>';
-        if (interview.interview_mode) {
-          const mode = interview.interview_mode.toLowerCase();
-          if (mode === 'physical') {
-            modeBadge = '<span class="mode-badge mode-physical"><i class="fas fa-building"></i> Physical</span>';
-          } else if (mode === 'online') {
-            modeBadge = '<span class="mode-badge mode-online"><i class="fas fa-video"></i> Online</span>';
-          }
-        }
-
-        row.innerHTML = `
-          <td class="whitespace-nowrap font-semibold text-slate-800 dark:text-slate-200" title="${formatInterviewDateTime(interview.interview_date)}">
-            <i class="far fa-clock text-amber-500 mr-1.5"></i>${formatInterviewDateTime(interview.interview_date)}
-          </td>
-          <td title="${safeName}" class="candidate-name-clickable" data-index="${index}">
-            <strong>${safeName}</strong>
-          </td>
-          <td class="text-slate-500 dark:text-slate-400" title="${escapeHtml(interview.email || '')}">${escapeHtml(interview.email || "")}</td>
-          <td class="font-medium text-blue-600 dark:text-blue-400" title="${escapeHtml(interview.position || '')}">${escapeHtml(interview.position || "")}</td>
-          <td class="font-semibold text-slate-800 dark:text-slate-200" title="${escapeHtml(interview.company || '')}">${escapeHtml(interview.company || "")}</td>
-          <td class="text-slate-500 dark:text-slate-400">${escapeHtml(recDisplay)}</td>
-          <td>${modeBadge}</td>
-          <td class="font-medium" title="${escapeHtml(interview.final_status || '')}">${escapeHtml(interview.final_status || "Pending")}</td>
-          <td><span class="interview-badge ${interviewStatus.class}">${interviewStatus.text}</span></td>
-        `;
-
-        tableBody.appendChild(row);
-
-        // Also populate Timeline Card View
-        if (cardsContainer) {
-          const card = document.createElement('div');
-          card.className = 'glass-card rounded-2xl p-4 flex flex-col justify-between gap-3 border hover:border-blue-500/40 transition-all cursor-pointer';
-          card.onclick = () => openCandidateOptionsPopup(interview);
-          card.innerHTML = `
-            <div>
-              <div class="flex items-center justify-between gap-2 mb-2.5">
-                <span class="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                  <i class="fas fa-calendar-day"></i> ${formatInterviewDateTime(interview.interview_date)}
-                </span>
-                <span class="interview-badge ${interviewStatus.class}">${interviewStatus.text}</span>
-              </div>
-              <h4 class="font-display font-bold text-base text-blue-600 dark:text-blue-400 hover:underline">${safeName}</h4>
-              <p class="text-xs font-semibold text-slate-700 dark:text-slate-300 mt-0.5">${escapeHtml(interview.position || "")} • ${escapeHtml(interview.company || "")}</p>
-              <div class="mt-3 space-y-1 text-[11px] text-slate-500 dark:text-slate-400">
-                <p><i class="fas fa-envelope w-4"></i> ${escapeHtml(interview.email || "")}</p>
-                <p><i class="fas fa-user-tie w-4"></i> Recruiter: ${escapeHtml(recDisplay)}</p>
-              </div>
-            </div>
-            <div class="pt-3 border-t border-slate-200/70 dark:border-slate-800 flex items-center justify-between">
-              ${modeBadge}
-              <span class="text-xs font-bold text-slate-600 dark:text-slate-300">${escapeHtml(interview.final_status || "Pending")} <i class="fas fa-chevron-right text-[10px] ml-1 text-blue-500"></i></span>
-            </div>
-          `;
-          cardsContainer.appendChild(card);
-        }
-      });
-
-      // Add click handlers to candidate names
-      tableBody.querySelectorAll('.candidate-name-clickable').forEach(nameCell => {
-        nameCell.addEventListener('click', (event) => {
-          event.stopPropagation();
-          const index = parseInt(event.currentTarget.getAttribute('data-index'));
-          const candidate = filteredInterviews[index];
-          if (candidate) {
-            openCandidateOptionsPopup(candidate);
-          }
-        });
-      });
-
-      updateStats();
-    }
-
-    // ==================== SUPABASE LOAD SCHEDULED INTERVIEWS ====================
-    async function loadScheduledInterviews() {
-      console.log("Loading scheduled interviews from Supabase...");
+    // Load data from Supabase 'candidates' table (Function name preserved for compatibility)
+    async function loadDataFromSheets() {
+      showLoading(true);
+      hideError();
+      const spinIcon = document.getElementById('syncSpinnerIcon');
+      if (spinIcon) spinIcon.classList.add('fa-spin');
 
       try {
         const { data, error } = await supabaseClient
           .from('candidates')
           .select('*')
-          .not('interview_date', 'is', null)
-          .neq('interview_date', '');
+          .order('timestamp', { ascending: false });
 
         if (error) {
           throw error;
         }
 
-        const normalizedData = (data || []).map(row => ({
+        // Normalize Supabase column names to match exact UI expectations
+        candidateData = (data || []).map(row => ({
           ...row,
-          recruiter: row.recruiter || row.recruiter_email || '',
-          __powerappsid__: row.id
+          timestamp: row.timestamp || row.created_at || row.updated_at || '',
+          company: row.company || '',
+          position: row.position || '',
+          candidateName: row.name || row.candidateName || '',
+          mobile: row.mobile || row.contact || '',
+          email: row.email || '',
+          currentCTC: row.current_ctc || row.currentCTC || '',
+          expectedCTC: row.expected_ctc || row.expectedCTC || '',
+          experience: row.experience || '',
+          noticePeriod: row.notice_period || row.noticePeriod || '',
+          recruiter: row.recruiter_name || row.recruiter || row.recruiter_email || ''
         }));
 
-        console.log("Raw scheduled records received from Supabase:", normalizedData.length);
+        filteredData = [...candidateData];
 
-        const roleFilteredCandidates = filterCandidatesByUserType(normalizedData);
-        const userCandidates = roleFilteredCandidates.filter(c => {
-          const hasInterviewDate = c.interview_date && c.interview_date.toString().trim() !== "";
-          return hasInterviewDate;
-        });
-
-        console.log("Role-filtered candidates with interview dates:", userCandidates.length);
-
-        allScheduledInterviews = userCandidates.sort((a, b) => {
-          try {
-            const dateA = new Date(a.interview_date);
-            const dateB = new Date(b.interview_date);
-            return dateA - dateB;
-          } catch (error) {
-            console.error("Error sorting dates:", error);
-            return 0;
-          }
-        });
-
-        filteredInterviews = [...allScheduledInterviews];
-        loadFilterOptions();
+        populateCompanyFilter();
+        populateRecruiterFilter();
         applyFilters();
-      } catch (err) {
-        console.error("Error loading scheduled interviews from Supabase:", err);
-        showToast("Error loading interviews: " + err.message, "error");
-        const tableBody = document.querySelector("#interviewTable tbody");
-        if (tableBody) {
-          tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 30px;"><i class="fas fa-exclamation-triangle text-rose-500 text-lg mb-2"></i><br>Error loading data from Supabase. Please click Refresh.</td></tr>';
+        updateLastUpdated();
+
+        if (candidateData.length === 0) {
+          showToast('⚠️ No candidate data found in Supabase');
+        } else {
+          showToast(`✅ Successfully loaded ${candidateData.length} candidates from Supabase`);
         }
+
+      } catch (error) {
+        console.error('Error loading data from Supabase:', error);
+        showError(`Failed to load data from Supabase: ${error.message}`);
+
+        const tbody = document.getElementById('candidateTableBody');
+        tbody.innerHTML = '<tr><td colspan="11" class="no-data">Failed to load data from Supabase. Please refresh to try again.</td></tr>';
+      } finally {
+        showLoading(false);
+        if (spinIcon) spinIcon.classList.remove('fa-spin');
       }
     }
 
-    // Initialize popup event handlers after DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-      const btnUpdateStatus = getElement('btnUpdateStatus');
-      if (btnUpdateStatus) {
-        btnUpdateStatus.addEventListener('click', () => {
-          if (!currentCandidateForPopup) {
-            showToast('No candidate selected', 'error');
-            return;
-          }
-          openPopup(currentCandidateForPopup);
-          closeCandidateOptionsPopup();
-        });
+    function refreshData() {
+      loadDataFromSheets();
+    }
+
+    function showLoading(show) {
+      const loading = document.getElementById('loading');
+      const tableContainer = document.querySelector('.table-container');
+
+      if (show) {
+        loading.classList.add('show');
+        if (tableContainer) tableContainer.style.display = 'none';
+      } else {
+        loading.classList.remove('show');
+        if (tableContainer) tableContainer.style.display = 'block';
+      }
+    }
+
+    function showError(message) {
+      const error = document.getElementById('error');
+      const errorMessage = document.getElementById('errorMessage');
+      errorMessage.textContent = message;
+      error.classList.add('show');
+    }
+
+    function hideError() {
+      const error = document.getElementById('error');
+      error.classList.remove('show');
+    }
+
+    function updateLastUpdated() {
+      const now = new Date();
+      const timeString = now.toLocaleString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+      document.getElementById('lastUpdated').textContent = timeString;
+    }
+
+    function populateCompanyFilter() {
+      const companyFilter = document.getElementById('companyFilter');
+      const currentVal = companyFilter.value;
+      const companies = [...new Set(candidateData.map(item => item.company))].filter(Boolean);
+
+      companyFilter.innerHTML = '<option value="">All Companies</option>';
+
+      companies.forEach(company => {
+        const option = document.createElement('option');
+        option.value = company;
+        option.textContent = company;
+        companyFilter.appendChild(option);
+      });
+
+      if (companies.includes(currentVal)) companyFilter.value = currentVal;
+    }
+
+    function populateRecruiterFilter() {
+      const recruiterFilter = document.getElementById('recruiterFilter');
+      if (!recruiterFilter) return;
+      const currentVal = recruiterFilter.value;
+      const recruiters = [...new Set(candidateData.map(item => item.recruiter))].filter(Boolean);
+      recruiterFilter.innerHTML = '<option value="">All Recruiters</option>';
+      recruiters.forEach(rec => {
+        const option = document.createElement('option');
+        option.value = rec;
+        option.textContent = rec;
+        recruiterFilter.appendChild(option);
+      });
+      if (recruiters.includes(currentVal)) recruiterFilter.value = currentVal;
+    }
+
+    function displayTable(data) {
+      const tbody = document.getElementById('candidateTableBody');
+      const cardsContainer = document.getElementById('cardsViewWrapper');
+
+      if (data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" class="no-data">No candidates found matching the selected criteria</td></tr>';
+        if (cardsContainer) {
+          cardsContainer.innerHTML = '<div class="col-span-full glass-card rounded-3xl p-10 text-center text-slate-400">No candidates found matching the selected criteria</div>';
+        }
+        return;
       }
 
-      const btnConnectWhatsapp = getElement('btnConnectWhatsapp');
-      if (btnConnectWhatsapp) {
-        btnConnectWhatsapp.addEventListener('click', () => {
-          if (!currentCandidateForPopup) {
-            showToast('No candidate selected', 'error');
-            return;
-          }
+      tbody.innerHTML = data.map(candidate => `
+        <tr>
+          <td class="timestamp" title="${formatTimestamp(candidate.timestamp)}">${formatTimestamp(candidate.timestamp)}</td>
+          <td class="company" title="${candidate.company || ''}">${candidate.company || ''}</td>
+          <td class="position" title="${candidate.position || ''}">${candidate.position || ''}</td>
+          <td class="candidate-name" title="${candidate.candidateName || ''}">${candidate.candidateName || ''}</td>
+          <td class="mobile">
+            <a href="https://wa.me/91${(candidate.mobile || '').toString().replace(/\D/g, '').slice(-10)}" target="_blank" class="hover:underline inline-flex items-center gap-1" title="Chat on WhatsApp">
+              <i class="fab fa-whatsapp text-emerald-500"></i> ${candidate.mobile || ''}
+            </a>
+          </td>
+          <td class="email" title="${candidate.email || ''}">${candidate.email || ''}</td>
+          <td class="ctc">${candidate.currentCTC || ''}</td>
+          <td class="ctc">${candidate.expectedCTC || ''}</td>
+          <td class="experience">${candidate.experience || ''}</td>
+          <td class="notice-period">${candidate.noticePeriod || ''}</td>
+          <td class="recruiter">${candidate.recruiter || ''}</td>
+        </tr>
+      `).join('');
 
-          const mobileRaw = currentCandidateForPopup.Mobile ||
-                            currentCandidateForPopup.mobile ||
-                            currentCandidateForPopup.Phone ||
-                            currentCandidateForPopup.phone || '';
-
-          if (!mobileRaw) {
-            showToast('Mobile number not available for this candidate', 'error');
-            return;
-          }
-
-          const digitsOnly = mobileRaw.toString().replace(/\D/g, '');
-          if (!digitsOnly) {
-            showToast('Invalid mobile number', 'error');
-            return;
-          }
-
-          const waUrl = `https://wa.me/91${digitsOnly}`;
-          window.open(waUrl, '_blank');
-          closeCandidateOptionsPopup();
-        });
+      if (cardsContainer) {
+        cardsContainer.innerHTML = data.map(candidate => {
+          const cleanMob = (candidate.mobile || '').toString().replace(/\D/g, '').slice(-10);
+          return `
+            <div class="glass-card rounded-2xl p-4 flex flex-col justify-between gap-3 border hover:border-purple-500/40 transition-all">
+              <div>
+                <div class="flex items-start justify-between gap-2 mb-2">
+                  <div>
+                    <h4 class="font-display font-bold text-base text-emerald-600 dark:text-emerald-400">${candidate.candidateName || 'N/A'}</h4>
+                    <p class="text-xs font-semibold text-blue-600 dark:text-blue-400">${candidate.position || ''} • <span class="text-slate-700 dark:text-slate-200">${candidate.company || ''}</span></p>
+                  </div>
+                  <span class="text-[10px] font-semibold text-slate-400">${formatTimestamp(candidate.timestamp)}</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 my-3 p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70 text-[11px]">
+                  <div><span class="text-slate-400 block">Current / Expected</span><strong class="text-amber-600 dark:text-amber-400">${candidate.currentCTC || '-'} → ${candidate.expectedCTC || '-'}</strong></div>
+                  <div><span class="text-slate-400 block">Exp / Notice</span><strong class="text-teal-600 dark:text-teal-400">${candidate.experience || '-'} • ${candidate.noticePeriod || '-'}</strong></div>
+                </div>
+                <div class="space-y-1 text-xs text-slate-500 dark:text-slate-400">
+                  <p class="truncate"><i class="fas fa-envelope w-4 text-purple-500"></i> ${candidate.email || '-'}</p>
+                  <p><i class="fas fa-user-tie w-4 text-slate-400"></i> Recruiter: ${candidate.recruiter || '-'}</p>
+                </div>
+              </div>
+              <div class="pt-3 border-t border-slate-200/70 dark:border-slate-800 flex items-center justify-between">
+                <span class="font-mono text-xs font-bold text-slate-700 dark:text-slate-300">${candidate.mobile || ''}</span>
+                <div class="flex items-center gap-2">
+                  ${cleanMob ? `<a href="tel:${cleanMob}" class="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold"><i class="fas fa-phone"></i></a>` : ''}
+                  ${cleanMob ? `<a href="https://wa.me/91${cleanMob}" target="_blank" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center gap-1"><i class="fab fa-whatsapp"></i> Chat</a>` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
       }
-    });
+    }
 
-    console.log('Scheduled Interviews page loaded with Supabase integration, popup functionality, and role-based filtering');
+    function formatTimestamp(timestamp) {
+      if (!timestamp) return '';
+
+      try {
+        const date = new Date(timestamp);
+        if (isNaN(date.getTime())) return timestamp;
+
+        return date.toLocaleString('en-IN', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+      } catch (error) {
+        return timestamp;
+      }
+    }
+
+    function matchesDateFilter(timestamp, filter) {
+      if (!filter || !timestamp) return true;
+
+      try {
+        const candidateDate = new Date(timestamp);
+        if (isNaN(candidateDate.getTime())) return true;
+
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const dayBeforeYesterday = new Date(today);
+        dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 2);
+
+        candidateDate.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+        yesterday.setHours(0, 0, 0, 0);
+        dayBeforeYesterday.setHours(0, 0, 0, 0);
+
+        switch (filter) {
+          case 'today':
+            return candidateDate.getTime() === today.getTime();
+          case 'yesterday':
+            return candidateDate.getTime() === yesterday.getTime();
+          case 'dayBeforeYesterday':
+            return candidateDate.getTime() === dayBeforeYesterday.getTime();
+          default:
+            return true;
+        }
+      } catch (error) {
+        return true;
+      }
+    }
+
+    function applyFilters() {
+      const dateFilter = document.getElementById('dateFilter').value;
+      const companyFilter = document.getElementById('companyFilter').value;
+      const recruiterFilter = document.getElementById('recruiterFilter')?.value || '';
+      const searchQuery = (document.getElementById('searchCandidateInput')?.value || '').toLowerCase().trim();
+
+      filteredData = candidateData.filter(candidate => {
+        const matchesDate = matchesDateFilter(candidate.timestamp, dateFilter);
+        const matchesCompany = !companyFilter || candidate.company === companyFilter;
+        const matchesRecruiter = !recruiterFilter || candidate.recruiter === recruiterFilter;
+        const matchesSearch = !searchQuery ||
+          (candidate.candidateName || '').toLowerCase().includes(searchQuery) ||
+          (candidate.position || '').toLowerCase().includes(searchQuery) ||
+          (candidate.email || '').toLowerCase().includes(searchQuery) ||
+          (candidate.mobile || '').toString().toLowerCase().includes(searchQuery);
+
+        return matchesDate && matchesCompany && matchesRecruiter && matchesSearch;
+      });
+
+      displayTable(filteredData);
+      updateStats();
+    }
+
+    function clearFilters() {
+      document.getElementById('dateFilter').value = '';
+      document.getElementById('companyFilter').value = '';
+      if (document.getElementById('recruiterFilter')) document.getElementById('recruiterFilter').value = '';
+      if (document.getElementById('searchCandidateInput')) document.getElementById('searchCandidateInput').value = '';
+      filteredData = [...candidateData];
+      displayTable(filteredData);
+      updateStats();
+    }
+
+    function updateStats() {
+      document.getElementById('totalCount').textContent = candidateData.length;
+      document.getElementById('filteredCount').textContent = filteredData.length;
+
+      const todayEl = document.getElementById('todaySourcedCount');
+      if (todayEl) {
+        const todayCount = candidateData.filter(c => matchesDateFilter(c.timestamp, 'today')).length;
+        todayEl.textContent = todayCount;
+      }
+    }
+
+    // Copy table data to clipboard - PRESERVED EXACT COLUMNS & EMAIL TABLE FORMATTING
+    function copyTableData() {
+      if (filteredData.length === 0) {
+        showToast('❌ No data to copy. Please load data first.');
+        return;
+      }
+
+      let htmlTable = `
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 12px;">
+    <thead>
+        <tr style="background-color: #4a5568; color: white;">
+            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Position</th>
+            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Candidate Name</th>
+            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Mobile Number</th>
+            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Email ID</th>
+            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Current CTC</th>
+            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Expected CTC</th>
+            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Experience</th>
+            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Notice Period</th>
+        </tr>
+    </thead>
+    <tbody>`;
+
+      filteredData.forEach((candidate, index) => {
+        const rowStyle = index % 2 === 0 ? 'background-color: #f9f9f9;' : 'background-color: white;';
+        htmlTable += `
+        <tr style="${rowStyle}">
+            <td style="border: 1px solid #000; padding: 8px; color: #007bff;">${candidate.position || ''}</td>
+            <td style="border: 1px solid #000; padding: 8px; color: #28a745; font-weight: bold;">${candidate.candidateName || ''}</td>
+            <td style="border: 1px solid #000; padding: 8px; font-family: monospace;">${candidate.mobile || ''}</td>
+            <td style="border: 1px solid #000; padding: 8px; color: #6f42c1;">${candidate.email || ''}</td>
+            <td style="border: 1px solid #000; padding: 8px; color: #fd7e14; font-weight: bold;">${candidate.currentCTC || ''}</td>
+            <td style="border: 1px solid #000; padding: 8px; color: #fd7e14; font-weight: bold;">${candidate.expectedCTC || ''}</td>
+            <td style="border: 1px solid #000; padding: 8px; color: #20c997; font-weight: bold;">${candidate.experience || ''}</td>
+            <td style="border: 1px solid #000; padding: 8px; color: #dc3545; font-weight: bold;">${candidate.noticePeriod || ''}</td>
+        </tr>`;
+      });
+
+      htmlTable += `
+    </tbody>
+</table>`;
+
+      let tabSeparatedText = "Position\tCandidate Name\tMobile Number\tEmail ID\tCurrent CTC\tExpected CTC\tExperience\tNotice Period\n";
+
+      filteredData.forEach(candidate => {
+        const row = [
+          candidate.position || '',
+          candidate.candidateName || '',
+          candidate.mobile || '',
+          candidate.email || '',
+          candidate.currentCTC || '',
+          candidate.expectedCTC || '',
+          candidate.experience || '',
+          candidate.noticePeriod || ''
+        ].join('\t');
+
+        tabSeparatedText += row + "\n";
+      });
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.write) {
+          const clipboardItems = [
+            new ClipboardItem({
+              'text/html': new Blob([htmlTable], { type: 'text/html' }),
+              'text/plain': new Blob([tabSeparatedText], { type: 'text/plain' })
+            })
+          ];
+
+          navigator.clipboard.write(clipboardItems).then(() => {
+            showToast(`✅ ${filteredData.length} candidates copied! Ready to paste in emails.`);
+          });
+        } else {
+          copyToClipboardFallback(htmlTable, tabSeparatedText);
+        }
+      } catch (err) {
+        copyToClipboardFallback(htmlTable, tabSeparatedText);
+      }
+    }
+
+    function copyToClipboardFallback(htmlContent, textContent) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = htmlContent;
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      document.body.appendChild(tempDiv);
+
+      try {
+        const range = document.createRange();
+        range.selectNodeContents(tempDiv);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        document.execCommand('copy');
+        showToast(`✅ ${filteredData.length} candidates copied! Ready to paste in emails.`);
+
+        selection.removeAllRanges();
+      } catch (err) {
+        const textArea = document.createElement('textarea');
+        textArea.value = textContent;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showToast('Candidates copied as text.');
+      }
+
+      document.body.removeChild(tempDiv);
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toastMessage');
+
+      toastMessage.textContent = message;
+      toast.classList.add('show');
+
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    document.getElementById('dateFilter').addEventListener('change', applyFilters);
+    document.getElementById('companyFilter').addEventListener('change', applyFilters);
+
+    document.addEventListener('DOMContentLoaded', init);
+
+    setInterval(() => {
+      if (candidateData.length > 0) {
+        loadDataFromSheets();
+      }
+    }, 10 * 60 * 1000);
   </script>
 </body>
 </html>
