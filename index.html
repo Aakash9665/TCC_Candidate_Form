@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -5,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>TCC Portal - Login & Workspace</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS Client SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <script>
@@ -346,7 +349,7 @@
           <span>TCC Portal v2.1</span>
           <span class="inline-flex items-center gap-1.5 text-emerald-500 font-medium">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-            Cloud Connected
+            Supabase Connected
           </span>
         </div>
       </div>
@@ -687,8 +690,12 @@
   </div>
 
   <script>
-    // Google Apps Script Web App URL - Preserved exactly as provided
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyppTAVxXAgMzB9vBp_FzS4ajl3A35roDgGoPY94ABBCTNjwfx0OxTv9-CUuOa44IUT/exec';
+    // ==================== SUPABASE CONFIGURATION ====================
+    const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0'; // Paste your Supabase anon/public key here
+
+    // Initialize Supabase Client
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // Non-blocking custom notification system (replaces browser alert)
     function showToast(message, type = 'info') {
@@ -812,7 +819,7 @@
       const q = (query || '').toLowerCase().trim();
       const cards = document.querySelectorAll('#modulesGrid .nav-button');
       cards.forEach(card => {
-        if (card.id === 'sourcedProfilesBtn' && sessionStorage.getItem('userType') !== 'Admin') {
+        if (card.id === 'sourcedProfilesBtn' && (sessionStorage.getItem('userType') || '').toLowerCase() !== 'admin') {
           return;
         }
         const keywords = (card.getAttribute('data-module-title') || '') + ' ' + card.innerText.toLowerCase();
@@ -886,10 +893,10 @@
 
     // Function to check admin access and show/hide sourced profiles button
     function checkAdminAccess() {
-      const userType = sessionStorage.getItem('userType');
+      const userType = sessionStorage.getItem('userType') || '';
       const sourcedProfilesBtn = document.getElementById('sourcedProfilesBtn');
 
-      if (userType === 'Admin') {
+      if (userType.toLowerCase() === 'admin') {
         sourcedProfilesBtn.style.display = 'flex';
         console.log('Admin user detected - Sourced Profiles button enabled');
       } else {
@@ -898,12 +905,12 @@
       }
     }
 
-    // Updated handleLogin function with Google Sheets authentication
+    // Updated handleLogin function with Supabase authentication
     async function handleLogin(event) {
       event.preventDefault();
 
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
       const errorMessage = document.getElementById('errorMessage');
       const loginBtn = document.getElementById('loginBtn');
       const loginText = document.getElementById('loginText');
@@ -915,88 +922,77 @@
       errorMessage.style.display = 'none';
 
       try {
-        // Make API call to Google Apps Script
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=login&username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+        // Query Supabase 'users' table directly
+        const { data: user, error } = await supabaseClient
+          .from('users')
+          .select('*')
+          .eq('email', email)
+          .eq('password', password)
+          .single();
 
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+        if (error || !user) {
+          throw new Error('Invalid email or password. Please try again.');
         }
 
-        const result = await response.json();
-        console.log('Login response:', result);
+        // Normalize role (e.g. 'Admin' or 'User')
+        const resolvedUserType = user.user_type || user.userType || 'User';
 
-        if (result.success) {
-          // Login successful
-          loginText.textContent = 'Success!';
-          loginBtn.classList.remove('loading');
+        // Login successful
+        loginText.textContent = 'Success!';
+        loginBtn.classList.remove('loading');
+
+        setTimeout(() => {
+          document.querySelector('.container').classList.add('fade-transition');
 
           setTimeout(() => {
-            document.querySelector('.container').classList.add('fade-transition');
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('mainContainer').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('loginSuccess').style.display = 'inline-block';
+            document.getElementById('userName').textContent = user.name;
 
-            setTimeout(() => {
-              document.getElementById('loginContainer').style.display = 'none';
-              document.getElementById('mainContainer').style.display = 'block';
-              document.getElementById('userInfo').style.display = 'block';
-              document.getElementById('loginSuccess').style.display = 'inline-block';
-              document.getElementById('userName').textContent = result.user.name;
+            // Clear form
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            errorMessage.style.display = 'none';
+            loginBtn.disabled = false;
+            loginText.textContent = 'Login';
 
-              // Clear form
-              document.getElementById('email').value = '';
-              document.getElementById('password').value = '';
-              errorMessage.style.display = 'none';
-              loginBtn.disabled = false;
-              loginText.textContent = 'Login to Portal';
+            // Store complete user information from Supabase into sessionStorage
+            sessionStorage.setItem('isLoggedIn', 'true');
+            sessionStorage.setItem('userEmail', user.email || email);
+            sessionStorage.setItem('userName', user.name || '');
+            sessionStorage.setItem('userContact', user.contact || '');
+            sessionStorage.setItem('userDesignation', user.designation || '');
+            sessionStorage.setItem('userType', resolvedUserType);
+            sessionStorage.setItem('loginTime', new Date().toISOString());
+            sessionStorage.setItem('userRowIndex', user.id || '');
 
-              // Store complete user information from Google Sheets
-              sessionStorage.setItem('isLoggedIn', 'true');
-              sessionStorage.setItem('userEmail', result.user.username || email);
-              sessionStorage.setItem('userName', result.user.name || '');
-              sessionStorage.setItem('userContact', result.user.contact || '');
-              sessionStorage.setItem('userDesignation', result.user.designation || '');
-              sessionStorage.setItem('userType', result.user.userType || '');
-              sessionStorage.setItem('loginTime', result.user.loginTime || new Date().toISOString());
-              sessionStorage.setItem('userRowIndex', result.user.rowIndex || '');
+            // Check admin access after login
+            checkAdminAccess();
+            syncDashboardHeaderUI();
 
-              // Check admin access after login
-              checkAdminAccess();
-              syncDashboardHeaderUI();
+            console.log('Login successful with Supabase data:', {
+              name: user.name,
+              email: user.email,
+              contact: user.contact,
+              designation: user.designation,
+              userType: resolvedUserType
+            });
+          }, 400);
+        }, 800);
 
-              console.log('Login successful with Google Sheets data:', {
-                name: result.user.name,
-                email: result.user.username,
-                contact: result.user.contact,
-                designation: result.user.designation,
-                userType: result.user.userType
-              });
-            }, 400);
-          }, 800);
-        } else {
-          // Login failed
-          loginBtn.classList.remove('loading');
-          loginText.textContent = 'Login to Portal';
-          loginBtn.disabled = false;
-          errorMessage.textContent = result.message || 'Login failed';
-          errorMessage.style.display = 'block';
-          errorMessage.classList.add('error-shake');
-          console.log('Login failed:', result.message);
-        }
       } catch (error) {
-        // Network or other error
+        // Login or network error
         loginBtn.classList.remove('loading');
-        loginText.textContent = 'Login to Portal';
+        loginText.textContent = 'Login';
         loginBtn.disabled = false;
 
-        console.error('Login error:', error);
+        console.error('Supabase Login error:', error);
 
-        if (error.name === 'TypeError' && error.message.includes('fetch')) {
-          errorMessage.textContent = 'Network error. Please check your connection and try again.';
-        } else if (error.message.includes('CORS')) {
-          errorMessage.textContent = 'Authentication service unavailable. Please try again later.';
-        } else {
-          errorMessage.textContent = 'Login failed. Please try again.';
-        }
-
+        errorMessage.textContent = error.message || 'Invalid email or password. Please try again.';
         errorMessage.style.display = 'block';
+        errorMessage.classList.add('error-shake');
       }
     }
 
@@ -1099,9 +1095,9 @@
         if (button) button.style.transform = '';
 
         if (sessionStorage.getItem('isLoggedIn') === 'true') {
-          const userType = sessionStorage.getItem('userType');
+          const userType = sessionStorage.getItem('userType') || '';
 
-          if (userType === 'Admin') {
+          if (userType.toLowerCase() === 'admin') {
             console.log('Navigating to sourced_profile.html with admin user data:', {
               email: sessionStorage.getItem('userEmail'),
               name: sessionStorage.getItem('userName'),
@@ -1127,9 +1123,9 @@
         if (button) button.style.transform = '';
 
         if (sessionStorage.getItem('isLoggedIn') === 'true') {
-          const userType = sessionStorage.getItem('userType');
+          const userType = sessionStorage.getItem('userType') || '';
 
-          if (userType === 'Admin') {
+          if (userType.toLowerCase() === 'admin') {
             console.log('Navigating to Whatsapp_Sender.html with admin user data:', {
               email: sessionStorage.getItem('userEmail'),
               name: sessionStorage.getItem('userName'),
@@ -1150,11 +1146,12 @@
     window.addEventListener('keydown', function(e) {
       if (sessionStorage.getItem('isLoggedIn') !== 'true') return;
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+      const isAdmin = (sessionStorage.getItem('userType') || '').toLowerCase() === 'admin';
       if (e.key === '1') navigateToEntry();
       if (e.key === '2') navigateToManagement();
       if (e.key === '3') navigateToInterviews();
-      if (e.key === '4' && sessionStorage.getItem('userType') === 'Admin') navigateToSourcedProfiles();
-      if (e.key === '5' && sessionStorage.getItem('userType') === 'Admin') navigateToWhatsapp();
+      if (e.key === '4' && isAdmin) navigateToSourcedProfiles();
+      if (e.key === '5' && isAdmin) navigateToWhatsapp();
     });
 
     // Check login state on page load
@@ -1176,7 +1173,7 @@
         checkAdminAccess();
         syncDashboardHeaderUI();
 
-        console.log('User already logged in with Google Sheets data:', {
+        console.log('User already logged in with Supabase session data:', {
           name: userName,
           email: userEmail,
           designation: userDesignation,
@@ -1216,7 +1213,7 @@
     };
 
     window.isAdminUser = function() {
-      return sessionStorage.getItem('userType') === 'Admin';
+      return (sessionStorage.getItem('userType') || '').toLowerCase() === 'admin';
     };
   </script>
 </body>
