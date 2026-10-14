@@ -1,739 +1,827 @@
+```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>TCC Candidate Registration</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    :root {
-      --primary-color: #2563eb;
-      --primary-dark: #1e40af;
-      --primary-light: #3b82f6;
-      --primary-extra-light: #dbeafe;
-      --secondary-color: #64748b;
-      --success-color: #10b981;
-      --warning-color: #f59e0b;
-      --error-color: #ef4444;
-      --whatsapp-color: #25D366;
-      --background-primary: #f8fafc;
-      --background-secondary: #ffffff;
-      --background-tertiary: #f1f5f9;
-      --text-primary: #0f172a;
-      --text-secondary: #64748b;
-      --text-tertiary: #94a3b8;
-      --border-color: #e2e8f0;
-      --border-light: #f1f5f9;
-      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-      --radius-sm: 0.375rem;
-      --radius-md: 0.5rem;
-      --radius-lg: 0.75rem;
-      --radius-xl: 1rem;
-      --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
-      --gradient-whatsapp: linear-gradient(135deg, var(--whatsapp-color) 0%, #128C7E 100%);
-    }
-
-    /* Home Button */
-    .home-button {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      width: 50px;
-      height: 50px;
-      background: rgba(255, 255, 255, 0.15);
-      border: none;
-      border-radius: 25px;
-      color: white;
-      font-size: 20px;
-      cursor: pointer;
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      z-index: 1000;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    }
-
-    .home-button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      transition: left 0.6s ease;
-    }
-
-    .home-button:hover::before {
-      left: 100%;
-    }
-
-    .home-button:hover {
-      background: rgba(255, 255, 255, 0.25);
-      transform: scale(1.1) rotate(5deg);
-      box-shadow: 0 12px 40px rgba(255, 255, 255, 0.2);
-    }
-
-    .home-button:active {
-      transform: scale(1.05) rotate(5deg);
-    }
-
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      -webkit-tap-highlight-color: transparent;
     }
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: linear-gradient(135deg, var(--background-primary) 0%, #e0f2fe 100%);
-      color: var(--text-primary);
-      line-height: 1.5;
-      font-size: 14px;
       min-height: 100vh;
-      padding: 24px;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
+      background-image:
+        radial-gradient(circle at 10% 15%, rgba(59, 130, 246, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 90% 85%, rgba(16, 185, 129, 0.15) 0%, transparent 45%);
     }
-    form {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(20px) saturate(180%);
-      padding: 32px;
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-xl);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      max-width: 700px;
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(226, 232, 240, 0.85);
+      box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.08);
+    }
+
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.82);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+    }
+
+    .form-input {
       width: 100%;
-      position: relative;
-      animation: formSlideUp 0.6s ease-out;
-    }
-    @keyframes formSlideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    form::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: var(--gradient-primary);
-      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 28px;
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--text-primary);
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: var(--text-primary);
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 12px 16px;
-      margin-bottom: 20px;
-      border-radius: var(--radius-md);
-      border: 1.5px solid var(--border-color);
+      padding: 12px 15px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(148, 163, 184, 0.3);
+      background: rgba(248, 250, 252, 0.9);
+      color: #0f172a;
       font-size: 14px;
-      background: var(--background-secondary);
-      color: var(--text-primary);
-      font-weight: 400;
-      transition: all 0.3s ease;
+      transition: all 0.22s ease;
     }
-    input:focus, select:focus {
+
+    .dark .form-input {
+      background: rgba(30, 41, 59, 0.75);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #f8fafc;
+    }
+
+    .form-input:focus {
       outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-      transform: translateY(-1px);
-      background: rgba(255, 255, 255, 0.95);
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
     }
-    .inline-group {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .inline-group input, .inline-group select {
-      margin-bottom: 0;
-    }
-    .checkbox-group {
-      display: flex;
-      align-items: center;
-      margin-top: -8px;
-      margin-bottom: 20px;
-      padding: 12px 16px;
-      background: rgba(37, 99, 235, 0.04);
-      border-radius: var(--radius-md);
-      border: 1px solid rgba(37, 99, 235, 0.1);
-    }
-    .checkbox-group input[type="checkbox"] {
-      margin-right: 12px;
-      margin-bottom: 0;
-      width: 18px;
-      height: 18px;
-      accent-color: var(--primary-color);
-      cursor: pointer;
-    }
-    .checkbox-group label {
-      margin-bottom: 0;
-      font-weight: 500;
-      cursor: pointer;
-      text-transform: none;
-      letter-spacing: normal;
-      color: var(--text-primary);
-    }
-    button {
-      background: var(--gradient-primary);
-      color: white;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: var(--shadow-md);
-    }
-    button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: left 0.5s;
-    }
-    button:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
-    button:hover::before {
-      left: 100%;
-    }
-    button:disabled {
-      opacity: 0.7;
+
+    .form-input:disabled {
+      opacity: 0.5;
       cursor: not-allowed;
-      transform: none;
     }
-    .secondary {
-      background: rgba(255, 255, 255, 0.8);
-      color: var(--text-primary);
-      border: 1.5px solid var(--border-color);
-      backdrop-filter: blur(10px);
-    }
-    .secondary:hover:not(:disabled) {
-      background: rgba(255, 255, 255, 0.95);
-      border-color: var(--primary-color);
-      transform: translateY(-2px);
-    }
-    .danger {
-      background: linear-gradient(135deg, var(--error-color), #dc2626);
-      color: white;
-    }
-    .danger:hover:not(:disabled) {
-      background: linear-gradient(135deg, #dc2626, #b91c1c);
-    }
+
     #positionDiv {
       display: none;
       animation: slideDown 0.3s ease-out;
     }
+
     @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-10px); }
+      from { opacity: 0; transform: translateY(-8px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .loading-spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 0.8s ease-in-out infinite;
-      margin-right: 8px;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+
+    /* Popup Overlay Preserved Classes */
     .popup-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(20px) saturate(180%);
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      background: rgba(2, 6, 23, 0.65);
+      backdrop-filter: blur(12px);
       display: none;
       align-items: center;
       justify-content: center;
-      border-radius: var(--radius-xl);
-      animation: overlayFadeIn 0.3s ease-out;
+      padding: 16px;
+      overflow-y: auto;
     }
-    @keyframes overlayFadeIn {
-      from { opacity: 0; backdrop-filter: blur(0px); }
-      to { opacity: 1; backdrop-filter: blur(20px) saturate(180%); }
-    }
+
     .popup {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(40px) saturate(200%);
-      padding: 28px 32px;
-      border-radius: var(--radius-xl);
-      width: 90%;
-      max-width: 450px;
-      text-align: center;
-      box-shadow: 
-        0 25px 50px -12px rgba(0, 0, 0, 0.25),
-        0 0 0 1px rgba(255, 255, 255, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      animation: popupSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      width: 100%;
+      max-width: 460px;
+      border-radius: 24px;
+      padding: 28px;
       position: relative;
+      animation: popupScale 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    .popup::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: var(--gradient-whatsapp);
-      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+
+    .popup.manage-popup {
+      max-width: 680px;
+      max-height: 90vh;
+      overflow-y: auto;
     }
-    @keyframes popupSlideUp {
-      from { opacity: 0; transform: translateY(40px) scale(0.9); }
+
+    @keyframes popupScale {
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .popup img {
-      width: 64px;
-      margin-bottom: 16px;
-      filter: drop-shadow(0 4px 8px rgba(37, 211, 102, 0.3));
-    }
-    .popup h3 {
-      margin-bottom: 12px;
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text-primary);
-    }
-    .popup p {
-      margin-bottom: 24px;
-      color: var(--text-secondary);
-      font-size: 14px;
-    }
-    .popup button {
-      margin: 8px 6px;
-      padding: 12px 24px;
-      border-radius: var(--radius-md);
-      border: none;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      min-width: 120px;
-    }
-    #sendBtn {
-      background: var(--gradient-whatsapp);
-      color: white;
-      box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
-    }
-    #sendBtn:hover {
-      background: linear-gradient(135deg, #128C7E, var(--whatsapp-color));
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
-    }
-    #cancelBtn {
-      background: rgba(255, 255, 255, 0.8);
-      color: var(--text-secondary);
-      border: 1.5px solid var(--border-color);
-    }
-    #cancelBtn:hover {
-      background: rgba(255, 255, 255, 0.95);
-      color: var(--text-primary);
-      border-color: var(--primary-color);
-      transform: translateY(-2px);
-    }
-    .popup.manage-popup {
-      text-align: left;
-      max-width: 620px;
-    }
-    .popup.manage-popup::before {
-      background: var(--gradient-primary);
-    }
-    .popup.manage-popup h3 {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-    .popup.manage-popup label {
-      margin-top: 12px;
-    }
-    .popup.manage-popup input,
-    .popup.manage-popup select {
-      margin-bottom: 16px;
-    }
-    .popup.manage-popup hr {
-      margin: 20px 0;
-      border: none;
-      border-top: 1px solid rgba(37, 99, 235, 0.1);
-    }
-    .popup.manage-popup .button-group {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px;
-    }
-    .popup.manage-popup .button-group button {
-      flex: 1;
-      margin: 0;
-    }
-    .close-button {
-      float: right;
-      margin-top: 16px;
-    }
+
     .loading {
-      opacity: 0.6;
+      opacity: 0.55;
       pointer-events: none;
     }
-    .file-upload-section {
-      background: rgba(16, 185, 129, 0.04);
-      border: 1px solid rgba(16, 185, 129, 0.2);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      margin-bottom: 16px;
-    }
-    .file-upload-section h4 {
-      margin-bottom: 12px;
-      color: var(--success-color);
-      font-size: 14px;
-      font-weight: 600;
-    }
+
+    /* Dynamic File Upload Styles for JS-generated inputs */
     .file-input-group {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 8px;
-      align-items: end;
+      display: flex;
+      flex-direction: column;
+       sm:flex-row;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.06);
+      border: 1px dashed rgba(16, 185, 129, 0.35);
       margin-bottom: 8px;
     }
+
     .file-input {
       display: none;
     }
+
     .file-input-label {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 8px 12px;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      border-radius: var(--radius-md);
+      padding: 8px 14px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 10px;
       cursor: pointer;
       font-size: 12px;
-      font-weight: 500;
-      color: var(--success-color);
-      margin-bottom: 0;
-      text-transform: none;
-      letter-spacing: normal;
-      width: 100%;
-      min-height: 36px;
+      font-weight: 600;
+      color: #10b981;
+      transition: all 0.2s ease;
     }
+
     .file-input-label:hover {
-      background: rgba(16, 185, 129, 0.15);
-      border-color: var(--success-color);
+      background: rgba(16, 185, 129, 0.25);
     }
+
     .file-status {
       font-size: 11px;
-      color: var(--text-secondary);
-      margin-top: 4px;
+      color: #94a3b8;
+      text-align: center;
     }
+
     .file-status.success {
-      color: var(--success-color);
+      color: #10b981;
+      font-weight: 600;
     }
+
     .file-status.error {
-      color: var(--error-color);
-    }
-    @media (max-width: 768px) {
-      body {
-        padding: 16px;
-      }
-      form {
-        padding: 24px;
-      }
-      h2 {
-        font-size: 24px;
-      }
-      .inline-group {
-        grid-template-columns: 1fr;
-        gap: 0;
-      }
-      .popup {
-        padding: 20px 24px;
-        margin: 16px;
-      }
-      .popup.manage-popup {
-        max-width: 95vw;
-      }
-      .popup.manage-popup .button-group {
-        flex-direction: column;
-      }
-      .close-button {
-        float: none;
-        width: 100%;
-      }
-      .file-input-group {
-        grid-template-columns: 1fr;
-      }
-      .home-button {
-        top: 15px;
-        left: 15px;
-        width: 45px;
-        height: 45px;
-        font-size: 18px;
-        border-radius: 22.5px;
-      }
+      color: #ef4444;
+      font-weight: 600;
     }
   </style>
 </head>
-<body>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-12 selection:bg-blue-500 selection:text-white">
 
-<!-- Home Button -->
-<button class="home-button" onclick="goHome()" title="Home">
-  🏠
-</button>
+  <!-- Custom Toast Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-[2000] flex flex-col gap-2.5 max-w-sm w-full px-4 pointer-events-none"></div>
 
-<form id="jobForm">
-  <h2>
-    <i class="fas fa-user-plus"></i>
-    Candidate Registration
-  </h2>
-  <label for="name"><i class="fas fa-user"></i> Full Name</label>
-  <input type="text" id="name" name="name" placeholder="Enter candidate's full name" required>
-  <label for="email"><i class="fas fa-envelope"></i> Email Address</label>
-  <input type="email" id="email" name="email" placeholder="candidate@email.com" required>
-  <label for="contact"><i class="fas fa-phone"></i> Contact Number</label>
-  <input type="tel" id="contact" name="contact" placeholder="Enter 10-digit mobile number" required>
-  <label for="currentCTC"><i class="fas fa-rupee-sign"></i> Current CTC</label>
-  <div class="inline-group">
-    <input type="number" Step="any" id="currentCTC" name="currentCTC" placeholder="e.g. 5.5 or 45000" required>
-    <select id="currentCTCUnit" name="currentCTCUnit" required>
-      <option value="LPA">LPA</option>
-      <option value="Monthly">Monthly</option>
-    </select>
-  </div>
-  <label for="expectedCTC"><i class="fas fa-chart-line"></i> Expected CTC</label>
-  <div class="inline-group">
-    <input type="number" Step="any" id="expectedCTC" name="expectedCTC" placeholder="e.g. 7.0 or 60000" required>
-    <select id="expectedCTCUnit" name="expectedCTCUnit" required>
-      <option value="LPA">LPA</option>
-      <option value="Monthly">Monthly</option>
-    </select>
-  </div>
-  <div class="checkbox-group">
-    <input type="checkbox" id="asPerCompany" name="asPerCompany">
-    <label for="asPerCompany">
-      <i class="fas fa-handshake"></i>
-      Negotiate as per company budget
-    </label>
-  </div>
-  <label for="experience"><i class="fas fa-briefcase"></i> Total Experience</label>
-  <div class="inline-group">
-    <input type="number" id="experience" name="experience" placeholder="e.g. 3" required>
-    <select id="experienceUnit" name="experienceUnit">
-      <option value="Years">Years</option>
-      <option value="Months">Months</option>
-    </select>
-  </div>
-  <div class="checkbox-group">
-    <input type="checkbox" id="isFresher" name="isFresher">
-    <label for="isFresher">
-      <i class="fas fa-graduation-cap"></i>
-      Fresh Graduate (No Experience)
-    </label>
-  </div>
-  <label for="noticePeriod"><i class="fas fa-calendar-alt"></i> Notice Period</label>
-  <div class="inline-group">
-    <input type="number" id="noticePeriod" name="noticePeriod" placeholder="e.g. 30" required>
-    <select id="noticePeriodUnit" name="noticePeriodUnit">
-      <option value="Days">Days</option>
-      <option value="Months">Months</option>
-    </select>
-  </div>
-  <div class="checkbox-group">
-    <input type="checkbox" id="immediateJoiner" name="immediateJoiner">
-    <label for="immediateJoiner">
-      <i class="fas fa-rocket"></i>
-      Available to join immediately
-    </label>
-  </div>
-  <label for="company"><i class="fas fa-building"></i> Select Company</label>
-  <select id="company" name="company" required>
-    <option value="">-- Choose Company --</option>
-  </select>
-  <div id="positionDiv">
-    <label for="position"><i class="fas fa-user-tie"></i> Open Position</label>
-    <select id="position" name="position" required>
-      <option value="">-- Choose Position --</option>
-    </select>
-  </div>
-  <label for="recruiterEmail"><i class="fas fa-user-check"></i> Recruiter</label>
-  <input type="text" id="recruiterDisplay" name="recruiterDisplay" readonly style="background: #f8f9fa; cursor: not-allowed;">
-  <input type="hidden" id="recruiterEmail" name="recruiterEmail">
-  
-  <button type="submit" id="submitBtn">
-    <i class="fas fa-paper-plane"></i>
-    <span class="btn-text">Submit Application</span>
-  </button>
-  <button type="button" id="manageCompanyBtn" class="secondary" style="margin-top: 8px;">
-    <i class="fas fa-cogs"></i>
-    Manage Companies & Positions
-  </button>
-  <!-- WhatsApp Popup -->
-  <div class="popup-overlay" id="popupOverlay">
-    <div class="popup">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Logo">
-      <h3><i class="fab fa-whatsapp"></i> Send via WhatsApp</h3>
-      <p>Click send to open WhatsApp with candidate details pre-filled.</p>
-      <button id="sendBtn">
-        <i class="fab fa-whatsapp"></i>
-        Send to Candidate
-      </button>
-      <button id="cancelBtn" class="secondary">
-        <i class="fas fa-times"></i>
-        Cancel
-      </button>
-    </div>
-  </div>
-  <!-- Manage Companies Popup -->
-  <div class="popup-overlay" id="manageOverlay">
-    <div class="popup manage-popup">
-      <h3><i class="fas fa-building"></i> Company & JD Management</h3>
-      
-      <label for="newCompanyName"><i class="fas fa-plus-circle"></i> New Company Name</label>
-      <input type="text" id="newCompanyName" placeholder="e.g. Acme Corporation">
-      
-      <label for="newCompanyPositions"><i class="fas fa-list"></i> Initial Positions</label>
-      <input type="text" id="newCompanyPositions" placeholder="e.g. Developer, Manager (comma separated)">
-      
-      <div class="file-upload-section">
-        <h4><i class="fas fa-file-pdf"></i> Upload Job Descriptions (Optional)</h4>
-        <div id="newCompanyFileInputs"></div>
+  <!-- Custom Confirmation Dialog Modal (Replaces native confirm()) -->
+  <div id="confirmDialogModal" class="fixed inset-0 z-[2100] bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-card rounded-3xl max-w-md w-full p-6 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-rose-500/15 text-rose-500 flex items-center justify-center mx-auto mb-4 text-xl">
+        <i class="fas fa-triangle-exclamation"></i>
       </div>
-      
-      <button type="button" id="addCompanyBtn">
-        <i class="fas fa-plus"></i>
-        Add New Company
-      </button>
-      
-      <hr>
-      
-      <label for="existingCompanySelect"><i class="fas fa-building"></i> Select Company</label>
-      <select id="existingCompanySelect">
-        <option value="">-- Select Company --</option>
-      </select>
-      
-      <label for="addPositionsInput"><i class="fas fa-briefcase"></i> Add Positions</label>
-      <input type="text" id="addPositionsInput" placeholder="e.g. Product Manager, Data Analyst (comma separated)">
-      
-      <div class="file-upload-section">
-        <h4><i class="fas fa-file-pdf"></i> Upload Job Descriptions</h4>
-        <div id="existingCompanyFileInputs"></div>
-      </div>
-      
-      <button type="button" id="addPositionsBtn">
-        <i class="fas fa-plus"></i>
-        Add Positions
-      </button>
-      
-      <label for="existingPositionSelect"><i class="fas fa-list-ul"></i> Existing Positions</label>
-      <select id="existingPositionSelect">
-        <option value="">-- Select Position --</option>
-      </select>
-      
-      <div class="button-group">
-        <button type="button" id="deletePositionBtn" class="danger">
-          <i class="fas fa-trash"></i>
-          Delete Position & JD
+      <h4 class="font-display font-bold text-lg text-slate-900 dark:text-white mb-2">Confirm Action</h4>
+      <p id="confirmDialogText" class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-6"></p>
+      <div class="flex items-center gap-3">
+        <button type="button" id="confirmCancelBtn" class="flex-1 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm">
+          Cancel
         </button>
-        <button type="button" id="deleteCompanyBtn" class="danger">
-          <i class="fas fa-trash-alt"></i>
-          Delete Company & All JDs
+        <button type="button" id="confirmAcceptBtn" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-rose-600/25">
+          Yes, Delete
         </button>
       </div>
-      
-      <button type="button" id="manageCloseBtn" class="secondary close-button">
-        <i class="fas fa-times"></i>
-        Close
-      </button>
     </div>
   </div>
-</form>
 
-<script>
-// Authentication and user data management
-window.addEventListener('load', function() {
-    console.log("Page loaded - checking authentication...");
-    
-    // Get all user data from sessionStorage
-    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-    const userEmail = sessionStorage.getItem('userEmail');
-    const userName = sessionStorage.getItem('userName');
-    const userContact = sessionStorage.getItem('userContact');
-    const userDesignation = sessionStorage.getItem('userDesignation');
-    const userType = sessionStorage.getItem('userType');
-    const loginTime = sessionStorage.getItem('loginTime');
-    
-    // Check if user is authenticated
-    if (isLoggedIn !== 'true') {
-        alert("Session expired or not logged in. Redirecting to login page.");
-        window.location.href = 'index.html';
-        return;
+  <!-- Sticky Top Navigation Header -->
+  <header class="sticky top-0 z-40 glass-card border-b border-slate-200/70 dark:border-slate-800/80 px-4 sm:px-6 py-3">
+    <div class="max-w-6xl mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <!-- Home Button (Preserves .home-button and onclick="goHome()") -->
+        <button class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-500/10 hover:bg-blue-500 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0" onclick="goHome()" title="Back to Dashboard">
+          <i class="fas fa-house text-base"></i>
+        </button>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-display font-extrabold text-sm sm:text-lg text-slate-900 dark:text-white leading-tight">
+              Candidate Registration
+            </h1>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+              Entry Module
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
+            Submit candidate profile to Power Automate & trigger WhatsApp confirmation
+          </p>
+        </div>
+      </div>
+
+      <!-- Progress Pill & Controls -->
+      <div class="flex items-center gap-2.5">
+        <div class="hidden md:flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          <span class="text-[11px] font-semibold text-slate-500">Completion</span>
+          <div class="w-20 h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+            <div id="formProgressBar" class="h-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <span id="formProgressText" class="text-[11px] font-bold text-blue-600 dark:text-blue-400">0%</span>
+        </div>
+
+        <button type="button" onclick="document.documentElement.classList.toggle('dark')" class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300" title="Toggle Theme">
+          <i class="fas fa-sun text-xs hidden dark:inline text-amber-400"></i>
+          <i class="fas fa-moon text-xs inline dark:hidden"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 pt-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+      <!-- ==================== LEFT / MAIN COLUMN: REGISTRATION FORM (#jobForm) ==================== -->
+      <div class="lg:col-span-8">
+        <form id="jobForm" class="glass-card rounded-3xl p-5 sm:p-8 relative overflow-hidden">
+          <!-- Top Gradient Highlight -->
+          <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-emerald-500"></div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-5 mb-6 border-b border-slate-200/70 dark:border-slate-800/80">
+            <h2 class="font-display text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2.5">
+              <span class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-sm shadow-md shadow-blue-600/25">
+                <i class="fas fa-user-plus"></i>
+              </span>
+              <span>Candidate Profile Details</span>
+            </h2>
+
+            <button type="button" onclick="resetCandidateFormClean()" class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors">
+              <i class="fas fa-rotate-left"></i>
+              Reset Fields
+            </button>
+          </div>
+
+          <!-- Section 1: Personal & Contact Info -->
+          <div class="mb-6">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-3 flex items-center gap-1.5">
+              <i class="fas fa-address-card"></i>
+              1. Personal & Contact Information
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="sm:col-span-2">
+                <label for="name" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                  <i class="fas fa-user text-blue-500 mr-1"></i> Full Name
+                </label>
+                <input type="text" id="name" name="name" class="form-input" placeholder="Enter candidate's full name" required>
+              </div>
+
+              <div>
+                <label for="email" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                  <i class="fas fa-envelope text-blue-500 mr-1"></i> Email Address
+                </label>
+                <input type="email" id="email" name="email" class="form-input" placeholder="candidate@email.com" required>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label for="contact" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300">
+                    <i class="fas fa-phone text-blue-500 mr-1"></i> Contact Number
+                  </label>
+                  <button type="button" onclick="cleanPhoneNumber()" class="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline">
+                    Clean +91/Spaces
+                  </button>
+                </div>
+                <input type="tel" id="contact" name="contact" class="form-input" placeholder="Enter 10-digit mobile number" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Compensation & Experience -->
+          <div class="mb-6 pt-5 border-t border-slate-200/60 dark:border-slate-800/80">
+            <div class="flex items-center justify-between mb-3">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                <i class="fas fa-indian-rupee-sign"></i>
+                2. Compensation & Experience
+              </p>
+              <!-- Live Calculated Hike Badge -->
+              <span id="liveHikeBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hidden">
+                Hike: 0%
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Current CTC -->
+              <div>
+                <label for="currentCTC" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                  <i class="fas fa-rupee-sign text-emerald-500 mr-1"></i> Current CTC
+                </label>
+                <div class="inline-group grid grid-cols-3 gap-2">
+                  <input type="number" step="any" id="currentCTC" name="currentCTC" class="form-input col-span-2" placeholder="e.g. 5.5 or 45000" required>
+                  <select id="currentCTCUnit" name="currentCTCUnit" class="form-input" required>
+                    <option value="LPA">LPA</option>
+                    <option value="Monthly">Monthly</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Expected CTC -->
+              <div>
+                <label for="expectedCTC" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                  <i class="fas fa-chart-line text-emerald-500 mr-1"></i> Expected CTC
+                </label>
+                <div class="inline-group grid grid-cols-3 gap-2">
+                  <input type="number" step="any" id="expectedCTC" name="expectedCTC" class="form-input col-span-2" placeholder="e.g. 7.0 or 60000" required>
+                  <select id="expectedCTCUnit" name="expectedCTCUnit" class="form-input" required>
+                    <option value="LPA">LPA</option>
+                    <option value="Monthly">Monthly</option>
+                  </select>
+                </div>
+                <div class="checkbox-group mt-2 flex items-center gap-2.5 px-3 py-2 rounded-xl bg-blue-500/5 border border-blue-500/15">
+                  <input type="checkbox" id="asPerCompany" name="asPerCompany" class="w-4 h-4 accent-blue-600 rounded cursor-pointer">
+                  <label for="asPerCompany" class="text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                    <i class="fas fa-handshake text-blue-500 mr-1"></i> Negotiate as per company budget
+                  </label>
+                </div>
+              </div>
+
+              <!-- Total Experience -->
+              <div>
+                <label for="experience" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                  <i class="fas fa-briefcase text-indigo-500 mr-1"></i> Total Experience
+                </label>
+                <div class="inline-group grid grid-cols-3 gap-2">
+                  <input type="number" step="any" id="experience" name="experience" class="form-input col-span-2" placeholder="e.g. 3" required>
+                  <select id="experienceUnit" name="experienceUnit" class="form-input">
+                    <option value="Years">Years</option>
+                    <option value="Months">Months</option>
+                  </select>
+                </div>
+                <div class="checkbox-group mt-2 flex items-center gap-2.5 px-3 py-2 rounded-xl bg-indigo-500/5 border border-indigo-500/15">
+                  <input type="checkbox" id="isFresher" name="isFresher" class="w-4 h-4 accent-indigo-600 rounded cursor-pointer">
+                  <label for="isFresher" class="text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                    <i class="fas fa-graduation-cap text-indigo-500 mr-1"></i> Fresh Graduate (No Experience)
+                  </label>
+                </div>
+              </div>
+
+              <!-- Notice Period -->
+              <div>
+                <label for="noticePeriod" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                  <i class="fas fa-calendar-alt text-amber-500 mr-1"></i> Notice Period
+                </label>
+                <div class="inline-group grid grid-cols-3 gap-2">
+                  <input type="number" id="noticePeriod" name="noticePeriod" class="form-input col-span-2" placeholder="e.g. 30" required>
+                  <select id="noticePeriodUnit" name="noticePeriodUnit" class="form-input">
+                    <option value="Days">Days</option>
+                    <option value="Months">Months</option>
+                  </select>
+                </div>
+                <div class="checkbox-group mt-2 flex items-center gap-2.5 px-3 py-2 rounded-xl bg-amber-500/5 border border-amber-500/15">
+                  <input type="checkbox" id="immediateJoiner" name="immediateJoiner" class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                  <label for="immediateJoiner" class="text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                    <i class="fas fa-rocket text-amber-500 mr-1"></i> Available to join immediately
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Client Company & Recruiter Attribution -->
+          <div class="mb-6 pt-5 border-t border-slate-200/60 dark:border-slate-800/80">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-3 flex items-center gap-1.5">
+              <i class="fas fa-building"></i>
+              3. Client Company & Role Selection
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label for="company" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                  <i class="fas fa-building text-purple-500 mr-1"></i> Select Company
+                </label>
+                <select id="company" name="company" class="form-input" required>
+                  <option value="">-- Choose Company --</option>
+                </select>
+              </div>
+
+              <div id="positionDiv">
+                <label for="position" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                  <i class="fas fa-user-tie text-purple-500 mr-1"></i> Open Position
+                </label>
+                <select id="position" name="position" class="form-input" required>
+                  <option value="">-- Choose Position --</option>
+                </select>
+              </div>
+
+              <div class="sm:col-span-2">
+                <label for="recruiterDisplay" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
+                  <i class="fas fa-user-check text-blue-500 mr-1"></i> Submitting Recruiter
+                </label>
+                <input type="text" id="recruiterDisplay" name="recruiterDisplay" readonly class="form-input opacity-80 cursor-not-allowed">
+                <input type="hidden" id="recruiterEmail" name="recruiterEmail">
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons (Preserves #submitBtn and #manageCompanyBtn) -->
+          <div class="flex flex-col sm:flex-row gap-3 pt-2">
+            <button type="submit" id="submitBtn" class="flex-1 py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm sm:text-base shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fas fa-paper-plane"></i>
+              <span class="btn-text">Submit Application</span>
+            </button>
+
+            <button type="button" id="manageCompanyBtn" class="secondary py-4 px-5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <i class="fas fa-cogs text-blue-500"></i>
+              <span>Manage Companies & JDs</span>
+            </button>
+          </div>
+
+          <!-- ==================== WHATSAPP POPUP (#popupOverlay) ==================== -->
+          <div class="popup-overlay" id="popupOverlay">
+            <div class="popup glass-card text-center">
+              <div class="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Logo" class="w-10 h-10">
+              </div>
+              <h3 class="font-display font-extrabold text-xl text-slate-900 dark:text-white mb-2">
+                <i class="fab fa-whatsapp text-emerald-500 mr-1"></i> Application Submitted!
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-6">
+                Candidate profile has been logged. Click below to open WhatsApp with the pre-filled acknowledgement message.
+              </p>
+              <div class="flex flex-col sm:flex-row gap-2.5">
+                <button type="button" id="sendBtn" class="flex-1 py-3.5 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 cursor-pointer">
+                  <i class="fab fa-whatsapp text-base"></i>
+                  Send to Candidate
+                </button>
+                <button type="button" id="cancelBtn" class="secondary py-3.5 px-5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-sm flex items-center justify-center gap-2 cursor-pointer">
+                  <i class="fas fa-times"></i>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== MANAGE COMPANIES POPUP (#manageOverlay) ==================== -->
+          <div class="popup-overlay" id="manageOverlay">
+            <div class="popup manage-popup glass-card text-left">
+              <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200 dark:border-slate-800">
+                <h3 class="font-display font-extrabold text-lg sm:text-xl text-slate-900 dark:text-white flex items-center gap-2">
+                  <i class="fas fa-building text-blue-500"></i>
+                  Company & JD Management
+                </h3>
+                <button type="button" id="manageCloseBtn" class="secondary close-button w-9 h-9 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+
+              <!-- Section A: Add New Company -->
+              <div class="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/15 mb-6 space-y-3">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
+                  <i class="fas fa-plus-circle"></i> Add New Client Company
+                </h4>
+
+                <div>
+                  <label for="newCompanyName" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Company Name</label>
+                  <input type="text" id="newCompanyName" class="form-input" placeholder="e.g. Acme Corporation">
+                </div>
+
+                <div>
+                  <label for="newCompanyPositions" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Initial Positions (comma separated)</label>
+                  <input type="text" id="newCompanyPositions" class="form-input" placeholder="e.g. Developer, Manager">
+                </div>
+
+                <div class="file-upload-section pt-1">
+                  <p class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-2">
+                    <i class="fas fa-file-pdf mr-1"></i> Upload Job Descriptions (Optional, PDF max 10MB)
+                  </p>
+                  <div id="newCompanyFileInputs"></div>
+                </div>
+
+                <button type="button" id="addCompanyBtn" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 cursor-pointer">
+                  <i class="fas fa-plus"></i>
+                  Add New Company
+                </button>
+              </div>
+
+              <!-- Section B: Manage Existing Company & Positions -->
+              <div class="p-4 rounded-2xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-3">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
+                  <i class="fas fa-sliders"></i> Modify Existing Company & Positions
+                </h4>
+
+                <div>
+                  <label for="existingCompanySelect" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Select Company</label>
+                  <select id="existingCompanySelect" class="form-input">
+                    <option value="">-- Select Company --</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="addPositionsInput" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Add New Positions (comma separated)</label>
+                  <input type="text" id="addPositionsInput" class="form-input" placeholder="e.g. Product Manager, Data Analyst">
+                </div>
+
+                <div class="file-upload-section pt-1">
+                  <p class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-2">
+                    <i class="fas fa-file-pdf mr-1"></i> Upload Job Descriptions for New Positions
+                  </p>
+                  <div id="existingCompanyFileInputs"></div>
+                </div>
+
+                <button type="button" id="addPositionsBtn" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 cursor-pointer">
+                  <i class="fas fa-plus"></i>
+                  Add Positions to Selected Company
+                </button>
+
+                <hr class="border-slate-200 dark:border-slate-800 my-3">
+
+                <div>
+                  <label for="existingPositionSelect" class="block text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">Existing Positions</label>
+                  <select id="existingPositionSelect" class="form-input">
+                    <option value="">-- Select Position --</option>
+                  </select>
+                </div>
+
+                <div class="button-group grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+                  <button type="button" id="deletePositionBtn" class="danger py-3 px-4 rounded-xl bg-rose-500/15 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white border border-rose-500/25 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer">
+                    <i class="fas fa-trash"></i>
+                    Delete Position & JD
+                  </button>
+                  <button type="button" id="deleteCompanyBtn" class="danger py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer">
+                    <i class="fas fa-trash-alt"></i>
+                    Delete Company & All JDs
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- ==================== RIGHT SIDEBAR: LIVE WHATSAPP PREVIEW & SESSION LOG ==================== -->
+      <div class="lg:col-span-4 space-y-5">
+        <!-- Live WhatsApp Message Preview Card -->
+        <div class="glass-card rounded-3xl p-5 sm:p-6 relative overflow-hidden">
+          <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-200/70 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-500 flex items-center justify-center">
+                <i class="fab fa-whatsapp text-lg"></i>
+              </span>
+              <div>
+                <h3 class="font-display font-bold text-sm text-slate-900 dark:text-white">Live WhatsApp Preview</h3>
+                <p class="text-[11px] text-slate-500">Auto-updates as you type</p>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-500">Ready</span>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-[#e7ffdb] dark:bg-emerald-950/50 border border-emerald-500/20 text-slate-800 dark:text-slate-200 text-xs leading-relaxed whitespace-pre-line font-sans shadow-inner" id="liveWaPreviewBox">
+*Hi Candidate*,
+
+As per our recent discussion regarding the position of *Position*, we have successfully submitted your profile for shortlisting to our client, *Company*, with the following details:
+
+*Current CTC : -*
+*Expected CTC : -*
+*Notice Period : -*
+
+We have also shared the *Job Description* with you via email.
+
+*_Kindly acknowledge this and share your updated resume for further processing._*
+          </div>
+        </div>
+
+        <!-- Recent Session Submissions Card -->
+        <div class="glass-card rounded-3xl p-5 sm:p-6">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200/70 dark:border-slate-800">
+            <h3 class="font-display font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fas fa-clock-rotate-left text-blue-500"></i>
+              Session Submissions
+            </h3>
+            <span id="sessionCountBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-600 dark:text-blue-400">0</span>
+          </div>
+          <div id="recentSubmissionsList" class="space-y-2.5 text-xs text-slate-500 dark:text-slate-400">
+            <p class="text-center py-4 italic">Candidates submitted in this session will appear here for quick WhatsApp re-sending.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // Custom non-blocking toast notification (replaces native alert)
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const styles = {
+        info: 'bg-slate-900 dark:bg-slate-800 text-white border-blue-500/40',
+        success: 'bg-emerald-600 text-white border-emerald-400',
+        error: 'bg-rose-600 text-white border-rose-400'
+      };
+      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl border shadow-xl text-xs sm:text-sm font-semibold transition-all duration-300 ${styles[type] || styles.info}`;
+      toast.innerHTML = `<i class="fas fa-circle-info shrink-0"></i><span class="flex-1">${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3800);
     }
-    
-    // User is authenticated
-    console.log('✓ User authenticated successfully');
-    console.log('Complete User Details:', {
+
+    // Custom Confirmation Dialog Promise (replaces native confirm)
+    function askConfirmation(message) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('confirmDialogModal');
+        const textEl = document.getElementById('confirmDialogText');
+        const cancelBtn = document.getElementById('confirmCancelBtn');
+        const acceptBtn = document.getElementById('confirmAcceptBtn');
+
+        textEl.textContent = message;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        const cleanup = (result) => {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          cancelBtn.onclick = null;
+          acceptBtn.onclick = null;
+          resolve(result);
+        };
+
+        cancelBtn.onclick = () => cleanup(false);
+        acceptBtn.onclick = () => cleanup(true);
+      });
+    }
+
+    // Smart Helper Functions
+    function cleanPhoneNumber() {
+      const input = document.getElementById('contact');
+      if (!input) return;
+      const digits = input.value.replace(/\D/g, '').slice(-10);
+      input.value = digits;
+      updateLivePreviewAndProgress();
+      showToast('Phone number formatted to 10 digits', 'success');
+    }
+
+    function resetCandidateFormClean() {
+      document.getElementById('jobForm').reset();
+      document.getElementById('positionDiv').style.display = 'none';
+      document.getElementById('expectedCTC').disabled = false;
+      document.getElementById('expectedCTCUnit').disabled = false;
+      document.getElementById('experience').disabled = false;
+      document.getElementById('experienceUnit').disabled = false;
+      document.getElementById('noticePeriod').disabled = false;
+      document.getElementById('noticePeriodUnit').disabled = false;
+
+      const userData = getUserData();
+      document.getElementById('recruiterDisplay').value = `${userData.name || 'Recruiter'} (${userData.email || ''})${userData.contact ? ' - ' + userData.contact : ''}`;
+      document.getElementById('recruiterEmail').value = `${userData.email || ''},${userData.name || ''},${userData.contact || ''}`;
+      updateLivePreviewAndProgress();
+    }
+
+    // Live Preview, Hike Badge & Completion Progress Updater
+    function updateLivePreviewAndProgress() {
+      const name = document.getElementById('name')?.value || 'Candidate';
+      const email = document.getElementById('email')?.value || 'candidate@email.com';
+      const contact = document.getElementById('contact')?.value || '';
+      const curCTC = document.getElementById('currentCTC')?.value || '-';
+      const curUnit = document.getElementById('currentCTCUnit')?.value || 'LPA';
+      const asPerComp = document.getElementById('asPerCompany')?.checked;
+      const expCTC = asPerComp ? 'As Per Company' : (document.getElementById('expectedCTC')?.value || '-');
+      const expUnit = asPerComp ? '' : (document.getElementById('expectedCTCUnit')?.value || 'LPA');
+      const immJoin = document.getElementById('immediateJoiner')?.checked;
+      const notice = immJoin ? 'Immediate' : (document.getElementById('noticePeriod')?.value || '-');
+      const noticeUnit = immJoin ? '' : (document.getElementById('noticePeriodUnit')?.value || 'Days');
+      const company = document.getElementById('company')?.value || 'Company';
+      const position = document.getElementById('position')?.value || 'Position';
+      const recruiterName = sessionStorage.getItem('userName') || 'Recruiter';
+
+      // Update WhatsApp Live Preview
+      const previewEl = document.getElementById('liveWaPreviewBox');
+      if (previewEl) {
+        previewEl.textContent = `*Hi ${name}*,\n\nAs per our recent discussion regarding the position of *${position}*, we have successfully submitted your profile for shortlisting to our client, *${company}*, with the following details:\n\n*Current CTC : ${curCTC} ${curUnit}*\n*Expected CTC : ${expCTC}* ${expUnit}\n*Notice Period : ${notice}* ${noticeUnit}\n\nWe have also shared the *Job Description* with you via email at ${email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
+      }
+
+      // Update Live Hike % Badge
+      const hikeBadge = document.getElementById('liveHikeBadge');
+      const cVal = parseFloat(curCTC);
+      const eVal = parseFloat(expCTC);
+      if (hikeBadge && !asPerComp && cVal > 0 && eVal > 0) {
+        const cAnnual = curUnit === 'Monthly' ? (cVal * 12) / 100000 : cVal;
+        const eAnnual = expUnit === 'Monthly' ? (eVal * 12) / 100000 : eVal;
+        if (cAnnual > 0) {
+          const hikePct = (((eAnnual - cAnnual) / cAnnual) * 100).toFixed(1);
+          hikeBadge.textContent = `Hike: ${hikePct > 0 ? '+' : ''}${hikePct}%`;
+          hikeBadge.classList.remove('hidden');
+        }
+      } else if (hikeBadge) {
+        hikeBadge.classList.add('hidden');
+      }
+
+      // Calculate Form Completion %
+      let filled = 0;
+      const total = 8;
+      if (document.getElementById('name')?.value.trim()) filled++;
+      if (document.getElementById('email')?.value.trim()) filled++;
+      if (contact.trim()) filled++;
+      if (document.getElementById('currentCTC')?.value.trim()) filled++;
+      if (asPerComp || document.getElementById('expectedCTC')?.value.trim()) filled++;
+      if (document.getElementById('isFresher')?.checked || document.getElementById('experience')?.value.trim()) filled++;
+      if (immJoin || document.getElementById('noticePeriod')?.value.trim()) filled++;
+      if (document.getElementById('company')?.value && document.getElementById('position')?.value) filled++;
+
+      const pct = Math.round((filled / total) * 100);
+      const bar = document.getElementById('formProgressBar');
+      const txt = document.getElementById('formProgressText');
+      if (bar) bar.style.width = `${pct}%`;
+      if (txt) txt.textContent = `${pct}%`;
+    }
+
+    const sessionSubmissions = [];
+    function logSessionSubmission(data, whatsappLink) {
+      sessionSubmissions.unshift({
+        name: data.name,
+        position: data.position,
+        company: data.company,
+        whatsappLink: whatsappLink,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+      const badge = document.getElementById('sessionCountBadge');
+      const list = document.getElementById('recentSubmissionsList');
+      if (badge) badge.textContent = sessionSubmissions.length;
+      if (list) {
+        list.innerHTML = sessionSubmissions.map(item => `
+          <div class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
+            <div>
+              <p class="font-bold text-slate-900 dark:text-white">${item.name}</p>
+              <p class="text-[11px] text-slate-500">${item.position} • ${item.company} (${item.time})</p>
+            </div>
+            <a href="${item.whatsappLink}" target="_blank" class="px-2.5 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-bold text-[11px] flex items-center gap-1 shrink-0">
+              <i class="fab fa-whatsapp"></i> Send
+            </a>
+          </div>
+        `).join('');
+      }
+    }
+
+    // ==================== PRESERVED AUTHENTICATION & LOGIC ====================
+    window.addEventListener('load', function() {
+      console.log("Page loaded - checking authentication...");
+
+      // Attach live preview listeners to all form inputs
+      document.querySelectorAll('#jobForm input, #jobForm select').forEach(el => {
+        el.addEventListener('input', updateLivePreviewAndProgress);
+        el.addEventListener('change', updateLivePreviewAndProgress);
+      });
+
+      // Get all user data from sessionStorage
+      const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+      const userEmail = sessionStorage.getItem('userEmail');
+      const userName = sessionStorage.getItem('userName');
+      const userContact = sessionStorage.getItem('userContact');
+      const userDesignation = sessionStorage.getItem('userDesignation');
+      const userType = sessionStorage.getItem('userType');
+      const loginTime = sessionStorage.getItem('loginTime');
+
+      // Check if user is authenticated
+      if (isLoggedIn !== 'true') {
+        showToast("Session expired or not logged in. Redirecting to login page.", "error");
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1200);
+        return;
+      }
+
+      // User is authenticated
+      console.log('✓ User authenticated successfully');
+      console.log('Complete User Details:', {
         name: userName,
         email: userEmail,
         contact: userContact,
         designation: userDesignation,
         userType: userType,
         loginTime: loginTime
-    });
-    
-    // Set recruiter information from logged-in user
-    const recruiterDisplay = document.getElementById('recruiterDisplay');
-    const recruiterEmail = document.getElementById('recruiterEmail');
-    
-    if (recruiterDisplay && recruiterEmail) {
+      });
+
+      // Set recruiter information from logged-in user
+      const recruiterDisplay = document.getElementById('recruiterDisplay');
+      const recruiterEmail = document.getElementById('recruiterEmail');
+
+      if (recruiterDisplay && recruiterEmail) {
         recruiterDisplay.value = `${userName} (${userEmail})${userContact ? ' - ' + userContact : ''}`;
         recruiterEmail.value = `${userEmail},${userName},${userContact || ''}`;
-    }
-    
-    // Store user data globally
-    window.USER_DATA = {
+      }
+
+      // Store user data globally
+      window.USER_DATA = {
         isLoggedIn: isLoggedIn === 'true',
         email: userEmail,
         name: userName,
@@ -741,56 +829,53 @@ window.addEventListener('load', function() {
         designation: userDesignation,
         userType: userType,
         loginTime: loginTime
-    };
-    
-    console.log('Complete user data available globally as window.USER_DATA:', window.USER_DATA);
-    
-    // Load companies after authentication is confirmed
-    loadData();
-    
-    // Update manage button visibility based on user type
-    updateManageButtonVisibility();
-});
+      };
 
-// Function to show/hide manage button based on user type
-function updateManageButtonVisibility() {
-    const userType = sessionStorage.getItem('userType') || sessionStorage.getItem('User_Type') || '';
-    const isAdmin = userType.toLowerCase() === 'admin';
-    
-    console.log('User Type:', userType, '| Is Admin:', isAdmin);
-    
-    // Get the manage button
-    const manageBtn = document.getElementById('manageCompanyBtn');
-    
-    // Show/hide button based on user type
-    if (manageBtn) {
-        manageBtn.style.display = isAdmin ? 'inline-block' : 'none';
+      console.log('Complete user data available globally as window.USER_DATA:', window.USER_DATA);
+
+      // Load companies after authentication is confirmed
+      loadData();
+
+      // Update manage button visibility based on user type
+      updateManageButtonVisibility();
+      updateLivePreviewAndProgress();
+    });
+
+    // Function to show/hide manage button based on user type
+    function updateManageButtonVisibility() {
+      const userType = sessionStorage.getItem('userType') || sessionStorage.getItem('User_Type') || '';
+      const isAdmin = userType.toLowerCase() === 'admin';
+
+      console.log('User Type:', userType, '| Is Admin:', isAdmin);
+
+      const manageBtn = document.getElementById('manageCompanyBtn');
+      if (manageBtn) {
+        manageBtn.style.display = isAdmin ? 'inline-flex' : 'none';
+      }
     }
-}
 
-// Global functions
-function logout() {
-    // Clear all session data
-    sessionStorage.removeItem('isLoggedIn');
-    sessionStorage.removeItem('userEmail');
-    sessionStorage.removeItem('userName');
-    sessionStorage.removeItem('userContact');
-    sessionStorage.removeItem('userDesignation');
-    sessionStorage.removeItem('userType');
-    sessionStorage.removeItem('loginTime');
-    sessionStorage.removeItem('userRowIndex');
-    
-    alert("Logged out successfully");
-    window.location.href = 'index.html';
-}
+    // Global functions
+    function logout() {
+      sessionStorage.removeItem('isLoggedIn');
+      sessionStorage.removeItem('userEmail');
+      sessionStorage.removeItem('userName');
+      sessionStorage.removeItem('userContact');
+      sessionStorage.removeItem('userDesignation');
+      sessionStorage.removeItem('userType');
+      sessionStorage.removeItem('loginTime');
+      sessionStorage.removeItem('userRowIndex');
 
-function goHome() {
-    window.location.href = 'index.html';
-}
+      showToast("Logged out successfully", "info");
+      window.location.href = 'index.html';
+    }
 
-// Helper function to get complete user data
-function getUserData() {
-    return {
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+
+    // Helper function to get complete user data
+    function getUserData() {
+      return {
         isLoggedIn: sessionStorage.getItem('isLoggedIn') === 'true',
         email: sessionStorage.getItem('userEmail'),
         name: sessionStorage.getItem('userName'),
@@ -798,462 +883,474 @@ function getUserData() {
         designation: sessionStorage.getItem('userDesignation'),
         userType: sessionStorage.getItem('userType'),
         loginTime: sessionStorage.getItem('loginTime')
-    };
-}
-
-// 🔥 IMPORTANT: REPLACE WITH YOUR ACTUAL GOOGLE APPS SCRIPT WEB APP URL
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxyo19lD_6WHXwCkpcIXrfV38pAobEjiO6sYhYBFh-nId-YWdGHNPJF_Rh9IQBchSd/exec';
-let companies = {};
-let newCompanyFiles = {};
-let existingCompanyFiles = {};
-
-// Call Google Apps Script
-async function callGoogleScript(action, data = {}) {
-  try {
-    const payload = { action, ...data };
-    console.log('Calling Google Script:', action);
-    
-    const response = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'text/plain',
-      },
-      body: JSON.stringify(payload)
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const text = await response.text();
-    const result = JSON.parse(text);
-    
-    if (!result.success) {
-      throw new Error(result.error || 'Unknown error');
-    }
-    
-    return result;
-  } catch (error) {
-    console.error('Error calling Google Script:', error);
-    alert('Error: ' + error.message);
-    return null;
-  }
-}
-
-// Load data from Google Sheets
-async function loadData() {
-  try {
-    console.log('Loading data from Google Sheets...');
-    
-    const result = await callGoogleScript('getData');
-    if (result && result.success) {
-      companies = result.data || {};
-      console.log('Loaded companies:', companies);
-      populateCompanies();
-    } else {
-      console.error('Failed to load data');
-      companies = {};
-      populateCompanies();
-    }
-  } catch (error) {
-    console.error('Error loading data:', error);
-    companies = {};
-    populateCompanies();
-  }
-}
-
-// Populate company dropdown
-function populateCompanies() {
-  const companySelect = document.getElementById('company');
-  companySelect.innerHTML = '<option value="">-- Choose Company --</option>';
-  Object.keys(companies).forEach(company => {
-    const option = document.createElement('option');
-    option.value = company;
-    option.textContent = company;
-    companySelect.appendChild(option);
-  });
-}
-
-// Populate positions
-function populatePositions() {
-  const company = document.getElementById('company').value;
-  const positionSelect = document.getElementById('position');
-  const positionDiv = document.getElementById('positionDiv');
-  positionSelect.innerHTML = '<option value="">-- Choose Position --</option>';
-  if (company && companies[company]) {
-    companies[company].forEach(position => {
-      const option = document.createElement('option');
-      option.value = position;
-      option.textContent = position;
-      positionSelect.appendChild(option);
-    });
-    positionDiv.style.display = 'block';
-  } else {
-    positionDiv.style.display = 'none';
-  }
-}
-
-// File handling
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-  });
-}
-
-function generateFileInput(position, containerId, filesObject) {
-  const container = document.getElementById(containerId);
-  const fileInputGroup = document.createElement('div');
-  fileInputGroup.className = 'file-input-group';
-  fileInputGroup.innerHTML = `
-    <label class="file-input-label" for="file-${position.replace(/\s+/g, '-')}">
-      <i class="fas fa-file-pdf"></i>
-      <span>JD for ${position}</span>
-    </label>
-    <input type="file" id="file-${position.replace(/\s+/g, '-')}" class="file-input" accept=".pdf" data-position="${position}">
-    <div class="file-status" id="status-${position.replace(/\s+/g, '-')}">No file selected</div>
-  `;
-  container.appendChild(fileInputGroup);
-  const fileInput = fileInputGroup.querySelector('.file-input');
-  const statusDiv = fileInputGroup.querySelector('.file-status');
-  fileInput.addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.type !== 'application/pdf') {
-        statusDiv.textContent = 'Only PDF files allowed';
-        statusDiv.className = 'file-status error';
-        return;
-      }
-      
-      if (file.size > 10 * 1024 * 1024) {
-        statusDiv.textContent = 'File too large (max 10MB)';
-        statusDiv.className = 'file-status error';
-        return;
-      }
-      
-      try {
-        statusDiv.textContent = 'Processing...';
-        statusDiv.className = 'file-status';
-        
-        const base64 = await fileToBase64(file);
-        filesObject[position] = {
-          position: position,
-          data: base64,
-          name: file.name
-        };
-        
-        statusDiv.textContent = `✓ ${file.name} selected`;
-        statusDiv.className = 'file-status success';
-      } catch (error) {
-        statusDiv.textContent = 'Error processing file';
-        statusDiv.className = 'file-status error';
-      }
-    } else {
-      delete filesObject[position];
-      statusDiv.textContent = 'No file selected';
-      statusDiv.className = 'file-status';
-    }
-  });
-}
-
-function generateNewCompanyFileInputs() {
-  const positions = document.getElementById('newCompanyPositions').value
-    .split(',')
-    .map(p => p.trim())
-    .filter(p => p);
-  const container = document.getElementById('newCompanyFileInputs');
-  container.innerHTML = '';
-  newCompanyFiles = {};
-  positions.forEach(position => {
-    generateFileInput(position, 'newCompanyFileInputs', newCompanyFiles);
-  });
-}
-
-function generateExistingCompanyFileInputs() {
-  const positions = document.getElementById('addPositionsInput').value
-    .split(',')
-    .map(p => p.trim())
-    .filter(p => p);
-  const container = document.getElementById('existingCompanyFileInputs');
-  container.innerHTML = '';
-  existingCompanyFiles = {};
-  positions.forEach(position => {
-    generateFileInput(position, 'existingCompanyFileInputs', existingCompanyFiles);
-  });
-}
-
-// Event listeners
-document.getElementById('company').addEventListener('change', populatePositions);
-document.getElementById('newCompanyPositions').addEventListener('input', generateNewCompanyFileInputs);
-document.getElementById('addPositionsInput').addEventListener('input', generateExistingCompanyFileInputs);
-
-document.getElementById("immediateJoiner").addEventListener("change", function () {
-  document.getElementById("noticePeriod").disabled = this.checked;
-  document.getElementById("noticePeriodUnit").disabled = this.checked;
-});
-
-document.getElementById("isFresher").addEventListener("change", function () {
-  document.getElementById("experience").disabled = this.checked;
-  document.getElementById("experienceUnit").disabled = this.checked;
-});
-
-document.getElementById("asPerCompany").addEventListener("change", function () {
-  document.getElementById("expectedCTC").disabled = this.checked;
-  document.getElementById("expectedCTCUnit").disabled = this.checked;
-});
-
-// Form submission - UPDATED WITH SEPARATED RECRUITER FIELDS
-document.getElementById("jobForm").addEventListener("submit", function (e) {
-  e.preventDefault();
-  
-  // Get recruiter information from hidden field
-  const recruiterInfo = document.getElementById("recruiterEmail").value;
-  const recruiterParts = recruiterInfo.split(",");
-  const recruiterEmail = recruiterParts[0] ? recruiterParts[0].trim() : "";
-  const recruiterName = recruiterParts[1] ? recruiterParts[1].trim() : "Recruiter";
-  const recruiterMobile = recruiterParts[2] ? recruiterParts[2].trim() : "";
-  
-  const data = {
-    name: document.getElementById("name").value,
-    email: document.getElementById("email").value,
-    contact: document.getElementById("contact").value,
-    currentCTC: document.getElementById("currentCTC").value,
-    currentCTCUnit: document.getElementById("currentCTCUnit").value,
-    expectedCTC: document.getElementById("asPerCompany").checked ? "As Per Company" : document.getElementById("expectedCTC").value,
-    expectedCTCUnit: document.getElementById("asPerCompany").checked ? "" : document.getElementById("expectedCTCUnit").value,
-    experience: document.getElementById("isFresher").checked ? "Fresher" : document.getElementById("experience").value,
-    experienceUnit: document.getElementById("isFresher").checked ? "" : document.getElementById("experienceUnit").value,
-    noticePeriod: document.getElementById("immediateJoiner").checked ? "Immediate" : document.getElementById("noticePeriod").value,
-    noticePeriodUnit: document.getElementById("immediateJoiner").checked ? "" : document.getElementById("noticePeriodUnit").value,
-    company: document.getElementById("company").value,
-    position: document.getElementById("position").value,
-    recruiterEmail: recruiterEmail,
-    recruiterName: recruiterName,
-    recruiterMobile: recruiterMobile
-  };
-  
-  fetch("https://default95bfece3066c4fa7b1004902edfde1.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/54210cf2969a42458623aa9427690ce1/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=p6yY_eBF3mEFGGYnnEUVIuAOi9aOt5JUmsyH5SF3hwM", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  })
-  .then(res => {
-    if (res.ok) {
-      const msg = `*Hi ${data.name}*,\n\nAs per our recent discussion regarding the position of *${data.position}*, we have successfully submitted your profile for shortlisting to our client, *${data.company}*, with the following details:\n\n*Current CTC : ${data.currentCTC} ${data.currentCTCUnit}*\n*Expected CTC : ${data.expectedCTC}* ${data.expectedCTCUnit}\n*Notice Period : ${data.noticePeriod}* ${data.noticePeriodUnit}\n\nWe have also shared the *Job Description* with you via email at ${data.email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
-      const whatsappLink = `https://wa.me/91${data.contact}?text=${encodeURIComponent(msg)}`;
-      document.getElementById("sendBtn").innerHTML = `<i class="fab fa-whatsapp"></i> Send to ${data.name}`;
-      document.getElementById("sendBtn").onclick = () => {
-        document.getElementById("popupOverlay").style.display = "none";
-        window.open(whatsappLink, "_blank");
-        document.getElementById("jobForm").reset();
-        document.getElementById("positionDiv").style.display = "none";
-        // Reset recruiter info after form reset
-        const userData = getUserData();
-        document.getElementById('recruiterDisplay').value = `${userData.name} (${userData.email})${userData.contact ? ' - ' + userData.contact : ''}`;
-        document.getElementById('recruiterEmail').value = `${userData.email},${userData.name},${userData.contact || ''}`;
       };
-      document.getElementById("popupOverlay").style.display = "flex";
-    } else {
-      alert("Error submitting form. Please try again.");
     }
-  })
-  .catch(err => {
-    alert("Failed to connect to server.");
-    console.error(err);
-  });
-});
 
-document.getElementById("cancelBtn").addEventListener("click", () => {
-  document.getElementById("popupOverlay").style.display = "none";
-  document.getElementById("jobForm").reset();
-  document.getElementById("positionDiv").style.display = "none";
-  // Reset recruiter info after cancel
-  const userData = getUserData();
-  document.getElementById('recruiterDisplay').value = `${userData.name} (${userData.email})${userData.contact ? ' - ' + userData.contact : ''}`;
-  document.getElementById('recruiterEmail').value = `${userData.email},${userData.name},${userData.contact || ''}`;
-});
+    // PRESERVED GOOGLE APPS SCRIPT WEB APP URL
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxyo19lD_6WHXwCkpcIXrfV38pAobEjiO6sYhYBFh-nId-YWdGHNPJF_Rh9IQBchSd/exec';
+    let companies = {};
+    let newCompanyFiles = {};
+    let existingCompanyFiles = {};
 
-// Management functions
-function refreshManagementDropdowns() {
-  const existingCompanySelect = document.getElementById('existingCompanySelect');
-  existingCompanySelect.innerHTML = '<option value="">-- Select Company --</option>';
-  Object.keys(companies).forEach(company => {
-    const option = document.createElement('option');
-    option.value = company;
-    option.textContent = company;
-    existingCompanySelect.appendChild(option);
-  });
-  refreshPositionDropdown();
-}
+    // Call Google Apps Script
+    async function callGoogleScript(action, data = {}) {
+      try {
+        const payload = { action, ...data };
+        console.log('Calling Google Script:', action);
 
-function refreshPositionDropdown() {
-  const company = document.getElementById('existingCompanySelect').value;
-  const positionSelect = document.getElementById('existingPositionSelect');
-  positionSelect.innerHTML = '<option value="">-- Select Position --</option>';
-  if (company && companies[company]) {
-    companies[company].forEach(position => {
-      const option = document.createElement('option');
-      option.value = position;
-      option.textContent = position;
-      positionSelect.appendChild(option);
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'text/plain',
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const text = await response.text();
+        const result = JSON.parse(text);
+
+        if (!result.success) {
+          throw new Error(result.error || 'Unknown error');
+        }
+
+        return result;
+      } catch (error) {
+        console.error('Error calling Google Script:', error);
+        showToast('Error: ' + error.message, 'error');
+        return null;
+      }
+    }
+
+    // Load data from Google Sheets
+    async function loadData() {
+      try {
+        console.log('Loading data from Google Sheets...');
+
+        const result = await callGoogleScript('getData');
+        if (result && result.success) {
+          companies = result.data || {};
+          console.log('Loaded companies:', companies);
+          populateCompanies();
+        } else {
+          console.error('Failed to load data');
+          companies = {};
+          populateCompanies();
+        }
+      } catch (error) {
+        console.error('Error loading data:', error);
+        companies = {};
+        populateCompanies();
+      }
+    }
+
+    // Populate company dropdown
+    function populateCompanies() {
+      const companySelect = document.getElementById('company');
+      companySelect.innerHTML = '<option value="">-- Choose Company --</option>';
+      Object.keys(companies).forEach(company => {
+        const option = document.createElement('option');
+        option.value = company;
+        option.textContent = company;
+        companySelect.appendChild(option);
+      });
+    }
+
+    // Populate positions
+    function populatePositions() {
+      const company = document.getElementById('company').value;
+      const positionSelect = document.getElementById('position');
+      const positionDiv = document.getElementById('positionDiv');
+      positionSelect.innerHTML = '<option value="">-- Choose Position --</option>';
+      if (company && companies[company]) {
+        companies[company].forEach(position => {
+          const option = document.createElement('option');
+          option.value = position;
+          option.textContent = position;
+          positionSelect.appendChild(option);
+        });
+        positionDiv.style.display = 'block';
+      } else {
+        positionDiv.style.display = 'none';
+      }
+      updateLivePreviewAndProgress();
+    }
+
+    // File handling
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    function generateFileInput(position, containerId, filesObject) {
+      const container = document.getElementById(containerId);
+      const fileInputGroup = document.createElement('div');
+      fileInputGroup.className = 'file-input-group';
+      fileInputGroup.innerHTML = `
+        <label class="file-input-label" for="file-${position.replace(/\s+/g, '-')}">
+          <i class="fas fa-file-pdf"></i>
+          <span>JD for ${position}</span>
+        </label>
+        <input type="file" id="file-${position.replace(/\s+/g, '-')}" class="file-input" accept=".pdf" data-position="${position}">
+        <div class="file-status" id="status-${position.replace(/\s+/g, '-')}">No file selected</div>
+      `;
+      container.appendChild(fileInputGroup);
+      const fileInput = fileInputGroup.querySelector('.file-input');
+      const statusDiv = fileInputGroup.querySelector('.file-status');
+      fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          if (file.type !== 'application/pdf') {
+            statusDiv.textContent = 'Only PDF files allowed';
+            statusDiv.className = 'file-status error';
+            return;
+          }
+
+          if (file.size > 10 * 1024 * 1024) {
+            statusDiv.textContent = 'File too large (max 10MB)';
+            statusDiv.className = 'file-status error';
+            return;
+          }
+
+          try {
+            statusDiv.textContent = 'Processing...';
+            statusDiv.className = 'file-status';
+
+            const base64 = await fileToBase64(file);
+            filesObject[position] = {
+              position: position,
+              data: base64,
+              name: file.name
+            };
+
+            statusDiv.textContent = `✓ ${file.name} selected`;
+            statusDiv.className = 'file-status success';
+          } catch (error) {
+            statusDiv.textContent = 'Error processing file';
+            statusDiv.className = 'file-status error';
+          }
+        } else {
+          delete filesObject[position];
+          statusDiv.textContent = 'No file selected';
+          statusDiv.className = 'file-status';
+        }
+      });
+    }
+
+    function generateNewCompanyFileInputs() {
+      const positions = document.getElementById('newCompanyPositions').value
+        .split(',')
+        .map(p => p.trim())
+        .filter(p => p);
+      const container = document.getElementById('newCompanyFileInputs');
+      container.innerHTML = '';
+      newCompanyFiles = {};
+      positions.forEach(position => {
+        generateFileInput(position, 'newCompanyFileInputs', newCompanyFiles);
+      });
+    }
+
+    function generateExistingCompanyFileInputs() {
+      const positions = document.getElementById('addPositionsInput').value
+        .split(',')
+        .map(p => p.trim())
+        .filter(p => p);
+      const container = document.getElementById('existingCompanyFileInputs');
+      container.innerHTML = '';
+      existingCompanyFiles = {};
+      positions.forEach(position => {
+        generateFileInput(position, 'existingCompanyFileInputs', existingCompanyFiles);
+      });
+    }
+
+    // Event listeners
+    document.getElementById('company').addEventListener('change', populatePositions);
+    document.getElementById('newCompanyPositions').addEventListener('input', generateNewCompanyFileInputs);
+    document.getElementById('addPositionsInput').addEventListener('input', generateExistingCompanyFileInputs);
+
+    document.getElementById("immediateJoiner").addEventListener("change", function () {
+      document.getElementById("noticePeriod").disabled = this.checked;
+      document.getElementById("noticePeriodUnit").disabled = this.checked;
+      updateLivePreviewAndProgress();
     });
-  }
-}
 
-function setManageLoading(isLoading) {
-  const popup = document.querySelector('.manage-popup');
-  if (isLoading) {
-    popup.classList.add('loading');
-  } else {
-    popup.classList.remove('loading');
-  }
-}
+    document.getElementById("isFresher").addEventListener("change", function () {
+      document.getElementById("experience").disabled = this.checked;
+      document.getElementById("experienceUnit").disabled = this.checked;
+      updateLivePreviewAndProgress();
+    });
 
-// Management popup events
-document.getElementById('manageCompanyBtn').addEventListener('click', () => {
-  refreshManagementDropdowns();
-  document.getElementById('manageOverlay').style.display = 'flex';
-});
+    document.getElementById("asPerCompany").addEventListener("change", function () {
+      document.getElementById("expectedCTC").disabled = this.checked;
+      document.getElementById("expectedCTCUnit").disabled = this.checked;
+      updateLivePreviewAndProgress();
+    });
 
-document.getElementById('manageCloseBtn').addEventListener('click', () => {
-  document.getElementById('manageOverlay').style.display = 'none';
-  document.getElementById('newCompanyFileInputs').innerHTML = '';
-  document.getElementById('existingCompanyFileInputs').innerHTML = '';
-  newCompanyFiles = {};
-  existingCompanyFiles = {};
-});
+    // Form submission - PRESERVED EXACT POWER AUTOMATE WORKFLOW & PAYLOAD
+    document.getElementById("jobForm").addEventListener("submit", function (e) {
+      e.preventDefault();
 
-document.getElementById('existingCompanySelect').addEventListener('change', refreshPositionDropdown);
+      const submitBtn = document.getElementById("submitBtn");
+      const originalBtnHTML = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> <span>Submitting...</span>`;
 
-// Add new company
-document.getElementById('addCompanyBtn').addEventListener('click', async () => {
-  const name = document.getElementById('newCompanyName').value.trim();
-  if (!name) {
-    alert('Please enter a company name');
-    return;
-  }
-  const positions = document.getElementById('newCompanyPositions').value
-    .split(',')
-    .map(p => p.trim())
-    .filter(p => p);
-  setManageLoading(true);
-  const files = Object.values(newCompanyFiles);
-  const result = await callGoogleScript('addCompany', {
-    company: name,
-    positions: positions,
-    files: files
-  });
-  setManageLoading(false);
-  if (result && result.success) {
-    alert(result.message);
-    
-    companies[name] = positions;
-    populateCompanies();
-    refreshManagementDropdowns();
-    
-    document.getElementById('newCompanyName').value = '';
-    document.getElementById('newCompanyPositions').value = '';
-    document.getElementById('newCompanyFileInputs').innerHTML = '';
-    newCompanyFiles = {};
-  }
-});
+      // Get recruiter information from hidden field
+      const recruiterInfo = document.getElementById("recruiterEmail").value;
+      const recruiterParts = recruiterInfo.split(",");
+      const recruiterEmail = recruiterParts[0] ? recruiterParts[0].trim() : "";
+      const recruiterName = recruiterParts[1] ? recruiterParts[1].trim() : "Recruiter";
+      const recruiterMobile = recruiterParts[2] ? recruiterParts[2].trim() : "";
 
-// Add positions
-document.getElementById('addPositionsBtn').addEventListener('click', async () => {
-  const company = document.getElementById('existingCompanySelect').value;
-  if (!company) {
-    alert('Please select a company first');
-    return;
-  }
-  const positions = document.getElementById('addPositionsInput').value
-    .split(',')
-    .map(p => p.trim())
-    .filter(p => p);
-  if (positions.length === 0) {
-    alert('Please enter at least one position');
-    return;
-  }
-  setManageLoading(true);
-  const files = Object.values(existingCompanyFiles);
-  const result = await callGoogleScript('addPositions', {
-    company: company,
-    positions: positions,
-    files: files
-  });
-  setManageLoading(false);
-  if (result && result.success) {
-    alert(result.message);
-    
-    await loadData();
-    refreshManagementDropdowns();
-    
-    if (document.getElementById('company').value === company) {
-      populatePositions();
+      const data = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        contact: document.getElementById("contact").value,
+        currentCTC: document.getElementById("currentCTC").value,
+        currentCTCUnit: document.getElementById("currentCTCUnit").value,
+        expectedCTC: document.getElementById("asPerCompany").checked ? "As Per Company" : document.getElementById("expectedCTC").value,
+        expectedCTCUnit: document.getElementById("asPerCompany").checked ? "" : document.getElementById("expectedCTCUnit").value,
+        experience: document.getElementById("isFresher").checked ? "Fresher" : document.getElementById("experience").value,
+        experienceUnit: document.getElementById("isFresher").checked ? "" : document.getElementById("experienceUnit").value,
+        noticePeriod: document.getElementById("immediateJoiner").checked ? "Immediate" : document.getElementById("noticePeriod").value,
+        noticePeriodUnit: document.getElementById("immediateJoiner").checked ? "" : document.getElementById("noticePeriodUnit").value,
+        company: document.getElementById("company").value,
+        position: document.getElementById("position").value,
+        recruiterEmail: recruiterEmail,
+        recruiterName: recruiterName,
+        recruiterMobile: recruiterMobile
+      };
+
+      fetch("https://default95bfece3066c4fa7b1004902edfde1.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/54210cf2969a42458623aa9427690ce1/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=p6yY_eBF3mEFGGYnnEUVIuAOi9aOt5JUmsyH5SF3hwM", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      .then(res => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHTML;
+
+        if (res.ok) {
+          const msg = `*Hi ${data.name}*,\n\nAs per our recent discussion regarding the position of *${data.position}*, we have successfully submitted your profile for shortlisting to our client, *${data.company}*, with the following details:\n\n*Current CTC : ${data.currentCTC} ${data.currentCTCUnit}*\n*Expected CTC : ${data.expectedCTC}* ${data.expectedCTCUnit}\n*Notice Period : ${data.noticePeriod}* ${data.noticePeriodUnit}\n\nWe have also shared the *Job Description* with you via email at ${data.email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
+          const whatsappLink = `https://wa.me/91${data.contact}?text=${encodeURIComponent(msg)}`;
+
+          logSessionSubmission(data, whatsappLink);
+
+          document.getElementById("sendBtn").innerHTML = `<i class="fab fa-whatsapp"></i> Send to ${data.name}`;
+          document.getElementById("sendBtn").onclick = () => {
+            document.getElementById("popupOverlay").style.display = "none";
+            window.open(whatsappLink, "_blank");
+            resetCandidateFormClean();
+          };
+          document.getElementById("popupOverlay").style.display = "flex";
+        } else {
+          showToast("Error submitting form. Please try again.", "error");
+        }
+      })
+      .catch(err => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHTML;
+        showToast("Failed to connect to server.", "error");
+        console.error(err);
+      });
+    });
+
+    document.getElementById("cancelBtn").addEventListener("click", () => {
+      document.getElementById("popupOverlay").style.display = "none";
+      resetCandidateFormClean();
+    });
+
+    // Management functions
+    function refreshManagementDropdowns() {
+      const existingCompanySelect = document.getElementById('existingCompanySelect');
+      existingCompanySelect.innerHTML = '<option value="">-- Select Company --</option>';
+      Object.keys(companies).forEach(company => {
+        const option = document.createElement('option');
+        option.value = company;
+        option.textContent = company;
+        existingCompanySelect.appendChild(option);
+      });
+      refreshPositionDropdown();
     }
-    
-    document.getElementById('addPositionsInput').value = '';
-    document.getElementById('existingCompanyFileInputs').innerHTML = '';
-    existingCompanyFiles = {};
-  }
-});
 
-// Delete position
-document.getElementById('deletePositionBtn').addEventListener('click', async () => {
-  const company = document.getElementById('existingCompanySelect').value;
-  const position = document.getElementById('existingPositionSelect').value;
-  if (!company || !position) {
-    alert('Please select both company and position');
-    return;
-  }
-  if (!confirm(`Delete position "${position}" from "${company}" and its JD file?`)) return;
-  setManageLoading(true);
-  const result = await callGoogleScript('deletePosition', {
-    company: company,
-    position: position
-  });
-  setManageLoading(false);
-  if (result && result.success) {
-    alert(result.message);
-    
-    await loadData();
-    refreshManagementDropdowns();
-    
-    if (document.getElementById('company').value === company) {
-      populatePositions();
+    function refreshPositionDropdown() {
+      const company = document.getElementById('existingCompanySelect').value;
+      const positionSelect = document.getElementById('existingPositionSelect');
+      positionSelect.innerHTML = '<option value="">-- Select Position --</option>';
+      if (company && companies[company]) {
+        companies[company].forEach(position => {
+          const option = document.createElement('option');
+          option.value = position;
+          option.textContent = position;
+          positionSelect.appendChild(option);
+        });
+      }
     }
-  }
-});
 
-// Delete company
-document.getElementById('deleteCompanyBtn').addEventListener('click', async () => {
-  const company = document.getElementById('existingCompanySelect').value;
-  if (!company) {
-    alert('Please select a company');
-    return;
-  }
-  if (!confirm(`Delete company "${company}" and ALL its positions and JD files?`)) return;
-  setManageLoading(true);
-  const result = await callGoogleScript('deleteCompany', {
-    company: company
-  });
-  setManageLoading(false);
-  if (result && result.success) {
-    alert(result.message);
-    
-    await loadData();
-    refreshManagementDropdowns();
-    
-    if (document.getElementById('company').value === company) {
-      document.getElementById('company').value = '';
-      populatePositions();
+    function setManageLoading(isLoading) {
+      const popup = document.querySelector('.manage-popup');
+      if (isLoading) {
+        popup.classList.add('loading');
+      } else {
+        popup.classList.remove('loading');
+      }
     }
-  }
-});
 
-console.log('Candidate Entry page loaded with authentication and role-based management button visibility');
-</script>
+    // Management popup events
+    document.getElementById('manageCompanyBtn').addEventListener('click', () => {
+      refreshManagementDropdowns();
+      document.getElementById('manageOverlay').style.display = 'flex';
+    });
+
+    document.getElementById('manageCloseBtn').addEventListener('click', () => {
+      document.getElementById('manageOverlay').style.display = 'none';
+      document.getElementById('newCompanyFileInputs').innerHTML = '';
+      document.getElementById('existingCompanyFileInputs').innerHTML = '';
+      newCompanyFiles = {};
+      existingCompanyFiles = {};
+    });
+
+    document.getElementById('existingCompanySelect').addEventListener('change', refreshPositionDropdown);
+
+    // Add new company
+    document.getElementById('addCompanyBtn').addEventListener('click', async () => {
+      const name = document.getElementById('newCompanyName').value.trim();
+      if (!name) {
+        showToast('Please enter a company name', 'error');
+        return;
+      }
+      const positions = document.getElementById('newCompanyPositions').value
+        .split(',')
+        .map(p => p.trim())
+        .filter(p => p);
+      setManageLoading(true);
+      const files = Object.values(newCompanyFiles);
+      const result = await callGoogleScript('addCompany', {
+        company: name,
+        positions: positions,
+        files: files
+      });
+      setManageLoading(false);
+      if (result && result.success) {
+        showToast(result.message, 'success');
+
+        companies[name] = positions;
+        populateCompanies();
+        refreshManagementDropdowns();
+
+        document.getElementById('newCompanyName').value = '';
+        document.getElementById('newCompanyPositions').value = '';
+        document.getElementById('newCompanyFileInputs').innerHTML = '';
+        newCompanyFiles = {};
+      }
+    });
+
+    // Add positions
+    document.getElementById('addPositionsBtn').addEventListener('click', async () => {
+      const company = document.getElementById('existingCompanySelect').value;
+      if (!company) {
+        showToast('Please select a company first', 'error');
+        return;
+      }
+      const positions = document.getElementById('addPositionsInput').value
+        .split(',')
+        .map(p => p.trim())
+        .filter(p => p);
+      if (positions.length === 0) {
+        showToast('Please enter at least one position', 'error');
+        return;
+      }
+      setManageLoading(true);
+      const files = Object.values(existingCompanyFiles);
+      const result = await callGoogleScript('addPositions', {
+        company: company,
+        positions: positions,
+        files: files
+      });
+      setManageLoading(false);
+      if (result && result.success) {
+        showToast(result.message, 'success');
+
+        await loadData();
+        refreshManagementDropdowns();
+
+        if (document.getElementById('company').value === company) {
+          populatePositions();
+        }
+
+        document.getElementById('addPositionsInput').value = '';
+        document.getElementById('existingCompanyFileInputs').innerHTML = '';
+        existingCompanyFiles = {};
+      }
+    });
+
+    // Delete position
+    document.getElementById('deletePositionBtn').addEventListener('click', async () => {
+      const company = document.getElementById('existingCompanySelect').value;
+      const position = document.getElementById('existingPositionSelect').value;
+      if (!company || !position) {
+        showToast('Please select both company and position', 'error');
+        return;
+      }
+      const confirmed = await askConfirmation(`Delete position "${position}" from "${company}" and its JD file?`);
+      if (!confirmed) return;
+
+      setManageLoading(true);
+      const result = await callGoogleScript('deletePosition', {
+        company: company,
+        position: position
+      });
+      setManageLoading(false);
+      if (result && result.success) {
+        showToast(result.message, 'success');
+
+        await loadData();
+        refreshManagementDropdowns();
+
+        if (document.getElementById('company').value === company) {
+          populatePositions();
+        }
+      }
+    });
+
+    // Delete company
+    document.getElementById('deleteCompanyBtn').addEventListener('click', async () => {
+      const company = document.getElementById('existingCompanySelect').value;
+      if (!company) {
+        showToast('Please select a company', 'error');
+        return;
+      }
+      const confirmed = await askConfirmation(`Delete company "${company}" and ALL its positions and JD files?`);
+      if (!confirmed) return;
+
+      setManageLoading(true);
+      const result = await callGoogleScript('deleteCompany', {
+        company: company
+      });
+      setManageLoading(false);
+      if (result && result.success) {
+        showToast(result.message, 'success');
+
+        await loadData();
+        refreshManagementDropdowns();
+
+        if (document.getElementById('company').value === company) {
+          document.getElementById('company').value = '';
+          populatePositions();
+        }
+      }
+    });
+
+    console.log('Candidate Entry page loaded with authentication and role-based management button visibility');
+  </script>
 </body>
 </html>
+```
