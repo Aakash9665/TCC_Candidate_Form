@@ -2125,6 +2125,35 @@ We have also shared the *Job Description* with you via email.
       validateExpectedCtcField();
     });
 
+    // ==================== SELF-HEALING SUPABASE CANDIDATE INSERT ====================
+    // Automatically strips any column not present in the Supabase 'candidates' table schema cache
+    async function insertCandidateSafe(initialPayload) {
+      const payload = { ...initialPayload };
+      const maxAttempts = 8;
+
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        const { error } = await supabaseClient
+          .from('candidates')
+          .insert([payload]);
+
+        if (!error) {
+          return { error: null };
+        }
+
+        // Check if PostgREST reported an unknown column in the schema cache
+        const match = error.message && error.message.match(/Could not find the '([^']+)' column/i);
+        if (match && match[1] && Object.prototype.hasOwnProperty.call(payload, match[1])) {
+          console.warn(`[Supabase Schema Guard] Stripping unmapped column '${match[1]}' and retrying insert...`);
+          delete payload[match[1]];
+          continue;
+        }
+
+        return { error };
+      }
+
+      return { error: new Error('Failed to insert candidate after schema adaptation.') };
+    }
+
     // ==================== FORM SUBMISSION (SUPABASE INSERT + POWER AUTOMATE BYPASSED) ====================
     let lastSubmitTimestamp = 0;
     document.getElementById("jobForm").addEventListener("submit", async function (e) {
@@ -2174,7 +2203,7 @@ We have also shared the *Job Description* with you via email.
         recruiterMobile: recruiterMobile
       };
 
-      // Format combined strings for downstream compatibility
+      // Format combined strings (value + unit) stored directly in the main columns
       const formattedCurrentCTC = `${data.currentCTC} ${data.currentCTCUnit}`.trim();
       const formattedExpectedCTC = `${data.expectedCTC} ${data.expectedCTCUnit}`.trim();
       const formattedExperience = `${data.experience} ${data.experienceUnit}`.trim();
@@ -2182,29 +2211,26 @@ We have also shared the *Job Description* with you via email.
 
       try {
         // 1. Insert candidate record into Supabase 'candidates' table
-        const { error: sbError } = await supabaseClient
-          .from('candidates')
-          .insert([{
-            name: data.name,
-            email: data.email,
-            mobile: data.contact,
-            current_ctc: formattedCurrentCTC,
-            current_ctc_unit: data.currentCTCUnit,
-            expected_ctc: formattedExpectedCTC,
-            expected_ctc_unit: data.expectedCTCUnit,
-            experience: formattedExperience,
-            experience_unit: data.experienceUnit,
-            notice_period: formattedNoticePeriod,
-            notice_period_unit: data.noticePeriodUnit,
-            company: data.company,
-            position: data.position,
-            recruiter: recruiterEmail,
-            recruiter_email: recruiterEmail,
-            recruiter_name: recruiterName,
-            recruiter_mobile: recruiterMobile,
-            status: 'Pending',
-            final_status: 'Submitted'
-          }]);
+        // Removed non-existent *_unit columns since units are already combined into current_ctc, expected_ctc, experience, and notice_period
+        const candidatePayload = {
+          name: data.name,
+          email: data.email,
+          mobile: data.contact,
+          current_ctc: formattedCurrentCTC,
+          expected_ctc: formattedExpectedCTC,
+          experience: formattedExperience,
+          notice_period: formattedNoticePeriod,
+          company: data.company,
+          position: data.position,
+          recruiter: recruiterEmail,
+          recruiter_email: recruiterEmail,
+          recruiter_name: recruiterName,
+          recruiter_mobile: recruiterMobile,
+          status: 'Pending',
+          final_status: 'Submitted'
+        };
+
+        const { error: sbError } = await insertCandidateSafe(candidatePayload);
 
         if (sbError) {
           throw new Error(sbError.message || 'Failed to save candidate to Supabase');
