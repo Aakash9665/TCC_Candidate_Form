@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<!-- Default theme is explicitly LIGHT (removed "dark" class from html root) -->
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>TCC Candidate Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Supabase JS Client SDK -->
@@ -23,6 +26,20 @@
     }
   </script>
   <style>
+    :root {
+      --bg-gradient:
+        radial-gradient(circle at 12% 15%, rgba(59, 130, 246, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(99, 102, 241, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.07) 0%, transparent 60%);
+    }
+
+    .dark {
+      --bg-gradient:
+        radial-gradient(circle at 12% 15%, rgba(59, 130, 246, 0.22) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(99, 102, 241, 0.20) 0%, transparent 45%),
+        radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.10) 0%, transparent 60%);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -33,21 +50,59 @@
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
-      background-image:
-        radial-gradient(circle at 12% 15%, rgba(59, 130, 246, 0.16) 0%, transparent 45%),
-        radial-gradient(circle at 88% 85%, rgba(99, 102, 241, 0.14) 0%, transparent 45%);
+      background-image: var(--bg-gradient);
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Ambient Floating Orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(85px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.32;
+      animation: floatOrb 18s ease-in-out infinite alternate;
+    }
+
+    .dark .orb {
+      opacity: 0.42;
+    }
+
+    .orb-1 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      top: -80px;
+      left: -80px;
+    }
+
+    .orb-2 {
+      width: 260px;
+      height: 260px;
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      bottom: -60px;
+      right: -60px;
+      animation-delay: -7s;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(24px, -28px) scale(1.06); }
+      100% { transform: translate(-18px, 20px) scale(0.95); }
     }
 
     .glass-card {
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border: 1px solid rgba(226, 232, 240, 0.85);
-      box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.07);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 14px 34px -10px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
     }
 
     .dark .glass-card {
-      background: rgba(15, 23, 42, 0.82);
+      background: rgba(15, 23, 42, 0.84);
       border: 1px solid rgba(255, 255, 255, 0.09);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
     }
@@ -118,29 +173,39 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+      animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+
     /* Table Styling */
     .table-scroll-wrapper {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
+      max-height: 70vh;
     }
 
     table {
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
-      font-size: 12.5px;
+      font-size: 12px;
     }
 
     th {
-      background: rgba(241, 245, 249, 0.9);
+      background: rgba(241, 245, 249, 0.96);
       color: #475569;
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 10.5px;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      padding: 13px 14px;
+      padding: 12px 12px;
       text-align: left;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.95);
       white-space: nowrap;
       position: sticky;
       top: 0;
@@ -148,14 +213,14 @@
     }
 
     .dark th {
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(15, 23, 42, 0.96);
       color: #94a3b8;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     td {
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.65);
       vertical-align: middle;
       transition: background-color 0.15s ease;
     }
@@ -186,8 +251,8 @@
     }
 
     .candidate-checkbox {
-      width: 17px;
-      height: 17px;
+      width: 16px;
+      height: 16px;
       accent-color: #2563eb;
       cursor: pointer;
       border-radius: 4px;
@@ -198,9 +263,9 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 4px 10px;
+      padding: 3.5px 9px;
       border-radius: 9999px;
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.4px;
@@ -212,20 +277,32 @@
 
     .status-selected {
       background: rgba(16, 185, 129, 0.14);
-      color: #10b981;
+      color: #059669;
       border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .dark .status-selected {
+      color: #10b981;
     }
 
     .status-rejected {
       background: rgba(239, 68, 68, 0.14);
-      color: #ef4444;
+      color: #e11d48;
       border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .dark .status-rejected {
+      color: #ef4444;
     }
 
     .status-hold {
       background: rgba(245, 158, 11, 0.14);
-      color: #f59e0b;
+      color: #d97706;
       border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .dark .status-hold {
+      color: #f59e0b;
     }
 
     /* Action Buttons inside Table */
@@ -241,7 +318,7 @@
     }
 
     .btn-sm {
-      padding: 7px 12px;
+      padding: 6px 10px;
       font-size: 11px;
       border-radius: 10px;
     }
@@ -273,17 +350,17 @@
 
     .popup-content {
       width: 100%;
-      max-width: 480px;
+      max-width: 490px;
       border-radius: 24px;
-      padding: 26px;
+      padding: 24px;
       position: relative;
-      max-height: 90vh;
+      max-height: 92vh;
       overflow-y: auto;
       animation: modalSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .popup-content.compact {
-      max-width: 460px;
+      max-width: 480px;
     }
 
     @keyframes modalSlideUp {
@@ -319,12 +396,12 @@
     #waFloatBtn {
       position: fixed;
       right: 20px;
-      bottom: 24px;
+      bottom: 72px;
       display: none !important;
       text-decoration: none;
       background: linear-gradient(135deg, #25D366, #128C7E);
       color: #fff;
-      padding: 14px 20px;
+      padding: 13px 20px;
       border-radius: 9999px;
       font-weight: 700;
       font-size: 13px;
@@ -333,6 +410,12 @@
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       align-items: center;
       gap: 8px;
+    }
+
+    @media (min-width: 640px) {
+      #waFloatBtn {
+        bottom: 24px;
+      }
     }
 
     #waFloatBtn.show {
@@ -348,8 +431,8 @@
       width: 100%;
       padding: 10px 14px;
       border-radius: 12px;
-      border: 1.5px solid rgba(148, 163, 184, 0.3);
-      background: rgba(248, 250, 252, 0.9);
+      border: 1.5px solid rgba(148, 163, 184, 0.35);
+      background: #ffffff;
       color: #0f172a;
       font-size: 13px;
       transition: all 0.2s ease;
@@ -357,7 +440,7 @@
 
     .dark .form-control-input {
       background: rgba(30, 41, 59, 0.8);
-      border-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.12);
       color: #f8fafc;
     }
 
@@ -366,143 +449,235 @@
       border-color: #3b82f6;
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
+
+    /* Input validation states */
+    .input-valid {
+      border-color: #10b981 !important;
+    }
+
+    .input-invalid {
+      border-color: #f43f5e !important;
+    }
   </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 selection:bg-blue-500 selection:text-white">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-20 sm:pb-12 selection:bg-blue-500 selection:text-white relative">
+
+  <!-- Ambient Floating Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
 
   <!-- Custom Non-Blocking Toast Container -->
-  <div id="toastContainer" class="fixed bottom-5 left-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-4 pointer-events-none"></div>
+  <div id="toastContainer" class="fixed bottom-16 sm:bottom-5 left-4 sm:left-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-3 pointer-events-none"></div>
 
   <!-- Sticky Top Header Bar -->
-  <header class="sticky top-0 z-40 glass-card border-b border-slate-200/70 dark:border-slate-800/80 px-4 sm:px-6 py-3">
-    <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
+  <header class="sticky top-0 z-40 glass-card border-b border-slate-200/80 dark:border-slate-800/80 px-3 sm:px-6 py-2.5 sm:py-3">
+    <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-2 sm:gap-3">
+      <div class="flex items-center gap-2.5 sm:gap-3">
         <!-- Home Button (Preserves .home-button and onclick="goHome()") -->
-        <button class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-500/10 hover:bg-blue-500 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0" onclick="goHome()" title="Home">
-          <i class="fas fa-house text-base"></i>
+        <button
+          class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0"
+          onclick="goHome()"
+          title="Home"
+          aria-label="Home"
+        >
+          <i class="fas fa-house text-sm sm:text-base"></i>
         </button>
 
         <div>
-          <div class="flex flex-wrap items-center gap-2">
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <h1 class="font-display font-extrabold text-sm sm:text-lg text-slate-900 dark:text-white leading-tight flex items-center gap-2">
               <i class="fas fa-users-cog text-blue-500 hidden sm:inline"></i>
               <span>TCC Candidate Management</span>
             </h1>
             <span id="userTypeBadge" class="user-type-badge"></span>
+            <span class="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25" title="Power Automate flow is disabled and bypassed">
+              <i class="fas fa-bolt-slash text-[9px]"></i> PA Bypassed
+            </span>
           </div>
           <p class="dashboard-subtitle text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-            Candidate pipeline tracking, bulk status updates, and automated interview scheduling (Supabase)
+            One-view pipeline tracking, bulk status updates & direct interview scheduling (Power Automate Bypassed)
           </p>
         </div>
       </div>
 
       <!-- Right Action Controls: Refresh, Export CSV, View Toggle, Dark/Light Theme -->
-      <div class="flex items-center gap-2">
-        <button type="button" onclick="refreshCandidateData()" class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-blue-500/10 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200 dark:border-slate-800 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer" title="Refresh Database">
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <button
+          type="button"
+          onclick="refreshCandidateData()"
+          class="px-2.5 sm:px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-blue-500/10 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200 dark:border-slate-800 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+          title="Refresh Database"
+        >
           <i class="fas fa-arrows-rotate" id="refreshIcon"></i>
           <span class="hidden md:inline">Sync</span>
         </button>
 
-        <button type="button" onclick="exportFilteredToCSV()" class="px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer" title="Export Filtered Candidates to CSV">
+        <button
+          type="button"
+          onclick="exportFilteredToCSV()"
+          class="px-2.5 sm:px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+          title="Export Filtered Candidates to Safe CSV"
+        >
           <i class="fas fa-file-csv"></i>
           <span class="hidden md:inline">Export CSV</span>
         </button>
 
         <!-- Table / Card View Switcher -->
-        <div class="hidden sm:flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-          <button type="button" id="viewTableBtn" onclick="switchDisplayMode('table')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all">
+        <div class="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          <button
+            type="button"
+            id="viewTableBtn"
+            onclick="switchDisplayMode('table')"
+            class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all"
+            title="High-Density Table View"
+          >
             <i class="fas fa-table"></i>
           </button>
-          <button type="button" id="viewCardsBtn" onclick="switchDisplayMode('cards')" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all">
+          <button
+            type="button"
+            id="viewCardsBtn"
+            onclick="switchDisplayMode('cards')"
+            class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all"
+            title="Mobile / Grid Card View"
+          >
             <i class="fas fa-grip"></i>
           </button>
         </div>
 
-        <button type="button" onclick="document.documentElement.classList.toggle('dark')" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer" title="Toggle Theme">
+        <button
+          type="button"
+          onclick="toggleTheme()"
+          class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer"
+          title="Toggle Light / Dark Theme"
+        >
           <i class="fas fa-sun text-xs hidden dark:inline text-amber-400"></i>
-          <i class="fas fa-moon text-xs inline dark:hidden"></i>
+          <i class="fas fa-moon text-xs inline dark:hidden text-indigo-600"></i>
         </button>
       </div>
     </div>
   </header>
 
   <!-- ==================== MAIN DASHBOARD CONTAINER (#dashboard) ==================== -->
-  <div id="dashboard" class="max-w-[1600px] mx-auto px-4 sm:px-6 pt-5">
+  <div id="dashboard" class="max-w-[1600px] mx-auto px-3 sm:px-6 pt-4 sm:pt-5 relative z-10">
 
-    <!-- Live Pipeline KPI Summary Strip (Clickable Quick Filters) -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-5">
-      <button type="button" onclick="quickFilterByCategory('')" class="glass-card rounded-2xl p-4 text-left hover:border-blue-500/50 transition-all group cursor-pointer">
+    <!-- Live Pipeline One-View 6-Card KPI Summary Strip (Clickable Quick Filters) -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 mb-4 animate-in">
+      <!-- KPI 1: Total Pipeline -->
+      <button type="button" onclick="quickFilterByCategory('')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-blue-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Pipeline</span>
-          <span class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Pipeline</span>
+          <span class="w-7 h-7 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
             <i class="fas fa-users"></i>
           </span>
         </div>
-        <p class="font-display text-2xl font-extrabold text-slate-900 dark:text-white" id="kpiTotalCount">0</p>
-        <p class="text-[10px] text-slate-400 mt-0.5">Click to show all</p>
+        <p class="font-display text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white" id="kpiTotalCount">0</p>
+        <p class="text-[10px] text-slate-400 mt-0.5 truncate">Click to show all</p>
       </button>
 
-      <button type="button" onclick="quickFilterByCategory('select')" class="glass-card rounded-2xl p-4 text-left hover:border-emerald-500/50 transition-all group cursor-pointer">
+      <!-- KPI 2: Selected / Shortlisted -->
+      <button type="button" onclick="quickFilterByCategory('select')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-emerald-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Selected / Shortlisted</span>
-          <span class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Shortlisted</span>
+          <span class="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
             <i class="fas fa-user-check"></i>
           </span>
         </div>
-        <p class="font-display text-2xl font-extrabold text-emerald-600 dark:text-emerald-400" id="kpiSelectedCount">0</p>
-        <p class="text-[10px] text-slate-400 mt-0.5">Active shortlist & L1-L3</p>
+        <p class="font-display text-xl sm:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400" id="kpiSelectedCount">0</p>
+        <p class="text-[10px] text-slate-400 mt-0.5 truncate">Active & L1-L3</p>
       </button>
 
-      <button type="button" onclick="quickFilterByCategory('hold')" class="glass-card rounded-2xl p-4 text-left hover:border-amber-500/50 transition-all group cursor-pointer">
+      <!-- KPI 3: On Hold / Pending -->
+      <button type="button" onclick="quickFilterByCategory('hold')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-amber-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">On Hold / Pending</span>
-          <span class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">On Hold</span>
+          <span class="w-7 h-7 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
             <i class="fas fa-pause-circle"></i>
           </span>
         </div>
-        <p class="font-display text-2xl font-extrabold text-amber-600 dark:text-amber-400" id="kpiHoldCount">0</p>
-        <p class="text-[10px] text-slate-400 mt-0.5">Awaiting client feedback</p>
+        <p class="font-display text-xl sm:text-2xl font-extrabold text-amber-600 dark:text-amber-400" id="kpiHoldCount">0</p>
+        <p class="text-[10px] text-slate-400 mt-0.5 truncate">Awaiting feedback</p>
       </button>
 
-      <button type="button" onclick="quickFilterByCategory('reject')" class="glass-card rounded-2xl p-4 text-left hover:border-rose-500/50 transition-all group cursor-pointer">
+      <!-- KPI 4: Rejected / Dropped -->
+      <button type="button" onclick="quickFilterByCategory('reject')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-rose-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Rejected / Dropped</span>
-          <span class="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Rejected</span>
+          <span class="w-7 h-7 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
             <i class="fas fa-user-xmark"></i>
           </span>
         </div>
-        <p class="font-display text-2xl font-extrabold text-rose-600 dark:text-rose-400" id="kpiRejectedCount">0</p>
-        <p class="text-[10px] text-slate-400 mt-0.5">Not shortlisted / L1-L3 reject</p>
+        <p class="font-display text-xl sm:text-2xl font-extrabold text-rose-600 dark:text-rose-400" id="kpiRejectedCount">0</p>
+        <p class="text-[10px] text-slate-400 mt-0.5 truncate">Dropped / L1-L3</p>
       </button>
+
+      <!-- KPI 5: Interviews Scheduled (Click to filter candidates with interview dates) -->
+      <button type="button" onclick="quickFilterByCategory('interview')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-purple-500/50 transition-all group cursor-pointer">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">Interviews</span>
+          <span class="w-7 h-7 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+            <i class="fas fa-calendar-check"></i>
+          </span>
+        </div>
+        <p class="font-display text-xl sm:text-2xl font-extrabold text-purple-600 dark:text-purple-400" id="kpiInterviewsCount">0</p>
+        <p class="text-[10px] text-slate-400 mt-0.5 truncate">Scheduled lineup</p>
+      </button>
+
+      <!-- KPI 6: Power Automate Status -->
+      <div class="glass-card rounded-2xl p-3 sm:p-3.5 text-left border-amber-500/30 bg-amber-500/5">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">Power Automate</span>
+          <span class="w-7 h-7 rounded-xl bg-amber-500 text-white flex items-center justify-center text-xs">
+            <i class="fas fa-forward-fast"></i>
+          </span>
+        </div>
+        <p class="font-display text-sm sm:text-base font-extrabold text-amber-700 dark:text-amber-400 mt-1">BYPASSED</p>
+        <p class="text-[10px] text-slate-400 mt-0.5 truncate">Direct Supabase Mode</p>
+      </div>
     </div>
 
     <!-- Search & Filters Card (Preserves #nameSearch, #searchButton, #companySelect, #statusSelect) -->
-    <div class="filters-container glass-card rounded-3xl p-4 sm:p-6 mb-5">
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-        <h3 class="filters-title font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
+    <div class="filters-container glass-card rounded-3xl p-4 sm:p-5 mb-4 animate-in" id="filterTopAnchor">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h3 class="filters-title font-display font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-2">
           <i class="fas fa-filter text-blue-500"></i>
           <span>Search & Filter Pipeline</span>
         </h3>
-        <button type="button" onclick="resetAllFilters()" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-          <i class="fas fa-rotate-left text-[10px]"></i>
-          Clear Filters
-        </button>
+        <div class="flex items-center gap-3">
+          <span id="searchCondBadge" class="text-[10px] font-semibold text-slate-400">Ready</span>
+          <button type="button" onclick="resetAllFilters()" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+            <i class="fas fa-rotate-left text-[10px]"></i>
+            Clear Filters
+          </button>
+        </div>
       </div>
 
-      <div class="filters grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3.5 items-end">
+      <div class="filters grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
         <div class="filter-group lg:col-span-4">
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
-            Search Candidate
-          </label>
+          <div class="flex items-center justify-between mb-1">
+            <label for="nameSearch" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+              Search Candidate (Name / Email / Phone)
+            </label>
+            <span id="nameSearchCounter" class="text-[10px] text-slate-400">0/60</span>
+          </div>
           <div class="input-with-icon relative">
             <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
             <input
               type="text"
               id="nameSearch"
-              oninput="applyFilters(false)"
-              placeholder="Search by candidate name..."
-              class="form-control-input pl-9"
+              maxlength="60"
+              oninput="validateSearchInput(this); applyFilters(false)"
+              placeholder="Search name, email, or mobile..."
+              class="form-control-input pl-9 pr-8"
             />
+            <button
+              type="button"
+              id="clearNameSearchBtn"
+              onclick="clearSearchField()"
+              class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 items-center justify-center text-[10px]"
+              title="Clear search"
+            >
+              <i class="fas fa-times"></i>
+            </button>
           </div>
         </div>
 
@@ -514,7 +689,7 @@
         </div>
 
         <div class="filter-group lg:col-span-3">
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+          <label for="companySelect" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
             Company
           </label>
           <select id="companySelect" onchange="applyFilters()" class="form-control-input">
@@ -523,7 +698,7 @@
         </div>
 
         <div class="filter-group lg:col-span-3">
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+          <label for="statusSelect" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
             Final Status
           </label>
           <select id="statusSelect" onchange="applyFilters()" class="form-control-input">
@@ -542,19 +717,22 @@
     </div>
 
     <!-- Candidate Database Table Container (Preserves #candidateTable, #selectAllCheckbox) -->
-    <div class="table-container glass-card rounded-3xl overflow-hidden" id="tableViewWrapper">
-      <div class="table-header px-5 py-4 border-b border-slate-200/70 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-3 bg-slate-100/50 dark:bg-slate-900/40">
-        <div class="flex items-center gap-2.5">
-          <h3 class="table-title font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
+    <div class="table-container glass-card rounded-3xl overflow-hidden animate-in" id="tableViewWrapper">
+      <div class="table-header px-4 sm:px-5 py-3.5 border-b border-slate-200/80 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2.5 bg-slate-100/60 dark:bg-slate-900/40">
+        <div class="flex flex-wrap items-center gap-2">
+          <h3 class="table-title font-display font-bold text-xs sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
             <i class="fas fa-table text-blue-500"></i>
-            <span>Candidate Database</span>
+            <span>All-in-One Candidate Database</span>
           </h3>
           <span id="showingCountBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
             Loading...
           </span>
+          <span class="hidden md:inline text-[11px] text-slate-400">
+            Click any row to update stage or add recruiter notes
+          </span>
         </div>
 
-        <div class="select-all-container flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 bg-white/80 dark:bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+        <div class="select-all-container flex items-center gap-2 text-xs font-bold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
           <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()" class="w-4 h-4 accent-blue-600 rounded cursor-pointer">
           <label for="selectAllCheckbox" class="cursor-pointer select-none">Select All Visible</label>
         </div>
@@ -564,20 +742,21 @@
         <table id="candidateTable">
           <thead>
             <tr>
-              <th class="w-10 text-center"><i class="fas fa-check"></i></th>
+              <th class="w-9 text-center"><i class="fas fa-check"></i></th>
               <th><i class="fas fa-clock mr-1"></i> Updated</th>
-              <th><i class="fas fa-user mr-1"></i> Name</th>
-              <th><i class="fas fa-envelope mr-1"></i> Email</th>
-              <th><i class="fas fa-briefcase mr-1"></i> Position</th>
+              <th><i class="fas fa-user mr-1"></i> Candidate & Mobile</th>
+              <th><i class="fas fa-briefcase mr-1"></i> Role & Client</th>
+              <th><i class="fas fa-indian-rupee-sign mr-1"></i> CTC (Cur → Exp)</th>
+              <th><i class="fas fa-hourglass-half mr-1"></i> Exp & Notice</th>
               <th><i class="fas fa-user-tie mr-1"></i> Recruiter</th>
-              <th><i class="fas fa-building mr-1"></i> Company</th>
-              <th><i class="fas fa-flag mr-1"></i> Status</th>
-              <th><i class="fas fa-phone mr-1"></i> Contact</th>
+              <th><i class="fas fa-flag mr-1"></i> Status & Notes</th>
+              <th><i class="fas fa-calendar-alt mr-1"></i> Interview</th>
+              <th><i class="fas fa-bolt mr-1"></i> Actions</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td colspan="9" class="loading py-12 text-center text-slate-400">
+              <td colspan="10" class="loading py-12 text-center text-slate-400">
                 <i class="fas fa-spinner fa-spin text-blue-500 text-lg mb-2"></i><br>
                 Loading candidates from Supabase...
               </td>
@@ -588,7 +767,7 @@
     </div>
 
     <!-- Mobile / Grid Card View Container (Synced with filteredCandidates) -->
-    <div id="cardsViewWrapper" class="hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2"></div>
+    <div id="cardsViewWrapper" class="hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 mt-2"></div>
 
     <!-- ==================== STATUS UPDATE POPUP (#popup) ==================== -->
     <div class="popup-overlay" id="popup">
@@ -602,16 +781,17 @@
           </button>
         </div>
 
-        <!-- Single Candidate Info -->
-        <div class="popup-info p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 mb-4 space-y-1.5 text-xs" id="singleCandidateInfo">
-          <p class="flex justify-between"><strong class="text-slate-500 dark:text-slate-400">Name:</strong> <span id="popupCandidateName" class="font-bold text-slate-900 dark:text-white text-right"></span></p>
-          <p class="flex justify-between"><strong class="text-slate-500 dark:text-slate-400">Company:</strong> <span id="popupCompany" class="font-semibold text-slate-800 dark:text-slate-200 text-right"></span></p>
-          <p class="flex justify-between"><strong class="text-slate-500 dark:text-slate-400">Position:</strong> <span id="popupPosition" class="font-semibold text-blue-600 dark:text-blue-400 text-right"></span></p>
+        <!-- Single Candidate One-View Info -->
+        <div class="popup-info p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 mb-4 space-y-1.5 text-xs" id="singleCandidateInfo">
+          <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">Name:</strong> <span id="popupCandidateName" class="font-bold text-slate-900 dark:text-white text-right"></span></p>
+          <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">Company:</strong> <span id="popupCompany" class="font-semibold text-slate-800 dark:text-slate-200 text-right"></span></p>
+          <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">Position:</strong> <span id="popupPosition" class="font-semibold text-blue-600 dark:text-blue-400 text-right"></span></p>
+          <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">CTC / Notice:</strong> <span id="popupCompSummary" class="font-medium text-slate-700 dark:text-slate-300 text-right">-</span></p>
           <span id="popup__powerappsid__" class="hidden"></span>
         </div>
 
         <!-- Bulk Update Info -->
-        <div class="bulk-info p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 mb-4 text-xs" id="bulkUpdateInfo" style="display: none;">
+        <div class="bulk-info p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 mb-4 text-xs" id="bulkUpdateInfo" style="display: none;">
           <p class="mb-1"><strong>Selected Candidates:</strong> <span id="bulkCandidateCount" class="font-bold text-emerald-600 dark:text-emerald-400"></span></p>
           <p class="mb-2"><strong>Companies:</strong> <span id="bulkCompanies" class="font-semibold"></span></p>
           <div class="bulk-candidates-list" id="bulkCandidatesList"></div>
@@ -619,10 +799,13 @@
 
         <div class="space-y-4">
           <div class="form-group">
-            <label for="statusDropdown" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-              <i class="fas fa-flag text-blue-500 mr-1"></i> Stage Category
-            </label>
-            <select id="statusDropdown" onchange="updateFinalStatusOptions()" class="form-control-input">
+            <div class="flex items-center justify-between mb-1">
+              <label for="statusDropdown" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <i class="fas fa-flag text-blue-500 mr-1"></i> Stage Category <span class="text-rose-500">*</span>
+              </label>
+              <span id="statusStageBadge" class="text-[10px] font-semibold text-slate-400">Required</span>
+            </div>
+            <select id="statusDropdown" onchange="updateFinalStatusOptions(); validateStatusModalInputs()" class="form-control-input">
               <option value="">Select Status</option>
               <option value="Selected">Selected</option>
               <option value="Rejected">Rejected</option>
@@ -631,27 +814,41 @@
           </div>
 
           <div class="form-group">
-            <label for="finalStatusDropdown" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-              <i class="fas fa-check-circle text-emerald-500 mr-1"></i> Final Status
-            </label>
-            <select id="finalStatusDropdown" class="form-control-input">
+            <div class="flex items-center justify-between mb-1">
+              <label for="finalStatusDropdown" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <i class="fas fa-check-circle text-emerald-500 mr-1"></i> Final Status <span class="text-rose-500">*</span>
+              </label>
+              <span id="finalStatusCondBadge" class="text-[10px] font-semibold text-slate-400">Required</span>
+            </div>
+            <select id="finalStatusDropdown" onchange="validateStatusModalInputs()" class="form-control-input">
               <option value="">Select Final Status</option>
             </select>
           </div>
 
           <div class="form-group">
-            <label for="commentBox" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-              <i class="fas fa-comment text-indigo-500 mr-1"></i> Recruiter Comment / Notes
-            </label>
-            <textarea id="commentBox" rows="2" placeholder="Optional comment..." class="form-control-input"></textarea>
+            <div class="flex items-center justify-between mb-1">
+              <label for="commentBox" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <i class="fas fa-comment text-indigo-500 mr-1"></i> Recruiter Comment / Notes
+              </label>
+              <span id="commentCharCounter" class="text-[10px] font-semibold text-slate-400">0/300</span>
+            </div>
+            <textarea
+              id="commentBox"
+              rows="2"
+              maxlength="300"
+              oninput="validateCommentInput(this)"
+              placeholder="Optional feedback, interview round notes, or follow-up reason..."
+              class="form-control-input"
+            ></textarea>
           </div>
+          <p id="statusModalErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-semibold hidden"></p>
         </div>
 
         <div class="popup-buttons flex items-center justify-end gap-2.5 mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
-          <button class="btn btn-secondary px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold" onclick="closePopup()">
+          <button type="button" class="btn btn-secondary px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold" onclick="closePopup()">
             <i class="fas fa-times"></i> Cancel
           </button>
-          <button class="btn btn-primary px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold shadow-lg shadow-blue-600/25" id="statusSubmitButton" onclick="submitStatusUpdate()">
+          <button type="button" class="btn btn-primary px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold shadow-lg shadow-blue-600/25" id="statusSubmitButton" onclick="submitStatusUpdate()">
             <i class="fas fa-save"></i>
             <span class="btn-text">Update</span>
           </button>
@@ -662,43 +859,61 @@
     <!-- ==================== INTERVIEW SCHEDULING POPUP (#extraPopup) ==================== -->
     <div class="popup-overlay" id="extraPopup">
       <div class="popup-content compact glass-card">
-        <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-200 dark:border-slate-800">
-          <h3 class="font-display font-extrabold text-lg text-slate-900 dark:text-white flex items-center gap-2">
-            <i class="fas fa-calendar-plus text-emerald-500"></i> Schedule Interview
-          </h3>
+        <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
+          <div>
+            <h3 class="font-display font-extrabold text-base sm:text-lg text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fas fa-calendar-plus text-emerald-500"></i> Schedule Interview
+            </h3>
+            <p class="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
+              Direct Supabase Save & WhatsApp Invite • Power Automate Bypassed
+            </p>
+          </div>
           <button type="button" onclick="closeExtraPopup()" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
             <i class="fas fa-times"></i>
           </button>
         </div>
 
-        <div class="space-y-3.5 text-xs">
-          <div class="compact-row p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-between">
+        <div class="space-y-3 text-xs">
+          <div class="compact-row p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-between gap-2">
             <strong class="text-slate-600 dark:text-slate-300"><i class="fas fa-user text-blue-500 mr-1.5"></i> Candidate:</strong>
-            <span id="extraCandidateName" class="font-bold text-slate-900 dark:text-white text-sm"></span>
+            <div class="text-right">
+              <span id="extraCandidateName" class="font-bold text-slate-900 dark:text-white text-sm block"></span>
+              <span id="extraCandidateRoleSub" class="text-[10px] text-blue-600 dark:text-blue-400 font-semibold"></span>
+            </div>
           </div>
 
-          <div class="compact-row p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <span class="font-bold text-slate-600 dark:text-slate-300"><i class="fas fa-paper-plane text-indigo-500 mr-1.5"></i> Send via:</span>
-            <div class="checkbox-group flex items-center gap-4">
-              <label class="checkbox-item flex items-center gap-1.5 font-semibold cursor-pointer">
+          <div class="compact-row p-3 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <span class="font-bold text-slate-600 dark:text-slate-300"><i class="fas fa-paper-plane text-indigo-500 mr-1.5"></i> Channel:</span>
+            <div class="checkbox-group flex items-center gap-3.5">
+              <label class="checkbox-item flex items-center gap-1.5 font-semibold cursor-pointer" title="Power Automate Email Flow is bypassed">
                 <input type="checkbox" id="sendEmail" class="w-4 h-4 accent-blue-600 rounded">
-                <i class="fas fa-envelope text-blue-500"></i> Email
+                <i class="fas fa-envelope text-blue-500"></i> Email <span class="text-[9px] px-1 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-300">PA Bypassed</span>
               </label>
               <label class="checkbox-item flex items-center gap-1.5 font-semibold cursor-pointer">
-                <input type="checkbox" id="sendWhatsapp" class="w-4 h-4 accent-emerald-600 rounded">
+                <input type="checkbox" id="sendWhatsapp" checked class="w-4 h-4 accent-emerald-600 rounded">
                 <i class="fab fa-whatsapp text-emerald-500"></i> WhatsApp
               </label>
             </div>
           </div>
 
           <div class="form-group">
-            <label for="extraDateTime" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-              <i class="fas fa-calendar-alt text-blue-500 mr-1"></i> Interview Date & Time
-            </label>
-            <input type="datetime-local" id="extraDateTime" class="form-control-input">
+            <div class="flex items-center justify-between mb-1">
+              <label for="extraDateTime" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <i class="fas fa-calendar-alt text-blue-500 mr-1"></i> Interview Date & Time <span class="text-rose-500">*</span>
+              </label>
+              <span id="dateTimeCondBadge" class="text-[10px] font-semibold text-slate-400">Required</span>
+            </div>
+            <input
+              type="datetime-local"
+              id="extraDateTime"
+              onchange="validateInterviewDateTime(this)"
+              oninput="validateInterviewDateTime(this)"
+              class="form-control-input"
+            >
+            <p id="extraDateTimeErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
           </div>
 
-          <div class="compact-row p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+          <div class="compact-row p-3 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <span class="font-bold text-slate-600 dark:text-slate-300"><i class="fas fa-map-marker-alt text-rose-500 mr-1.5"></i> Mode:</span>
             <div class="checkbox-group flex items-center gap-4">
               <label class="checkbox-item flex items-center gap-1.5 font-semibold cursor-pointer">
@@ -714,30 +929,46 @@
 
           <div id="locationBox" style="display:none;">
             <div class="form-group">
-              <label for="locationSelect" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-                <i class="fas fa-map-marker-alt text-amber-500 mr-1"></i> Client Office Location
-              </label>
-              <select id="locationSelect" class="form-control-input">
+              <div class="flex items-center justify-between mb-1">
+                <label for="locationSelect" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  <i class="fas fa-map-marker-alt text-amber-500 mr-1"></i> Client Office Location <span class="text-rose-500">*</span>
+                </label>
+                <span id="locationCondBadge" class="text-[10px] font-semibold text-slate-400">Select branch</span>
+              </div>
+              <select id="locationSelect" onchange="validateLocationSelection()" class="form-control-input">
                 <option value="">Select Location</option>
               </select>
+              <!-- One-View Selected Office SPOC & Address Preview -->
+              <div id="selectedLocationPreview" class="hidden mt-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-[11px] text-slate-700 dark:text-slate-300 space-y-0.5"></div>
             </div>
           </div>
 
           <div id="inviteBox" style="display:none;">
             <div class="form-group">
-              <label for="inviteLink" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-                <i class="fas fa-link text-purple-500 mr-1"></i> Online Meeting Link
-              </label>
-              <input type="url" id="inviteLink" placeholder="https://meet.google.com/xxx" class="form-control-input">
+              <div class="flex items-center justify-between mb-1">
+                <label for="inviteLink" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  <i class="fas fa-link text-purple-500 mr-1"></i> Online Meeting Link <span class="text-rose-500">*</span>
+                </label>
+                <span id="inviteLinkCondBadge" class="text-[10px] font-semibold text-slate-400">https:// required</span>
+              </div>
+              <input
+                type="url"
+                id="inviteLink"
+                maxlength="300"
+                oninput="validateInviteLinkField(this)"
+                placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                class="form-control-input"
+              >
+              <p id="inviteLinkErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
             </div>
           </div>
         </div>
 
-        <div class="popup-buttons flex items-center justify-end gap-2.5 mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
-          <button class="btn btn-secondary px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold" onclick="closeExtraPopup()">
+        <div class="popup-buttons flex items-center justify-end gap-2.5 mt-5 pt-4 border-t border-slate-200 dark:border-slate-800">
+          <button type="button" class="btn btn-secondary px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold" onclick="closeExtraPopup()">
             <i class="fas fa-times"></i> Cancel
           </button>
-          <button class="btn btn-primary px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold shadow-lg shadow-emerald-600/25" id="interviewSubmitButton" onclick="submitExtraPopup()">
+          <button type="button" class="btn btn-primary px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-bold shadow-lg shadow-emerald-600/25" id="interviewSubmitButton" onclick="submitExtraPopup()">
             <i class="fas fa-paper-plane"></i>
             <span class="btn-text">Send Invitation</span>
           </button>
@@ -748,20 +979,95 @@
   </div>
 
   <!-- WhatsApp Float Button (Preserves #waFloatBtn and #waButtonText) -->
-  <a id="waFloatBtn" href="#" target="_blank" rel="noopener">
+  <a id="waFloatBtn" href="#" target="_blank" rel="noopener noreferrer">
     <i class="fab fa-whatsapp text-lg"></i>
     <span id="waButtonText">Send WhatsApp</span>
   </a>
 
+  <!-- Mobile-First Bottom Quick Navigation Bar (Thumb-friendly on phones) -->
+  <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 glass-card border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
+    <button type="button" onclick="goHome()" class="flex flex-col items-center gap-0.5 text-blue-600 dark:text-blue-400 text-[10px] font-bold">
+      <i class="fas fa-house text-sm"></i>
+      <span>Home</span>
+    </button>
+    <button type="button" onclick="document.getElementById('filterTopAnchor').scrollIntoView({behavior:'smooth'})" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
+      <i class="fas fa-filter text-sm"></i>
+      <span>Filters</span>
+    </button>
+    <button type="button" onclick="switchDisplayMode(currentDisplayMode === 'table' ? 'cards' : 'table')" class="flex flex-col items-center gap-0.5 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold">
+      <i class="fas fa-grip text-sm"></i>
+      <span>View Mode</span>
+    </button>
+    <button type="button" onclick="refreshCandidateData()" class="flex flex-col items-center gap-0.5 text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold">
+      <i class="fas fa-arrows-rotate text-sm"></i>
+      <span>Sync</span>
+    </button>
+    <button type="button" onclick="toggleTheme()" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
+      <i class="fas fa-circle-half-stroke text-sm"></i>
+      <span>Theme</span>
+    </button>
+  </nav>
+
   <script>
     // ==================== SUPABASE CONFIGURATION ====================
     const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0'; // Paste your Supabase anon/public key here
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0';
 
     // Initialize Supabase Client
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Custom Toast Notification Helper (non-blocking replacement for alert)
+    // ==================== REQUIREMENT #5: POWER AUTOMATE BYPASS ====================
+    window.POWER_AUTOMATE_ENABLED = false;
+    window.BYPASS_POWER_AUTOMATE = true;
+    sessionStorage.setItem('powerAutomateEnabled', 'false');
+    sessionStorage.setItem('bypassPowerAutomate', 'true');
+
+    // Global fetch interceptor to ensure any Power Automate / Logic App webhook is safely bypassed
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = async function(resource, config) {
+      const urlStr = typeof resource === 'string' ? resource : (resource?.url || '');
+      if (
+        urlStr.includes('powerplatform.com') ||
+        urlStr.includes('powerautomate') ||
+        urlStr.includes('logic.azure.com') ||
+        urlStr.includes('flow.microsoft.com')
+      ) {
+        console.info('[Power Automate Bypassed] Webhook call intercepted and bypassed:', urlStr);
+        return new Response(
+          JSON.stringify({ success: true, bypassed: true, message: 'Power Automate is disabled and bypassed.' }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+      return originalFetch(resource, config);
+    };
+
+    // ==================== REQUIREMENT #1: SECURITY UTILITIES ====================
+    function escapeHtml(unsafe) {
+      if (unsafe === null || unsafe === undefined) return "";
+      return String(unsafe)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Prevent CSV Formula Injection (CSV Injection) when exporting to Excel/Sheets
+    function sanitizeCsvCell(val) {
+      let str = String(val ?? "").replace(/"/g, '""').trim();
+      if (/^[=+\-@\t\r]/.test(str)) {
+        str = "'" + str;
+      }
+      return `"${str}"`;
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle('dark');
+      sessionStorage.setItem('tccTheme', isDark ? 'dark' : 'light');
+    }
+
+    // Custom XSS-Safe Toast Notification Helper
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
       if (!container) return;
@@ -777,13 +1083,202 @@
         error: 'fa-triangle-exclamation text-white'
       };
       toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl border shadow-xl text-xs sm:text-sm font-semibold transition-all duration-300 ${colors[type] || colors.info}`;
-      toast.innerHTML = `<i class="fas ${icons[type] || icons.info} shrink-0"></i><span class="flex-1">${message}</span>`;
+
+      const iconEl = document.createElement('i');
+      iconEl.className = `fas ${icons[type] || icons.info} shrink-0`;
+
+      const textSpan = document.createElement('span');
+      textSpan.className = 'flex-1';
+      textSpan.textContent = String(message || '');
+
+      toast.appendChild(iconEl);
+      toast.appendChild(textSpan);
       container.appendChild(toast);
+
       setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateY(8px)';
         setTimeout(() => toast.remove(), 300);
       }, 3800);
+    }
+
+    // ==================== REQUIREMENT #4: INPUT CONDITION CHECKS ====================
+    // 1. Search Input Condition Check
+    function validateSearchInput(inputEl) {
+      if (!inputEl) return;
+      const cleaned = inputEl.value.replace(/[<>"{}`\\]/g, '').slice(0, 60);
+      if (inputEl.value !== cleaned) inputEl.value = cleaned;
+
+      const counterEl = document.getElementById('nameSearchCounter');
+      const clearBtn = document.getElementById('clearNameSearchBtn');
+      const badgeEl = document.getElementById('searchCondBadge');
+
+      if (counterEl) counterEl.textContent = `${cleaned.length}/60`;
+      if (clearBtn) clearBtn.style.display = cleaned.length > 0 ? 'inline-flex' : 'none';
+      if (badgeEl) badgeEl.textContent = cleaned.length > 0 ? 'Filtering active' : 'Ready';
+    }
+
+    function clearSearchField() {
+      const el = document.getElementById('nameSearch');
+      if (el) {
+        el.value = '';
+        validateSearchInput(el);
+        applyFilters(false);
+      }
+    }
+
+    // 2. Status Update Modal Dropdowns & Comment Condition Check
+    function validateStatusModalInputs() {
+      const stEl = document.getElementById('statusDropdown');
+      const fnEl = document.getElementById('finalStatusDropdown');
+      const stBadge = document.getElementById('statusStageBadge');
+      const fnBadge = document.getElementById('finalStatusCondBadge');
+      const errMsg = document.getElementById('statusModalErrorMsg');
+
+      let valid = true;
+      if (!stEl?.value) {
+        stEl?.classList.remove('input-valid');
+        stEl?.classList.add('input-invalid');
+        if (stBadge) stBadge.textContent = 'Required';
+        valid = false;
+      } else {
+        stEl?.classList.remove('input-invalid');
+        stEl?.classList.add('input-valid');
+        if (stBadge) stBadge.textContent = '✓ Selected';
+      }
+
+      if (!fnEl?.value) {
+        fnEl?.classList.remove('input-valid');
+        fnEl?.classList.add('input-invalid');
+        if (fnBadge) fnBadge.textContent = 'Required';
+        valid = false;
+      } else {
+        fnEl?.classList.remove('input-invalid');
+        fnEl?.classList.add('input-valid');
+        if (fnBadge) fnBadge.textContent = '✓ Selected';
+      }
+
+      if (errMsg && valid) errMsg.classList.add('hidden');
+      return valid;
+    }
+
+    function validateCommentInput(textareaEl) {
+      if (!textareaEl) return true;
+      const cleaned = textareaEl.value.replace(/[<>]/g, '').slice(0, 300);
+      if (textareaEl.value !== cleaned) textareaEl.value = cleaned;
+      const counter = document.getElementById('commentCharCounter');
+      if (counter) counter.textContent = `${cleaned.length}/300`;
+      return true;
+    }
+
+    // 3. Interview Date & Time Condition Check
+    function validateInterviewDateTime(inputEl) {
+      const el = inputEl || document.getElementById('extraDateTime');
+      const errEl = document.getElementById('extraDateTimeErrorMsg');
+      const badgeEl = document.getElementById('dateTimeCondBadge');
+      if (!el) return false;
+
+      if (!el.value) {
+        el.classList.remove('input-valid');
+        el.classList.add('input-invalid');
+        if (errEl) {
+          errEl.textContent = 'Please select an interview date and time.';
+          errEl.classList.remove('hidden');
+        }
+        if (badgeEl) badgeEl.textContent = 'Required';
+        return false;
+      }
+
+      const selectedDate = new Date(el.value);
+      const nowMinus5Min = new Date(Date.now() - 5 * 60 * 1000);
+      if (isNaN(selectedDate.getTime()) || selectedDate < nowMinus5Min) {
+        el.classList.remove('input-valid');
+        el.classList.add('input-invalid');
+        if (errEl) {
+          errEl.textContent = 'Interview date/time cannot be in the past.';
+          errEl.classList.remove('hidden');
+        }
+        if (badgeEl) badgeEl.textContent = 'Past date invalid';
+        return false;
+      }
+
+      el.classList.remove('input-invalid');
+      el.classList.add('input-valid');
+      if (errEl) errEl.classList.add('hidden');
+      if (badgeEl) badgeEl.textContent = '✓ Valid schedule';
+      return true;
+    }
+
+    // 4. Physical Location Condition Check & Live Address Preview
+    function validateLocationSelection() {
+      const select = document.getElementById('locationSelect');
+      const preview = document.getElementById('selectedLocationPreview');
+      const badge = document.getElementById('locationCondBadge');
+      if (!select) return false;
+
+      const val = (select.value || '').trim();
+      if (!val) {
+        select.classList.remove('input-valid');
+        select.classList.add('input-invalid');
+        if (preview) preview.classList.add('hidden');
+        if (badge) badge.textContent = 'Required';
+        return false;
+      }
+
+      select.classList.remove('input-invalid');
+      select.classList.add('input-valid');
+      if (badge) badge.textContent = '✓ Verified';
+
+      const normalize = str => (str || "").toString().trim().toLowerCase();
+      const loc = (locationRows || []).find(r => {
+        const locName = normalize(r.office_locations ?? r.Office_Locations ?? r.Location ?? "");
+        return locName === normalize(val);
+      });
+
+      if (loc && preview) {
+        const spoc = getVal(loc, "Spoc_Name", "spoc_name") || "-";
+        const phone = getVal(loc, "Spoc_Number", "spoc_number") || "-";
+        const addr = getVal(loc, "Address", "address") || "-";
+        preview.innerHTML = '';
+        const p1 = document.createElement('p');
+        p1.className = 'font-bold text-slate-900 dark:text-white';
+        p1.textContent = `SPOC: ${spoc} (${phone})`;
+        const p2 = document.createElement('p');
+        p2.className = 'text-[10px] text-slate-500 dark:text-slate-400';
+        p2.textContent = `Address: ${addr}`;
+        preview.appendChild(p1);
+        preview.appendChild(p2);
+        preview.classList.remove('hidden');
+      }
+      return true;
+    }
+
+    // 5. Online Meeting Link Condition Check
+    function validateInviteLinkField(inputEl) {
+      const el = inputEl || document.getElementById('inviteLink');
+      const errEl = document.getElementById('inviteLinkErrorMsg');
+      const badgeEl = document.getElementById('inviteLinkCondBadge');
+      if (!el) return false;
+
+      const val = el.value.trim();
+      const urlRegex = /^https:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/\S*)?$/;
+
+      if (!val || !urlRegex.test(val)) {
+        el.classList.remove('input-valid');
+        el.classList.add('input-invalid');
+        if (errEl) {
+          errEl.textContent = 'Enter a secure meeting URL starting with https:// (e.g. Google Meet, Zoom, Teams).';
+          errEl.classList.remove('hidden');
+        }
+        if (badgeEl) badgeEl.textContent = 'Invalid URL';
+        return false;
+      }
+
+      el.classList.remove('input-invalid');
+      el.classList.add('input-valid');
+      if (errEl) errEl.classList.add('hidden');
+      if (badgeEl) badgeEl.textContent = '✓ Valid URL';
+      return true;
     }
 
     // View Mode Toggle (Table vs Cards)
@@ -799,14 +1294,14 @@
         tableWrapper.classList.add('hidden');
         cardsWrapper.classList.remove('hidden');
         cardsWrapper.classList.add('grid');
-        if (btnCards) btnCards.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
-        if (btnTable) btnTable.className = 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
+        if (btnCards) btnCards.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
+        if (btnTable) btnTable.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
       } else {
         tableWrapper.classList.remove('hidden');
         cardsWrapper.classList.add('hidden');
         cardsWrapper.classList.remove('grid');
-        if (btnTable) btnTable.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
-        if (btnCards) btnCards.className = 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
+        if (btnTable) btnTable.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
+        if (btnCards) btnCards.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
       }
     }
 
@@ -816,6 +1311,7 @@
       let selectedCount = 0;
       let holdCount = 0;
       let rejectedCount = 0;
+      let interviewCount = 0;
 
       list.forEach(c => {
         const st = (c.final_status || c.status || '').toLowerCase();
@@ -826,18 +1322,23 @@
         } else if (st.includes('reject') || st.includes('not')) {
           rejectedCount++;
         }
+        if (c.interview_date) {
+          interviewCount++;
+        }
       });
 
       const totalEl = document.getElementById('kpiTotalCount');
       const selEl = document.getElementById('kpiSelectedCount');
       const holdEl = document.getElementById('kpiHoldCount');
       const rejEl = document.getElementById('kpiRejectedCount');
+      const intEl = document.getElementById('kpiInterviewsCount');
       const badgeEl = document.getElementById('showingCountBadge');
 
       if (totalEl) totalEl.textContent = list.length;
       if (selEl) selEl.textContent = selectedCount;
       if (holdEl) holdEl.textContent = holdCount;
       if (rejEl) rejEl.textContent = rejectedCount;
+      if (intEl) intEl.textContent = interviewCount;
       if (badgeEl) badgeEl.textContent = `${list.length} Candidate${list.length === 1 ? '' : 's'}`;
     }
 
@@ -853,6 +1354,7 @@
         if (keyword === 'select') return st.includes('select') || st.includes('shortlist') || st.includes('join');
         if (keyword === 'hold') return st.includes('hold') || st.includes('delay');
         if (keyword === 'reject') return st.includes('reject') || st.includes('not');
+        if (keyword === 'interview') return Boolean(c.interview_date);
         return true;
       });
       filteredCandidates = filtered;
@@ -863,7 +1365,10 @@
     function resetAllFilters() {
       if (companySelect) companySelect.value = '';
       if (statusSelect) statusSelect.value = '';
-      if (nameSearchInput) nameSearchInput.value = '';
+      if (nameSearchInput) {
+        nameSearchInput.value = '';
+        validateSearchInput(nameSearchInput);
+      }
       applyFilters(false);
       showToast('All filters cleared', 'info');
     }
@@ -882,16 +1387,21 @@
         showToast('No candidates to export', 'error');
         return;
       }
-      const headers = ['Updated', 'Name', 'Email', 'Position', 'Recruiter', 'Company', 'Final Status', 'Mobile'];
+      const headers = ['Updated', 'Name', 'Email', 'Mobile', 'Position', 'Company', 'Current CTC', 'Expected CTC', 'Experience', 'Notice Period', 'Recruiter', 'Final Status', 'Comment'];
       const rows = filteredCandidates.map(c => [
-        formatTimestamp(c.updated_at || c.timestamp),
-        `"${(c.name || '').replace(/"/g, '""')}"`,
-        `"${(c.email || '').replace(/"/g, '""')}"`,
-        `"${(c.position || '').replace(/"/g, '""')}"`,
-        `"${(c.recruiter || c.recruiter_email || '').replace(/"/g, '""')}"`,
-        `"${(c.company || '').replace(/"/g, '""')}"`,
-        `"${(c.final_status || '').replace(/"/g, '""')}"`,
-        `"${onlyDigits(c.Mobile || c.mobile || c.phone || c.Phone || '')}"`
+        sanitizeCsvCell(formatTimestamp(c.updated_at || c.timestamp)),
+        sanitizeCsvCell(c.name || ''),
+        sanitizeCsvCell(c.email || ''),
+        sanitizeCsvCell(onlyDigits(c.Mobile || c.mobile || c.phone || c.Phone || '')),
+        sanitizeCsvCell(c.position || ''),
+        sanitizeCsvCell(c.company || ''),
+        sanitizeCsvCell(c.current_ctc || ''),
+        sanitizeCsvCell(c.expected_ctc || ''),
+        sanitizeCsvCell(c.experience || ''),
+        sanitizeCsvCell(c.notice_period || ''),
+        sanitizeCsvCell(c.recruiter || c.recruiter_email || ''),
+        sanitizeCsvCell(c.final_status || ''),
+        sanitizeCsvCell(c.comment || '')
       ]);
       const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
       const encodedUri = encodeURI(csvContent);
@@ -901,12 +1411,23 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast(`Exported ${filteredCandidates.length} candidates to CSV`, 'success');
+      showToast(`Exported ${filteredCandidates.length} candidates to safe CSV`, 'success');
     }
 
     // ==================== PRESERVED AUTHENTICATION & CORE LOGIC ====================
     window.addEventListener('load', function() {
-      console.log("Management page loaded - checking authentication...");
+      // Ensure Light Mode is the default unless dark was chosen in session
+      const savedTheme = sessionStorage.getItem('tccTheme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+
+      // Auto-switch to cards view on small mobile screens for optimal UX
+      if (window.innerWidth < 640) {
+        switchDisplayMode('cards');
+      }
 
       // Get all user data from sessionStorage
       const isLoggedIn = sessionStorage.getItem('isLoggedIn');
@@ -926,9 +1447,6 @@
         return;
       }
 
-      // User is authenticated - display user info
-      console.log('✓ User authenticated successfully');
-
       // Set loggedInEmail to the authenticated user's email
       loggedInEmail = userEmail;
 
@@ -940,7 +1458,8 @@
         contact: userContact,
         designation: userDesignation,
         userType: userType,
-        loginTime: loginTime
+        loginTime: loginTime,
+        powerAutomateBypassed: true
       };
 
       // Display user type badge
@@ -1004,10 +1523,8 @@
       const userData = getUserData();
 
       if (userData.userType && userData.userType.toLowerCase() === 'admin') {
-        console.log('✓ Admin user detected - showing ALL candidates');
         return data;
       } else {
-        console.log('✓ Regular user detected - filtering by recruiter email');
         return data.filter(c => {
           const recEmail = (c.recruiter || c.recruiter_email || "").toLowerCase();
           return recEmail === (loggedInEmail || "").toLowerCase();
@@ -1089,7 +1606,6 @@
         }));
 
         candidates = filterCandidatesByUserType(normalizedData);
-        console.log(`✓ Loaded ${candidates.length} candidates from Supabase`);
 
         loadCompanyOptions();
         loadStatusOptions();
@@ -1098,7 +1614,7 @@
         console.error("Error loading dashboard from Supabase:", err);
         showToast("Error loading candidates from Supabase: " + err.message, "error");
         if (tableBody) {
-          tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 30px;"><i class="fas fa-exclamation-triangle text-rose-500 text-lg mb-2"></i><br>Error loading data from Supabase. Please click Sync to refresh.</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 30px;"><i class="fas fa-exclamation-triangle text-rose-500 text-lg mb-2"></i><br>Error loading data from Supabase. Please click Sync to refresh.</td></tr>';
         }
       }
     }
@@ -1146,8 +1662,12 @@
         const filtered = candidates.filter(c => {
           const matchCompany = !selectedCompany || c.company === selectedCompany;
           const matchStatus = !selectedStatus || (c.final_status || '').toLowerCase() === selectedStatus;
-          const matchName = !nameQuery || (c.name || '').toLowerCase().includes(nameQuery);
-          return matchCompany && matchStatus && matchName;
+          const matchQuery = !nameQuery ||
+            (c.name || '').toLowerCase().includes(nameQuery) ||
+            (c.email || '').toLowerCase().includes(nameQuery) ||
+            (c.mobile || c.Mobile || '').toLowerCase().includes(nameQuery) ||
+            (c.position || '').toLowerCase().includes(nameQuery);
+          return matchCompany && matchStatus && matchQuery;
         });
 
         filteredCandidates = filtered;
@@ -1157,7 +1677,7 @@
         if (isNameSearch) {
           setButtonLoading('searchButton', false);
         }
-      }, isNameSearch ? 200 : 0);
+      }, isNameSearch ? 180 : 0);
     }
 
     // Checkbox and bulk update functions
@@ -1245,6 +1765,7 @@
       updateBulkUpdateButton();
     }
 
+    // XSS-Safe Bulk Update Popup
     function openBulkUpdatePopup() {
       if (selectedCandidates.length === 0) {
         showToast("Please select at least one candidate to update.", "error");
@@ -1274,7 +1795,10 @@
         selectedCandidates.forEach(candidate => {
           const item = document.createElement("div");
           item.className = "bulk-candidate-item";
-          item.innerHTML = `<strong>${candidate.name || 'N/A'}</strong> - ${candidate.company || 'N/A'} (${candidate.position || 'N/A'})`;
+          const strongEl = document.createElement("strong");
+          strongEl.textContent = candidate.name || 'N/A';
+          item.appendChild(strongEl);
+          item.appendChild(document.createTextNode(` - ${candidate.company || 'N/A'} (${candidate.position || 'N/A'})`));
           bulkCandidatesList.appendChild(item);
         });
       }
@@ -1283,9 +1807,18 @@
       const finalStatusDropdown = getElement("finalStatusDropdown");
       const commentBox = getElement("commentBox");
 
-      if (statusDropdown) statusDropdown.value = "";
-      if (finalStatusDropdown) finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
-      if (commentBox) commentBox.value = "";
+      if (statusDropdown) {
+        statusDropdown.value = "";
+        statusDropdown.classList.remove('input-valid', 'input-invalid');
+      }
+      if (finalStatusDropdown) {
+        finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
+        finalStatusDropdown.classList.remove('input-valid', 'input-invalid');
+      }
+      if (commentBox) {
+        commentBox.value = "";
+        validateCommentInput(commentBox);
+      }
 
       const popup = getElement("popup");
       if (popup) popup.style.display = "flex";
@@ -1303,7 +1836,6 @@
 
         return `${dd}/${mm}/${yy}`;
       } catch (error) {
-        console.error("Error formatting timestamp:", error);
         return ts;
       }
     }
@@ -1324,7 +1856,6 @@
 
         return `${dd}-${mm}-${yy} ${h}:${m} ${ampm}`;
       } catch (error) {
-        console.error("Error formatting interview date:", error);
         return dt;
       }
     }
@@ -1335,15 +1866,6 @@
         if (obj[k] != null && obj[k] !== "") return obj[k];
       }
       return "";
-    }
-
-    function escapeHtml(unsafe) {
-      return (unsafe || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
     }
 
     function getStatusBadge(status) {
@@ -1362,6 +1884,7 @@
       return `<span class="${badgeClass}">${escapeHtml(status)}</span>`;
     }
 
+    // ==================== ONE-VIEW HIGH-DENSITY TABLE & CARD RENDERER ====================
     function renderTable(data) {
       if (!tableBody) return;
       tableBody.innerHTML = "";
@@ -1371,7 +1894,7 @@
       updateDashboardKPIs(data);
 
       if (data.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="9" class="py-12 text-center text-slate-400"><i class="fas fa-search text-lg mb-2"></i><br>No candidates found matching current filters</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="10" class="py-12 text-center text-slate-400"><i class="fas fa-search text-lg mb-2"></i><br>No candidates found matching current filters</td></tr>';
         if (cardsContainer) {
           cardsContainer.innerHTML = '<div class="col-span-full glass-card rounded-3xl p-10 text-center text-slate-400">No candidates found matching current filters</div>';
         }
@@ -1380,24 +1903,70 @@
 
       data.forEach((c, idx) => {
         const row = document.createElement("tr");
-        const safeName = escapeHtml(c.name || "");
+        const safeName = escapeHtml(c.name || "Candidate");
+        const safeEmail = escapeHtml(c.email || "-");
+        const rawPhone = onlyDigits(c.Mobile || c.mobile || c.phone || c.Phone || "");
+        const safePhone = escapeHtml(rawPhone || "-");
+        const safePos = escapeHtml(c.position || "-");
+        const safeComp = escapeHtml(c.company || "-");
+        const safeCurCtc = escapeHtml(c.current_ctc || "-");
+        const safeExpCtc = escapeHtml(c.expected_ctc || "-");
+        const safeExp = escapeHtml(c.experience || "-");
+        const safeNotice = escapeHtml(c.notice_period || "-");
+        const safeComment = escapeHtml(c.comment || "");
+        const safeIntMode = escapeHtml((c.interview_mode || "").toUpperCase());
+        const formattedIntDate = c.interview_date ? escapeHtml(formatInterviewDT(c.interview_date)) : "";
+
         const uniqueKey = c.id || c.email;
         const isSelected = selectedCandidates.some(selected => (selected.id || selected.email) === uniqueKey);
-        const recDisplay = (c.recruiter || c.recruiter_email || '').split("@")[0];
+        const recDisplay = escapeHtml((c.recruiter || c.recruiter_email || '').split("@")[0] || "-");
 
         row.innerHTML = `
-          <td class="text-center"><input type="checkbox" class="candidate-checkbox" ${isSelected ? 'checked' : ''} onchange="toggleCandidateSelection(${idx}, this.checked)" onclick="event.stopPropagation()"></td>
-          <td class="text-slate-500 dark:text-slate-400 whitespace-nowrap" title="${formatTimestamp(c.timestamp)}">${formatTimestamp(c.timestamp)}</td>
-          <td title="${safeName}"><strong class="font-bold text-slate-900 dark:text-white">${safeName}</strong></td>
-          <td class="text-slate-600 dark:text-slate-300" title="${escapeHtml(c.email || '')}">${escapeHtml(c.email || "")}</td>
-          <td class="font-medium text-blue-600 dark:text-blue-400" title="${escapeHtml(c.position || '')}">${escapeHtml(c.position || "")}</td>
-          <td class="text-slate-500 dark:text-slate-400">${escapeHtml(recDisplay)}</td>
-          <td class="font-semibold text-slate-800 dark:text-slate-200" title="${escapeHtml(c.company || '')}">${escapeHtml(c.company || "")}</td>
-          <td>${getStatusBadge(c.final_status || '')}</td>
+          <td class="text-center">
+            <input type="checkbox" class="candidate-checkbox" ${isSelected ? 'checked' : ''} onchange="toggleCandidateSelection(${idx}, this.checked)" onclick="event.stopPropagation()">
+          </td>
+          <td class="text-slate-500 dark:text-slate-400 whitespace-nowrap font-medium">${formatTimestamp(c.timestamp)}</td>
           <td>
-            <button class="btn btn-success btn-sm" onclick="event.stopPropagation(); openExtraPopup(${idx})" title="Schedule Interview">
-              <i class="fas fa-calendar-check"></i> Contact
-            </button>
+            <div class="font-bold text-slate-900 dark:text-white">${safeName}</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[170px]" title="${safeEmail}">${safeEmail}</div>
+            <div class="text-[11px] font-semibold text-blue-600 dark:text-blue-400">${safePhone !== '-' ? '+91 ' + safePhone : '-'}</div>
+          </td>
+          <td>
+            <div class="font-bold text-blue-600 dark:text-blue-400">${safePos}</div>
+            <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-300">${safeComp}</div>
+          </td>
+          <td class="whitespace-nowrap">
+            <div class="text-[11px] text-slate-500">Cur: <strong class="text-slate-800 dark:text-slate-200">${safeCurCtc}</strong></div>
+            <div class="text-[11px] text-emerald-600 dark:text-emerald-400">Exp: <strong>${safeExpCtc}</strong></div>
+          </td>
+          <td class="whitespace-nowrap">
+            <div class="text-[11px] text-slate-700 dark:text-slate-300"><i class="fas fa-briefcase text-[10px] text-indigo-400 mr-1"></i>${safeExp}</div>
+            <div class="text-[11px] text-amber-600 dark:text-amber-400 font-semibold"><i class="fas fa-clock text-[10px] mr-1"></i>NP: ${safeNotice}</div>
+          </td>
+          <td class="text-slate-600 dark:text-slate-400 font-medium">${recDisplay}</td>
+          <td>
+            ${getStatusBadge(c.final_status || '')}
+            ${safeComment ? `<div class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 max-w-[150px] truncate" title="${safeComment}"><i class="fas fa-comment-dots mr-1"></i>${safeComment}</div>` : ''}
+          </td>
+          <td class="whitespace-nowrap">
+            ${formattedIntDate
+              ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20"><i class="fas fa-calendar-day"></i> ${formattedIntDate}</span>
+                 ${safeIntMode ? `<div class="text-[10px] text-slate-400 mt-0.5">${safeIntMode}</div>` : ''}`
+              : `<span class="text-[11px] text-slate-400">Not Scheduled</span>`
+            }
+          </td>
+          <td>
+            <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+              <button type="button" class="btn btn-success btn-sm" onclick="openExtraPopup(${idx})" title="Schedule Interview">
+                <i class="fas fa-calendar-check"></i>
+                <span class="hidden xl:inline">Schedule</span>
+              </button>
+              ${rawPhone ? `
+                <a href="https://wa.me/91${rawPhone}" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded-lg bg-emerald-500/15 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white flex items-center justify-center text-xs transition-colors" title="Direct WhatsApp Chat">
+                  <i class="fab fa-whatsapp"></i>
+                </a>
+              ` : ''}
+            </div>
           </td>
         `;
 
@@ -1406,42 +1975,67 @@
         }
 
         row.addEventListener("click", (event) => {
-          if (event.target.type === 'checkbox' || event.target.closest('button')) {
+          if (event.target.type === 'checkbox' || event.target.closest('button') || event.target.closest('a')) {
             return;
           }
           openPopup(c);
         });
         tableBody.appendChild(row);
 
-        // Also populate Responsive Card View
+        // Also populate Responsive Mobile-First Card View with Full One-View Data
         if (cardsContainer) {
           const card = document.createElement('div');
           card.className = `glass-card rounded-2xl p-4 flex flex-col justify-between gap-3 border transition-all cursor-pointer hover:border-blue-500/40 ${isSelected ? 'ring-2 ring-blue-500' : ''}`;
           card.onclick = (e) => {
-            if (e.target.type === 'checkbox' || e.target.closest('button')) return;
+            if (e.target.type === 'checkbox' || e.target.closest('button') || e.target.closest('a')) return;
             openPopup(c);
           };
           card.innerHTML = `
             <div>
               <div class="flex items-start justify-between gap-2 mb-2">
-                <div>
-                  <h4 class="font-display font-bold text-sm text-slate-900 dark:text-white">${safeName}</h4>
-                  <p class="text-xs font-semibold text-blue-600 dark:text-blue-400">${escapeHtml(c.position || "")} • ${escapeHtml(c.company || "")}</p>
+                <div class="flex items-start gap-2">
+                  <input type="checkbox" class="candidate-checkbox mt-1" ${isSelected ? 'checked' : ''} onchange="toggleCandidateSelection(${idx}, this.checked)" onclick="event.stopPropagation()">
+                  <div>
+                    <h4 class="font-display font-bold text-sm text-slate-900 dark:text-white">${safeName}</h4>
+                    <p class="text-xs font-bold text-blue-600 dark:text-blue-400">${safePos} • ${safeComp}</p>
+                  </div>
                 </div>
                 ${getStatusBadge(c.final_status || '')}
               </div>
-              <div class="space-y-1 text-[11px] text-slate-500 dark:text-slate-400 mt-3">
-                <p><i class="fas fa-envelope w-4 text-slate-400"></i> ${escapeHtml(c.email || "")}</p>
-                <p><i class="fas fa-user-tie w-4 text-slate-400"></i> Recruiter: ${escapeHtml(recDisplay)} • ${formatTimestamp(c.timestamp)}</p>
+
+              <!-- One-View Mini Metrics Grid inside Card -->
+              <div class="grid grid-cols-2 gap-1.5 my-2.5 p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70 text-[11px]">
+                <div><span class="text-slate-400">Cur CTC:</span> <strong class="text-slate-800 dark:text-slate-200">${safeCurCtc}</strong></div>
+                <div><span class="text-slate-400">Exp CTC:</span> <strong class="text-emerald-600 dark:text-emerald-400">${safeExpCtc}</strong></div>
+                <div><span class="text-slate-400">Exp:</span> <strong class="text-slate-800 dark:text-slate-200">${safeExp}</strong></div>
+                <div><span class="text-slate-400">Notice:</span> <strong class="text-amber-600 dark:text-amber-400">${safeNotice}</strong></div>
+              </div>
+
+              <div class="space-y-1 text-[11px] text-slate-500 dark:text-slate-400">
+                <p><i class="fas fa-envelope w-4 text-slate-400"></i> ${safeEmail}</p>
+                <p><i class="fas fa-phone w-4 text-slate-400"></i> ${safePhone !== '-' ? '+91 ' + safePhone : '-'}</p>
+                <p><i class="fas fa-user-tie w-4 text-slate-400"></i> Recruiter: ${recDisplay} • ${formatTimestamp(c.timestamp)}</p>
+                ${formattedIntDate ? `<p class="text-purple-600 dark:text-purple-400 font-semibold"><i class="fas fa-calendar-day w-4"></i> Interview: ${formattedIntDate} (${safeIntMode})</p>` : ''}
+                ${safeComment ? `<p class="italic text-slate-600 dark:text-slate-300"><i class="fas fa-comment w-4 text-indigo-400"></i> "${safeComment}"</p>` : ''}
               </div>
             </div>
-            <div class="pt-3 border-t border-slate-200/70 dark:border-slate-800 flex items-center justify-between gap-2">
-              <button type="button" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline" onclick="event.stopPropagation(); openPopup(filteredCandidates[${idx}])">
-                <i class="fas fa-pen-to-square mr-1"></i>Update Status
+            <div class="pt-3 border-t border-slate-200/70 dark:border-slate-800 flex items-center justify-between gap-2" onclick="event.stopPropagation()">
+              <button type="button" class="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline" onclick="openPopup(filteredCandidates[${idx}])">
+                <i class="fas fa-pen-to-square mr-1"></i>Status
               </button>
-              <button type="button" class="btn btn-success btn-sm" onclick="event.stopPropagation(); openExtraPopup(${idx})">
-                <i class="fas fa-phone"></i> Contact
-              </button>
+              <div class="flex items-center gap-1.5">
+                ${rawPhone ? `
+                  <a href="tel:+91${rawPhone}" class="px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold">
+                    <i class="fas fa-phone"></i>
+                  </a>
+                  <a href="https://wa.me/91${rawPhone}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
+                    <i class="fab fa-whatsapp"></i>
+                  </a>
+                ` : ''}
+                <button type="button" class="btn btn-success btn-sm" onclick="openExtraPopup(${idx})">
+                  <i class="fas fa-calendar-plus"></i> Schedule
+                </button>
+              </div>
             </div>
           `;
           cardsContainer.appendChild(card);
@@ -1468,6 +2062,7 @@
         candidateName: getElement("popupCandidateName"),
         company: getElement("popupCompany"),
         position: getElement("popupPosition"),
+        compSummary: getElement("popupCompSummary"),
         powerAppsId: getElement("popup__powerappsid__"),
         statusDropdown: getElement("statusDropdown"),
         finalStatusDropdown: getElement("finalStatusDropdown"),
@@ -1478,12 +2073,26 @@
       if (elements.candidateName) elements.candidateName.textContent = candidate.name || "";
       if (elements.company) elements.company.textContent = candidate.company || "";
       if (elements.position) elements.position.textContent = candidate.position || "";
+      if (elements.compSummary) {
+        elements.compSummary.textContent = `${candidate.current_ctc || '-'} → ${candidate.expected_ctc || '-'} | NP: ${candidate.notice_period || '-'}`;
+      }
       if (elements.powerAppsId) {
         elements.powerAppsId.textContent = candidate.id || candidate.__powerappsid__ || "";
       }
-      if (elements.statusDropdown) elements.statusDropdown.value = "";
-      if (elements.finalStatusDropdown) elements.finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
-      if (elements.commentBox) elements.commentBox.value = candidate.comment || "";
+      if (elements.statusDropdown) {
+        elements.statusDropdown.value = "";
+        elements.statusDropdown.classList.remove('input-valid', 'input-invalid');
+      }
+      if (elements.finalStatusDropdown) {
+        elements.finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
+        elements.finalStatusDropdown.classList.remove('input-valid', 'input-invalid');
+      }
+      if (elements.commentBox) {
+        elements.commentBox.value = candidate.comment || "";
+        validateCommentInput(elements.commentBox);
+      }
+      const errMsg = document.getElementById('statusModalErrorMsg');
+      if (errMsg) errMsg.classList.add('hidden');
       if (elements.popup) elements.popup.style.display = "flex";
     }
 
@@ -1523,14 +2132,20 @@
         return;
       }
 
-      const status = statusDropdown.value;
-      const finalStatus = finalStatusDropdown.value;
-      const comment = commentBox.value;
-
-      if (!status || !finalStatus) {
+      if (!validateStatusModalInputs()) {
+        const errMsg = document.getElementById('statusModalErrorMsg');
+        if (errMsg) {
+          errMsg.textContent = "Please select both Stage Category and Final Status.";
+          errMsg.classList.remove('hidden');
+        }
         showToast("Please select both status and final status.", "error");
         return;
       }
+
+      validateCommentInput(commentBox);
+      const status = statusDropdown.value;
+      const finalStatus = finalStatusDropdown.value;
+      const comment = commentBox.value.trim();
 
       if (isBulkUpdate) {
         if (selectedCandidates.length === 0) {
@@ -1670,6 +2285,7 @@
 
     function openExtraPopup(idx) {
       const extraCandidateName = getElement("extraCandidateName");
+      const extraRoleSub = document.getElementById("extraCandidateRoleSub");
       const extraPopup = getElement("extraPopup");
       const sendEmail = getElement("sendEmail");
       const sendWhatsapp = getElement("sendWhatsapp");
@@ -1677,6 +2293,7 @@
       const locationSelect = getElement("locationSelect");
       const inviteLink = getElement("inviteLink");
       const waBtn = getElement("waFloatBtn");
+      const locPreview = document.getElementById("selectedLocationPreview");
 
       currentCandidate = filteredCandidates[idx] || null;
       if (!currentCandidate) {
@@ -1684,12 +2301,26 @@
         return;
       }
       if (extraCandidateName) extraCandidateName.textContent = currentCandidate.name || "";
+      if (extraRoleSub) extraRoleSub.textContent = `${currentCandidate.position || ''} @ ${currentCandidate.company || ''}`;
 
       if (sendEmail) sendEmail.checked = false;
-      if (sendWhatsapp) sendWhatsapp.checked = false;
-      if (extraDateTime) extraDateTime.value = "";
-      if (inviteLink) inviteLink.value = "";
-      if (locationSelect) locationSelect.innerHTML = '<option value="">Select Location</option>';
+      if (sendWhatsapp) sendWhatsapp.checked = true;
+      if (extraDateTime) {
+        extraDateTime.value = "";
+        extraDateTime.classList.remove('input-valid', 'input-invalid');
+      }
+      if (inviteLink) {
+        inviteLink.value = "";
+        inviteLink.classList.remove('input-valid', 'input-invalid');
+      }
+      if (locationSelect) {
+        locationSelect.innerHTML = '<option value="">Select Location</option>';
+        locationSelect.classList.remove('input-valid', 'input-invalid');
+      }
+      if (locPreview) locPreview.classList.add('hidden');
+      document.getElementById('extraDateTimeErrorMsg')?.classList.add('hidden');
+      document.getElementById('inviteLinkErrorMsg')?.classList.add('hidden');
+
       if (waBtn) {
         waBtn.classList.remove('show');
         waBtn.href = "#";
@@ -1717,7 +2348,7 @@
       return (s || "").toString().replace(/\D/g, "");
     }
 
-    // ==================== SUPABASE SAVE INTERVIEW + POWER AUTOMATE EMAIL ====================
+    // ==================== SUPABASE SAVE INTERVIEW (POWER AUTOMATE BYPASSED) ====================
     async function submitExtraPopup() {
       const extraCandidateName = getElement("extraCandidateName");
       const extraDateTime = getElement("extraDateTime");
@@ -1735,22 +2366,24 @@
         showToast("Please select interview mode (Physical or Online).", "error");
         return;
       }
-      const dt = extraDateTime.value;
-      if (!dt) {
-        showToast("Please select interview date & time.", "error");
+
+      if (!validateInterviewDateTime(extraDateTime)) {
+        showToast("Please select a valid upcoming interview date & time.", "error");
         return;
       }
+
+      const dt = extraDateTime.value;
       const isoDt = new Date(dt).toISOString();
       const emailChecked = sendEmail.checked;
       const whatsappChecked = sendWhatsapp.checked;
       let loc = null;
+
       if (mode === "physical") {
-        const selectedLoc = (locationSelect?.value || "").toString().trim();
-        if (!selectedLoc) {
-          showToast("Please select a physical location.", "error");
+        if (!validateLocationSelection()) {
+          showToast("Please select a physical office location.", "error");
           return;
         }
-
+        const selectedLoc = (locationSelect?.value || "").toString().trim();
         const normalize = str => (str || "").toString().trim().toLowerCase();
         const targetLocation = normalize(selectedLoc);
 
@@ -1764,9 +2397,8 @@
           return;
         }
       } else if (mode === "online") {
-        const linkVal = (inviteLink?.value || "").trim();
-        if (!linkVal) {
-          showToast("Please enter an online meeting link.", "error");
+        if (!validateInviteLinkField(inviteLink)) {
+          showToast("Please enter a valid https:// online meeting link.", "error");
           return;
         }
       }
@@ -1807,32 +2439,7 @@
       const userData = getUserData();
       const recruiterName = userData.name || (loggedInEmail || "").split("@")[0] || "Recruiter";
 
-      // SAFE PAYLOAD - Preserved for Power Automate Email Invite
-      const payload = {
-        candidate_name: String(currentCandidate?.name || ""),
-        candidate_email: String(currentCandidate?.email || ""),
-        candidate_phone: String(mobile || ""),
-        candidate_company: String(currentCandidate?.company || ""),
-        candidate_position: String(currentCandidate?.position || ""),
-        recruiter: String(recruiterName || ""),
-        interview_mode: String(mode || ""),
-        rowId: String(currentCandidate?.id || currentCandidate?.__powerappsid__ || ""),
-        interview_datetime: String(isoDt || "")
-      };
-
-      if (mode === "physical" && loc) {
-        payload.location_company_name = String(loc?.Company_Name || loc?.company_name || "");
-        payload.location_spoc_name = String(loc?.Spoc_Name || loc?.spoc_name || "");
-        payload.location_spoc_number = String(loc?.Spoc_Number || loc?.spoc_number || "");
-        payload.location_address = String(loc?.Address || loc?.address || "");
-        payload.location_google_map = String(loc?.Google_Map || loc?.google_map || "");
-      }
-
-      if (mode === "online") {
-        payload.invite_link = String((inviteLink?.value || "").trim());
-      }
-
-      // WhatsApp message (unchanged)
+      // WhatsApp message preparation
       if (whatsappChecked && mobile) {
         let msg = `*Hi ${currentCandidate?.name}*,\n\n` +
                   `We are pleased to schedule your interview for the *${currentCandidate?.position || ""}* role at *${currentCandidate?.company || ""}*.\n\n` +
@@ -1863,53 +2470,22 @@
         }
       }
 
-      // Send to Power Automate (if Email checkbox checked)
+      // 2. Requirement #5: Power Automate Email Flow is DISABLED and BYPASSED
       if (emailChecked) {
-        const url = "https://default95bfece3066c4fa7b1004902edfde1.f3.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4acbeedd695b453c953eef63041723b6/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=fMQ-vKxXAcsLpQJuoeyXaar8AN-RT-7xSx3c2nbdmN8";
-
-        try {
-          const response = await fetch(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
-          });
-
-          const responseText = await response.text();
-          console.log("=== POWER AUTOMATE RESPONSE ===", response.status, responseText);
-
-          setTimeout(() => {
-            if (!response.ok) {
-              showToast(`Interview saved to Supabase, but Email service returned (${response.status}).`, "error");
-              setButtonLoading('interviewSubmitButton', false);
-              loadDashboard();
-              return;
-            }
-
-            showToast("Interview scheduled in Supabase & Email invitation sent!", "success");
-            closeExtraPopup();
-            setButtonLoading('interviewSubmitButton', false);
-            loadDashboard();
-          }, 800);
-
-        } catch (err) {
-          console.error("❌ Network/CORS Error:", err);
-          setTimeout(() => {
-            showToast("Interview saved to Supabase, but could not reach email service.", "error");
-            setButtonLoading('interviewSubmitButton', false);
-            loadDashboard();
-          }, 800);
-          return;
-        }
-      } else {
-        setTimeout(() => {
-          showToast(whatsappChecked ? "Interview scheduled! Click the floating WhatsApp button to send." : "Interview scheduled in Supabase!", "success");
-          closeExtraPopup();
-          setButtonLoading('interviewSubmitButton', false);
-          loadDashboard();
-        }, 500);
+        console.info("Power Automate interview email flow is disabled and bypassed.");
       }
+
+      setTimeout(() => {
+        showToast(
+          whatsappChecked
+            ? "Interview saved in Supabase! Click the green WhatsApp button to send invite. (PA Bypassed)"
+            : "Interview scheduled in Supabase! (Power Automate Bypassed)",
+          "success"
+        );
+        closeExtraPopup();
+        setButtonLoading('interviewSubmitButton', false);
+        loadDashboard();
+      }, 350);
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -1922,8 +2498,6 @@
         });
       }
     });
-
-    console.log('Management page loaded with Supabase integration, role-based filtering, and bulk update functionality');
   </script>
 </body>
 </html>
