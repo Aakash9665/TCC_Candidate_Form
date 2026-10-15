@@ -1742,53 +1742,13 @@
       updateStats();
     }
 
-// ==================== SUPABASE LOAD SCHEDULED INTERVIEWS ====================
+    // ==================== SUPABASE LOAD SCHEDULED INTERVIEWS ====================
     async function loadScheduledInterviews() {
       try {
-        // Removed .neq('interview_date', '') because timestamptz columns cannot be compared to empty strings in PostgreSQL
         const { data, error } = await supabaseClient
           .from('candidates')
           .select('*')
           .not('interview_date', 'is', null);
-
-        if (error) {
-          throw error;
-        }
-
-        const normalizedData = (data || []).map(row => ({
-          ...row,
-          recruiter: row.recruiter || row.recruiter_email || '',
-          __powerappsid__: row.id
-        }));
-
-        const roleFilteredCandidates = filterCandidatesByUserType(normalizedData);
-        const userCandidates = roleFilteredCandidates.filter(c => {
-          const rawDate = c.interview_date ? c.interview_date.toString().trim() : "";
-          return rawDate !== "" && !isNaN(new Date(rawDate).getTime());
-        });
-
-        allScheduledInterviews = userCandidates.sort((a, b) => {
-          try {
-            const dateA = new Date(a.interview_date);
-            const dateB = new Date(b.interview_date);
-            return dateA - dateB;
-          } catch (error) {
-            return 0;
-          }
-        });
-
-        filteredInterviews = [...allScheduledInterviews];
-        loadFilterOptions();
-        applyFilters();
-      } catch (err) {
-        console.error("Error loading scheduled interviews from Supabase:", err);
-        showToast("Error loading interviews: " + err.message, "error");
-        const tableBody = document.querySelector("#interviewTable tbody");
-        if (tableBody) {
-          tableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 30px;"><i class="fas fa-exclamation-triangle text-rose-500 text-lg mb-2"></i><br>Error loading data from Supabase. Please click Refresh.</td></tr>';
-        }
-      }
-    }
 
         if (error) {
           throw error;
