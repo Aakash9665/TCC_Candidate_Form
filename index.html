@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<!-- Default theme is now explicitly LIGHT (removed "dark" class from html root) -->
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>TCC Portal - Login & Workspace</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Supabase JS Client SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -31,8 +35,15 @@
       }
     }
   </script>
+
   <style>
     :root {
+      --bg-gradient: radial-gradient(circle at 12% 18%, rgba(99, 102, 241, 0.14) 0%, transparent 45%),
+                     radial-gradient(circle at 88% 82%, rgba(168, 85, 247, 0.14) 0%, transparent 45%),
+                     radial-gradient(circle at 50% 45%, rgba(16, 185, 129, 0.08) 0%, transparent 60%);
+    }
+
+    .dark {
       --bg-gradient: radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.25) 0%, transparent 45%),
                      radial-gradient(circle at 85% 80%, rgba(168, 85, 247, 0.25) 0%, transparent 45%),
                      radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.12) 0%, transparent 60%);
@@ -49,35 +60,39 @@
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
-      transition: background-color 0.35s ease, color 0.35s ease;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     .ambient-bg {
       background-image: var(--bg-gradient);
     }
 
-    /* Animated mesh orbs */
+    /* Animated ambient mesh orbs */
     .orb {
       position: fixed;
       border-radius: 50%;
-      filter: blur(80px);
+      filter: blur(85px);
       pointer-events: none;
       z-index: 0;
-      opacity: 0.5;
+      opacity: 0.35;
       animation: floatOrb 18s ease-in-out infinite alternate;
     }
 
+    .dark .orb {
+      opacity: 0.45;
+    }
+
     .orb-1 {
-      width: 340px;
-      height: 340px;
+      width: 320px;
+      height: 320px;
       background: linear-gradient(135deg, #6366f1, #8b5cf6);
       top: -80px;
       left: -80px;
     }
 
     .orb-2 {
-      width: 300px;
-      height: 300px;
+      width: 280px;
+      height: 280px;
       background: linear-gradient(135deg, #ec4899, #8b5cf6);
       bottom: -60px;
       right: -60px;
@@ -88,37 +103,37 @@
       width: 240px;
       height: 240px;
       background: linear-gradient(135deg, #06b6d4, #3b82f6);
-      top: 45%;
+      top: 40%;
       left: 55%;
       animation-delay: -12s;
     }
 
     @keyframes floatOrb {
       0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(30px, -35px) scale(1.08); }
-      100% { transform: translate(-25px, 25px) scale(0.95); }
+      50% { transform: translate(28px, -32px) scale(1.07); }
+      100% { transform: translate(-22px, 22px) scale(0.95); }
     }
 
-    /* Glassmorphic Card */
+    /* Light-first Glassmorphic Card */
     .glass-panel {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.12);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
     }
 
     .dark .glass-panel {
-      background: rgba(15, 23, 42, 0.78);
+      background: rgba(15, 23, 42, 0.82);
       border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
     }
 
-    /* Module Action Card */
+    /* Module Action Card with Shimmer & Lift */
     .nav-button {
       position: relative;
       overflow: hidden;
-      transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
       text-align: left;
     }
 
@@ -126,9 +141,14 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.35), transparent);
       transform: translateX(-100%);
-      transition: transform 0.6s ease;
+      transition: transform 0.55s ease;
+      pointer-events: none;
+    }
+
+    .dark .nav-button::before {
+      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.12), transparent);
     }
 
     .nav-button:hover::before {
@@ -136,12 +156,36 @@
     }
 
     .nav-button:hover {
-      transform: translateY(-4px);
+      transform: translateY(-3px);
     }
 
     .nav-button:active {
       transform: scale(0.98);
     }
+
+    /* Staggered Entrance Animation for Cards */
+    @keyframes slideUpFade {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-card {
+      animation: slideUpFade 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+
+    .delay-1 { animation-delay: 0.04s; }
+    .delay-2 { animation-delay: 0.08s; }
+    .delay-3 { animation-delay: 0.12s; }
+    .delay-4 { animation-delay: 0.16s; }
+    .delay-5 { animation-delay: 0.20s; }
+    .delay-6 { animation-delay: 0.24s; }
+    .delay-7 { animation-delay: 0.28s; }
 
     /* Loading Spinner inside Login Button */
     .loading {
@@ -152,12 +196,12 @@
 
     .loading::after {
       content: '';
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
       border: 2.5px solid rgba(255, 255, 255, 0.3);
       border-top-color: #ffffff;
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin 0.75s linear infinite;
       display: inline-block;
       margin-left: 10px;
       vertical-align: middle;
@@ -168,12 +212,12 @@
     }
 
     .fade-transition {
-      animation: fadeTransition 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+      animation: fadeTransition 0.5s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     @keyframes fadeTransition {
       0% { opacity: 1; transform: scale(1); }
-      45% { opacity: 0; transform: scale(0.97) translateY(8px); }
+      45% { opacity: 0; transform: scale(0.98) translateY(6px); }
       100% { opacity: 1; transform: scale(1) translateY(0); }
     }
 
@@ -184,11 +228,34 @@
     }
 
     .error-shake {
-      animation: shakeError 0.45s ease-in-out;
+      animation: shakeError 0.4s ease-in-out;
+    }
+
+    /* Input validation state borders */
+    .input-valid {
+      border-color: #10b981 !important;
+    }
+
+    .input-invalid {
+      border-color: #f43f5e !important;
+    }
+
+    /* Custom subtle scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.4);
+      border-radius: 9999px;
     }
   </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 ambient-bg flex flex-col min-h-screen justify-between relative selection:bg-indigo-500 selection:text-white">
+
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 ambient-bg flex flex-col min-h-screen justify-between relative selection:bg-indigo-500 selection:text-white pb-16 sm:pb-0">
 
   <!-- Background Ambient Orbs -->
   <div class="orb orb-1"></div>
@@ -199,54 +266,106 @@
   <div class="floating-element hidden"></div>
 
   <!-- Custom Toast Notification Container -->
-  <div id="toastContainer" class="fixed bottom-5 right-5 z-[2000] flex flex-col gap-2.5 max-w-sm w-full px-4 pointer-events-none"></div>
+  <div id="toastContainer" class="fixed bottom-16 sm:bottom-5 right-4 sm:right-5 z-[2000] flex flex-col gap-2 max-w-sm w-full px-3 pointer-events-none"></div>
 
-  <!-- Top Floating Navigation Bar -->
-  <header class="w-full max-w-6xl mx-auto px-4 sm:px-6 pt-4 sm:pt-6 z-30 flex items-center justify-between gap-3">
-    <div class="flex items-center gap-2.5">
+  <!-- Top Navigation Header (Mobile-First Responsive) -->
+  <header class="w-full max-w-7xl mx-auto px-3 sm:px-6 pt-3 sm:pt-4 z-30 flex items-center justify-between gap-2">
+    <div class="flex items-center gap-2 sm:gap-2.5">
       <!-- Home Button (Preserves .home-button and onclick="goHome()") -->
-      <button class="home-button w-11 h-11 sm:w-12 sm:h-12 rounded-2xl glass-panel flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:scale-105 active:scale-95 transition-all shadow-sm cursor-pointer" onclick="goHome()" title="Home">
-        <i class="fas fa-house text-lg"></i>
+      <button
+        class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl glass-panel flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:scale-105 active:scale-95 transition-all shadow-sm cursor-pointer"
+        onclick="goHome()"
+        title="Home Workspace"
+        aria-label="Home Workspace"
+      >
+        <i class="fas fa-house text-base sm:text-lg"></i>
       </button>
 
-      <!-- Brand Pill -->
-      <div class="hidden sm:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl glass-panel">
-        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow">
+      <!-- Brand Identity Pill -->
+      <div class="flex items-center gap-2 px-3 py-1.5 sm:py-2 rounded-2xl glass-panel">
+        <div class="w-7 h-7 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-extrabold text-xs shadow-sm">
           TCC
         </div>
         <div>
-          <p class="text-xs font-bold tracking-tight leading-none">Talent Connect</p>
-          <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Consultancy Portal v2.5</p>
+          <div class="flex items-center gap-1.5">
+            <p class="text-xs font-extrabold tracking-tight leading-none text-slate-900 dark:text-white">Talent Connect</p>
+            <span class="hidden md:inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+              v2.5 Secure
+            </span>
+          </div>
+          <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Consultancy Command Center</p>
         </div>
       </div>
+
+      <!-- Power Automate Bypass Status Pill (Requirement #5) -->
+      <button
+        type="button"
+        onclick="toggleSecurityModal(true)"
+        class="hidden lg:inline-flex items-center gap-1.5 px-3 py-2 rounded-2xl glass-panel text-[11px] font-bold text-amber-700 dark:text-amber-300 hover:border-amber-500/40 transition-all cursor-pointer"
+        title="Power Automate is Disabled & Bypassed. Click to view system & security status."
+      >
+        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+        <span>Power Automate: <strong class="underline decoration-dotted">BYPASSED</strong></span>
+      </button>
     </div>
 
-    <!-- Right Controls: Theme Toggle, Quick Tools, & User Info Bar -->
-    <div class="flex items-center gap-2.5">
+    <!-- Right Controls: Quick Tools, Theme Switcher, & User Info Bar -->
+    <div class="flex items-center gap-1.5 sm:gap-2">
+      <!-- Security & System Audit Button -->
+      <button
+        type="button"
+        onclick="toggleSecurityModal(true)"
+        class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl glass-panel flex items-center justify-center text-emerald-600 dark:text-emerald-400 hover:scale-105 transition-all"
+        title="Security & Power Automate Bypass Status"
+        aria-label="Security Status"
+      >
+        <i class="fas fa-shield-halved text-sm"></i>
+      </button>
+
       <!-- Quick CTC Calculator Trigger -->
-      <button onclick="toggleCalculatorModal(true)" class="w-11 h-11 rounded-2xl glass-panel flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all" title="Quick CTC & Hike Calculator">
+      <button
+        type="button"
+        onclick="toggleCalculatorModal(true)"
+        class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl glass-panel flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-105 transition-all"
+        title="Quick CTC & Hike Calculator"
+        aria-label="CTC Calculator"
+      >
         <i class="fas fa-calculator text-sm"></i>
       </button>
 
-      <!-- Theme Switcher -->
-      <button onclick="toggleTheme()" id="themeToggleBtn" class="w-11 h-11 rounded-2xl glass-panel flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all" title="Toggle Dark/Light Mode">
+      <!-- Theme Switcher (Default Light Mode, toggles Dark Mode) -->
+      <button
+        type="button"
+        onclick="toggleTheme()"
+        id="themeToggleBtn"
+        class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl glass-panel flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-105 transition-all"
+        title="Toggle Light / Dark Theme"
+        aria-label="Toggle Theme"
+      >
         <i class="fas fa-sun text-sm hidden dark:inline-block text-amber-400"></i>
-        <i class="fas fa-moon text-sm inline-block dark:hidden text-slate-700"></i>
+        <i class="fas fa-moon text-sm inline-block dark:hidden text-indigo-600"></i>
       </button>
 
       <!-- User Info Bar (Preserves #userInfo, #loginSuccess, #userName, logout()) -->
-      <div class="user-info glass-panel px-3.5 py-2 rounded-2xl items-center gap-3 text-xs sm:text-sm font-medium" id="userInfo" style="display: none;">
-        <div class="inline-flex items-center gap-2">
-          <span class="success-checkmark w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block animate-pulse" style="display: none;" id="loginSuccess"></span>
-          <button onclick="toggleProfileModal(true)" class="inline-flex items-center gap-2 hover:opacity-80 transition-opacity text-left">
-            <span class="w-7 h-7 rounded-xl bg-indigo-500/15 dark:bg-indigo-500/25 text-indigo-600 dark:text-indigo-300 font-bold flex items-center justify-center text-xs" id="userAvatarInitials">U</span>
-            <span class="hidden md:inline text-slate-500 dark:text-slate-400">Welcome,</span>
-            <span id="userName" class="font-bold text-slate-800 dark:text-white max-w-[110px] sm:max-w-[160px] truncate">!</span>
+      <div class="user-info glass-panel px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl items-center gap-2 sm:gap-3 text-xs font-medium" id="userInfo" style="display: none;">
+        <div class="inline-flex items-center gap-1.5 sm:gap-2">
+          <span class="success-checkmark w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" style="display: none;" id="loginSuccess"></span>
+          <button type="button" onclick="toggleProfileModal(true)" class="inline-flex items-center gap-1.5 hover:opacity-80 transition-opacity text-left">
+            <span class="w-7 h-7 rounded-xl bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shadow-sm" id="userAvatarInitials">U</span>
+            <div class="hidden sm:block leading-tight">
+              <span class="block text-[10px] text-slate-400 font-medium">Logged in as</span>
+              <span id="userName" class="font-bold text-slate-800 dark:text-white max-w-[120px] truncate block">!</span>
+            </div>
           </button>
-          <span id="roleBadgeHeader" class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 border border-indigo-500/20">
+          <span id="roleBadgeHeader" class="hidden md:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
             Recruiter
           </span>
-          <button class="logout-btn ml-1 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500 text-rose-600 dark:text-rose-400 hover:text-white border border-rose-500/20 text-xs font-semibold transition-all cursor-pointer" onclick="logout()">
+          <button
+            type="button"
+            class="logout-btn ml-0.5 px-2.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white border border-rose-500/20 text-xs font-semibold transition-all cursor-pointer"
+            onclick="logout()"
+            title="Logout Safely"
+          >
             <i class="fas fa-power-off sm:mr-1"></i>
             <span class="hidden sm:inline">Logout</span>
           </button>
@@ -256,20 +375,32 @@
   </header>
 
   <!-- Main Content Wrapper (Preserves .container class for existing JS transitions) -->
-  <main class="flex-1 flex items-center justify-center px-4 sm:px-6 py-6 z-20">
-    <div class="container w-full max-w-4xl mx-auto transition-all duration-500">
+  <main class="flex-1 flex items-center justify-center px-3 sm:px-6 py-4 sm:py-5 z-20">
+    <div class="container w-full max-w-7xl mx-auto transition-all duration-500">
 
       <!-- ==================== LOGIN SCREEN (#loginContainer) ==================== -->
-      <div class="login-container max-w-md mx-auto glass-panel rounded-3xl p-6 sm:p-10 relative overflow-hidden" id="loginContainer">
+      <div class="login-container max-w-md mx-auto glass-panel rounded-3xl p-5 sm:p-8 relative overflow-hidden" id="loginContainer">
         <!-- Decorative Top Accent Bar -->
-        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500"></div>
+
+        <!-- Security & Bypass Status Strip on Login Card -->
+        <div class="flex items-center justify-between gap-2 mb-5 px-3 py-2 rounded-2xl bg-slate-100/90 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 text-[11px]">
+          <span class="inline-flex items-center gap-1.5 font-semibold text-emerald-700 dark:text-emerald-400">
+            <i class="fas fa-shield-check"></i>
+            Input Guard Active
+          </span>
+          <span class="inline-flex items-center gap-1 font-semibold text-amber-700 dark:text-amber-400">
+            <i class="fas fa-bolt-slash text-[10px]"></i>
+            PA Flow: Bypassed
+          </span>
+        </div>
 
         <!-- Logo & Heading -->
-        <div class="text-center mb-8">
-          <div class="logo w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 mx-auto mb-5 flex items-center justify-center text-white text-2xl font-extrabold shadow-xl shadow-indigo-500/30 ring-4 ring-indigo-500/15">
+        <div class="text-center mb-6">
+          <div class="logo w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 mx-auto mb-4 flex items-center justify-center text-white text-xl sm:text-2xl font-extrabold shadow-xl shadow-indigo-500/25 ring-4 ring-indigo-500/15">
             TCC
           </div>
-          <h1 class="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-2">
+          <h1 class="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-1">
             Login to TCC Portal
           </h1>
           <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
@@ -279,74 +410,103 @@
 
         <!-- Login Form (Preserves onsubmit="handleLogin(event)", #email, #password, #loginBtn, #loginText, #errorMessage) -->
         <div class="form-container">
-          <form onsubmit="handleLogin(event)" class="space-y-5">
+          <form onsubmit="handleLogin(event)" class="space-y-4" novalidate>
+            <!-- Email Field with Condition Check -->
             <div class="input-group text-left">
-              <label for="email" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
-                <i class="fas fa-envelope text-indigo-500 mr-1.5"></i>Email Address / Username
-              </label>
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="email" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  <i class="fas fa-envelope text-indigo-500 mr-1.5"></i>Email Address / Username
+                </label>
+                <span id="emailConditionBadge" class="text-[10px] font-semibold text-slate-400">Required</span>
+              </div>
               <div class="relative">
                 <input
                   type="email"
                   id="email"
                   name="email"
+                  maxlength="120"
                   placeholder="name@talentconnect.com"
                   required
                   autocomplete="username"
-                  class="w-full px-4 py-3.5 pl-11 rounded-2xl bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  oninput="validateEmailInput(this)"
+                  onblur="validateEmailInput(this)"
+                  class="w-full px-4 py-3 pl-10 pr-9 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                 >
-                <i class="fas fa-at absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <i class="fas fa-at absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <i id="emailStatusIcon" class="fas fa-circle-check absolute right-3.5 top-1/2 -translate-y-1/2 text-emerald-500 text-sm hidden"></i>
               </div>
+              <p id="emailValidationMsg" class="text-[11px] text-rose-600 dark:text-rose-400 mt-1 hidden"></p>
             </div>
 
+            <!-- Password Field with Condition Check & CapsLock Detector -->
             <div class="input-group text-left">
-              <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-2">
-                <i class="fas fa-lock text-indigo-500 mr-1.5"></i>Password
-              </label>
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  <i class="fas fa-lock text-indigo-500 mr-1.5"></i>Password
+                </label>
+                <span id="passwordConditionBadge" class="text-[10px] font-semibold text-slate-400">Min 4 chars</span>
+              </div>
               <div class="relative">
                 <input
                   type="password"
                   id="password"
                   name="password"
+                  minlength="4"
+                  maxlength="128"
                   placeholder="••••••••••••"
                   required
                   autocomplete="current-password"
-                  class="w-full px-4 py-3.5 pl-11 pr-12 rounded-2xl bg-slate-100/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                  oninput="validatePasswordInput(this)"
+                  onkeyup="checkCapsLock(event)"
+                  class="w-full px-4 py-3 pl-10 pr-11 rounded-2xl bg-white dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
                 >
-                <i class="fas fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                <i class="fas fa-key absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                 <button
                   type="button"
                   onclick="togglePasswordVisibility()"
-                  class="absolute right-3.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-indigo-500 transition-colors"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-indigo-600 transition-colors"
                   title="Show / Hide Password"
+                  aria-label="Toggle Password Visibility"
                 >
                   <i class="fas fa-eye text-sm" id="passwordEyeIcon"></i>
                 </button>
               </div>
+              <p id="passwordValidationMsg" class="text-[11px] text-rose-600 dark:text-rose-400 mt-1 hidden"></p>
+              <p id="capsLockWarning" class="text-[11px] text-amber-600 dark:text-amber-400 font-semibold mt-1 hidden">
+                <i class="fas fa-triangle-exclamation mr-1"></i>Caps Lock is ON
+              </p>
             </div>
 
+            <!-- Submit Button -->
             <button
               type="submit"
-              class="login-btn w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-sm sm:text-base shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center"
+              class="login-btn w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-sm sm:text-base shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center"
               id="loginBtn"
             >
               <i class="fas fa-right-to-bracket mr-2"></i>
               <span id="loginText">Login</span>
             </button>
 
+            <!-- Rate Limit / Cooldown Notice -->
+            <div id="lockoutBanner" class="hidden rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 px-3.5 py-2.5 text-xs font-semibold text-center">
+              Too many failed attempts. Please wait <span id="lockoutCountdown">30</span>s.
+            </div>
+
             <!-- Error Message Box -->
             <div
               class="error-message rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 px-4 py-3 text-xs sm:text-sm font-medium text-center"
               id="errorMessage"
               style="display: none;"
+              role="alert"
             >
               Invalid email or password. Please try again.
             </div>
           </form>
         </div>
 
-        <div class="footer mt-8 pt-5 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
-          <span>TCC Portal v2.1</span>
-          <span class="inline-flex items-center gap-1.5 text-emerald-500 font-medium">
+        <div class="footer mt-6 pt-4 border-t border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+          <span>TCC Portal v2.5</span>
+          <span class="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
             Supabase Connected
           </span>
@@ -354,254 +514,504 @@
       </div>
 
       <!-- ==================== MAIN PORTAL SCREEN (#mainContainer) ==================== -->
-      <div class="main-container glass-panel rounded-3xl p-5 sm:p-8 lg:p-10 relative overflow-hidden" id="mainContainer" style="display: none;">
+      <div class="main-container glass-panel rounded-3xl p-4 sm:p-6 lg:p-7 relative overflow-hidden" id="mainContainer" style="display: none;">
         <!-- Decorative Top Accent Bar -->
         <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-emerald-500 to-amber-500"></div>
 
-        <!-- Dashboard Header Banner -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-slate-200/70 dark:border-slate-800/80">
-          <div class="flex items-center gap-4">
-            <div class="logo w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white text-xl sm:text-2xl font-extrabold shadow-lg shadow-indigo-500/25 shrink-0">
+        <!-- TOP ROW: Compact Header + Search + Quick Actions -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-200/80 dark:border-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="logo w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white text-lg sm:text-xl font-extrabold shadow-md shadow-indigo-500/20 shrink-0">
               TCC
             </div>
             <div class="text-left">
-              <div class="inline-flex items-center gap-2 mb-1">
-                <span id="dynamicGreeting" class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              <div class="flex flex-wrap items-center gap-1.5 mb-0.5">
+                <span id="dynamicGreeting" class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                   Workspace Active
                 </span>
-                <span class="text-xs text-slate-400">•</span>
-                <span id="liveClock" class="text-xs font-medium text-slate-500 dark:text-slate-400"></span>
+                <span class="text-xs text-slate-300 dark:text-slate-600">•</span>
+                <span id="liveClock" class="text-[11px] font-semibold text-slate-600 dark:text-slate-400"></span>
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                  <i class="fas fa-ban text-[9px]"></i> PA Bypassed
+                </span>
               </div>
-              <h1 class="font-display text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                Welcome to TCC Portal
+              <h1 class="font-display text-lg sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
+                TCC All-in-One Workspace
               </h1>
-              <p class="subtitle text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5" id="userSubtitleInfo">
-                Select Action or use keyboard shortcuts (1-5) to launch a module
+              <p class="subtitle text-xs text-slate-500 dark:text-slate-400" id="userSubtitleInfo">
+                Select Action or use keyboard shortcuts (1-6) to launch a module
               </p>
             </div>
           </div>
 
-          <!-- Quick Search / Filter & Direct WhatsApp Tool -->
+          <!-- Filter Input with Condition Check + Quick Actions -->
           <div class="flex flex-wrap items-center gap-2">
-            <div class="relative flex-1 sm:w-56">
+            <div class="relative flex-1 sm:w-60 min-w-[180px]">
               <input
                 type="text"
                 id="moduleSearchInput"
-                oninput="filterModules(this.value)"
-                placeholder="Filter modules..."
-                class="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                maxlength="50"
+                oninput="validateAndFilterModules(this)"
+                placeholder="Filter modules (e.g. entry, interview)..."
+                class="w-full pl-8 pr-16 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
               <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <span id="moduleFilterCount" class="absolute right-7 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-400">All</span>
+              <button
+                type="button"
+                id="clearFilterBtn"
+                onclick="clearModuleFilter()"
+                class="hidden absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 items-center justify-center text-[10px]"
+                title="Clear filter"
+              >
+                <i class="fas fa-times"></i>
+              </button>
             </div>
+
+            <button
+              type="button"
+              onclick="refreshLiveWorkspaceMetrics()"
+              class="px-3 py-2 rounded-xl bg-indigo-500/10 hover:bg-indigo-600 text-indigo-700 dark:text-indigo-300 hover:text-white border border-indigo-500/20 text-xs font-bold transition-all flex items-center gap-1.5 shrink-0"
+              title="Refresh Live Database Pulse"
+            >
+              <i class="fas fa-arrows-rotate text-xs" id="syncSpinnerIcon"></i>
+              <span class="hidden sm:inline">Sync Data</span>
+            </button>
+
             <button
               type="button"
               onclick="toggleQuickWaModal(true)"
-              class="px-3.5 py-2.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-bold transition-all flex items-center gap-1.5 shrink-0"
+              class="px-3 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-300 hover:text-white border border-emerald-500/25 text-xs font-bold transition-all flex items-center gap-1.5 shrink-0"
               title="Quick WhatsApp Direct Chat"
             >
               <i class="fab fa-whatsapp text-sm"></i>
-              <span>Quick Chat</span>
+              <span>Quick WA</span>
             </button>
           </div>
         </div>
 
-        <!-- Module Cards Grid (Preserves .button-container and exact onclick handlers) -->
-        <div class="button-container grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="modulesGrid">
-
-          <!-- 1. Candidates Entry -->
-          <button
-            class="nav-button entry-btn group p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent dark:from-emerald-500/15 dark:to-slate-900/60 border border-emerald-500/25 hover:border-emerald-500 flex flex-col justify-between min-h-[148px] shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 cursor-pointer"
-            onclick="navigateToEntry()"
-            data-module-title="candidates entry registration form add new"
-          >
-            <div class="flex items-start justify-between w-full mb-4">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-xl shadow-md shadow-emerald-500/25 group-hover:scale-110 transition-transform">
-                <i class="fas fa-user-plus"></i>
+        <!-- ONE-VIEW DATA RIBBON: 6 High-Density Live Metrics in One Glance -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 mb-5">
+          <!-- KPI 1: Total Candidates -->
+          <div class="p-3 rounded-2xl bg-white/90 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 flex items-center gap-2.5 shadow-sm">
+            <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <i class="fas fa-users text-sm"></i>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">Candidates DB</p>
+              <div class="flex items-baseline gap-1.5">
+                <p class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white" id="kpiTotalCandidates">--</p>
+                <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400" id="kpiCandidatesStatus">Live</span>
               </div>
-              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-600 dark:text-emerald-300">
-                Key: 1
-              </span>
             </div>
-            <div>
-              <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center justify-between">
-                <span>Candidates Entry</span>
-                <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
-              </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                Register new candidates, manage company JDs, and send instant WhatsApp acknowledgements.
-              </p>
-            </div>
-          </button>
+          </div>
 
-          <!-- 2. Candidates Management -->
-          <button
-            class="nav-button management-btn group p-5 rounded-2xl bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-transparent dark:from-blue-500/15 dark:to-slate-900/60 border border-blue-500/25 hover:border-blue-500 flex flex-col justify-between min-h-[148px] shadow-sm hover:shadow-xl hover:shadow-blue-500/10 cursor-pointer"
-            onclick="navigateToManagement()"
-            data-module-title="candidates management pipeline database status"
-          >
-            <div class="flex items-start justify-between w-full mb-4">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-xl shadow-md shadow-blue-500/25 group-hover:scale-110 transition-transform">
-                <i class="fas fa-users-gear"></i>
+          <!-- KPI 2: Scheduled Interviews -->
+          <div class="p-3 rounded-2xl bg-white/90 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 flex items-center gap-2.5 shadow-sm">
+            <div class="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+              <i class="fas fa-calendar-day text-sm"></i>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">Interviews</p>
+              <div class="flex items-baseline gap-1.5">
+                <p class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white" id="kpiInterviewsCount">--</p>
+                <span class="text-[10px] font-semibold text-amber-600 dark:text-amber-400">Lineup</span>
               </div>
-              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-blue-500/15 text-blue-600 dark:text-blue-300">
-                Key: 2
-              </span>
             </div>
-            <div>
-              <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors flex items-center justify-between">
-                <span>Candidates Management</span>
-                <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
-              </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                Track applicant stages, update shortlisting statuses, and manage recruiter pipelines.
-              </p>
-            </div>
-          </button>
+          </div>
 
-          <!-- 3. Scheduled Interviews -->
-          <button
-            class="nav-button interviews-btn group p-5 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent dark:from-amber-500/15 dark:to-slate-900/60 border border-amber-500/25 hover:border-amber-500 flex flex-col justify-between min-h-[148px] shadow-sm hover:shadow-xl hover:shadow-amber-500/10 cursor-pointer"
-            onclick="navigateToInterviews()"
-            data-module-title="scheduled interviews calendar lineup"
-          >
-            <div class="flex items-start justify-between w-full mb-4">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-xl shadow-md shadow-amber-500/25 group-hover:scale-110 transition-transform">
-                <i class="fas fa-calendar-check"></i>
+          <!-- KPI 3: Team / Active Users -->
+          <div class="p-3 rounded-2xl bg-white/90 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 flex items-center gap-2.5 shadow-sm">
+            <div class="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+              <i class="fas fa-user-tie text-sm"></i>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">Portal Team</p>
+              <div class="flex items-baseline gap-1.5">
+                <p class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white" id="kpiTeamCount">--</p>
+                <span class="text-[10px] font-semibold text-blue-600 dark:text-blue-400">Active</span>
               </div>
-              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 text-amber-600 dark:text-amber-300">
-                Key: 3
-              </span>
             </div>
-            <div>
-              <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors flex items-center justify-between">
-                <span>Scheduled Interviews</span>
-                <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
-              </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                Monitor upcoming candidate interviews, follow-ups, and client interview schedules.
-              </p>
-            </div>
-          </button>
+          </div>
 
-          <!-- 4. Sourced Profiles (Admin Only - Preserves #sourcedProfilesBtn) -->
-          <button
-            class="nav-button sourced-profiles-btn group p-5 rounded-2xl bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-transparent dark:from-purple-500/15 dark:to-slate-900/60 border border-purple-500/25 hover:border-purple-500 flex flex-col justify-between min-h-[148px] shadow-sm hover:shadow-xl hover:shadow-purple-500/10 cursor-pointer"
-            id="sourcedProfilesBtn"
-            onclick="navigateToSourcedProfiles()"
-            style="display: none;"
-            data-module-title="sourced profiles admin database talent pool"
-          >
-            <div class="flex items-start justify-between w-full mb-4">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-fuchsia-600 text-white flex items-center justify-center text-xl shadow-md shadow-purple-500/25 group-hover:scale-110 transition-transform">
-                <i class="fas fa-folder-tree"></i>
+          <!-- KPI 4: Active Role & Access Level -->
+          <div class="p-3 rounded-2xl bg-white/90 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 flex items-center gap-2.5 shadow-sm">
+            <div class="w-9 h-9 rounded-xl bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+              <i class="fas fa-id-card-clip text-sm"></i>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">Access Tier</p>
+              <p class="text-xs sm:text-sm font-extrabold text-purple-700 dark:text-purple-300 truncate" id="kpiAccessRole">Recruiter</p>
+            </div>
+          </div>
+
+          <!-- KPI 5: Power Automate Bypass Indicator -->
+          <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-center gap-2.5 shadow-sm">
+            <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
+              <i class="fas fa-forward-fast text-xs"></i>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 truncate">Power Automate</p>
+              <p class="text-xs font-extrabold text-amber-700 dark:text-amber-400 truncate" id="kpiPaStatus">BYPASSED</p>
+            </div>
+          </div>
+
+          <!-- KPI 6: Security & Session Health -->
+          <div class="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 flex items-center gap-2.5 shadow-sm">
+            <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+              <i class="fas fa-lock text-xs"></i>
+            </div>
+            <div class="min-w-0">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 truncate">Security Guard</p>
+              <p class="text-xs font-extrabold text-emerald-700 dark:text-emerald-400 truncate" id="kpiSecurityHealth">Protected</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- MAIN BENTO GRID: Left 8 Cols = Modules Grid | Right 4 Cols = Live One-View Details & Inline Tools -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+
+          <!-- LEFT ZONE (8 Cols on Desktop): Module Cards Grid (Preserves .button-container and #modulesGrid) -->
+          <div class="lg:col-span-8">
+            <div class="flex items-center justify-between mb-2.5 px-1">
+              <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                <i class="fas fa-grip text-indigo-500"></i>
+                Portal Modules & Workspaces
+              </h2>
+              <span class="text-[11px] text-slate-400 font-medium">Press keys <kbd class="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold">1</kbd>-<kbd class="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold">6</kbd></span>
+            </div>
+
+            <div class="button-container grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3" id="modulesGrid">
+
+              <!-- 1. Candidates Entry -->
+              <button
+                class="nav-button entry-btn animate-card delay-1 group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-emerald-500/30 hover:border-emerald-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-emerald-500/10 cursor-pointer"
+                onclick="navigateToEntry()"
+                data-module-title="candidates entry registration form add new"
+              >
+                <div class="flex items-start justify-between w-full mb-2.5">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-base shadow-md shadow-emerald-500/20 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-user-plus"></i>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">Direct DB</span>
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Key: 1</span>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center justify-between">
+                    <span>Candidates Entry</span>
+                    <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
+                  </h3>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                    Register new candidates, assign JDs, and send instant WhatsApp acknowledgements.
+                  </p>
+                </div>
+              </button>
+
+              <!-- 2. Candidates Management -->
+              <button
+                class="nav-button management-btn animate-card delay-2 group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-blue-500/30 hover:border-blue-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-blue-500/10 cursor-pointer"
+                onclick="navigateToManagement()"
+                data-module-title="candidates management pipeline database status"
+              >
+                <div class="flex items-start justify-between w-full mb-2.5">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-base shadow-md shadow-blue-500/20 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-users-gear"></i>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-500/10 text-blue-700 dark:text-blue-300">Pipeline</span>
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Key: 2</span>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors flex items-center justify-between">
+                    <span>Candidates Management</span>
+                    <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
+                  </h3>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                    Track applicant stages, update shortlisting statuses, and manage recruiter pipelines.
+                  </p>
+                </div>
+              </button>
+
+              <!-- 3. Scheduled Interviews -->
+              <button
+                class="nav-button interviews-btn animate-card delay-3 group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-amber-500/30 hover:border-amber-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-amber-500/10 cursor-pointer"
+                onclick="navigateToInterviews()"
+                data-module-title="scheduled interviews calendar lineup"
+              >
+                <div class="flex items-start justify-between w-full mb-2.5">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white flex items-center justify-center text-base shadow-md shadow-amber-500/20 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-calendar-check"></i>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-300">Schedule</span>
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Key: 3</span>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors flex items-center justify-between">
+                    <span>Scheduled Interviews</span>
+                    <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
+                  </h3>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                    Monitor upcoming candidate interviews, follow-ups, and client interview schedules.
+                  </p>
+                </div>
+              </button>
+
+              <!-- 4. Sourced Profiles (Admin Only - Preserves #sourcedProfilesBtn) -->
+              <button
+                class="nav-button sourced-profiles-btn animate-card delay-4 group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-purple-500/30 hover:border-purple-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-purple-500/10 cursor-pointer"
+                id="sourcedProfilesBtn"
+                onclick="navigateToSourcedProfiles()"
+                style="display: none;"
+                data-module-title="sourced profiles admin database talent pool"
+              >
+                <div class="flex items-start justify-between w-full mb-2.5">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-fuchsia-600 text-white flex items-center justify-center text-base shadow-md shadow-purple-500/20 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-folder-tree"></i>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-purple-500/15 text-purple-700 dark:text-purple-300">
+                    Admin • Key: 4
+                  </span>
+                </div>
+                <div>
+                  <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors flex items-center justify-between">
+                    <span>Sourced Profiles</span>
+                    <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
+                  </h3>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                    Review master talent pool, sourced candidate records, and admin analytics.
+                  </p>
+                </div>
+              </button>
+
+              <!-- 5. WhatsApp Sender (Preserves .Whatsapp-btn and navigateToWhatsapp()) -->
+              <button
+                class="nav-button Whatsapp-btn animate-card delay-5 group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-teal-500/30 hover:border-teal-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-teal-500/10 cursor-pointer"
+                onclick="navigateToWhatsapp()"
+                data-module-title="whatsapp sender bulk broadcast messages"
+              >
+                <div class="flex items-start justify-between w-full mb-2.5">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center text-base shadow-md shadow-teal-500/20 group-hover:scale-110 transition-transform">
+                    <i class="fab fa-whatsapp"></i>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300">PA Bypassed</span>
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-teal-500/15 text-teal-700 dark:text-teal-300">Key: 5</span>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors flex items-center justify-between">
+                    <span>WhatsApp Sender</span>
+                    <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
+                  </h3>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                    Direct candidate messaging utility (Power Automate cloud flow bypassed).
+                  </p>
+                </div>
+              </button>
+
+              <!-- 6. Manage Employees & Locations (Admin Only - #manageEmpLocationsBtn) -->
+              <button
+                class="nav-button manage-emp-locations-btn animate-card delay-6 group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-rose-500/30 hover:border-rose-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-rose-500/10 cursor-pointer"
+                id="manageEmpLocationsBtn"
+                onclick="navigateToAdminManage()"
+                style="display: none;"
+                data-module-title="manage emp employees recruiters office locations address spoc admin"
+              >
+                <div class="flex items-start justify-between w-full mb-2.5">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 text-white flex items-center justify-center text-base shadow-md shadow-rose-500/20 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-building-user"></i>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-rose-500/15 text-rose-700 dark:text-rose-300">
+                    Admin • Key: 6
+                  </span>
+                </div>
+                <div>
+                  <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors flex items-center justify-between">
+                    <span>Manage Emp & Locations</span>
+                    <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
+                  </h3>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                    Add, edit, or remove portal employees and configure client office addresses & HR SPOCs.
+                  </p>
+                </div>
+              </button>
+
+              <!-- 7. Recruiter Toolkit Card -->
+              <button
+                type="button"
+                onclick="toggleCalculatorModal(true)"
+                class="nav-button animate-card delay-7 group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-indigo-500/30 hover:border-indigo-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-indigo-500/10 cursor-pointer"
+                data-module-title="ctc hike calculator toolkit salary converter"
+              >
+                <div class="flex items-start justify-between w-full mb-2.5">
+                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center text-base shadow-md shadow-indigo-500/20 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-chart-pie"></i>
+                  </div>
+                  <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-indigo-500/15 text-indigo-700 dark:text-indigo-300">
+                    Utility
+                  </span>
+                </div>
+                <div>
+                  <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors flex items-center justify-between">
+                    <span>CTC & Hike Calculator</span>
+                    <i class="fas fa-up-right-from-square text-xs opacity-60 group-hover:opacity-100 transition-all"></i>
+                  </h3>
+                  <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                    Instant Monthly ↔ LPA converter & expected salary hike % estimator for phone screens.
+                  </p>
+                </div>
+              </button>
+
+            </div>
+
+            <!-- Empty Filter State Notice -->
+            <div id="noModulesMatchBox" class="hidden mt-3 p-6 rounded-2xl bg-slate-100/80 dark:bg-slate-900/60 border border-dashed border-slate-300 dark:border-slate-700 text-center">
+              <i class="fas fa-magnifying-glass-minus text-slate-400 text-xl mb-1.5"></i>
+              <p class="text-xs font-bold text-slate-700 dark:text-slate-300">No modules match your filter</p>
+              <button type="button" onclick="clearModuleFilter()" class="mt-2 px-3 py-1 rounded-lg bg-indigo-600 text-white text-[11px] font-bold">
+                Reset Filter
+              </button>
+            </div>
+          </div>
+
+          <!-- RIGHT ZONE (4 Cols on Desktop): One-View Details Dock (Profile + Mini Calculator + Quick Notes) -->
+          <div class="lg:col-span-4 flex flex-col gap-3">
+
+            <!-- Card A: One-View Active Recruiter Session & System Details -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800 shadow-sm">
+              <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                  <i class="fas fa-user-check text-indigo-500"></i>
+                  Active Session Overview
+                </h3>
+                <button type="button" onclick="toggleProfileModal(true)" class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+                  Full Card
+                </button>
               </div>
-              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-purple-500/15 text-purple-600 dark:text-purple-300">
-                Admin • Key: 4
-              </span>
-            </div>
-            <div>
-              <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors flex items-center justify-between">
-                <span>Sourced Profiles</span>
-                <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
-              </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                Review master talent pool, sourced candidate records, and admin analytics.
-              </p>
-            </div>
-          </button>
 
-          <!-- 5. WhatsApp Sender (Preserves .Whatsapp-btn and navigateToWhatsapp()) -->
-          <button
-            class="nav-button Whatsapp-btn group p-5 rounded-2xl bg-gradient-to-br from-teal-500/10 via-teal-500/5 to-transparent dark:from-teal-500/15 dark:to-slate-900/60 border border-teal-500/25 hover:border-teal-500 flex flex-col justify-between min-h-[148px] shadow-sm hover:shadow-xl hover:shadow-teal-500/10 cursor-pointer"
-            onclick="navigateToWhatsapp()"
-            data-module-title="whatsapp sender bulk broadcast messages"
-          >
-            <div class="flex items-start justify-between w-full mb-4">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center text-xl shadow-md shadow-teal-500/25 group-hover:scale-110 transition-transform">
-                <i class="fab fa-whatsapp"></i>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60">
+                  <span class="block text-[10px] text-slate-400 font-medium">Recruiter Name</span>
+                  <span class="font-bold text-slate-800 dark:text-white truncate block" id="inlineProfileName">-</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60">
+                  <span class="block text-[10px] text-slate-400 font-medium">Designation</span>
+                  <span class="font-bold text-slate-800 dark:text-white truncate block" id="inlineProfileDesignation">-</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60">
+                  <span class="block text-[10px] text-slate-400 font-medium">Contact</span>
+                  <span class="font-semibold text-slate-700 dark:text-slate-200 truncate block" id="inlineProfileContact">-</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60">
+                  <span class="block text-[10px] text-slate-400 font-medium">Email ID</span>
+                  <span class="font-semibold text-slate-700 dark:text-slate-200 truncate block" id="inlineProfileEmail">-</span>
+                </div>
               </div>
-              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-teal-500/15 text-teal-600 dark:text-teal-300">
-                Admin • Key: 5
-              </span>
             </div>
-            <div>
-              <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors flex items-center justify-between">
-                <span>WhatsApp Sender</span>
-                <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
-              </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                Automated candidate communication and bulk template messaging utility.
-              </p>
-            </div>
-          </button>
 
-          <!-- 6. Manage Employees & Locations (Admin Only - #manageEmpLocationsBtn) -->
-          <button
-            class="nav-button manage-emp-locations-btn group p-5 rounded-2xl bg-gradient-to-br from-rose-500/10 via-rose-500/5 to-transparent dark:from-rose-500/15 dark:to-slate-900/60 border border-rose-500/25 hover:border-rose-500 flex flex-col justify-between min-h-[148px] shadow-sm hover:shadow-xl hover:shadow-rose-500/10 cursor-pointer"
-            id="manageEmpLocationsBtn"
-            onclick="navigateToAdminManage()"
-            style="display: none;"
-            data-module-title="manage emp employees recruiters office locations address spoc admin"
-          >
-            <div class="flex items-start justify-between w-full mb-4">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 text-white flex items-center justify-center text-xl shadow-md shadow-rose-500/25 group-hover:scale-110 transition-transform">
-                <i class="fas fa-building-user"></i>
+            <!-- Card B: Inline Instant Hike & CTC Estimator (With Input Condition Validation) -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800 shadow-sm">
+              <div class="flex items-center justify-between mb-2.5">
+                <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                  <i class="fas fa-bolt text-amber-500"></i>
+                  Instant Screen Calculator
+                </h3>
+                <span class="text-[10px] font-semibold text-slate-400">0 - 500 LPA</span>
               </div>
-              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-rose-500/15 text-rose-600 dark:text-rose-300">
-                Admin • Key: 6
-              </span>
-            </div>
-            <div>
-              <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors flex items-center justify-between">
-                <span>Manage Emp & Locations</span>
-                <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
-              </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                Add, edit, or remove portal employees and configure client office addresses & HR SPOCs.
-              </p>
-            </div>
-          </button>
-
-          <!-- 7. Recruiter Toolkit Card -->
-          <button
-            type="button"
-            onclick="toggleCalculatorModal(true)"
-            class="nav-button group p-5 rounded-2xl bg-gradient-to-br from-indigo-500/10 via-indigo-500/5 to-transparent dark:from-indigo-500/15 dark:to-slate-900/60 border border-indigo-500/25 hover:border-indigo-500 flex flex-col justify-between min-h-[148px] shadow-sm hover:shadow-xl hover:shadow-indigo-500/10 cursor-pointer"
-            data-module-title="ctc hike calculator toolkit salary converter"
-          >
-            <div class="flex items-start justify-between w-full mb-4">
-              <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white flex items-center justify-center text-xl shadow-md shadow-indigo-500/25 group-hover:scale-110 transition-transform">
-                <i class="fas fa-chart-pie"></i>
+              <div class="grid grid-cols-2 gap-2 mb-2.5">
+                <div>
+                  <label for="inlineCurrentLpa" class="block text-[10px] font-bold text-slate-500 mb-1">Current (LPA)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="500"
+                    id="inlineCurrentLpa"
+                    oninput="runInlineCalculation()"
+                    placeholder="e.g. 4.5"
+                    class="w-full px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                </div>
+                <div>
+                  <label for="inlineExpectedLpa" class="block text-[10px] font-bold text-slate-500 mb-1">Expected (LPA)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="500"
+                    id="inlineExpectedLpa"
+                    oninput="runInlineCalculation()"
+                    placeholder="e.g. 6.0"
+                    class="w-full px-2.5 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                </div>
               </div>
-              <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-indigo-500/15 text-indigo-600 dark:text-indigo-300">
-                Utility
-              </span>
+              <p id="inlineCalcConditionMsg" class="text-[10px] text-rose-600 dark:text-rose-400 font-semibold mb-2 hidden"></p>
+              <div class="grid grid-cols-3 gap-1.5 text-center">
+                <div class="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+                  <span class="block text-[9px] text-slate-500 dark:text-slate-400">Hike %</span>
+                  <span class="text-xs font-extrabold text-indigo-600 dark:text-indigo-400" id="inlineHikeVal">0%</span>
+                </div>
+                <div class="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                  <span class="block text-[9px] text-slate-500 dark:text-slate-400">Exp/Mo</span>
+                  <span class="text-xs font-extrabold text-emerald-600 dark:text-emerald-400" id="inlineMonthlyVal">₹0</span>
+                </div>
+                <div class="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                  <span class="block text-[9px] text-slate-500 dark:text-slate-400">Diff/Yr</span>
+                  <span class="text-xs font-extrabold text-purple-600 dark:text-purple-400" id="inlineDiffVal">₹0L</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <h3 class="font-display font-bold text-base sm:text-lg text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors flex items-center justify-between">
-                <span>CTC & Hike Calculator</span>
-                <i class="fas fa-up-right-from-square text-xs opacity-60 group-hover:opacity-100 transition-all"></i>
-              </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                Instant Monthly ↔ LPA converter & expected salary hike % estimator for phone screens.
-              </p>
-            </div>
-          </button>
 
+            <!-- Card C: Quick Call Scratchpad with Condition Checks -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800 shadow-sm">
+              <div class="flex items-center justify-between mb-1.5">
+                <label for="quickScratchpad" class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+                  <i class="fas fa-note-sticky text-emerald-500"></i>
+                  Screening Scratchpad
+                </label>
+                <span id="scratchpadCounter" class="text-[10px] font-semibold text-slate-400">0/300</span>
+              </div>
+              <textarea
+                id="quickScratchpad"
+                rows="2"
+                maxlength="300"
+                oninput="validateScratchpadInput(this)"
+                placeholder="Jot down quick candidate notes, NP, location preference..."
+                class="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              ></textarea>
+              <div class="flex items-center justify-between mt-1.5">
+                <span id="scratchpadConditionMsg" class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">Auto-saved in session</span>
+                <button type="button" onclick="copyScratchpad()" class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+                  <i class="fas fa-copy mr-1"></i>Copy Note
+                </button>
+              </div>
+            </div>
+
+          </div>
         </div>
 
         <!-- Session Status Footer Bar -->
-        <div class="footer mt-8 pt-5 border-t border-slate-200/70 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
-          <div class="flex items-center gap-3">
-            <span class="font-semibold text-slate-700 dark:text-slate-300">TCC Portal v2.1</span>
+        <div class="footer mt-5 pt-4 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
+          <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+            <span class="font-bold text-slate-700 dark:text-slate-300">TCC Portal v2.5</span>
             <span>•</span>
-            <button onclick="toggleProfileModal(true)" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
+            <button type="button" onclick="toggleProfileModal(true)" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">
               View Session Profile
+            </button>
+            <span>•</span>
+            <button type="button" onclick="toggleSecurityModal(true)" class="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold">
+              Security & Bypass Log
             </button>
           </div>
           <div class="flex items-center gap-2">
             <i class="fas fa-shield-halved text-emerald-500"></i>
-            <span id="sessionTimerDisplay">Session Active</span>
+            <span id="sessionTimerDisplay" class="font-medium">Session Active</span>
           </div>
         </div>
       </div>
@@ -609,42 +1019,70 @@
     </div>
   </main>
 
+  <!-- Mobile-First Bottom Dock (Visible on Phone screens for instant thumb reach) -->
+  <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
+    <button type="button" onclick="goHome()" class="flex flex-col items-center gap-0.5 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold">
+      <i class="fas fa-house text-sm"></i>
+      <span>Home</span>
+    </button>
+    <button type="button" onclick="toggleCalculatorModal(true)" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
+      <i class="fas fa-calculator text-sm"></i>
+      <span>CTC Calc</span>
+    </button>
+    <button type="button" onclick="toggleQuickWaModal(true)" class="flex flex-col items-center gap-0.5 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+      <i class="fab fa-whatsapp text-sm"></i>
+      <span>Quick WA</span>
+    </button>
+    <button type="button" onclick="toggleSecurityModal(true)" class="flex flex-col items-center gap-0.5 text-amber-600 dark:text-amber-400 text-[10px] font-semibold">
+      <i class="fas fa-bolt-slash text-sm"></i>
+      <span>PA Bypass</span>
+    </button>
+    <button type="button" onclick="toggleTheme()" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
+      <i class="fas fa-circle-half-stroke text-sm"></i>
+      <span>Theme</span>
+    </button>
+  </nav>
+
   <!-- ==================== USER PROFILE MODAL ==================== -->
   <div id="profileModal" class="fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="glass-panel rounded-3xl max-w-md w-full p-6 sm:p-7 relative animate-[fadeTransition_0.25s_ease-out]">
       <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
-        <h3 class="font-display font-bold text-lg flex items-center gap-2">
+        <h3 class="font-display font-bold text-lg flex items-center gap-2 text-slate-900 dark:text-white">
           <i class="fas fa-id-badge text-indigo-500"></i>
           Active Recruiter Profile
         </h3>
-        <button onclick="toggleProfileModal(false)" class="w-8 h-8 rounded-xl bg-slate-200/60 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white">
+        <button type="button" onclick="toggleProfileModal(false)" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white">
           <i class="fas fa-times"></i>
         </button>
       </div>
-      <div class="space-y-3 text-xs sm:text-sm">
-        <div class="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 flex justify-between">
+      <div class="space-y-2.5 text-xs sm:text-sm">
+        <div class="p-3 rounded-2xl bg-slate-100/90 dark:bg-slate-900/70 flex justify-between gap-2">
           <span class="text-slate-500">Full Name</span>
-          <span class="font-bold text-slate-900 dark:text-white" id="modalProfileName">-</span>
+          <span class="font-bold text-slate-900 dark:text-white text-right" id="modalProfileName">-</span>
         </div>
-        <div class="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 flex justify-between">
+        <div class="p-3 rounded-2xl bg-slate-100/90 dark:bg-slate-900/70 flex justify-between gap-2">
           <span class="text-slate-500">Email / Username</span>
-          <span class="font-semibold text-slate-900 dark:text-white" id="modalProfileEmail">-</span>
+          <span class="font-semibold text-slate-900 dark:text-white text-right break-all" id="modalProfileEmail">-</span>
         </div>
-        <div class="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 flex justify-between">
+        <div class="p-3 rounded-2xl bg-slate-100/90 dark:bg-slate-900/70 flex justify-between gap-2">
           <span class="text-slate-500">Contact Number</span>
-          <span class="font-semibold text-slate-900 dark:text-white" id="modalProfileContact">-</span>
+          <span class="font-semibold text-slate-900 dark:text-white text-right" id="modalProfileContact">-</span>
         </div>
-        <div class="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 flex justify-between">
+        <div class="p-3 rounded-2xl bg-slate-100/90 dark:bg-slate-900/70 flex justify-between gap-2">
           <span class="text-slate-500">Designation</span>
-          <span class="font-semibold text-slate-900 dark:text-white" id="modalProfileDesignation">-</span>
+          <span class="font-semibold text-slate-900 dark:text-white text-right" id="modalProfileDesignation">-</span>
         </div>
-        <div class="p-3.5 rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 flex justify-between">
+        <div class="p-3 rounded-2xl bg-slate-100/90 dark:bg-slate-900/70 flex justify-between gap-2">
           <span class="text-slate-500">Access Role</span>
-          <span class="font-bold text-indigo-600 dark:text-indigo-400" id="modalProfileRole">-</span>
+          <span class="font-bold text-indigo-600 dark:text-indigo-400 text-right" id="modalProfileRole">-</span>
+        </div>
+        <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex justify-between gap-2">
+          <span class="text-amber-800 dark:text-amber-300 font-medium">Power Automate</span>
+          <span class="font-bold text-amber-700 dark:text-amber-400">Disabled (Bypassed)</span>
         </div>
       </div>
-      <div class="mt-6 flex justify-end gap-2">
-        <button onclick="toggleProfileModal(false)" class="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-bold">
+      <div class="mt-5 flex justify-end gap-2">
+        <button type="button" onclick="toggleProfileModal(false)" class="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold">
           Close
         </button>
       </div>
@@ -654,25 +1092,50 @@
   <!-- ==================== QUICK CTC & HIKE CALCULATOR MODAL ==================== -->
   <div id="calculatorModal" class="fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="glass-panel rounded-3xl max-w-md w-full p-6 sm:p-7 relative">
-      <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200 dark:border-slate-800">
-        <h3 class="font-display font-bold text-lg flex items-center gap-2">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
+        <h3 class="font-display font-bold text-lg flex items-center gap-2 text-slate-900 dark:text-white">
           <i class="fas fa-calculator text-indigo-500"></i>
           Recruiter CTC & Hike Calculator
         </h3>
-        <button onclick="toggleCalculatorModal(false)" class="w-8 h-8 rounded-xl bg-slate-200/60 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white">
+        <button type="button" onclick="toggleCalculatorModal(false)" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white">
           <i class="fas fa-times"></i>
         </button>
       </div>
       <div class="space-y-4">
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Current CTC (LPA)</label>
-          <input type="number" step="any" id="calcCurrentLpa" oninput="runCtcCalculation()" placeholder="e.g. 5.5" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm">
+          <div class="flex justify-between mb-1">
+            <label for="calcCurrentLpa" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Current CTC (LPA)</label>
+            <span class="text-[10px] text-slate-400">Range: 0.5 – 500 LPA</span>
+          </div>
+          <input
+            type="number"
+            step="any"
+            min="0"
+            max="500"
+            id="calcCurrentLpa"
+            oninput="runCtcCalculation()"
+            placeholder="e.g. 5.5"
+            class="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
         </div>
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Expected CTC (LPA)</label>
-          <input type="number" step="any" id="calcExpectedLpa" oninput="runCtcCalculation()" placeholder="e.g. 7.2" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm">
+          <div class="flex justify-between mb-1">
+            <label for="calcExpectedLpa" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Expected CTC (LPA)</label>
+            <span class="text-[10px] text-slate-400">Range: 0.5 – 500 LPA</span>
+          </div>
+          <input
+            type="number"
+            step="any"
+            min="0"
+            max="500"
+            id="calcExpectedLpa"
+            oninput="runCtcCalculation()"
+            placeholder="e.g. 7.2"
+            class="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
         </div>
-        <div class="grid grid-cols-2 gap-3 pt-2">
+        <p id="calcModalValidationMsg" class="text-xs text-rose-600 dark:text-rose-400 font-semibold hidden"></p>
+        <div class="grid grid-cols-2 gap-3 pt-1">
           <div class="p-3.5 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-center">
             <p class="text-[11px] text-slate-500 dark:text-slate-400">Hike Percentage</p>
             <p class="text-xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-0.5" id="calcHikeResult">0%</p>
@@ -689,27 +1152,113 @@
   <!-- ==================== QUICK WHATSAPP DIRECT CHAT MODAL ==================== -->
   <div id="quickWaModal" class="fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="glass-panel rounded-3xl max-w-md w-full p-6 sm:p-7 relative">
-      <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200 dark:border-slate-800">
-        <h3 class="font-display font-bold text-lg flex items-center gap-2">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
+        <h3 class="font-display font-bold text-lg flex items-center gap-2 text-slate-900 dark:text-white">
           <i class="fab fa-whatsapp text-emerald-500 text-xl"></i>
           Quick WhatsApp Launcher
         </h3>
-        <button onclick="toggleQuickWaModal(false)" class="w-8 h-8 rounded-xl bg-slate-200/60 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+        <button type="button" onclick="toggleQuickWaModal(false)" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-500">
           <i class="fas fa-times"></i>
         </button>
       </div>
       <div class="space-y-4">
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Candidate 10-Digit Mobile</label>
-          <input type="tel" id="quickWaNumber" placeholder="e.g. 9876543210" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm">
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="quickWaNumber" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Candidate 10-Digit Mobile</label>
+            <span id="waNumberCounter" class="text-[10px] font-bold text-slate-400">0/10 digits</span>
+          </div>
+          <input
+            type="tel"
+            id="quickWaNumber"
+            maxlength="14"
+            oninput="validateWaNumberInput(this)"
+            placeholder="e.g. 9876543210"
+            class="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          >
+          <p id="waNumberErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
         </div>
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Optional Message</label>
-          <textarea id="quickWaMessage" rows="3" placeholder="Hi, connecting from Talent Connect Consultancy regarding a job opportunity..." class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm"></textarea>
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="quickWaMessage" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Optional Message</label>
+            <span id="waMsgCounter" class="text-[10px] font-semibold text-slate-400">0/500</span>
+          </div>
+          <!-- Quick Template Pills -->
+          <div class="flex flex-wrap gap-1.5 mb-2">
+            <button type="button" onclick="setWaTemplate('Hi, connecting from Talent Connect Consultancy regarding a job opportunity matching your profile.')" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-500/15 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+              + Job Intro
+            </button>
+            <button type="button" onclick="setWaTemplate('Hi, gentle reminder regarding your scheduled interview today. Please confirm your availability.')" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-500/15 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+              + Interview Reminder
+            </button>
+            <button type="button" onclick="setWaTemplate('Hi, please share your updated resume on WhatsApp or email for client shortlisting.')" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-500/15 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+              + Request CV
+            </button>
+          </div>
+          <textarea
+            id="quickWaMessage"
+            rows="3"
+            maxlength="500"
+            oninput="validateWaMessageInput(this)"
+            placeholder="Hi, connecting from Talent Connect Consultancy regarding a job opportunity..."
+            class="w-full px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          ></textarea>
         </div>
-        <button onclick="launchQuickWhatsApp()" class="w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2">
+        <button
+          type="button"
+          onclick="launchQuickWhatsApp()"
+          class="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all"
+        >
           <i class="fab fa-whatsapp text-base"></i>
-          Open WhatsApp Chat
+          Open WhatsApp Chat (Direct Bypass)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SECURITY & POWER AUTOMATE BYPASS AUDIT MODAL ==================== -->
+  <div id="securityModal" class="fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-panel rounded-3xl max-w-lg w-full p-6 sm:p-7 relative">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
+        <h3 class="font-display font-bold text-lg flex items-center gap-2 text-slate-900 dark:text-white">
+          <i class="fas fa-shield-halved text-emerald-500"></i>
+          Security Hardening & Bypass Status
+        </h3>
+        <button type="button" onclick="toggleSecurityModal(false)" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="space-y-2.5 text-xs">
+        <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-start gap-3">
+          <i class="fas fa-bolt-slash text-amber-600 dark:text-amber-400 text-base mt-0.5"></i>
+          <div>
+            <p class="font-bold text-slate-900 dark:text-white">Power Automate Feature: DISABLED (Bypassed)</p>
+            <p class="text-slate-600 dark:text-slate-300 mt-0.5">
+              All Power Automate webhook/flow triggers (`*.logic.azure.com` / `flow.microsoft.com`) are intercepted and bypassed. Portal operates in direct Supabase & direct WhatsApp mode.
+            </p>
+          </div>
+        </div>
+        <div class="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 flex items-start gap-3">
+          <i class="fas fa-code text-emerald-600 dark:text-emerald-400 text-base mt-0.5"></i>
+          <div>
+            <p class="font-bold text-slate-900 dark:text-white">DOM XSS Sanitization & Input Guards</p>
+            <p class="text-slate-600 dark:text-slate-300 mt-0.5">
+              Toast notifications, search filters, and user profile fields use strict HTML entity escaping (`textContent`) and regex condition checks.
+            </p>
+          </div>
+        </div>
+        <div class="p-3 rounded-2xl bg-indigo-500/10 border border-indigo-500/25 flex items-start gap-3">
+          <i class="fas fa-user-lock text-indigo-600 dark:text-indigo-400 text-base mt-0.5"></i>
+          <div>
+            <p class="font-bold text-slate-900 dark:text-white">Brute-Force Rate Limiter & Credential Hygiene</p>
+            <p class="text-slate-600 dark:text-slate-300 mt-0.5">
+              Login attempts are guarded by a 5-attempt lockout timer, password fields are stripped from memory post-authentication, and external links enforce `noopener,noreferrer`.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="mt-5 flex justify-end">
+        <button type="button" onclick="toggleSecurityModal(false)" class="px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold">
+          Got It
         </button>
       </div>
     </div>
@@ -718,12 +1267,70 @@
   <script>
     // ==================== SUPABASE CONFIGURATION ====================
     const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0'; // Paste your Supabase anon/public key here
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0';
 
     // Initialize Supabase Client
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Non-blocking custom notification system (replaces browser alert)
+    // ==================== REQUIREMENT #5: POWER AUTOMATE BYPASS ====================
+    // Explicitly disable and bypass Power Automate across session and window
+    window.POWER_AUTOMATE_ENABLED = false;
+    window.BYPASS_POWER_AUTOMATE = true;
+
+    function enforcePowerAutomateBypass() {
+      sessionStorage.setItem('powerAutomateEnabled', 'false');
+      sessionStorage.setItem('bypassPowerAutomate', 'true');
+      sessionStorage.setItem('powerAutomateStatus', 'BYPASSED');
+    }
+    enforcePowerAutomateBypass();
+
+    // Global helper if any module calls Power Automate directly
+    window.triggerPowerAutomateFlow = async function(payload = {}, flowUrl = '') {
+      console.info('[Bypass] Power Automate flow call intercepted and bypassed:', { bypassed: true });
+      return {
+        ok: true,
+        status: 200,
+        bypassed: true,
+        message: 'Power Automate is disabled and bypassed.'
+      };
+    };
+
+    // Intercept any accidental fetch calls to Power Automate / Azure Logic Apps endpoints
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = async function(resource, config) {
+      const urlStr = typeof resource === 'string' ? resource : (resource?.url || '');
+      if (
+        urlStr.includes('logic.azure.com') ||
+        urlStr.includes('powerautomate') ||
+        urlStr.includes('flow.microsoft.com')
+      ) {
+        console.warn('[Power Automate Bypassed] Blocked external flow request:', urlStr);
+        return new Response(
+          JSON.stringify({ success: true, bypassed: true, message: 'Power Automate bypassed' }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+      return originalFetch(resource, config);
+    };
+
+    // ==================== REQUIREMENT #1: SECURITY UTILITIES ====================
+    // HTML Entity Sanitizer to prevent DOM XSS
+    function escapeHTML(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // Brute-force login rate limiter state
+    let failedLoginAttempts = 0;
+    let lockoutUntilTimestamp = 0;
+    let lockoutTimerInterval = null;
+
+    // Non-blocking XSS-safe custom notification system
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
       if (!container) return;
@@ -738,12 +1345,20 @@
         error: 'fa-triangle-exclamation text-white',
         success: 'fa-circle-check text-white'
       };
-      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl border shadow-xl text-xs sm:text-sm font-semibold transition-all duration-300 ${colors[type] || colors.info}`;
-      toast.innerHTML = `
-        <i class="fas ${icons[type] || icons.info} text-base shrink-0"></i>
-        <span class="flex-1">${message}</span>
-      `;
+      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl border shadow-xl text-xs sm:text-sm font-semibold transition-all duration-300 ${colors[type] || colors.info}`;
+
+      const iconEl = document.createElement('i');
+      iconEl.className = `fas ${icons[type] || icons.info} text-base shrink-0`;
+
+      const textEl = document.createElement('span');
+      textEl.className = 'flex-1';
+      // Safe textContent assignment prevents XSS injection
+      textEl.textContent = String(message || '');
+
+      toast.appendChild(iconEl);
+      toast.appendChild(textEl);
       container.appendChild(toast);
+
       setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateY(10px)';
@@ -751,10 +1366,206 @@
       }, 3500);
     }
 
-    // UI Enhancement Helpers
+    // ==================== REQUIREMENT #4: INPUT CONDITION CHECKS ====================
+    // 1. Login Email / Username Validation
+    function validateEmailInput(inputEl) {
+      if (!inputEl) return false;
+      const rawVal = inputEl.value.trim();
+      const msgEl = document.getElementById('emailValidationMsg');
+      const iconEl = document.getElementById('emailStatusIcon');
+      const badgeEl = document.getElementById('emailConditionBadge');
+
+      // Disallow dangerous injection characters
+      const hasForbiddenChars = /[<>'";\\]/.test(rawVal);
+      // Accept standard email or alphanumeric username >= 3 chars
+      const isValidEmailOrUser = /^[a-zA-Z0-9._%+-]+(@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})?$/.test(rawVal) && rawVal.length >= 3 && rawVal.length <= 120;
+
+      if (!rawVal) {
+        inputEl.classList.remove('input-valid');
+        inputEl.classList.add('input-invalid');
+        if (msgEl) {
+          msgEl.textContent = 'Email address or username is required.';
+          msgEl.classList.remove('hidden');
+        }
+        if (iconEl) iconEl.classList.add('hidden');
+        if (badgeEl) badgeEl.textContent = 'Required';
+        return false;
+      }
+
+      if (hasForbiddenChars || !isValidEmailOrUser) {
+        inputEl.classList.remove('input-valid');
+        inputEl.classList.add('input-invalid');
+        if (msgEl) {
+          msgEl.textContent = hasForbiddenChars
+            ? 'Invalid special characters detected.'
+            : 'Enter a valid email (e.g. user@company.com) or username (min 3 chars).';
+          msgEl.classList.remove('hidden');
+        }
+        if (iconEl) iconEl.classList.add('hidden');
+        if (badgeEl) badgeEl.textContent = 'Invalid format';
+        return false;
+      }
+
+      inputEl.classList.remove('input-invalid');
+      inputEl.classList.add('input-valid');
+      if (msgEl) msgEl.classList.add('hidden');
+      if (iconEl) iconEl.classList.remove('hidden');
+      if (badgeEl) badgeEl.textContent = 'Valid';
+      return true;
+    }
+
+    // 2. Login Password Validation
+    function validatePasswordInput(inputEl) {
+      if (!inputEl) return false;
+      const val = inputEl.value;
+      const msgEl = document.getElementById('passwordValidationMsg');
+      const badgeEl = document.getElementById('passwordConditionBadge');
+
+      if (!val || val.trim().length === 0) {
+        inputEl.classList.remove('input-valid');
+        inputEl.classList.add('input-invalid');
+        if (msgEl) {
+          msgEl.textContent = 'Password cannot be empty.';
+          msgEl.classList.remove('hidden');
+        }
+        if (badgeEl) badgeEl.textContent = 'Required';
+        return false;
+      }
+
+      if (val.length < 4 || val.length > 128) {
+        inputEl.classList.remove('input-valid');
+        inputEl.classList.add('input-invalid');
+        if (msgEl) {
+          msgEl.textContent = 'Password must be between 4 and 128 characters.';
+          msgEl.classList.remove('hidden');
+        }
+        if (badgeEl) badgeEl.textContent = `${val.length}/4 chars`;
+        return false;
+      }
+
+      inputEl.classList.remove('input-invalid');
+      inputEl.classList.add('input-valid');
+      if (msgEl) msgEl.classList.add('hidden');
+      if (badgeEl) badgeEl.textContent = 'Ready';
+      return true;
+    }
+
+    function checkCapsLock(event) {
+      const warning = document.getElementById('capsLockWarning');
+      if (!warning || !event.getModifierState) return;
+      if (event.getModifierState('CapsLock')) {
+        warning.classList.remove('hidden');
+      } else {
+        warning.classList.add('hidden');
+      }
+    }
+
+    // 3. Module Filter Input Condition Check
+    function validateAndFilterModules(inputEl) {
+      if (!inputEl) return;
+      // Strip angle brackets or script chars immediately
+      const cleanVal = inputEl.value.replace(/[<>"{}`]/g, '').slice(0, 50);
+      if (inputEl.value !== cleanVal) {
+        inputEl.value = cleanVal;
+      }
+      const clearBtn = document.getElementById('clearFilterBtn');
+      if (clearBtn) {
+        clearBtn.style.display = cleanVal.length > 0 ? 'inline-flex' : 'none';
+      }
+      filterModules(cleanVal);
+    }
+
+    function clearModuleFilter() {
+      const inputEl = document.getElementById('moduleSearchInput');
+      if (inputEl) {
+        inputEl.value = '';
+        validateAndFilterModules(inputEl);
+      }
+    }
+
+    // 4. WhatsApp Mobile & Message Input Condition Checks
+    function validateWaNumberInput(inputEl) {
+      if (!inputEl) return false;
+      // Allow digits only, strip +91 if pasted
+      let digits = inputEl.value.replace(/\D/g, '');
+      if (digits.startsWith('91') && digits.length > 10) {
+        digits = digits.slice(2);
+      }
+      digits = digits.slice(0, 10);
+      inputEl.value = digits;
+
+      const counterEl = document.getElementById('waNumberCounter');
+      const errEl = document.getElementById('waNumberErrorMsg');
+      if (counterEl) counterEl.textContent = `${digits.length}/10 digits`;
+
+      const isValidIndianMobile = /^[6-9]\d{9}$/.test(digits);
+      if (digits.length === 0) {
+        inputEl.classList.remove('input-valid', 'input-invalid');
+        if (errEl) errEl.classList.add('hidden');
+        return false;
+      }
+
+      if (!isValidIndianMobile) {
+        inputEl.classList.remove('input-valid');
+        inputEl.classList.add('input-invalid');
+        if (errEl) {
+          errEl.textContent = 'Enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.';
+          errEl.classList.remove('hidden');
+        }
+        return false;
+      }
+
+      inputEl.classList.remove('input-invalid');
+      inputEl.classList.add('input-valid');
+      if (errEl) errEl.classList.add('hidden');
+      return true;
+    }
+
+    function validateWaMessageInput(textareaEl) {
+      if (!textareaEl) return true;
+      // Strip script tags
+      const clean = textareaEl.value.replace(/<\/?script[^>]*>/gi, '').slice(0, 500);
+      if (textareaEl.value !== clean) textareaEl.value = clean;
+      const counter = document.getElementById('waMsgCounter');
+      if (counter) counter.textContent = `${clean.length}/500`;
+      return true;
+    }
+
+    function setWaTemplate(text) {
+      const msgEl = document.getElementById('quickWaMessage');
+      if (msgEl) {
+        msgEl.value = text;
+        validateWaMessageInput(msgEl);
+      }
+    }
+
+    // 5. Scratchpad Condition Validation
+    function validateScratchpadInput(textareaEl) {
+      if (!textareaEl) return;
+      const clean = textareaEl.value.replace(/[<>]/g, '').slice(0, 300);
+      if (textareaEl.value !== clean) textareaEl.value = clean;
+      const counter = document.getElementById('scratchpadCounter');
+      if (counter) counter.textContent = `${clean.length}/300`;
+      sessionStorage.setItem('recruiterScratchpad', clean);
+    }
+
+    function copyScratchpad() {
+      const el = document.getElementById('quickScratchpad');
+      if (!el || !el.value.trim()) {
+        showToast('Scratchpad is empty', 'error');
+        return;
+      }
+      el.select();
+      document.execCommand('copy');
+      showToast('Scratchpad notes copied to clipboard!', 'success');
+    }
+
+    // ==================== STREAMING_CHUNK:Configuring theme, calculators, and modal toggles... ====================
+    // Theme Switcher (Default is Light Mode)
     function toggleTheme() {
       const html = document.documentElement;
-      html.classList.toggle('dark');
+      const isDark = html.classList.toggle('dark');
+      sessionStorage.setItem('tccTheme', isDark ? 'dark' : 'light');
     }
 
     function togglePasswordVisibility() {
@@ -786,6 +1597,18 @@
       }
     }
 
+    function toggleSecurityModal(show) {
+      const modal = document.getElementById('securityModal');
+      if (!modal) return;
+      if (show) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      } else {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
     function toggleCalculatorModal(show) {
       const modal = document.getElementById('calculatorModal');
       if (show) {
@@ -797,11 +1620,36 @@
       }
     }
 
+    // Modal CTC Calculator with Condition Validation
     function runCtcCalculation() {
-      const cur = parseFloat(document.getElementById('calcCurrentLpa').value) || 0;
-      const exp = parseFloat(document.getElementById('calcExpectedLpa').value) || 0;
+      const curInput = document.getElementById('calcCurrentLpa');
+      const expInput = document.getElementById('calcExpectedLpa');
+      const msgEl = document.getElementById('calcModalValidationMsg');
       const hikeEl = document.getElementById('calcHikeResult');
       const monthlyEl = document.getElementById('calcMonthlyResult');
+
+      const cur = parseFloat(curInput.value);
+      const exp = parseFloat(expInput.value);
+
+      if ((curInput.value && (isNaN(cur) || cur < 0 || cur > 500)) ||
+          (expInput.value && (isNaN(exp) || exp < 0 || exp > 500))) {
+        if (msgEl) {
+          msgEl.textContent = 'Please enter a realistic CTC value between 0 and 500 LPA.';
+          msgEl.classList.remove('hidden');
+        }
+        hikeEl.textContent = 'Invalid';
+        monthlyEl.textContent = '₹0';
+        return;
+      }
+
+      if (msgEl) {
+        if (cur > 0 && exp > 0 && exp < cur) {
+          msgEl.textContent = 'Note: Expected CTC is lower than Current CTC.';
+          msgEl.classList.remove('hidden');
+        } else {
+          msgEl.classList.add('hidden');
+        }
+      }
 
       if (cur > 0 && exp > 0) {
         const pct = (((exp - cur) / cur) * 100).toFixed(1);
@@ -818,6 +1666,45 @@
       }
     }
 
+    // Inline Dashboard Calculator with Condition Validation
+    function runInlineCalculation() {
+      const curEl = document.getElementById('inlineCurrentLpa');
+      const expEl = document.getElementById('inlineExpectedLpa');
+      const msgEl = document.getElementById('inlineCalcConditionMsg');
+      const hikeEl = document.getElementById('inlineHikeVal');
+      const moEl = document.getElementById('inlineMonthlyVal');
+      const diffEl = document.getElementById('inlineDiffVal');
+
+      const cur = parseFloat(curEl?.value);
+      const exp = parseFloat(expEl?.value);
+
+      if ((curEl?.value && (cur < 0 || cur > 500)) || (expEl?.value && (exp < 0 || exp > 500))) {
+        if (msgEl) {
+          msgEl.textContent = 'Values must be between 0 and 500 LPA.';
+          msgEl.classList.remove('hidden');
+        }
+        return;
+      }
+      if (msgEl) msgEl.classList.add('hidden');
+
+      if (cur > 0 && exp > 0) {
+        const pct = (((exp - cur) / cur) * 100).toFixed(1);
+        hikeEl.textContent = `${pct > 0 ? '+' : ''}${pct}%`;
+        const diff = (exp - cur).toFixed(1);
+        diffEl.textContent = `${diff > 0 ? '+' : ''}₹${diff}L`;
+      } else {
+        hikeEl.textContent = '0%';
+        diffEl.textContent = '₹0L';
+      }
+
+      if (exp > 0) {
+        const monthly = Math.round((exp * 100000) / 12);
+        moEl.textContent = '₹' + monthly.toLocaleString('en-IN');
+      } else {
+        moEl.textContent = '₹0';
+      }
+    }
+
     function toggleQuickWaModal(show) {
       const modal = document.getElementById('quickWaModal');
       if (show) {
@@ -830,33 +1717,95 @@
     }
 
     function launchQuickWhatsApp() {
-      const rawNum = (document.getElementById('quickWaNumber').value || '').replace(/\D/g, '').slice(-10);
-      if (rawNum.length !== 10) {
-        showToast('Please enter a valid 10-digit mobile number', 'error');
+      const numInput = document.getElementById('quickWaNumber');
+      const msgInput = document.getElementById('quickWaMessage');
+      if (!validateWaNumberInput(numInput)) {
+        showToast('Please enter a valid 10-digit Indian mobile number (starts with 6-9)', 'error');
         return;
       }
-      const msg = document.getElementById('quickWaMessage').value || '';
+      validateWaMessageInput(msgInput);
+      const rawNum = numInput.value;
+      const msg = (msgInput.value || '').trim();
       const url = `https://wa.me/91${rawNum}${msg ? '?text=' + encodeURIComponent(msg) : ''}`;
-      window.open(url, '_blank');
+      // Security Fix: Prevent reverse tabnabbing with noopener,noreferrer
+      window.open(url, '_blank', 'noopener,noreferrer');
       toggleQuickWaModal(false);
     }
 
+    // ==================== STREAMING_CHUNK:Implementing module filtering and live Supabase metrics sync... ====================
     function filterModules(query) {
       const q = (query || '').toLowerCase().trim();
       const cards = document.querySelectorAll('#modulesGrid .nav-button');
       const isAdmin = (sessionStorage.getItem('userType') || '').toLowerCase() === 'admin';
+      let visibleCount = 0;
+      let totalEligible = 0;
+
       cards.forEach(card => {
         if ((card.id === 'sourcedProfilesBtn' || card.id === 'manageEmpLocationsBtn') && !isAdmin) {
+          card.style.display = 'none';
           return;
         }
+        totalEligible++;
         const keywords = (card.getAttribute('data-module-title') || '') + ' ' + card.innerText.toLowerCase();
-        card.style.display = (!q || keywords.includes(q)) ? 'flex' : 'none';
+        const matches = !q || keywords.includes(q);
+        card.style.display = matches ? 'flex' : 'none';
+        if (matches) visibleCount++;
       });
+
+      const countBadge = document.getElementById('moduleFilterCount');
+      if (countBadge) {
+        countBadge.textContent = q ? `${visibleCount}/${totalEligible}` : 'All';
+      }
+
+      const emptyBox = document.getElementById('noModulesMatchBox');
+      if (emptyBox) {
+        emptyBox.classList.toggle('hidden', visibleCount > 0);
+      }
+    }
+
+    // Fetch live overview counts for One-View KPI Ribbon
+    async function refreshLiveWorkspaceMetrics() {
+      const spinner = document.getElementById('syncSpinnerIcon');
+      if (spinner) spinner.classList.add('fa-spin');
+
+      try {
+        // Count portal users
+        const { count: userCount } = await supabaseClient
+          .from('users')
+          .select('*', { count: 'exact', head: true });
+
+        const teamEl = document.getElementById('kpiTeamCount');
+        if (teamEl) teamEl.textContent = typeof userCount === 'number' ? String(userCount) : 'Active';
+
+        // Try fetching candidates count if table exists
+        const { count: candCount, error: candErr } = await supabaseClient
+          .from('candidates')
+          .select('*', { count: 'exact', head: true });
+
+        const candEl = document.getElementById('kpiTotalCandidates');
+        if (candEl) {
+          candEl.textContent = (!candErr && typeof candCount === 'number') ? String(candCount) : 'Ready';
+        }
+
+        // Try fetching interviews count or fallback cleanly
+        const intEl = document.getElementById('kpiInterviewsCount');
+        if (intEl && intEl.textContent === '--') {
+          intEl.textContent = 'Live';
+        }
+      } catch (e) {
+        // Silent graceful fallback if table names vary
+      } finally {
+        setTimeout(() => {
+          if (spinner) spinner.classList.remove('fa-spin');
+        }, 400);
+      }
     }
 
     function syncDashboardHeaderUI() {
       const name = sessionStorage.getItem('userName') || 'User';
-      const designation = sessionStorage.getItem('userDesignation') || '';
+      const email = sessionStorage.getItem('userEmail') || '-';
+      const contact = sessionStorage.getItem('userContact') || '-';
+      const designation = sessionStorage.getItem('userDesignation') || 'Recruiter';
       const userType = sessionStorage.getItem('userType') || 'Recruiter';
 
       const initialsEl = document.getElementById('userAvatarInitials');
@@ -871,31 +1820,67 @@
 
       const subtitle = document.getElementById('userSubtitleInfo');
       if (subtitle && designation) {
-        subtitle.textContent = `${designation} • ${userType} Access`;
+        subtitle.textContent = `${designation} • ${userType} Access • Power Automate Bypassed`;
+      }
+
+      // Sync One-View Inline Profile Cards
+      const inName = document.getElementById('inlineProfileName');
+      const inDesig = document.getElementById('inlineProfileDesignation');
+      const inContact = document.getElementById('inlineProfileContact');
+      const inEmail = document.getElementById('inlineProfileEmail');
+      const kpiRole = document.getElementById('kpiAccessRole');
+
+      if (inName) inName.textContent = name;
+      if (inDesig) inDesig.textContent = designation || '-';
+      if (inContact) inContact.textContent = contact || '-';
+      if (inEmail) inEmail.textContent = email || '-';
+      if (kpiRole) kpiRole.textContent = userType;
+
+      // Restore scratchpad if saved
+      const savedNote = sessionStorage.getItem('recruiterScratchpad');
+      const padEl = document.getElementById('quickScratchpad');
+      if (padEl && savedNote) {
+        padEl.value = savedNote;
+        validateScratchpadInput(padEl);
       }
 
       const hour = new Date().getHours();
       const greet = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
       const greetEl = document.getElementById('dynamicGreeting');
       if (greetEl) greetEl.textContent = `${greet}, ${name.split(' ')[0]}`;
+
+      refreshLiveWorkspaceMetrics();
     }
 
+    // Live Clock & Session Uptime Counter
     setInterval(() => {
       const clockEl = document.getElementById('liveClock');
       if (clockEl) {
         clockEl.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       }
+
+      const loginTimeStr = sessionStorage.getItem('loginTime');
+      const timerEl = document.getElementById('sessionTimerDisplay');
+      if (loginTimeStr && timerEl && sessionStorage.getItem('isLoggedIn') === 'true') {
+        const diffMs = Date.now() - new Date(loginTimeStr).getTime();
+        const mins = Math.max(0, Math.floor(diffMs / 60000));
+        // Auto-expire session if older than 12 hours for security
+        if (mins > 720) {
+          logout();
+          showToast('Session expired after 12 hours for security. Please login again.', 'info');
+          return;
+        }
+        timerEl.textContent = `Session Active (${mins}m) • PA Bypassed`;
+      }
     }, 1000);
 
-    // ==================== PRESERVED CORE FUNCTIONS ====================
+    // ==================== STREAMING_CHUNK:Preserving core authentication, admin check, and navigation logic... ====================
     function goHome() {
-      console.log("Home button clicked");
-
       const homeButton = document.querySelector('.home-button');
-      homeButton.style.transform = 'scale(0.9) rotate(10deg)';
+      if (homeButton) homeButton.style.transform = 'scale(0.9) rotate(10deg)';
 
       setTimeout(() => {
-        homeButton.style.transform = '';
+        if (homeButton) homeButton.style.transform = '';
 
         if (sessionStorage.getItem('isLoggedIn') === 'true') {
           document.querySelector('.container').classList.add('fade-transition');
@@ -927,23 +1912,63 @@
       if (userType.toLowerCase() === 'admin') {
         if (sourcedProfilesBtn) sourcedProfilesBtn.style.display = 'flex';
         if (manageEmpLocationsBtn) manageEmpLocationsBtn.style.display = 'flex';
-        console.log('Admin user detected - Sourced Profiles & Manage Emp/Locations buttons enabled');
       } else {
         if (sourcedProfilesBtn) sourcedProfilesBtn.style.display = 'none';
         if (manageEmpLocationsBtn) manageEmpLocationsBtn.style.display = 'none';
-        console.log('Non-admin user - Admin buttons hidden');
       }
     }
 
-    // Updated handleLogin function with Supabase authentication
+    function startLockoutCountdown() {
+      const banner = document.getElementById('lockoutBanner');
+      const countEl = document.getElementById('lockoutCountdown');
+      const loginBtn = document.getElementById('loginBtn');
+      if (!banner || !countEl) return;
+
+      banner.classList.remove('hidden');
+      if (loginBtn) loginBtn.disabled = true;
+
+      if (lockoutTimerInterval) clearInterval(lockoutTimerInterval);
+      lockoutTimerInterval = setInterval(() => {
+        const remaining = Math.ceil((lockoutUntilTimestamp - Date.now()) / 1000);
+        if (remaining <= 0) {
+          clearInterval(lockoutTimerInterval);
+          banner.classList.add('hidden');
+          failedLoginAttempts = 0;
+          if (loginBtn) loginBtn.disabled = false;
+        } else {
+          countEl.textContent = String(remaining);
+        }
+      }, 500);
+    }
+
+    // Updated handleLogin function with Input Condition Validation, Brute-Force Protection & Supabase authentication
     async function handleLogin(event) {
       event.preventDefault();
 
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
+      // Check rate-limit lockout
+      if (Date.now() < lockoutUntilTimestamp) {
+        showToast('Please wait for the security cooldown timer to finish.', 'error');
+        return;
+      }
+
+      const emailInput = document.getElementById('email');
+      const passwordInput = document.getElementById('password');
       const errorMessage = document.getElementById('errorMessage');
       const loginBtn = document.getElementById('loginBtn');
       const loginText = document.getElementById('loginText');
+
+      // Validate input conditions before sending network request
+      const isEmailValid = validateEmailInput(emailInput);
+      const isPwdValid = validatePasswordInput(passwordInput);
+      if (!isEmailValid || !isPwdValid) {
+        errorMessage.textContent = 'Please fix the highlighted input fields before logging in.';
+        errorMessage.style.display = 'block';
+        errorMessage.classList.add('error-shake');
+        return;
+      }
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
 
       // Add loading state
       loginBtn.classList.add('loading');
@@ -952,7 +1977,7 @@
       errorMessage.style.display = 'none';
 
       try {
-        // Query Supabase 'users' table directly
+        // Query Supabase 'users' table directly (keeping current logic intact)
         const { data: user, error } = await supabaseClient
           .from('users')
           .select('*')
@@ -963,6 +1988,10 @@
         if (error || !user) {
           throw new Error('Invalid email or password. Please try again.');
         }
+
+        // Security hygiene: immediately delete plaintext password property from in-memory user object
+        delete user.password;
+        failedLoginAttempts = 0;
 
         // Normalize role (e.g. 'Admin' or 'User')
         const resolvedUserType = user.user_type || user.userType || 'User';
@@ -981,9 +2010,11 @@
             document.getElementById('loginSuccess').style.display = 'inline-block';
             document.getElementById('userName').textContent = user.name;
 
-            // Clear form
-            document.getElementById('email').value = '';
-            document.getElementById('password').value = '';
+            // Clear form & validation states
+            emailInput.value = '';
+            passwordInput.value = '';
+            emailInput.classList.remove('input-valid', 'input-invalid');
+            passwordInput.classList.remove('input-valid', 'input-invalid');
             errorMessage.style.display = 'none';
             loginBtn.disabled = false;
             loginText.textContent = 'Login';
@@ -998,19 +2029,15 @@
             sessionStorage.setItem('loginTime', new Date().toISOString());
             sessionStorage.setItem('userRowIndex', user.id || '');
 
+            // Ensure Power Automate bypass flags remain set in sessionStorage
+            enforcePowerAutomateBypass();
+
             // Check admin access after login
             checkAdminAccess();
             syncDashboardHeaderUI();
-
-            console.log('Login successful with Supabase data:', {
-              name: user.name,
-              email: user.email,
-              contact: user.contact,
-              designation: user.designation,
-              userType: resolvedUserType
-            });
+            showToast(`Welcome back, ${user.name || 'Recruiter'}!`, 'success');
           }, 400);
-        }, 800);
+        }, 600);
 
       } catch (error) {
         // Login or network error
@@ -1018,10 +2045,16 @@
         loginText.textContent = 'Login';
         loginBtn.disabled = false;
 
-        console.error('Supabase Login error:', error);
+        failedLoginAttempts++;
+        if (failedLoginAttempts >= 5) {
+          lockoutUntilTimestamp = Date.now() + 30000;
+          startLockoutCountdown();
+        }
 
         errorMessage.textContent = error.message || 'Invalid email or password. Please try again.';
         errorMessage.style.display = 'block';
+        errorMessage.classList.remove('error-shake');
+        void errorMessage.offsetWidth; // trigger reflow for animation
         errorMessage.classList.add('error-shake');
       }
     }
@@ -1044,14 +2077,13 @@
         sessionStorage.removeItem('loginTime');
         sessionStorage.removeItem('userRowIndex');
 
+        enforcePowerAutomateBypass();
         showToast('Logged out safely', 'info');
-        console.log('User logged out - all session data cleared');
       }, 400);
     }
 
-    // Updated navigation functions for web hosting
+    // Updated navigation functions for web hosting (Preserving all existing URLs & logic)
     function navigateToEntry() {
-      console.log("Entry button clicked");
       const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.querySelector('.entry-btn');
       if (button) button.style.transform = 'scale(0.95)';
 
@@ -1059,12 +2091,7 @@
         if (button) button.style.transform = '';
 
         if (sessionStorage.getItem('isLoggedIn') === 'true') {
-          console.log('Navigating to entry.html with user data:', {
-            email: sessionStorage.getItem('userEmail'),
-            name: sessionStorage.getItem('userName'),
-            designation: sessionStorage.getItem('userDesignation'),
-            userType: sessionStorage.getItem('userType')
-          });
+          enforcePowerAutomateBypass();
           window.location.href = 'entry.html';
         } else {
           showToast("Please login first", "error");
@@ -1073,7 +2100,6 @@
     }
 
     function navigateToManagement() {
-      console.log("Management button clicked");
       const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.querySelector('.management-btn');
       if (button) button.style.transform = 'scale(0.95)';
 
@@ -1081,12 +2107,7 @@
         if (button) button.style.transform = '';
 
         if (sessionStorage.getItem('isLoggedIn') === 'true') {
-          console.log('Navigating to management.html with user data:', {
-            email: sessionStorage.getItem('userEmail'),
-            name: sessionStorage.getItem('userName'),
-            designation: sessionStorage.getItem('userDesignation'),
-            userType: sessionStorage.getItem('userType')
-          });
+          enforcePowerAutomateBypass();
           window.location.href = 'management.html';
         } else {
           showToast("Please login first", "error");
@@ -1095,7 +2116,6 @@
     }
 
     function navigateToInterviews() {
-      console.log("Scheduled Interviews button clicked");
       const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.querySelector('.interviews-btn');
       if (button) button.style.transform = 'scale(0.95)';
 
@@ -1103,12 +2123,7 @@
         if (button) button.style.transform = '';
 
         if (sessionStorage.getItem('isLoggedIn') === 'true') {
-          console.log('Navigating to interviews.html with user data:', {
-            email: sessionStorage.getItem('userEmail'),
-            name: sessionStorage.getItem('userName'),
-            designation: sessionStorage.getItem('userDesignation'),
-            userType: sessionStorage.getItem('userType')
-          });
+          enforcePowerAutomateBypass();
           window.location.href = 'interviews.html';
         } else {
           showToast("Please login first", "error");
@@ -1117,7 +2132,6 @@
     }
 
     function navigateToSourcedProfiles() {
-      console.log("Sourced Profiles button clicked");
       const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.getElementById('sourcedProfilesBtn');
       if (button) button.style.transform = 'scale(0.95)';
 
@@ -1128,12 +2142,7 @@
           const userType = sessionStorage.getItem('userType') || '';
 
           if (userType.toLowerCase() === 'admin') {
-            console.log('Navigating to sourced_profile.html with admin user data:', {
-              email: sessionStorage.getItem('userEmail'),
-              name: sessionStorage.getItem('userName'),
-              designation: sessionStorage.getItem('userDesignation'),
-              userType: sessionStorage.getItem('userType')
-            });
+            enforcePowerAutomateBypass();
             window.location.href = 'sourced_profile.html';
           } else {
             showToast("Access denied. This feature is only available for Admin users.", "error");
@@ -1145,7 +2154,6 @@
     }
 
     function navigateToWhatsapp() {
-      console.log("Whatsapp button clicked");
       const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.querySelector('.Whatsapp-btn');
       if (button) button.style.transform = 'scale(0.95)';
 
@@ -1156,12 +2164,7 @@
           const userType = sessionStorage.getItem('userType') || '';
 
           if (userType.toLowerCase() === 'admin') {
-            console.log('Navigating to Whatsapp_Sender.html with admin user data:', {
-              email: sessionStorage.getItem('userEmail'),
-              name: sessionStorage.getItem('userName'),
-              designation: sessionStorage.getItem('userDesignation'),
-              userType: sessionStorage.getItem('userType')
-            });
+            enforcePowerAutomateBypass();
             window.location.href = 'Whatsapp_Sender.html';
           } else {
             showToast("Access denied. This feature is only available for Admin users.", "error");
@@ -1173,7 +2176,6 @@
     }
 
     function navigateToAdminManage() {
-      console.log("Manage Emp & Locations button clicked");
       const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.getElementById('manageEmpLocationsBtn');
       if (button) button.style.transform = 'scale(0.95)';
 
@@ -1184,12 +2186,7 @@
           const userType = sessionStorage.getItem('userType') || '';
 
           if (userType.toLowerCase() === 'admin') {
-            console.log('Navigating to admin_manage.html with admin user data:', {
-              email: sessionStorage.getItem('userEmail'),
-              name: sessionStorage.getItem('userName'),
-              designation: sessionStorage.getItem('userDesignation'),
-              userType: sessionStorage.getItem('userType')
-            });
+            enforcePowerAutomateBypass();
             window.location.href = 'admin_manage.html';
           } else {
             showToast("Access denied. This feature is only available for Admin users.", "error");
@@ -1213,16 +2210,20 @@
       if (e.key === '6' && isAdmin) navigateToAdminManage();
     });
 
-    // Check login state on page load
+    // Check login state & default Light theme on page load
     window.addEventListener('load', function() {
-      console.log("Page loaded");
+      // Ensure Light Mode is the default unless the user explicitly switched to dark in this session
+      const savedTheme = sessionStorage.getItem('tccTheme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+
+      enforcePowerAutomateBypass();
 
       if (sessionStorage.getItem('isLoggedIn') === 'true') {
         const userName = sessionStorage.getItem('userName');
-        const userEmail = sessionStorage.getItem('userEmail');
-        const userDesignation = sessionStorage.getItem('userDesignation');
-        const userType = sessionStorage.getItem('userType');
-        const loginTime = sessionStorage.getItem('loginTime');
 
         document.getElementById('loginContainer').style.display = 'none';
         document.getElementById('mainContainer').style.display = 'block';
@@ -1231,26 +2232,18 @@
 
         checkAdminAccess();
         syncDashboardHeaderUI();
-
-        console.log('User already logged in with Supabase session data:', {
-          name: userName,
-          email: userEmail,
-          designation: userDesignation,
-          userType: userType,
-          loginTime: loginTime
-        });
       }
 
       // Entrance animation
       const container = document.querySelector('.container');
       container.style.opacity = '0';
-      container.style.transform = 'translateY(25px) scale(0.98)';
+      container.style.transform = 'translateY(20px) scale(0.99)';
 
       setTimeout(() => {
-        container.style.transition = 'all 0.7s cubic-bezier(0.22, 1, 0.36, 1)';
+        container.style.transition = 'all 0.6s cubic-bezier(0.22, 1, 0.36, 1)';
         container.style.opacity = '1';
         container.style.transform = 'translateY(0) scale(1)';
-      }, 100);
+      }, 80);
     });
 
     // Helper functions for accessing user data globally
@@ -1263,7 +2256,8 @@
         designation: sessionStorage.getItem('userDesignation'),
         userType: sessionStorage.getItem('userType'),
         loginTime: sessionStorage.getItem('loginTime'),
-        rowIndex: sessionStorage.getItem('userRowIndex')
+        rowIndex: sessionStorage.getItem('userRowIndex'),
+        powerAutomateBypassed: true
       };
     };
 
