@@ -8,6 +8,8 @@
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>TCC Sourced Profiles - Today's Sourcing</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS Client SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <script>
@@ -365,7 +367,6 @@
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
-  <!-- Sticky Top Header Bar -->
   <header class="sticky top-0 z-40 glass-card border-b border-slate-200/80 dark:border-slate-800/80 px-3 sm:px-6 py-2.5 sm:py-3">
     <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-2 sm:gap-3">
       <div class="flex items-center gap-2.5 sm:gap-3">
@@ -385,14 +386,14 @@
               <span>Today's Sourcing & Master Pool</span>
             </h1>
             <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
-              Admin Analytics
+              Live Supabase DB
             </span>
             <span class="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25" title="Power Automate flow is disabled and bypassed">
               <i class="fas fa-bolt-slash text-[9px]"></i> PA Bypassed
             </span>
           </div>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-            One-View Master Pool, Email-Ready Table Copy & Direct WhatsApp Broadcast Export (Power Automate Bypassed)
+            One-View Master Pool, Email-Ready Table Copy & Direct WhatsApp Broadcast Export (Synced with Supabase)
           </p>
         </div>
       </div>
@@ -403,7 +404,7 @@
           type="button"
           onclick="refreshData()"
           class="px-2.5 sm:px-3 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
-          title="Refresh Google Sheets Data"
+          title="Refresh Supabase Data"
         >
           <i class="fas fa-arrows-rotate" id="syncSpinnerIcon"></i>
           <span class="hidden md:inline">Refresh</span>
@@ -537,11 +538,11 @@
           </span>
         </div>
         <strong id="lastUpdated" class="font-display text-xs font-bold text-slate-800 dark:text-slate-200 block mt-1 truncate">Loading...</strong>
-        <span class="text-[10px] text-amber-700 dark:text-amber-400 font-semibold truncate block">PA Bypassed • 10m Sync</span>
+        <span class="text-[10px] text-amber-700 dark:text-amber-400 font-semibold truncate block">Supabase Live • PA Bypassed</span>
       </div>
     </div>
 
-    <!-- Filters & Action Controls Card (Preserves #searchCandidateInput, #dateFilter, #companyFilter, #recruiterFilter + adds #noticeFilter & input conditions) -->
+    <!-- Filters & Action Controls Card -->
     <div class="controls glass-card rounded-3xl p-4 sm:p-5 mb-4 animate-in" id="filterTopAnchor">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
         <div class="flex items-center gap-2">
@@ -673,7 +674,7 @@
     <!-- Loading Indicator (#loading) -->
     <div id="loading" class="loading glass-card rounded-3xl mb-5">
       <i class="fas fa-circle-notch fa-spin text-2xl text-purple-500 mb-2 block"></i>
-      <div>Loading Sourced Candidate Database...</div>
+      <div>Loading Sourced Candidate Database from Supabase...</div>
     </div>
 
     <!-- Error Box (#error & #errorMessage) -->
@@ -702,7 +703,7 @@
             </tr>
           </thead>
           <tbody id="candidateTableBody">
-            <tr><td colspan="12" class="no-data">Loading candidate data from Google Sheets...</td></tr>
+            <tr><td colspan="12" class="no-data">Loading candidate data from Supabase...</td></tr>
           </tbody>
         </table>
       </div>
@@ -743,13 +744,16 @@
   </nav>
 
   <script>
+    // ==================== SUPABASE CONFIGURATION ====================
+    const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0';
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     // Global variables
     let candidateData = [];
     let filteredData = [];
     let currentSourcedView = 'table';
-
-    // PRESERVED GOOGLE APPS SCRIPT WEB APP URL
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwb-SxWeOscvz-QCefKn1eK9L7K3gv-bBmjVNi-gsVROg96OKJZ_pq5m2GLGxVKPE3bOQ/exec';
 
     // ==================== REQUIREMENT #5: POWER AUTOMATE BYPASS ====================
     window.POWER_AUTOMATE_ENABLED = false;
@@ -799,6 +803,54 @@
       const html = document.documentElement;
       const isDark = html.classList.toggle('dark');
       sessionStorage.setItem('tccTheme', isDark ? 'dark' : 'light');
+    }
+
+    // Accurately parses ISO 8601 (Supabase), DD/MM/YYYY, DD-MM-YYYY (Indian format), and Date objects
+    function parseFlexibleDate(input) {
+      if (!input) return null;
+      if (input instanceof Date) {
+        return isNaN(input.getTime()) ? null : input;
+      }
+
+      const str = String(input).trim();
+      if (!str) return null;
+
+      // 1. Handle Indian DD/MM/YYYY or DD-MM-YYYY format (with optional time & AM/PM)
+      // Example: "15/10/2026, 05:30:12 pm" or "05/10/2026 14:20"
+      const dmyMatch = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})(?:[,\sT]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(am|pm)?)?/i);
+      if (dmyMatch) {
+        const first = parseInt(dmyMatch[1], 10);
+        const second = parseInt(dmyMatch[2], 10);
+        const year = parseInt(dmyMatch[3], 10);
+        let hours = dmyMatch[4] ? parseInt(dmyMatch[4], 10) : 0;
+        const minutes = dmyMatch[5] ? parseInt(dmyMatch[5], 10) : 0;
+        const seconds = dmyMatch[6] ? parseInt(dmyMatch[6], 10) : 0;
+        const ampm = dmyMatch[7] ? dmyMatch[7].toLowerCase() : null;
+
+        if (ampm === 'pm' && hours < 12) hours += 12;
+        if (ampm === 'am' && hours === 12) hours = 0;
+
+        // Default to DD/MM/YYYY; only treat as MM/DD/YYYY if second > 12 and first <= 12
+        let day = first;
+        let month = second - 1;
+        if (second > 12 && first <= 12) {
+          month = first - 1;
+          day = second;
+        }
+
+        const parsedDmy = new Date(year, month, day, hours, minutes, seconds);
+        if (!isNaN(parsedDmy.getTime())) {
+          return parsedDmy;
+        }
+      }
+
+      // 2. Standard ISO 8601 / RFC date string
+      const parsedIso = new Date(str);
+      if (!isNaN(parsedIso.getTime())) {
+        return parsedIso;
+      }
+
+      return null;
     }
 
     // ==================== REQUIREMENT #4: INPUT CONDITION CHECKS ====================
@@ -966,9 +1018,8 @@
       showToast(`✅ Exported ${filteredData.length} candidates to safe CSV`);
     }
 
-    // ==================== PRESERVED CORE LOGIC & FUNCTIONS ====================
+    // ==================== SUPABASE DATA LOADING ====================
     function init() {
-      // Ensure Light Mode is default unless dark was chosen in session
       const savedTheme = sessionStorage.getItem('tccTheme');
       if (savedTheme === 'dark') {
         document.documentElement.classList.add('dark');
@@ -976,79 +1027,88 @@
         document.documentElement.classList.remove('dark');
       }
 
-      // Auto-switch to cards view on small mobile screens for optimal phone UX
       if (window.innerWidth < 640) {
         switchSourcedView('cards');
       }
 
-      if (!WEB_APP_URL || WEB_APP_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
-        showError('Web App URL not configured. Please update the WEB_APP_URL constant in the script.');
-        return;
-      }
-
-      loadDataFromSheets();
+      loadDataFromSupabase();
     }
 
-    async function loadDataFromSheets() {
+    async function loadDataFromSupabase() {
       showLoading(true);
       hideError();
       const spinIcon = document.getElementById('syncSpinnerIcon');
       if (spinIcon) spinIcon.classList.add('fa-spin');
 
       try {
-        const url = `${WEB_APP_URL}?action=getCandidateData&timestamp=${Date.now()}`;
+        // Fetch all candidates from Supabase ordered by newest first (id descending)
+        const { data: rows, error } = await supabaseClient
+          .from('candidates')
+          .select('*')
+          .order('id', { ascending: false });
 
-        const response = await fetch(url, {
-          method: 'GET',
-          mode: 'cors',
-          headers: {
-            'Accept': 'application/json',
-          },
-          cache: 'no-cache'
+        if (error) {
+          throw error;
+        }
+
+        const todayIsoFallback = new Date().toISOString();
+
+        // Normalize Supabase row schema to match the table's expected fields
+        candidateData = (rows || []).map(row => {
+          const rawTimestamp =
+            row.created_at ||
+            row.timestamp ||
+            row.Timestamp ||
+            row.date ||
+            row.submitted_at ||
+            row.updated_at ||
+            '';
+
+          // If a row was newly inserted in Supabase via Candidate Registration without a timestamp column default,
+          // fallback to today's timestamp so profiles registered today are never hidden
+          const effectiveTimestamp = rawTimestamp ? String(rawTimestamp).trim() : todayIsoFallback;
+
+          const recNameOrEmail =
+            row.recruiter_name ||
+            row.recruiter ||
+            row.recruiter_email ||
+            row.Recruiter ||
+            '';
+
+          return {
+            id: row.id,
+            timestamp: effectiveTimestamp,
+            hasExplicitTimestamp: Boolean(rawTimestamp),
+            company: row.company || row.Company || '',
+            position: row.position || row.Position || '',
+            candidateName: row.name || row.candidateName || row.Candidate_Name || '',
+            mobile: row.mobile || row.Mobile || row.contact || row.Phone || '',
+            email: row.email || row.Email || '',
+            currentCTC: row.current_ctc || row.currentCTC || row.Current_CTC || '',
+            expectedCTC: row.expected_ctc || row.expectedCTC || row.Expected_CTC || '',
+            experience: row.experience || row.experience_years || row.Experience || '',
+            noticePeriod: row.notice_period || row.noticePeriod || row.Notice_Period || '',
+            recruiter: recNameOrEmail.includes('@') ? recNameOrEmail.split('@')[0] : recNameOrEmail
+          };
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText || 'Unknown error'}`);
-        }
-
-        const textResponse = await response.text();
-        let data;
-
-        try {
-          data = JSON.parse(textResponse);
-        } catch (parseError) {
-          throw new Error(`Invalid JSON response: ${textResponse.substring(0, 100)}...`);
-        }
-
-        if (data.error) {
-          throw new Error(data.error);
-        }
-
-        if (!Array.isArray(data)) {
-          throw new Error('Invalid data format received from server - expected array');
-        }
-
-        candidateData = data;
-        filteredData = [...candidateData];
 
         populateCompanyFilter();
         populateRecruiterFilter();
-        displayTable(candidateData);
-        updateStats();
+        applyFilters();
         updateLastUpdated();
 
         if (candidateData.length === 0) {
-          showToast('⚠️ No candidate data found');
+          showToast('⚠️ No candidate data found in Supabase');
         } else {
-          showToast(`✅ Successfully loaded ${candidateData.length} candidates`);
+          showToast(`✅ Loaded ${candidateData.length} candidates from Supabase`);
         }
 
       } catch (error) {
-        console.error('Error loading data:', error);
-        showError(`Failed to load data: ${error.message}`);
+        console.error('Error loading data from Supabase:', error);
+        showError(`Failed to load data from Supabase: ${error.message}`);
 
         const tbody = document.getElementById('candidateTableBody');
-        tbody.innerHTML = '<tr><td colspan="12" class="no-data">Failed to load data from Google Sheets. Please refresh to try again.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" class="no-data">Failed to load data from Supabase. Please click Refresh to try again.</td></tr>';
       } finally {
         showLoading(false);
         if (spinIcon) spinIcon.classList.remove('fa-spin');
@@ -1056,7 +1116,7 @@
     }
 
     function refreshData() {
-      loadDataFromSheets();
+      loadDataFromSupabase();
     }
 
     function showLoading(show) {
@@ -1245,54 +1305,47 @@
 
     function formatTimestamp(timestamp) {
       if (!timestamp) return '';
+      const date = parseFlexibleDate(timestamp);
+      if (!date) return String(timestamp);
 
-      try {
-        const date = new Date(timestamp);
-        if (isNaN(date.getTime())) return timestamp;
-
-        return date.toLocaleString('en-IN', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true
-        });
-      } catch (error) {
-        return timestamp;
-      }
+      return date.toLocaleString('en-IN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
     }
 
+    // Fixed date filter using parseFlexibleDate() so Indian DD/MM/YYYY & ISO timestamps match Today accurately
     function matchesDateFilter(timestamp, filter) {
-      if (!filter || !timestamp) return true;
+      if (!filter) return true;
+      if (!timestamp) return false;
 
-      try {
-        const candidateDate = new Date(timestamp);
-        if (isNaN(candidateDate.getTime())) return true;
+      const candidateDate = parseFlexibleDate(timestamp);
+      if (!candidateDate) return false;
 
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        const dayBeforeYesterday = new Date(today);
-        dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 2);
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      const dayBeforeYesterday = new Date(today);
+      dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 2);
 
-        candidateDate.setHours(0, 0, 0, 0);
-        today.setHours(0, 0, 0, 0);
-        yesterday.setHours(0, 0, 0, 0);
-        dayBeforeYesterday.setHours(0, 0, 0, 0);
+      const candDay = new Date(candidateDate.getFullYear(), candidateDate.getMonth(), candidateDate.getDate()).getTime();
+      const todayDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+      const yesterdayDay = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate()).getTime();
+      const dbyDay = new Date(dayBeforeYesterday.getFullYear(), dayBeforeYesterday.getMonth(), dayBeforeYesterday.getDate()).getTime();
 
-        switch (filter) {
-          case 'today':
-            return candidateDate.getTime() === today.getTime();
-          case 'yesterday':
-            return candidateDate.getTime() === yesterday.getTime();
-          case 'dayBeforeYesterday':
-            return candidateDate.getTime() === dayBeforeYesterday.getTime();
-          default:
-            return true;
-        }
-      } catch (error) {
-        return true;
+      switch (filter) {
+        case 'today':
+          return candDay === todayDay;
+        case 'yesterday':
+          return candDay === yesterdayDay;
+        case 'dayBeforeYesterday':
+          return candDay === dbyDay;
+        default:
+          return true;
       }
     }
 
@@ -1499,7 +1552,7 @@
 
     setInterval(() => {
       if (candidateData.length > 0) {
-        loadDataFromSheets();
+        loadDataFromSupabase();
       }
     }, 10 * 60 * 1000);
   </script>
