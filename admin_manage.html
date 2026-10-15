@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<!-- Default theme is explicitly LIGHT (removed "dark" class from html root) -->
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>TCC Admin - Manage Employees & Locations</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Supabase JS Client SDK -->
@@ -23,6 +26,20 @@
     }
   </script>
   <style>
+    :root {
+      --bg-gradient:
+        radial-gradient(circle at 12% 15%, rgba(244, 63, 94, 0.13) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(59, 130, 246, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.08) 0%, transparent 60%);
+    }
+
+    .dark {
+      --bg-gradient:
+        radial-gradient(circle at 12% 15%, rgba(244, 63, 94, 0.20) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(59, 130, 246, 0.22) 0%, transparent 45%),
+        radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.10) 0%, transparent 60%);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -33,31 +50,78 @@
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
-      background-image:
-        radial-gradient(circle at 12% 15%, rgba(244, 63, 94, 0.14) 0%, transparent 45%),
-        radial-gradient(circle at 88% 85%, rgba(59, 130, 246, 0.15) 0%, transparent 45%);
+      background-image: var(--bg-gradient);
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Ambient Floating Orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(85px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.32;
+      animation: floatOrb 18s ease-in-out infinite alternate;
+    }
+
+    .dark .orb {
+      opacity: 0.42;
+    }
+
+    .orb-1 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #f43f5e, #6366f1);
+      top: -80px;
+      left: -80px;
+    }
+
+    .orb-2 {
+      width: 260px;
+      height: 260px;
+      background: linear-gradient(135deg, #10b981, #3b82f6);
+      bottom: -60px;
+      right: -60px;
+      animation-delay: -7s;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(24px, -28px) scale(1.06); }
+      100% { transform: translate(-18px, 20px) scale(0.95); }
     }
 
     .glass-card {
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border: 1px solid rgba(226, 232, 240, 0.85);
-      box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.07);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 14px 34px -10px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
     }
 
     .dark .glass-card {
-      background: rgba(15, 23, 42, 0.82);
+      background: rgba(15, 23, 42, 0.84);
       border: 1px solid rgba(255, 255, 255, 0.09);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
     }
 
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+      animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    }
+
     .form-input {
       width: 100%;
-      padding: 11px 14px;
-      border-radius: 13px;
-      border: 1.5px solid rgba(148, 163, 184, 0.3);
-      background: rgba(248, 250, 252, 0.9);
+      padding: 10px 13px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(148, 163, 184, 0.35);
+      background: #ffffff;
       color: #0f172a;
       font-size: 13px;
       transition: all 0.2s ease;
@@ -65,7 +129,7 @@
 
     .dark .form-input {
       background: rgba(30, 41, 59, 0.8);
-      border-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.12);
       color: #f8fafc;
     }
 
@@ -75,8 +139,18 @@
       box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.15);
     }
 
+    .input-valid {
+      border-color: #10b981 !important;
+    }
+
+    .input-invalid {
+      border-color: #f43f5e !important;
+    }
+
     .table-scroll {
       overflow-x: auto;
+      max-height: 64vh;
+      overflow-y: auto;
       -webkit-overflow-scrolling: touch;
     }
 
@@ -84,31 +158,34 @@
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
-      font-size: 12.5px;
+      font-size: 12px;
     }
 
     th {
-      background: rgba(241, 245, 249, 0.95);
+      background: rgba(241, 245, 249, 0.96);
       color: #475569;
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 10.5px;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      padding: 13px 14px;
+      padding: 12px 12px;
       text-align: left;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.95);
       white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     .dark th {
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(15, 23, 42, 0.96);
       color: #94a3b8;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     td {
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+      padding: 11px 12px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.65);
       vertical-align: middle;
     }
 
@@ -153,9 +230,13 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 selection:bg-rose-500 selection:text-white">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-20 sm:pb-14 selection:bg-rose-500 selection:text-white relative">
 
-  <div id="toastContainer" class="fixed bottom-5 right-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-4 pointer-events-none"></div>
+  <!-- Ambient Floating Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div id="toastContainer" class="fixed bottom-16 sm:bottom-5 right-4 sm:right-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-3 pointer-events-none"></div>
 
   <!-- Custom Delete Confirmation Modal (No browser confirm()) -->
   <div id="confirmDialogModal" class="fixed inset-0 z-[2100] bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4">
@@ -176,15 +257,21 @@
     </div>
   </div>
 
-  <header class="sticky top-0 z-40 glass-card border-b border-slate-200/70 dark:border-slate-800/80 px-4 sm:px-6 py-3">
-    <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <button onclick="goHome()" class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-rose-500/10 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white border border-rose-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0" title="Back to Dashboard">
-          <i class="fas fa-house text-base"></i>
+  <!-- Sticky Top Header Bar -->
+  <header class="sticky top-0 z-40 glass-card border-b border-slate-200/80 dark:border-slate-800/80 px-3 sm:px-6 py-2.5 sm:py-3">
+    <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-2 sm:gap-3">
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <button
+          onclick="goHome()"
+          class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-rose-500/10 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white border border-rose-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0"
+          title="Back to Dashboard"
+          aria-label="Back to Dashboard"
+        >
+          <i class="fas fa-house text-sm sm:text-base"></i>
         </button>
 
         <div>
-          <div class="flex flex-wrap items-center gap-2">
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <h1 class="font-display font-extrabold text-sm sm:text-lg text-slate-900 dark:text-white leading-tight flex items-center gap-2">
               <i class="fas fa-building-user text-rose-500 hidden sm:inline"></i>
               <span>Manage Employees & Locations</span>
@@ -192,109 +279,184 @@
             <span class="role-badge role-admin">
               <i class="fas fa-shield-halved"></i> Admin Only
             </span>
+            <span class="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25" title="Power Automate flow is disabled and bypassed">
+              <i class="fas fa-bolt-slash text-[9px]"></i> PA Bypassed
+            </span>
           </div>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-            Add/Edit Recruiter Accounts & Configure Client Office Addresses for Interview Invitations (Supabase)
+            One-View Admin Control: Recruiter Accounts & Client Office Addresses for Interview Invites (Power Automate Bypassed)
           </p>
         </div>
       </div>
 
       <!-- Right Action Controls -->
-      <div class="flex items-center gap-2">
-        <button type="button" onclick="syncAllAdminData()" class="px-3 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer" title="Refresh Employees & Locations">
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <button
+          type="button"
+          onclick="syncAllAdminData()"
+          class="px-2.5 sm:px-3 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+          title="Refresh Employees & Locations"
+        >
           <i class="fas fa-arrows-rotate" id="syncIcon"></i>
           <span class="hidden md:inline">Sync All</span>
         </button>
 
-        <button type="button" onclick="document.documentElement.classList.toggle('dark')" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer" title="Toggle Theme">
+        <button
+          type="button"
+          onclick="exportEmployeesToCSV()"
+          class="px-2.5 sm:px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white border border-rose-500/20 text-xs font-bold hidden md:flex items-center gap-1.5 transition-all cursor-pointer"
+          title="Export Employees to Safe CSV"
+        >
+          <i class="fas fa-file-csv"></i>
+          <span>Emp CSV</span>
+        </button>
+
+        <button
+          type="button"
+          onclick="exportLocationsToCSV()"
+          class="px-2.5 sm:px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-bold hidden md:flex items-center gap-1.5 transition-all cursor-pointer"
+          title="Export Office Locations to Safe CSV"
+        >
+          <i class="fas fa-file-csv"></i>
+          <span>Loc CSV</span>
+        </button>
+
+        <button
+          type="button"
+          onclick="toggleTheme()"
+          class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer"
+          title="Toggle Light / Dark Theme"
+        >
           <i class="fas fa-sun text-xs hidden dark:inline text-amber-400"></i>
-          <i class="fas fa-moon text-xs inline dark:hidden"></i>
+          <i class="fas fa-moon text-xs inline dark:hidden text-indigo-600"></i>
         </button>
       </div>
     </div>
   </header>
 
-  <main class="max-w-[1600px] mx-auto px-4 sm:px-6 pt-5">
+  <main class="max-w-[1600px] mx-auto px-3 sm:px-6 pt-4 sm:pt-5 relative z-10">
 
-    <!-- KPI Summary Strip -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-5">
-      <button type="button" onclick="switchAdminTab('employees')" class="glass-card rounded-2xl p-4 text-left hover:border-rose-500/40 transition-all cursor-pointer">
+    <!-- 6-Card One-View KPI Summary Strip -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 mb-4 animate-in">
+      <!-- KPI 1: Total Employees -->
+      <button type="button" onclick="switchAdminTab('employees')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-rose-500/40 transition-all cursor-pointer">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Employees</span>
-          <span class="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center text-xs">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Employees</span>
+          <span class="w-7 h-7 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center text-xs">
             <i class="fas fa-users"></i>
           </span>
         </div>
-        <strong id="kpiTotalEmployees" class="font-display text-2xl font-extrabold text-slate-900 dark:text-white block">0</strong>
-        <span class="text-[10px] text-slate-400" id="kpiRoleBreakdown">0 Admins • 0 Users</span>
+        <strong id="kpiTotalEmployees" class="font-display text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white block">0</strong>
+        <span class="text-[10px] text-slate-400 truncate block" id="kpiRoleBreakdown">0 Admins • 0 Users</span>
       </button>
 
-      <button type="button" onclick="switchAdminTab('employees')" class="glass-card rounded-2xl p-4 text-left hover:border-blue-500/40 transition-all cursor-pointer">
+      <!-- KPI 2: Active Recruiters -->
+      <button type="button" onclick="switchAdminTab('employees')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-blue-500/40 transition-all cursor-pointer">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Active Recruiters</span>
-          <span class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Active Recruiters</span>
+          <span class="w-7 h-7 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs">
             <i class="fas fa-user-tie"></i>
           </span>
         </div>
-        <strong id="kpiRecruitersCount" class="font-display text-2xl font-extrabold text-blue-600 dark:text-blue-400 block">0</strong>
-        <span class="text-[10px] text-slate-400">Standard portal users</span>
+        <strong id="kpiRecruitersCount" class="font-display text-xl sm:text-2xl font-extrabold text-blue-600 dark:text-blue-400 block">0</strong>
+        <span class="text-[10px] text-slate-400 truncate block">Standard portal users</span>
       </button>
 
-      <button type="button" onclick="switchAdminTab('locations')" class="glass-card rounded-2xl p-4 text-left hover:border-emerald-500/40 transition-all cursor-pointer">
+      <!-- KPI 3: Office Locations -->
+      <button type="button" onclick="switchAdminTab('locations')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-emerald-500/40 transition-all cursor-pointer">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Office Locations</span>
-          <span class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Office Locations</span>
+          <span class="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs">
             <i class="fas fa-map-location-dot"></i>
           </span>
         </div>
-        <strong id="kpiTotalLocations" class="font-display text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 block">0</strong>
-        <span class="text-[10px] text-slate-400">For Extra Popup invites</span>
+        <strong id="kpiTotalLocations" class="font-display text-xl sm:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 block">0</strong>
+        <span class="text-[10px] text-slate-400 truncate block">For Extra Popup invites</span>
       </button>
 
-      <button type="button" onclick="switchAdminTab('locations')" class="glass-card rounded-2xl p-4 text-left hover:border-amber-500/40 transition-all cursor-pointer">
+      <!-- KPI 4: Client Companies -->
+      <button type="button" onclick="switchAdminTab('locations')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-amber-500/40 transition-all cursor-pointer">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Client Companies</span>
-          <span class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Client Companies</span>
+          <span class="w-7 h-7 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs">
             <i class="fas fa-building"></i>
           </span>
         </div>
-        <strong id="kpiTotalCompanies" class="font-display text-2xl font-extrabold text-amber-600 dark:text-amber-400 block">0</strong>
-        <span class="text-[10px] text-slate-400">Synced from companies table</span>
+        <strong id="kpiTotalCompanies" class="font-display text-xl sm:text-2xl font-extrabold text-amber-600 dark:text-amber-400 block">0</strong>
+        <span class="text-[10px] text-slate-400 truncate block" id="kpiCompanyCoverageText">Synced from DB</span>
       </button>
+
+      <!-- KPI 5: All-in-One Split View Shortcut -->
+      <button type="button" onclick="switchAdminTab('both')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-indigo-500/40 transition-all cursor-pointer">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">One-View Mode</span>
+          <span class="w-7 h-7 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs">
+            <i class="fas fa-table-columns"></i>
+          </span>
+        </div>
+        <strong class="font-display text-sm sm:text-base font-extrabold text-slate-900 dark:text-white block mt-1">Emp + Locations</strong>
+        <span class="text-[10px] text-slate-400 truncate block">Click for combined view</span>
+      </button>
+
+      <!-- KPI 6: Power Automate Bypass Status -->
+      <div class="glass-card rounded-2xl p-3 sm:p-3.5 text-left border-amber-500/30 bg-amber-500/5">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">Power Automate</span>
+          <span class="w-7 h-7 rounded-xl bg-amber-500 text-white flex items-center justify-center text-xs">
+            <i class="fas fa-forward-fast"></i>
+          </span>
+        </div>
+        <strong class="font-display text-sm sm:text-base font-extrabold text-amber-700 dark:text-amber-400 block mt-1">BYPASSED</strong>
+        <span class="text-[10px] text-slate-400 truncate block">Direct Supabase Mode</span>
+      </div>
     </div>
 
-    <!-- Main Tab Switcher Bar -->
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
-      <div class="inline-flex p-1.5 rounded-2xl glass-card">
+    <!-- Main Tab Switcher Bar (Supports Employees, Locations, or Combined All-in-One View) -->
+    <div class="flex flex-wrap items-center justify-between gap-2.5 mb-4">
+      <div class="inline-flex flex-wrap p-1.5 rounded-2xl glass-card gap-1">
         <button
           type="button"
           id="tabBtnEmployees"
           onclick="switchAdminTab('employees')"
-          class="px-5 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 bg-gradient-to-r from-rose-600 to-pink-600 text-white shadow-md shadow-rose-600/25 cursor-pointer"
+          class="px-4 py-2 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 bg-gradient-to-r from-rose-600 to-pink-600 text-white shadow-md shadow-rose-600/25 cursor-pointer"
         >
           <i class="fas fa-user-shield"></i>
-          <span>1. Manage Employees (Users)</span>
+          <span>1. Manage Employees</span>
         </button>
         <button
           type="button"
           id="tabBtnLocations"
           onclick="switchAdminTab('locations')"
-          class="px-5 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+          class="px-4 py-2 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer"
         >
           <i class="fas fa-location-dot"></i>
-          <span>2. Manage Company Locations (Interview Address)</span>
+          <span>2. Manage Locations</span>
         </button>
+        <button
+          type="button"
+          id="tabBtnBoth"
+          onclick="switchAdminTab('both')"
+          class="px-4 py-2 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+        >
+          <i class="fas fa-layer-group"></i>
+          <span>3. All-in-One View (Both)</span>
+        </button>
+      </div>
+
+      <div class="text-[11px] font-semibold text-slate-500 dark:text-slate-400 hidden md:flex items-center gap-2">
+        <i class="fas fa-lock text-emerald-500"></i>
+        <span>Passwords masked by default • Strict input condition checks active</span>
       </div>
     </div>
 
     <!-- ==================== TAB 1: MANAGE EMPLOYEES (#sectionEmployees) ==================== -->
-    <section id="sectionEmployees" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <section id="sectionEmployees" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start mb-6 animate-in">
 
       <!-- Left Column: Add / Modify Employee Form -->
-      <div class="lg:col-span-4 glass-card rounded-3xl p-5 sm:p-7 relative overflow-hidden">
+      <div class="lg:col-span-4 glass-card rounded-3xl p-4 sm:p-6 relative overflow-hidden">
         <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-rose-500 via-pink-500 to-indigo-500"></div>
 
-        <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200/70 dark:border-slate-800">
+        <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-200/80 dark:border-slate-800">
           <h2 id="empFormTitle" class="font-display font-extrabold text-base sm:text-lg text-slate-900 dark:text-white flex items-center gap-2">
             <i class="fas fa-user-plus text-rose-500"></i>
             <span>Add New Employee</span>
@@ -304,46 +466,108 @@
           </button>
         </div>
 
-        <form id="employeeForm" onsubmit="handleEmployeeSubmit(event)" class="space-y-4">
+        <form id="employeeForm" onsubmit="handleEmployeeSubmit(event)" class="space-y-3.5" novalidate>
           <input type="hidden" id="empId" value="">
 
+          <!-- Full Name with Condition Check -->
           <div>
-            <label for="empName" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-              <i class="fas fa-user text-rose-500 mr-1"></i> Full Name *
-            </label>
-            <input type="text" id="empName" class="form-input" placeholder="e.g. Priya Sharma" required>
+            <div class="flex items-center justify-between mb-1">
+              <label for="empName" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <i class="fas fa-user text-rose-500 mr-1"></i> Full Name <span class="text-rose-500">*</span>
+              </label>
+              <span id="empNameCondBadge" class="text-[10px] font-semibold text-slate-400">2-80 letters</span>
+            </div>
+            <input
+              type="text"
+              id="empName"
+              maxlength="80"
+              oninput="validateEmpName(this)"
+              onblur="validateEmpName(this)"
+              class="form-input"
+              placeholder="e.g. Priya Sharma"
+              required
+            >
+            <p id="empNameErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
           </div>
 
+          <!-- Email Address with Condition Check -->
           <div>
-            <label for="empEmail" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-              <i class="fas fa-envelope text-rose-500 mr-1"></i> Email Address (Login ID) *
-            </label>
-            <input type="email" id="empEmail" class="form-input" placeholder="priya@talentconnect.com" required>
+            <div class="flex items-center justify-between mb-1">
+              <label for="empEmail" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <i class="fas fa-envelope text-rose-500 mr-1"></i> Email Address (Login ID) <span class="text-rose-500">*</span>
+              </label>
+              <span id="empEmailCondBadge" class="text-[10px] font-semibold text-slate-400">Required</span>
+            </div>
+            <input
+              type="email"
+              id="empEmail"
+              maxlength="120"
+              oninput="validateEmpEmail(this)"
+              onblur="validateEmpEmail(this)"
+              class="form-input"
+              placeholder="priya@talentconnect.com"
+              required
+            >
+            <p id="empEmailErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
           </div>
 
+          <!-- Portal Password with Condition Check & Generator -->
           <div>
-            <label for="empPassword" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-              <i class="fas fa-key text-rose-500 mr-1"></i> Portal Password *
-            </label>
+            <div class="flex items-center justify-between mb-1">
+              <label for="empPassword" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <i class="fas fa-key text-rose-500 mr-1"></i> Portal Password <span class="text-rose-500">*</span>
+              </label>
+              <div class="flex items-center gap-2">
+                <span id="empPassCondBadge" class="text-[10px] font-semibold text-slate-400">4-64 chars</span>
+                <button type="button" onclick="generateStrongEmpPassword()" class="text-[10px] font-bold text-rose-600 dark:text-rose-400 hover:underline">
+                  Auto-Generate
+                </button>
+              </div>
+            </div>
             <div class="relative">
-              <input type="password" id="empPassword" class="form-input pr-10" placeholder="Enter login password" required>
+              <input
+                type="password"
+                id="empPassword"
+                minlength="4"
+                maxlength="64"
+                oninput="validateEmpPassword(this)"
+                onblur="validateEmpPassword(this)"
+                class="form-input pr-10"
+                placeholder="Enter login password (min 4 chars)"
+                required
+              >
               <button type="button" onclick="toggleEmpPassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500">
                 <i class="fas fa-eye text-xs" id="empPassEye"></i>
               </button>
             </div>
+            <p id="empPassErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- Mobile Number with Condition Check -->
             <div>
-              <label for="empContact" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-                <i class="fas fa-phone text-rose-500 mr-1"></i> Mobile Number
-              </label>
-              <input type="tel" id="empContact" class="form-input" placeholder="9876543210">
+              <div class="flex items-center justify-between mb-1">
+                <label for="empContact" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  <i class="fas fa-phone text-rose-500 mr-1"></i> Mobile
+                </label>
+                <span id="empContactCounter" class="text-[10px] text-slate-400">10 digits</span>
+              </div>
+              <input
+                type="tel"
+                id="empContact"
+                maxlength="14"
+                oninput="validateEmpContact(this)"
+                onblur="validateEmpContact(this)"
+                class="form-input"
+                placeholder="9876543210"
+              >
+              <p id="empContactErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
             </div>
 
+            <!-- Portal Role -->
             <div>
-              <label for="empRole" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-                <i class="fas fa-shield-halved text-rose-500 mr-1"></i> Portal Role *
+              <label for="empRole" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                <i class="fas fa-shield-halved text-rose-500 mr-1"></i> Portal Role <span class="text-rose-500">*</span>
               </label>
               <select id="empRole" class="form-input" required>
                 <option value="User">User (Recruiter)</option>
@@ -352,45 +576,62 @@
             </div>
           </div>
 
+          <!-- Designation with Condition Check -->
           <div>
-            <label for="empDesignation" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-              <i class="fas fa-id-badge text-rose-500 mr-1"></i> Designation
-            </label>
-            <input type="text" id="empDesignation" class="form-input" placeholder="e.g. Senior HR Executive / Team Lead">
+            <div class="flex items-center justify-between mb-1">
+              <label for="empDesignation" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <i class="fas fa-id-badge text-rose-500 mr-1"></i> Designation
+              </label>
+              <span id="empDesigCounter" class="text-[10px] text-slate-400">0/80</span>
+            </div>
+            <input
+              type="text"
+              id="empDesignation"
+              maxlength="80"
+              oninput="validateEmpDesignation(this)"
+              class="form-input"
+              placeholder="e.g. Senior HR Executive / Team Lead"
+            >
           </div>
 
           <div class="pt-2 flex flex-col sm:flex-row gap-2.5">
-            <button type="submit" id="empSubmitBtn" class="flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-rose-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all">
+            <button type="submit" id="empSubmitBtn" class="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-rose-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all">
               <i class="fas fa-floppy-disk"></i>
               <span id="empSubmitBtnText">Add Employee</span>
             </button>
-            <button type="button" id="empCancelEditBtn" onclick="resetEmployeeForm()" class="hidden py-3.5 px-4 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm cursor-pointer">
+            <button type="button" id="empCancelEditBtn" onclick="resetEmployeeForm()" class="hidden py-3 px-4 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm cursor-pointer">
               Cancel Edit
             </button>
           </div>
         </form>
       </div>
 
-      <!-- Right Column: Employee Directory Table -->
+      <!-- Right Column: Employee Directory Table & Mobile Cards -->
       <div class="lg:col-span-8 glass-card rounded-3xl overflow-hidden">
-        <div class="p-4 sm:p-5 border-b border-slate-200/70 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="p-4 sm:p-5 border-b border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
-              <i class="fas fa-users-gear text-rose-500"></i>
-              <span>Portal Employees Directory</span>
-            </h3>
-            <p class="text-[11px] text-slate-500">Click "Edit" on any employee to modify their credentials or role</p>
+            <div class="flex items-center gap-2">
+              <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="fas fa-users-gear text-rose-500"></i>
+                <span>Portal Employees Directory</span>
+              </h3>
+              <span id="empShowingBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
+                0 Users
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500">Click eye icon to reveal password or copy login credentials for onboarding</p>
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
-            <div class="relative w-full sm:w-56">
-              <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <div class="relative flex-1 sm:w-52 min-w-[160px]">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
               <input
                 type="text"
                 id="empSearchInput"
-                oninput="filterEmployeesTable()"
+                maxlength="60"
+                oninput="sanitizeSearchField(this); filterEmployeesTable()"
                 placeholder="Search name, email, role..."
-                class="form-input pl-9 py-2 text-xs"
+                class="form-input pl-8 py-2 text-xs"
               >
             </div>
             <select id="empRoleFilter" onchange="filterEmployeesTable()" class="form-input w-auto py-2 text-xs">
@@ -406,11 +647,11 @@
             <thead>
               <tr>
                 <th><i class="fas fa-user mr-1"></i> Name & Designation</th>
-                <th><i class="fas fa-envelope mr-1"></i> Email / Login</th>
+                <th><i class="fas fa-envelope mr-1"></i> Email / Login ID</th>
                 <th><i class="fas fa-phone mr-1"></i> Contact</th>
-                <th><i class="fas fa-key mr-1"></i> Password</th>
+                <th><i class="fas fa-key mr-1"></i> Password (Masked)</th>
                 <th><i class="fas fa-shield mr-1"></i> Role</th>
-                <th class="text-right"><i class="fas fa-sliders mr-1"></i> Actions</th>
+                <th class="text-right"><i class="fas fa-sliders mr-1"></i> Quick Actions</th>
               </tr>
             </thead>
             <tbody id="employeesTableBody">
@@ -428,13 +669,13 @@
     </section>
 
     <!-- ==================== TAB 2: MANAGE COMPANY LOCATIONS (#sectionLocations) ==================== -->
-    <section id="sectionLocations" class="hidden grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <section id="sectionLocations" class="hidden grid-cols-1 lg:grid-cols-12 gap-5 items-start animate-in">
 
       <!-- Left Column: Add / Modify Office Location Form -->
-      <div class="lg:col-span-5 glass-card rounded-3xl p-5 sm:p-7 relative overflow-hidden">
+      <div class="lg:col-span-5 glass-card rounded-3xl p-4 sm:p-6 relative overflow-hidden">
         <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500"></div>
 
-        <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200/70 dark:border-slate-800">
+        <div class="flex items-center justify-between pb-3.5 mb-4 border-b border-slate-200/80 dark:border-slate-800">
           <div>
             <h2 id="locFormTitle" class="font-display font-extrabold text-base sm:text-lg text-slate-900 dark:text-white flex items-center gap-2">
               <i class="fas fa-map-location-dot text-emerald-500"></i>
@@ -447,69 +688,162 @@
           </button>
         </div>
 
-        <form id="locationForm" onsubmit="handleLocationSubmit(event)" class="space-y-3.5">
+        <form id="locationForm" onsubmit="handleLocationSubmit(event)" class="space-y-3" novalidate>
           <input type="hidden" id="locId" value="">
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- Select Existing Company -->
             <div>
-              <label for="locCompanyCodeSelect" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-                <i class="fas fa-building text-emerald-500 mr-1"></i> Select Existing Company *
-              </label>
-              <select id="locCompanyCodeSelect" onchange="handleCompanyCodeSelectChange()" class="form-input" required>
+              <div class="flex items-center justify-between mb-1">
+                <label for="locCompanyCodeSelect" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  <i class="fas fa-building text-emerald-500 mr-1"></i> Client Code <span class="text-rose-500">*</span>
+                </label>
+                <span id="locCodeCondBadge" class="text-[10px] text-slate-400">Required</span>
+              </div>
+              <select id="locCompanyCodeSelect" onchange="handleCompanyCodeSelectChange(); validateLocCompanyCode()" class="form-input" required>
                 <option value="">-- Choose Company --</option>
               </select>
+              <p id="locCodeErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
             </div>
 
+            <!-- Full Company Name -->
             <div>
-              <label for="locCompanyName" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-                <i class="fas fa-file-signature text-emerald-500 mr-1"></i> Full Company Name *
-              </label>
-              <input type="text" id="locCompanyName" oninput="updateLocationInvitePreview()" class="form-input" placeholder="e.g. Acme Corp Pvt Ltd" required>
+              <div class="flex items-center justify-between mb-1">
+                <label for="locCompanyName" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  <i class="fas fa-file-signature text-emerald-500 mr-1"></i> Legal Name <span class="text-rose-500">*</span>
+                </label>
+                <span id="locCompNameBadge" class="text-[10px] text-slate-400">2-100 chars</span>
+              </div>
+              <input
+                type="text"
+                id="locCompanyName"
+                maxlength="100"
+                oninput="validateLocCompanyName(this); updateLocationInvitePreview()"
+                onblur="validateLocCompanyName(this)"
+                class="form-input"
+                placeholder="e.g. Acme Corp Pvt Ltd"
+                required
+              >
+              <p id="locCompNameErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
             </div>
           </div>
 
+          <!-- Office Location Branch Label -->
           <div>
-            <label for="locBranchName" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-              <i class="fas fa-location-crosshairs text-emerald-500 mr-1"></i> Office Location Label (Shown in Dropdown) *
-            </label>
-            <input type="text" id="locBranchName" oninput="updateLocationInvitePreview()" class="form-input" placeholder="e.g. Andheri East HQ / Mindspace Malad" required>
+            <div class="flex items-center justify-between mb-1">
+              <label for="locBranchName" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <i class="fas fa-location-crosshairs text-emerald-500 mr-1"></i> Office Branch Label (Dropdown) <span class="text-rose-500">*</span>
+              </label>
+              <span id="locBranchBadge" class="text-[10px] text-slate-400">2-80 chars</span>
+            </div>
+            <input
+              type="text"
+              id="locBranchName"
+              maxlength="80"
+              oninput="validateLocBranchName(this); updateLocationInvitePreview()"
+              onblur="validateLocBranchName(this)"
+              class="form-input"
+              placeholder="e.g. Andheri East HQ / Mindspace Malad"
+              required
+            >
+            <p id="locBranchErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- HR / SPOC Name -->
             <div>
-              <label for="locSpocName" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-                <i class="fas fa-user-tie text-emerald-500 mr-1"></i> HR / SPOC Name *
-              </label>
-              <input type="text" id="locSpocName" oninput="updateLocationInvitePreview()" class="form-input" placeholder="e.g. Rahul Verma" required>
+              <div class="flex items-center justify-between mb-1">
+                <label for="locSpocName" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  <i class="fas fa-user-tie text-emerald-500 mr-1"></i> HR / SPOC Name <span class="text-rose-500">*</span>
+                </label>
+                <span id="locSpocNameBadge" class="text-[10px] text-slate-400">Required</span>
+              </div>
+              <input
+                type="text"
+                id="locSpocName"
+                maxlength="80"
+                oninput="validateLocSpocName(this); updateLocationInvitePreview()"
+                onblur="validateLocSpocName(this)"
+                class="form-input"
+                placeholder="e.g. Rahul Verma"
+                required
+              >
+              <p id="locSpocNameErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
             </div>
 
+            <!-- HR Contact Number -->
             <div>
-              <label for="locSpocNumber" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-                <i class="fas fa-phone text-emerald-500 mr-1"></i> HR Contact Number *
-              </label>
-              <input type="tel" id="locSpocNumber" oninput="updateLocationInvitePreview()" class="form-input" placeholder="e.g. 9876543210" required>
+              <div class="flex items-center justify-between mb-1">
+                <label for="locSpocNumber" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  <i class="fas fa-phone text-emerald-500 mr-1"></i> HR Mobile <span class="text-rose-500">*</span>
+                </label>
+                <span id="locSpocNumCounter" class="text-[10px] text-slate-400">0/10 digits</span>
+              </div>
+              <input
+                type="tel"
+                id="locSpocNumber"
+                maxlength="14"
+                oninput="validateLocSpocNumber(this); updateLocationInvitePreview()"
+                onblur="validateLocSpocNumber(this)"
+                class="form-input"
+                placeholder="e.g. 9876543210"
+                required
+              >
+              <p id="locSpocNumErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
             </div>
           </div>
 
+          <!-- Full Office Address -->
           <div>
-            <label for="locAddress" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-              <i class="fas fa-map-pin text-emerald-500 mr-1"></i> Full Office Address *
-            </label>
-            <textarea id="locAddress" rows="2" oninput="updateLocationInvitePreview()" class="form-input" placeholder="Building, Floor, Landmark, City, PIN..." required></textarea>
+            <div class="flex items-center justify-between mb-1">
+              <label for="locAddress" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <i class="fas fa-map-pin text-emerald-500 mr-1"></i> Full Office Address <span class="text-rose-500">*</span>
+              </label>
+              <span id="locAddrCounter" class="text-[10px] text-slate-400">0/300</span>
+            </div>
+            <textarea
+              id="locAddress"
+              rows="2"
+              maxlength="300"
+              oninput="validateLocAddress(this); updateLocationInvitePreview()"
+              onblur="validateLocAddress(this)"
+              class="form-input"
+              placeholder="Building, Floor, Landmark, City, PIN..."
+              required
+            ></textarea>
+            <p id="locAddressErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
           </div>
 
+          <!-- Google Maps Link -->
           <div>
-            <label for="locGoogleMap" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-              <i class="fas fa-map-location text-emerald-500 mr-1"></i> Google Maps Link
-            </label>
-            <input type="url" id="locGoogleMap" oninput="updateLocationInvitePreview()" class="form-input" placeholder="https://maps.app.goo.gl/...">
+            <div class="flex items-center justify-between mb-1">
+              <label for="locGoogleMap" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <i class="fas fa-map-location text-emerald-500 mr-1"></i> Google Maps Link
+              </label>
+              <span id="locMapCondBadge" class="text-[10px] text-slate-400">Optional (https://)</span>
+            </div>
+            <input
+              type="url"
+              id="locGoogleMap"
+              maxlength="300"
+              oninput="validateLocGoogleMap(this); updateLocationInvitePreview()"
+              onblur="validateLocGoogleMap(this)"
+              class="form-input"
+              placeholder="https://maps.app.goo.gl/..."
+            >
+            <p id="locMapErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
           </div>
 
           <!-- Live Preview of Extra Popup WhatsApp Message -->
-          <div class="p-3.5 rounded-2xl bg-[#e7ffdb] dark:bg-emerald-950/50 border border-emerald-500/20 text-slate-800 dark:text-slate-200 text-[11px] leading-relaxed whitespace-pre-line">
-            <span class="font-bold text-emerald-700 dark:text-emerald-400 block mb-1 uppercase tracking-wider text-[10px]">
-              <i class="fab fa-whatsapp"></i> Extra Popup Invite Preview:
-            </span>
+          <div class="p-3 rounded-2xl bg-[#e7ffdb] dark:bg-emerald-950/50 border border-emerald-500/20 text-slate-800 dark:text-slate-200 text-[11px] leading-relaxed whitespace-pre-line">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider text-[10px]">
+                <i class="fab fa-whatsapp"></i> Extra Popup Invite Preview:
+              </span>
+              <button type="button" onclick="copyLocationPreviewText()" class="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 hover:underline">
+                <i class="fas fa-copy mr-0.5"></i>Copy
+              </button>
+            </div>
             <div id="locLivePreviewText">*Company Details:*
 🏢 *Company:* -
 👤 *HR Name:* -
@@ -518,12 +852,12 @@
 🗺 *Google Map:* -</div>
           </div>
 
-          <div class="pt-2 flex flex-col sm:flex-row gap-2.5">
-            <button type="submit" id="locSubmitBtn" class="flex-1 py-3.5 px-5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all">
+          <div class="pt-1 flex flex-col sm:flex-row gap-2.5">
+            <button type="submit" id="locSubmitBtn" class="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 cursor-pointer transition-all">
               <i class="fas fa-floppy-disk"></i>
               <span id="locSubmitBtnText">Save Office Location</span>
             </button>
-            <button type="button" id="locCancelEditBtn" onclick="resetLocationForm()" class="hidden py-3.5 px-4 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm cursor-pointer">
+            <button type="button" id="locCancelEditBtn" onclick="resetLocationForm()" class="hidden py-3 px-4 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm cursor-pointer">
               Cancel Edit
             </button>
           </div>
@@ -532,24 +866,30 @@
 
       <!-- Right Column: Configured Office Locations Table -->
       <div class="lg:col-span-7 glass-card rounded-3xl overflow-hidden">
-        <div class="p-4 sm:p-5 border-b border-slate-200/70 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="p-4 sm:p-5 border-b border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
-              <i class="fas fa-building-circle-check text-emerald-500"></i>
-              <span>Configured Company Locations</span>
-            </h3>
-            <p class="text-[11px] text-slate-500">Used automatically in Management -> Schedule Physical Interview</p>
+            <div class="flex items-center gap-2">
+              <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="fas fa-building-circle-check text-emerald-500"></i>
+                <span>Configured Company Locations</span>
+              </h3>
+              <span id="locShowingBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+                0 Branches
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-500">Used automatically in Management → Schedule Physical Interview</p>
           </div>
 
           <div class="flex flex-wrap items-center gap-2">
-            <div class="relative w-full sm:w-48">
-              <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <div class="relative flex-1 sm:w-48 min-w-[150px]">
+              <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
               <input
                 type="text"
                 id="locSearchInput"
-                oninput="filterLocationsTable()"
-                placeholder="Search location, SPOC..."
-                class="form-input pl-9 py-2 text-xs"
+                maxlength="60"
+                oninput="sanitizeSearchField(this); filterLocationsTable()"
+                placeholder="Search branch, SPOC..."
+                class="form-input pl-8 py-2 text-xs"
               >
             </div>
             <select id="locCompanyFilter" onchange="filterLocationsTable()" class="form-input w-auto py-2 text-xs">
@@ -563,9 +903,9 @@
             <thead>
               <tr>
                 <th><i class="fas fa-building mr-1"></i> Company & Branch</th>
-                <th><i class="fas fa-user-tie mr-1"></i> HR SPOC</th>
+                <th><i class="fas fa-user-tie mr-1"></i> HR SPOC & Contact</th>
                 <th><i class="fas fa-map-pin mr-1"></i> Address & Map</th>
-                <th class="text-right"><i class="fas fa-sliders mr-1"></i> Actions</th>
+                <th class="text-right"><i class="fas fa-sliders mr-1"></i> Quick Actions</th>
               </tr>
             </thead>
             <tbody id="locationsTableBody">
@@ -584,23 +924,105 @@
 
   </main>
 
+  <!-- Mobile-First Bottom Quick Navigation Bar (Thumb-friendly on phones) -->
+  <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 glass-card border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
+    <button type="button" onclick="goHome()" class="flex flex-col items-center gap-0.5 text-rose-600 dark:text-rose-400 text-[10px] font-bold">
+      <i class="fas fa-house text-sm"></i>
+      <span>Home</span>
+    </button>
+    <button type="button" onclick="switchAdminTab('employees')" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
+      <i class="fas fa-users text-sm"></i>
+      <span>Employees</span>
+    </button>
+    <button type="button" onclick="switchAdminTab('locations')" class="flex flex-col items-center gap-0.5 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+      <i class="fas fa-location-dot text-sm"></i>
+      <span>Locations</span>
+    </button>
+    <button type="button" onclick="switchAdminTab('both')" class="flex flex-col items-center gap-0.5 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold">
+      <i class="fas fa-layer-group text-sm"></i>
+      <span>One-View</span>
+    </button>
+    <button type="button" onclick="toggleTheme()" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
+      <i class="fas fa-circle-half-stroke text-sm"></i>
+      <span>Theme</span>
+    </button>
+  </nav>
+
   <script>
     // ==================== SUPABASE CONFIGURATION ====================
     const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0'; // Paste your Supabase anon/public key here
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0';
 
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ==================== REQUIREMENT #5: POWER AUTOMATE BYPASS ====================
+    window.POWER_AUTOMATE_ENABLED = false;
+    window.BYPASS_POWER_AUTOMATE = true;
+    sessionStorage.setItem('powerAutomateEnabled', 'false');
+    sessionStorage.setItem('bypassPowerAutomate', 'true');
+
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = async function(resource, config) {
+      const urlStr = typeof resource === 'string' ? resource : (resource?.url || '');
+      if (
+        urlStr.includes('powerplatform.com') ||
+        urlStr.includes('powerautomate') ||
+        urlStr.includes('logic.azure.com') ||
+        urlStr.includes('flow.microsoft.com')
+      ) {
+        console.info('[Power Automate Bypassed] Webhook call intercepted and bypassed:', urlStr);
+        return new Response(
+          JSON.stringify({ success: true, bypassed: true, message: 'Power Automate is disabled and bypassed.' }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+      return originalFetch(resource, config);
+    };
+
+    // ==================== REQUIREMENT #1: SECURITY UTILITIES ====================
+    function escapeHtml(unsafe) {
+      if (unsafe === null || unsafe === undefined) return '';
+      return String(unsafe)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function sanitizeCsvCell(val) {
+      let str = String(val ?? '').replace(/"/g, '""').trim();
+      if (/^[=+\-@\t\r]/.test(str)) {
+        str = "'" + str;
+      }
+      return `"${str}"`;
+    }
+
+    function getSafeHttpsUrl(rawUrl) {
+      const trimmed = String(rawUrl || '').trim();
+      if (/^https:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/\S*)?$/.test(trimmed)) {
+        return trimmed;
+      }
+      return '';
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle('dark');
+      sessionStorage.setItem('tccTheme', isDark ? 'dark' : 'light');
+    }
 
     // State Arrays
     let allEmployees = [];
     let allLocations = [];
     let allCompanies = [];
+    const revealedPasswordIds = new Set();
 
     function goHome() {
       window.location.href = 'index.html';
     }
 
-    // Non-blocking Toast Helper
+    // XSS-Safe Non-blocking Toast Helper
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
       if (!container) return;
@@ -610,9 +1032,24 @@
         success: 'bg-emerald-600 text-white border-emerald-400',
         error: 'bg-rose-600 text-white border-rose-400'
       };
+      const icons = {
+        info: 'fa-circle-info text-blue-400',
+        success: 'fa-circle-check text-white',
+        error: 'fa-triangle-exclamation text-white'
+      };
       toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl border shadow-xl text-xs sm:text-sm font-semibold transition-all duration-300 ${styles[type] || styles.info}`;
-      toast.innerHTML = `<i class="fas fa-circle-info shrink-0"></i><span class="flex-1">${message}</span>`;
+
+      const iconEl = document.createElement('i');
+      iconEl.className = `fas ${icons[type] || icons.info} shrink-0`;
+
+      const spanEl = document.createElement('span');
+      spanEl.className = 'flex-1';
+      spanEl.textContent = String(message || '');
+
+      toast.appendChild(iconEl);
+      toast.appendChild(spanEl);
       container.appendChild(toast);
+
       setTimeout(() => {
         toast.style.opacity = '0';
         setTimeout(() => toast.remove(), 300);
@@ -644,7 +1081,346 @@
       });
     }
 
+    // ==================== REQUIREMENT #4: INPUT CONDITION CHECKS ====================
+    function sanitizeSearchField(inputEl) {
+      if (!inputEl) return;
+      const cleaned = inputEl.value.replace(/[<>"{}`\\]/g, '').slice(0, 60);
+      if (inputEl.value !== cleaned) inputEl.value = cleaned;
+    }
+
+    // Employee Form Validators
+    function validateEmpName(inputEl) {
+      const el = inputEl || document.getElementById('empName');
+      if (!el) return false;
+      const cleaned = el.value.replace(/[<>"{}`\\]/g, '');
+      if (el.value !== cleaned) el.value = cleaned;
+      const val = el.value.trim();
+      const errEl = document.getElementById('empNameErrorMsg');
+      const badgeEl = document.getElementById('empNameCondBadge');
+
+      if (!val || !/^[a-zA-Z\s.'-]{2,80}$/.test(val)) {
+        el.classList.remove('input-valid');
+        el.classList.add('input-invalid');
+        if (errEl) {
+          errEl.textContent = 'Enter a valid full name (2–80 letters and spaces).';
+          errEl.classList.remove('hidden');
+        }
+        if (badgeEl) badgeEl.textContent = 'Invalid';
+        return false;
+      }
+      el.classList.remove('input-invalid');
+      el.classList.add('input-valid');
+      if (errEl) errEl.classList.add('hidden');
+      if (badgeEl) badgeEl.textContent = '✓ Valid';
+      return true;
+    }
+
+    function validateEmpEmail(inputEl) {
+      const el = inputEl || document.getElementById('empEmail');
+      if (!el) return false;
+      const val = el.value.trim();
+      const errEl = document.getElementById('empEmailErrorMsg');
+      const badgeEl = document.getElementById('empEmailCondBadge');
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+      if (!val || /[<>'";\\]/.test(val) || !emailRegex.test(val) || val.length > 120) {
+        el.classList.remove('input-valid');
+        el.classList.add('input-invalid');
+        if (errEl) {
+          errEl.textContent = 'Enter a valid login email address (e.g. name@domain.com).';
+          errEl.classList.remove('hidden');
+        }
+        if (badgeEl) badgeEl.textContent = 'Invalid';
+        return false;
+      }
+      el.classList.remove('input-invalid');
+      el.classList.add('input-valid');
+      if (errEl) errEl.classList.add('hidden');
+      if (badgeEl) badgeEl.textContent = '✓ Valid';
+      return true;
+    }
+
+    function validateEmpPassword(inputEl) {
+      const el = inputEl || document.getElementById('empPassword');
+      if (!el) return false;
+      const val = el.value.trim();
+      const errEl = document.getElementById('empPassErrorMsg');
+      const badgeEl = document.getElementById('empPassCondBadge');
+
+      if (!val || val.length < 4 || val.length > 64) {
+        el.classList.remove('input-valid');
+        el.classList.add('input-invalid');
+        if (errEl) {
+          errEl.textContent = 'Password must be between 4 and 64 characters.';
+          errEl.classList.remove('hidden');
+        }
+        if (badgeEl) badgeEl.textContent = `${val.length}/4 min`;
+        return false;
+      }
+      el.classList.remove('input-invalid');
+      el.classList.add('input-valid');
+      if (errEl) errEl.classList.add('hidden');
+      if (badgeEl) badgeEl.textContent = val.length >= 8 ? '✓ Strong' : '✓ Valid';
+      return true;
+    }
+
+    function generateStrongEmpPassword() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789@#$!';
+      let pass = 'Tcc@';
+      for (let i = 0; i < 6; i++) {
+        pass += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      const el = document.getElementById('empPassword');
+      if (el) {
+        el.value = pass;
+        el.type = 'text';
+        document.getElementById('empPassEye')?.classList.replace('fa-eye', 'fa-eye-slash');
+        validateEmpPassword(el);
+        showToast('Generated strong password!', 'info');
+      }
+    }
+
+    function validateEmpContact(inputEl) {
+      const el = inputEl || document.getElementById('empContact');
+      if (!el) return true;
+      let digits = el.value.replace(/\D/g, '');
+      if (digits.startsWith('91') && digits.length > 10) digits = digits.slice(2);
+      if (digits.startsWith('0') && digits.length > 10) digits = digits.slice(1);
+      digits = digits.slice(0, 10);
+      el.value = digits;
+
+      const counterEl = document.getElementById('empContactCounter');
+      const errEl = document.getElementById('empContactErrorMsg');
+      if (counterEl) counterEl.textContent = `${digits.length}/10 digits`;
+
+      if (digits.length === 0) {
+        el.classList.remove('input-valid', 'input-invalid');
+        if (errEl) errEl.classList.add('hidden');
+        return true; // Contact is optional for employee
+      }
+
+      if (!/^[6-9]\d{9}$/.test(digits)) {
+        el.classList.remove('input-valid');
+        el.classList.add('input-invalid');
+        if (errEl) {
+          errEl.textContent = 'Enter a valid 10-digit Indian mobile number (starts with 6-9).';
+          errEl.classList.remove('hidden');
+        }
+        return false;
+      }
+
+      el.classList.remove('input-invalid');
+      el.classList.add('input-valid');
+      if (errEl) errEl.classList.add('hidden');
+      return true;
+    }
+
+    function validateEmpDesignation(inputEl) {
+      const el = inputEl || document.getElementById('empDesignation');
+      if (!el) return true;
+      const cleaned = el.value.replace(/[<>"{}`\\]/g, '').slice(0, 80);
+      if (el.value !== cleaned) el.value = cleaned;
+      const counter = document.getElementById('empDesigCounter');
+      if (counter) counter.textContent = `${cleaned.length}/80`;
+      return true;
+    }
+
+    // Location Form Validators
+    function validateLocCompanyCode() {
+      const el = document.getElementById('locCompanyCodeSelect');
+      const errEl = document.getElementById('locCodeErrorMsg');
+      const badgeEl = document.getElementById('locCodeCondBadge');
+      if (!el) return false;
+      if (!el.value.trim()) {
+        el.classList.remove('input-valid');
+        el.classList.add('input-invalid');
+        if (errEl) {
+          errEl.textContent = 'Please select a client company code.';
+          errEl.classList.remove('hidden');
+        }
+        if (badgeEl) badgeEl.textContent = 'Required';
+        return false;
+      }
+      el.classList.remove('input-invalid');
+      el.classList.add('input-valid');
+      if (errEl) errEl.classList.add('hidden');
+      if (badgeEl) badgeEl.textContent = '✓ Selected';
+      return true;
+    }
+
+    function validateLocCompanyName(inputEl) {
+      const el = inputEl || document.getElementById('locCompanyName');
+      if (!el) return false;
+      const cleaned = el.value.replace(/[<>"{}`\\]/g, '').slice(0, 100);
+      if (el.value !== cleaned) el.value = cleaned;
+      const val = el.value.trim();
+      const errEl = document.getElementById('locCompNameErrorMsg');
+      const badgeEl = document.getElementById('locCompNameBadge');
+
+      if (val.length < 2) {
+        el.classList.remove('input-valid');
+        el.classList.add('input-invalid');
+        if (errEl) {
+          errEl.textContent = 'Enter the full company name (min 2 characters).';
+          errEl.classList.remove('hidden');
+        }
+        if (badgeEl) badgeEl.textContent = 'Required';
+        return false;
+      }
+      el.classList.remove('input-invalid');
+      el.classList.add('input-valid');
+      if (errEl) errEl.classList.add('hidden');
+      if (badgeEl) badgeEl.textContent = '✓ Valid';
+      return true;
+    }
+
+    function validateLocBranchName(inputEl) {
+      const el = inputEl || document.getElementById('locBranchName');
+      if (!el) return false;
+      const cleaned = el.value.replace(/[<>"{}`\\]/g, '').slice(0, 80);
+      if (el.value !== cleaned) el.value = cleaned;
+      const val = el.value.trim();
+      const errEl = document.getElementById('locBranchErrorMsg');
+      const badgeEl = document.getElementById('locBranchBadge');
+
+      if (val.length < 2) {
+        el.classList.remove('input-valid');
+        el.classList.add('input-invalid');
+        if (errEl) {
+          errEl.textContent = 'Enter a branch/office label (min 2 characters).';
+          errEl.classList.remove('hidden');
+        }
+        if (badgeEl) badgeEl.textContent = 'Required';
+        return false;
+      }
+      el.classList.remove('input-invalid');
+      el.classList.add('input-valid');
+      if (errEl) errEl.classList.add('hidden');
+      if (badgeEl) badgeEl.textContent = '✓ Valid';
+      return true;
+    }
+
+    function validateLocSpocName(inputEl) {
+      const el = inputEl || document.getElementById('locSpocName');
+      if (!el) return false;
+      const cleaned = el.value.replace(/[<>"{}`\\]/g, '').slice(0, 80);
+      if (el.value !== cleaned) el.value = cleaned;
+      const val = el.value.trim();
+      const errEl = document.getElementById('locSpocNameErrorMsg');
+      const badgeEl = document.getElementById('locSpocNameBadge');
+
+      if (!/^[a-zA-Z\s.'-]{2,80}$/.test(val)) {
+        el.classList.remove('input-valid');
+        el.classList.add('input-invalid');
+        if (errEl) {
+          errEl.textContent = 'Enter a valid HR / SPOC name (2–80 letters).';
+          errEl.classList.remove('hidden');
+        }
+        if (badgeEl) badgeEl.textContent = 'Invalid';
+        return false;
+      }
+      el.classList.remove('input-invalid');
+      el.classList.add('input-valid');
+      if (errEl) errEl.classList.add('hidden');
+      if (badgeEl) badgeEl.textContent = '✓ Valid';
+      return true;
+    }
+
+    function validateLocSpocNumber(inputEl) {
+      const el = inputEl || document.getElementById('locSpocNumber');
+      if (!el) return false;
+      let digits = el.value.replace(/\D/g, '');
+      if (digits.startsWith('91') && digits.length > 10) digits = digits.slice(2);
+      if (digits.startsWith('0') && digits.length > 10) digits = digits.slice(1);
+      digits = digits.slice(0, 10);
+      el.value = digits;
+
+      const counter = document.getElementById('locSpocNumCounter');
+      const errEl = document.getElementById('locSpocNumErrorMsg');
+      if (counter) counter.textContent = `${digits.length}/10 digits`;
+
+      if (!/^[6-9]\d{9}$/.test(digits)) {
+        el.classList.remove('input-valid');
+        el.classList.add('input-invalid');
+        if (errEl) {
+          errEl.textContent = 'Enter a valid 10-digit HR mobile number (starts with 6-9).';
+          errEl.classList.remove('hidden');
+        }
+        return false;
+      }
+      el.classList.remove('input-invalid');
+      el.classList.add('input-valid');
+      if (errEl) errEl.classList.add('hidden');
+      return true;
+    }
+
+    function validateLocAddress(inputEl) {
+      const el = inputEl || document.getElementById('locAddress');
+      if (!el) return false;
+      const cleaned = el.value.replace(/[<>]/g, '').slice(0, 300);
+      if (el.value !== cleaned) el.value = cleaned;
+      const val = el.value.trim();
+      const counter = document.getElementById('locAddrCounter');
+      const errEl = document.getElementById('locAddressErrorMsg');
+      if (counter) counter.textContent = `${cleaned.length}/300`;
+
+      if (val.length < 5) {
+        el.classList.remove('input-valid');
+        el.classList.add('input-invalid');
+        if (errEl) {
+          errEl.textContent = 'Please enter the full office address (min 5 characters).';
+          errEl.classList.remove('hidden');
+        }
+        return false;
+      }
+      el.classList.remove('input-invalid');
+      el.classList.add('input-valid');
+      if (errEl) errEl.classList.add('hidden');
+      return true;
+    }
+
+    function validateLocGoogleMap(inputEl) {
+      const el = inputEl || document.getElementById('locGoogleMap');
+      if (!el) return true;
+      const val = el.value.trim();
+      const errEl = document.getElementById('locMapErrorMsg');
+      const badgeEl = document.getElementById('locMapCondBadge');
+
+      if (!val) {
+        el.classList.remove('input-valid', 'input-invalid');
+        if (errEl) errEl.classList.add('hidden');
+        if (badgeEl) badgeEl.textContent = 'Optional (https://)';
+        return true;
+      }
+
+      if (!getSafeHttpsUrl(val)) {
+        el.classList.remove('input-valid');
+        el.classList.add('input-invalid');
+        if (errEl) {
+          errEl.textContent = 'Google Map link must start with https://';
+          errEl.classList.remove('hidden');
+        }
+        if (badgeEl) badgeEl.textContent = 'Invalid URL';
+        return false;
+      }
+
+      el.classList.remove('input-invalid');
+      el.classList.add('input-valid');
+      if (errEl) errEl.classList.add('hidden');
+      if (badgeEl) badgeEl.textContent = '✓ Valid URL';
+      return true;
+    }
+
+    // ==================== INITIALIZATION & TAB SWITCHING ====================
     window.addEventListener('load', function() {
+      // Ensure Light Mode is default unless dark was chosen in session
+      const savedTheme = sessionStorage.getItem('tccTheme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+
       const isLoggedIn = sessionStorage.getItem('isLoggedIn');
       const userType = (sessionStorage.getItem('userType') || '').toLowerCase();
 
@@ -668,6 +1444,9 @@
       const secLoc = document.getElementById('sectionLocations');
       const btnEmp = document.getElementById('tabBtnEmployees');
       const btnLoc = document.getElementById('tabBtnLocations');
+      const btnBoth = document.getElementById('tabBtnBoth');
+
+      const inactiveClass = 'px-4 py-2 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer';
 
       if (tab === 'locations') {
         secEmp.classList.add('hidden');
@@ -675,16 +1454,27 @@
         secLoc.classList.remove('hidden');
         secLoc.classList.add('grid');
 
-        btnLoc.className = 'px-5 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/25 cursor-pointer';
-        btnEmp.className = 'px-5 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer';
+        btnLoc.className = 'px-4 py-2 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/25 cursor-pointer';
+        btnEmp.className = inactiveClass;
+        if (btnBoth) btnBoth.className = inactiveClass;
+      } else if (tab === 'both') {
+        secEmp.classList.remove('hidden');
+        secEmp.classList.add('grid');
+        secLoc.classList.remove('hidden');
+        secLoc.classList.add('grid');
+
+        if (btnBoth) btnBoth.className = 'px-4 py-2 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/25 cursor-pointer';
+        btnEmp.className = inactiveClass;
+        btnLoc.className = inactiveClass;
       } else {
         secLoc.classList.add('hidden');
         secLoc.classList.remove('grid');
         secEmp.classList.remove('hidden');
         secEmp.classList.add('grid');
 
-        btnEmp.className = 'px-5 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 bg-gradient-to-r from-rose-600 to-pink-600 text-white shadow-md shadow-rose-600/25 cursor-pointer';
-        btnLoc.className = 'px-5 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white cursor-pointer';
+        btnEmp.className = 'px-4 py-2 rounded-xl font-display font-bold text-xs sm:text-sm transition-all flex items-center gap-2 bg-gradient-to-r from-rose-600 to-pink-600 text-white shadow-md shadow-rose-600/25 cursor-pointer';
+        btnLoc.className = inactiveClass;
+        if (btnBoth) btnBoth.className = inactiveClass;
       }
     }
 
@@ -699,16 +1489,6 @@
       if (icon) icon.classList.remove('fa-spin');
     }
 
-    function escapeHtml(unsafe) {
-      return (unsafe || '')
-        .toString()
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
     // ==================== 1. MANAGE EMPLOYEES (SUPABASE 'users' TABLE) ====================
     function toggleEmpPassword() {
       const input = document.getElementById('empPassword');
@@ -720,6 +1500,48 @@
         input.type = 'password';
         eye.classList.replace('fa-eye-slash', 'fa-eye');
       }
+    }
+
+    function toggleRowPasswordReveal(empId) {
+      const key = String(empId);
+      if (revealedPasswordIds.has(key)) {
+        revealedPasswordIds.delete(key);
+      } else {
+        revealedPasswordIds.add(key);
+      }
+      filterEmployeesTable();
+    }
+
+    function copyEmployeeCredentials(empId) {
+      const emp = allEmployees.find(e => String(e.id) === String(empId));
+      if (!emp) return;
+      const text = `*TCC Portal Login Credentials*\n👤 Name: ${emp.name || '-'}\n📧 Login Email: ${emp.email || '-'}\n🔑 Password: ${emp.password || '-'}\n🛡 Role: ${emp.user_type || emp.userType || 'User'}`;
+      navigator.clipboard?.writeText(text).then(() => {
+        showToast(`Copied credentials for ${emp.name || 'Employee'}!`, 'success');
+      });
+    }
+
+    function exportEmployeesToCSV() {
+      if (!allEmployees || allEmployees.length === 0) {
+        showToast('No employees to export', 'error');
+        return;
+      }
+      const headers = ['Name', 'Email', 'Contact', 'Designation', 'Role'];
+      const rows = allEmployees.map(e => [
+        sanitizeCsvCell(e.name || ''),
+        sanitizeCsvCell(e.email || ''),
+        sanitizeCsvCell(e.contact || ''),
+        sanitizeCsvCell(e.designation || ''),
+        sanitizeCsvCell(e.user_type || e.userType || 'User')
+      ]);
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const link = document.createElement('a');
+      link.setAttribute('href', encodeURI(csvContent));
+      link.setAttribute('download', `TCC_Employees_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast(`Exported ${allEmployees.length} employees to safe CSV`, 'success');
     }
 
     async function loadEmployees() {
@@ -768,9 +1590,13 @@
         return matchRole && matchSearch;
       });
 
+      const badge = document.getElementById('empShowingBadge');
+      if (badge) badge.textContent = `${filtered.length} User${filtered.length === 1 ? '' : 's'}`;
+
       renderEmployeesTable(filtered);
     }
 
+    // XSS-Hardened Employee Table Renderer with Masked Passwords & Safe Action Bindings
     function renderEmployeesTable(list) {
       const tbody = document.getElementById('employeesTableBody');
       if (!tbody) return;
@@ -781,9 +1607,12 @@
       }
 
       tbody.innerHTML = list.map(emp => {
+        const safeId = escapeHtml(emp.id);
         const role = emp.user_type || emp.userType || 'User';
         const isAdmin = role.toLowerCase() === 'admin';
         const badgeClass = isAdmin ? 'role-badge role-admin' : 'role-badge role-user';
+        const isRevealed = revealedPasswordIds.has(String(emp.id));
+        const cleanMob = String(emp.contact || '').replace(/\D/g, '').slice(-10);
 
         return `
           <tr>
@@ -792,17 +1621,44 @@
               <div class="text-[11px] text-slate-500">${escapeHtml(emp.designation || 'Recruiter')}</div>
             </td>
             <td class="font-medium text-blue-600 dark:text-blue-400">${escapeHtml(emp.email || '')}</td>
-            <td class="font-mono text-xs">${escapeHtml(emp.contact || '-')}</td>
+            <td class="font-mono text-xs">
+              ${cleanMob ? `
+                <a href="https://wa.me/91${cleanMob}" target="_blank" rel="noopener noreferrer" class="hover:underline inline-flex items-center gap-1" title="WhatsApp Employee">
+                  <i class="fab fa-whatsapp text-emerald-500"></i> ${escapeHtml(emp.contact)}
+                </a>
+              ` : escapeHtml(emp.contact || '-')}
+            </td>
             <td>
-              <span class="font-mono text-xs px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                ${escapeHtml(emp.password || '')}
-              </span>
+              <div class="inline-flex items-center gap-1.5">
+                <span class="font-mono text-xs px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                  ${isRevealed ? escapeHtml(emp.password || '') : '••••••••'}
+                </span>
+                <button
+                  type="button"
+                  data-action="toggle-pass"
+                  data-id="${safeId}"
+                  class="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-[10px]"
+                  title="${isRevealed ? 'Hide Password' : 'Reveal Password'}"
+                >
+                  <i class="fas ${isRevealed ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                </button>
+              </div>
             </td>
             <td><span class="${badgeClass}">${escapeHtml(role)}</span></td>
             <td class="text-right whitespace-nowrap">
               <button
                 type="button"
-                onclick="editEmployee('${emp.id}')"
+                data-action="copy-emp"
+                data-id="${safeId}"
+                class="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-600 text-slate-600 dark:text-slate-300 hover:text-white text-xs font-bold transition-all mr-1 cursor-pointer"
+                title="Copy Login Credentials"
+              >
+                <i class="fas fa-copy"></i>
+              </button>
+              <button
+                type="button"
+                data-action="edit-emp"
+                data-id="${safeId}"
                 class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white text-xs font-bold transition-all mr-1 cursor-pointer"
                 title="Modify Employee"
               >
@@ -810,7 +1666,8 @@
               </button>
               <button
                 type="button"
-                onclick="deleteEmployee('${emp.id}', '${escapeHtml(emp.name)}')"
+                data-action="delete-emp"
+                data-id="${safeId}"
                 class="px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white text-xs font-bold transition-all cursor-pointer"
                 title="Delete Employee"
               >
@@ -820,6 +1677,19 @@
           </tr>
         `;
       }).join('');
+
+      // Attach event listeners safely via data-attributes (prevents inline quote injection)
+      tbody.querySelectorAll('button[data-action]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const action = btn.getAttribute('data-action');
+          const id = btn.getAttribute('data-id');
+          const emp = allEmployees.find(e => String(e.id) === String(id));
+          if (action === 'toggle-pass') toggleRowPasswordReveal(id);
+          if (action === 'copy-emp') copyEmployeeCredentials(id);
+          if (action === 'edit-emp') editEmployee(id);
+          if (action === 'delete-emp' && emp) deleteEmployee(emp.id, emp.name || 'Employee');
+        });
+      });
     }
 
     function editEmployee(id) {
@@ -834,6 +1704,12 @@
       document.getElementById('empDesignation').value = emp.designation || '';
       document.getElementById('empRole').value = (emp.user_type || emp.userType || 'User').toLowerCase() === 'admin' ? 'Admin' : 'User';
 
+      validateEmpName();
+      validateEmpEmail();
+      validateEmpPassword();
+      validateEmpContact();
+      validateEmpDesignation();
+
       document.getElementById('empFormTitle').innerHTML = `<i class="fas fa-user-pen text-blue-500"></i> <span>Modify Employee</span>`;
       document.getElementById('empSubmitBtnText').textContent = 'Save Changes';
       document.getElementById('empCancelEditBtn').classList.remove('hidden');
@@ -842,15 +1718,35 @@
     }
 
     function resetEmployeeForm() {
-      document.getElementById('employeeForm').reset();
+      const form = document.getElementById('employeeForm');
+      if (form) form.reset();
       document.getElementById('empId').value = '';
       document.getElementById('empFormTitle').innerHTML = `<i class="fas fa-user-plus text-rose-500"></i> <span>Add New Employee</span>`;
       document.getElementById('empSubmitBtnText').textContent = 'Add Employee';
       document.getElementById('empCancelEditBtn').classList.add('hidden');
+
+      ['empName', 'empEmail', 'empPassword', 'empContact', 'empDesignation'].forEach(id => {
+        document.getElementById(id)?.classList.remove('input-valid', 'input-invalid');
+      });
+      ['empNameErrorMsg', 'empEmailErrorMsg', 'empPassErrorMsg', 'empContactErrorMsg'].forEach(id => {
+        document.getElementById(id)?.classList.add('hidden');
+      });
     }
 
     async function handleEmployeeSubmit(e) {
       e.preventDefault();
+
+      const v1 = validateEmpName();
+      const v2 = validateEmpEmail();
+      const v3 = validateEmpPassword();
+      const v4 = validateEmpContact();
+      validateEmpDesignation();
+
+      if (!v1 || !v2 || !v3 || !v4) {
+        showToast('Please fix the highlighted employee fields before saving.', 'error');
+        return;
+      }
+
       const id = document.getElementById('empId').value.trim();
       const name = document.getElementById('empName').value.trim();
       const email = document.getElementById('empEmail').value.trim();
@@ -864,7 +1760,6 @@
 
       try {
         if (id) {
-          // Update existing employee
           const { error } = await supabaseClient
             .from('users')
             .update({ name, email, password, contact, designation, user_type })
@@ -873,7 +1768,6 @@
           if (error) throw error;
           showToast(`Updated employee "${name}" successfully!`, 'success');
         } else {
-          // Insert new employee
           const { error } = await supabaseClient
             .from('users')
             .insert([{ name, email, password, contact, designation, user_type }]);
@@ -954,6 +1848,7 @@
       const fullNameInput = document.getElementById('locCompanyName');
       if (selectedCode && !fullNameInput.value.trim()) {
         fullNameInput.value = selectedCode;
+        validateLocCompanyName(fullNameInput);
       }
       updateLocationInvitePreview();
     }
@@ -971,6 +1866,53 @@
       }
     }
 
+    function copyLocationPreviewText() {
+      const text = document.getElementById('locLivePreviewText')?.textContent || '';
+      navigator.clipboard?.writeText(text).then(() => {
+        showToast('Copied location invite block!', 'success');
+      });
+    }
+
+    function copyRowLocationSummary(locId) {
+      const loc = allLocations.find(l => String(l.id) === String(locId));
+      if (!loc) return;
+      const compName = loc.company_name || loc.Company_Name || loc.company_code || '-';
+      const branch = loc.office_locations || loc.Office_Locations || '-';
+      const spocName = loc.spoc_name || loc.Spoc_Name || '-';
+      const spocNum = loc.spoc_number || loc.Spoc_Number || '-';
+      const addr = loc.address || loc.Address || '-';
+      const mapLink = loc.google_map || loc.Google_Map || '-';
+      const text = `*Company Details (${branch}):*\n🏢 *Company:* ${compName}\n👤 *HR Name:* ${spocName}\n📞 *HR Contact:* +91 ${spocNum}\n📍 *Address:* ${addr}\n🗺 *Google Map:* ${mapLink}`;
+      navigator.clipboard?.writeText(text).then(() => {
+        showToast(`Copied ${branch} address details!`, 'success');
+      });
+    }
+
+    function exportLocationsToCSV() {
+      if (!allLocations || allLocations.length === 0) {
+        showToast('No office locations to export', 'error');
+        return;
+      }
+      const headers = ['Company Code', 'Company Name', 'Branch Label', 'HR SPOC Name', 'HR Mobile', 'Address', 'Google Map URL'];
+      const rows = allLocations.map(l => [
+        sanitizeCsvCell(l.company_code || l.Company_code || ''),
+        sanitizeCsvCell(l.company_name || l.Company_Name || ''),
+        sanitizeCsvCell(l.office_locations || l.Office_Locations || ''),
+        sanitizeCsvCell(l.spoc_name || l.Spoc_Name || ''),
+        sanitizeCsvCell(l.spoc_number || l.Spoc_Number || ''),
+        sanitizeCsvCell(l.address || l.Address || ''),
+        sanitizeCsvCell(l.google_map || l.Google_Map || '')
+      ]);
+      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const link = document.createElement('a');
+      link.setAttribute('href', encodeURI(csvContent));
+      link.setAttribute('download', `TCC_Office_Locations_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast(`Exported ${allLocations.length} office locations to safe CSV`, 'success');
+    }
+
     async function loadLocations() {
       try {
         const { data, error } = await supabaseClient
@@ -983,10 +1925,13 @@
         allLocations = data || [];
         document.getElementById('kpiTotalLocations').textContent = allLocations.length;
 
-        // Populate filter dropdown
         const filterSelect = document.getElementById('locCompanyFilter');
         const prevFilter = filterSelect.value;
         const uniqueCodes = [...new Set(allLocations.map(l => l.company_code || l.Company_code).filter(Boolean))];
+
+        const covEl = document.getElementById('kpiCompanyCoverageText');
+        if (covEl) covEl.textContent = `${uniqueCodes.length} with branches`;
+
         filterSelect.innerHTML = '<option value="">All Companies</option>';
         uniqueCodes.forEach(code => {
           const opt = document.createElement('option');
@@ -996,7 +1941,6 @@
         });
         if (uniqueCodes.includes(prevFilter)) filterSelect.value = prevFilter;
 
-        // Also ensure any company_code in office_locations is present in the form dropdown
         const formCompanySelect = document.getElementById('locCompanyCodeSelect');
         uniqueCodes.forEach(code => {
           const exists = Array.from(formCompanySelect.options).some(o => o.value === code);
@@ -1038,9 +1982,13 @@
         return matchComp && matchQuery;
       });
 
+      const badge = document.getElementById('locShowingBadge');
+      if (badge) badge.textContent = `${filtered.length} Branch${filtered.length === 1 ? '' : 'es'}`;
+
       renderLocationsTable(filtered);
     }
 
+    // XSS-Hardened Locations Table Renderer with Safe URL Validation & Data-Attribute Actions
     function renderLocationsTable(list) {
       const tbody = document.getElementById('locationsTableBody');
       if (!tbody) return;
@@ -1051,35 +1999,53 @@
       }
 
       tbody.innerHTML = list.map(loc => {
+        const safeId = escapeHtml(loc.id);
         const code = loc.company_code || loc.Company_code || '';
         const compName = loc.company_name || loc.Company_Name || '';
         const branch = loc.office_locations || loc.Office_Locations || '';
         const spocName = loc.spoc_name || loc.Spoc_Name || '-';
         const spocNum = loc.spoc_number || loc.Spoc_Number || '-';
+        const cleanSpocMob = String(spocNum).replace(/\D/g, '').slice(-10);
         const addr = loc.address || loc.Address || '-';
-        const mapLink = loc.google_map || loc.Google_Map || '';
+        const safeMapUrl = getSafeHttpsUrl(loc.google_map || loc.Google_Map || '');
 
         return `
           <tr>
             <td>
               <div class="font-bold text-slate-900 dark:text-white">${escapeHtml(code)}</div>
-              <div class="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-md text-[11px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+              <div class="inline-flex items-center gap-1 px-2 py-0.5 mt-1 rounded-md text-[11px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
                 <i class="fas fa-location-dot text-[10px]"></i> ${escapeHtml(branch)}
               </div>
               <div class="text-[11px] text-slate-400 mt-0.5">${escapeHtml(compName)}</div>
             </td>
             <td>
               <div class="font-semibold text-slate-800 dark:text-slate-200">${escapeHtml(spocName)}</div>
-              <div class="font-mono text-xs text-slate-500">${escapeHtml(spocNum)}</div>
+              <div class="font-mono text-xs text-slate-500">
+                ${cleanSpocMob ? `
+                  <a href="https://wa.me/91${cleanSpocMob}" target="_blank" rel="noopener noreferrer" class="hover:underline inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400" title="WhatsApp HR SPOC">
+                    <i class="fab fa-whatsapp"></i> +91 ${escapeHtml(cleanSpocMob)}
+                  </a>
+                ` : escapeHtml(spocNum)}
+              </div>
             </td>
             <td class="max-w-xs">
-              <div class="text-xs text-slate-600 dark:text-slate-300 whitespace-normal line-clamp-2">${escapeHtml(addr)}</div>
-              ${mapLink ? `<a href="${escapeHtml(mapLink)}" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline mt-1"><i class="fas fa-map-location-dot"></i> Open Map</a>` : ''}
+              <div class="text-xs text-slate-600 dark:text-slate-300 whitespace-normal line-clamp-2" title="${escapeHtml(addr)}">${escapeHtml(addr)}</div>
+              ${safeMapUrl ? `<a href="${escapeHtml(safeMapUrl)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline mt-1"><i class="fas fa-map-location-dot"></i> Open Map</a>` : ''}
             </td>
             <td class="text-right whitespace-nowrap">
               <button
                 type="button"
-                onclick="editLocation('${loc.id}')"
+                data-loc-action="copy-loc"
+                data-id="${safeId}"
+                class="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-600 text-slate-600 dark:text-slate-300 hover:text-white text-xs font-bold transition-all mr-1 cursor-pointer"
+                title="Copy WhatsApp Location Block"
+              >
+                <i class="fas fa-copy"></i>
+              </button>
+              <button
+                type="button"
+                data-loc-action="edit-loc"
+                data-id="${safeId}"
                 class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white text-xs font-bold transition-all mr-1 cursor-pointer"
                 title="Modify Location"
               >
@@ -1087,7 +2053,8 @@
               </button>
               <button
                 type="button"
-                onclick="deleteLocation('${loc.id}', '${escapeHtml(branch)} (${escapeHtml(code)})')"
+                data-loc-action="delete-loc"
+                data-id="${safeId}"
                 class="px-2.5 py-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white text-xs font-bold transition-all cursor-pointer"
                 title="Delete Location"
               >
@@ -1097,6 +2064,21 @@
           </tr>
         `;
       }).join('');
+
+      tbody.querySelectorAll('button[data-loc-action]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const action = btn.getAttribute('data-loc-action');
+          const id = btn.getAttribute('data-id');
+          const loc = allLocations.find(l => String(l.id) === String(id));
+          if (action === 'copy-loc') copyRowLocationSummary(id);
+          if (action === 'edit-loc') editLocation(id);
+          if (action === 'delete-loc' && loc) {
+            const branch = loc.office_locations || loc.Office_Locations || 'Branch';
+            const code = loc.company_code || loc.Company_code || '';
+            deleteLocation(loc.id, `${branch} (${code})`);
+          }
+        });
+      });
     }
 
     function editLocation(id) {
@@ -1122,6 +2104,14 @@
       document.getElementById('locAddress').value = loc.address || loc.Address || '';
       document.getElementById('locGoogleMap').value = loc.google_map || loc.Google_Map || '';
 
+      validateLocCompanyCode();
+      validateLocCompanyName();
+      validateLocBranchName();
+      validateLocSpocName();
+      validateLocSpocNumber();
+      validateLocAddress();
+      validateLocGoogleMap();
+
       document.getElementById('locFormTitle').innerHTML = `<i class="fas fa-pen-to-square text-blue-500"></i> <span>Modify Office Location</span>`;
       document.getElementById('locSubmitBtnText').textContent = 'Save Location Changes';
       document.getElementById('locCancelEditBtn').classList.remove('hidden');
@@ -1131,16 +2121,38 @@
     }
 
     function resetLocationForm() {
-      document.getElementById('locationForm').reset();
+      const form = document.getElementById('locationForm');
+      if (form) form.reset();
       document.getElementById('locId').value = '';
       document.getElementById('locFormTitle').innerHTML = `<i class="fas fa-map-location-dot text-emerald-500"></i> <span>Add Office Location</span>`;
       document.getElementById('locSubmitBtnText').textContent = 'Save Office Location';
       document.getElementById('locCancelEditBtn').classList.add('hidden');
+
+      ['locCompanyCodeSelect', 'locCompanyName', 'locBranchName', 'locSpocName', 'locSpocNumber', 'locAddress', 'locGoogleMap'].forEach(id => {
+        document.getElementById(id)?.classList.remove('input-valid', 'input-invalid');
+      });
+      ['locCodeErrorMsg', 'locCompNameErrorMsg', 'locBranchErrorMsg', 'locSpocNameErrorMsg', 'locSpocNumErrorMsg', 'locAddressErrorMsg', 'locMapErrorMsg'].forEach(id => {
+        document.getElementById(id)?.classList.add('hidden');
+      });
+
       updateLocationInvitePreview();
     }
 
     async function handleLocationSubmit(e) {
       e.preventDefault();
+
+      const v1 = validateLocCompanyCode();
+      const v2 = validateLocCompanyName();
+      const v3 = validateLocBranchName();
+      const v4 = validateLocSpocName();
+      const v5 = validateLocSpocNumber();
+      const v6 = validateLocAddress();
+      const v7 = validateLocGoogleMap();
+
+      if (!v1 || !v2 || !v3 || !v4 || !v5 || !v6 || !v7) {
+        showToast('Please fix the highlighted office location fields before saving.', 'error');
+        return;
+      }
 
       const id = document.getElementById('locId').value.trim();
       const company_code = document.getElementById('locCompanyCodeSelect').value.trim();
