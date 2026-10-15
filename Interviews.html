@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<!-- Default theme is explicitly LIGHT (removed "dark" class from html root) -->
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>TCC Scheduled Interviews</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Supabase JS Client SDK -->
@@ -23,6 +26,20 @@
     }
   </script>
   <style>
+    :root {
+      --bg-gradient:
+        radial-gradient(circle at 12% 15%, rgba(245, 158, 11, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(59, 130, 246, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.07) 0%, transparent 60%);
+    }
+
+    .dark {
+      --bg-gradient:
+        radial-gradient(circle at 12% 15%, rgba(245, 158, 11, 0.20) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(59, 130, 246, 0.22) 0%, transparent 45%),
+        radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.10) 0%, transparent 60%);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -33,23 +50,70 @@
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
-      background-image:
-        radial-gradient(circle at 12% 15%, rgba(245, 158, 11, 0.14) 0%, transparent 45%),
-        radial-gradient(circle at 88% 85%, rgba(59, 130, 246, 0.15) 0%, transparent 45%);
+      background-image: var(--bg-gradient);
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Ambient Floating Orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(85px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.32;
+      animation: floatOrb 18s ease-in-out infinite alternate;
+    }
+
+    .dark .orb {
+      opacity: 0.42;
+    }
+
+    .orb-1 {
+      width: 300px;
+      height: 300px;
+      background: linear-gradient(135deg, #f59e0b, #3b82f6);
+      top: -80px;
+      left: -80px;
+    }
+
+    .orb-2 {
+      width: 260px;
+      height: 260px;
+      background: linear-gradient(135deg, #6366f1, #10b981);
+      bottom: -60px;
+      right: -60px;
+      animation-delay: -7s;
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(24px, -28px) scale(1.06); }
+      100% { transform: translate(-18px, 20px) scale(0.95); }
     }
 
     .glass-card {
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border: 1px solid rgba(226, 232, 240, 0.85);
-      box-shadow: 0 20px 45px -15px rgba(15, 23, 42, 0.07);
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 14px 34px -10px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
     }
 
     .dark .glass-card {
-      background: rgba(15, 23, 42, 0.82);
+      background: rgba(15, 23, 42, 0.84);
       border: 1px solid rgba(255, 255, 255, 0.09);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+    }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+      animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
     }
 
     /* User Type Badge Preserved Classes */
@@ -81,8 +145,8 @@
       width: 100%;
       padding: 10px 14px;
       border-radius: 12px;
-      border: 1.5px solid rgba(148, 163, 184, 0.3);
-      background: rgba(248, 250, 252, 0.9);
+      border: 1.5px solid rgba(148, 163, 184, 0.35);
+      background: #ffffff;
       color: #0f172a;
       font-size: 13px;
       transition: all 0.2s ease;
@@ -90,7 +154,7 @@
 
     .dark .form-control-input {
       background: rgba(30, 41, 59, 0.8);
-      border-color: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.12);
       color: #f8fafc;
     }
 
@@ -100,29 +164,39 @@
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
 
+    /* Input validation states */
+    .input-valid {
+      border-color: #10b981 !important;
+    }
+
+    .input-invalid {
+      border-color: #f43f5e !important;
+    }
+
     /* Table Styling */
     .table-scroll {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
+      max-height: 70vh;
     }
 
     table {
       width: 100%;
       border-collapse: separate;
       border-spacing: 0;
-      font-size: 12.5px;
+      font-size: 12px;
     }
 
     th {
-      background: rgba(241, 245, 249, 0.92);
+      background: rgba(241, 245, 249, 0.96);
       color: #475569;
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 10.5px;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      padding: 13px 14px;
+      padding: 12px 12px;
       text-align: left;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.95);
       white-space: nowrap;
       position: sticky;
       top: 0;
@@ -130,14 +204,14 @@
     }
 
     .dark th {
-      background: rgba(15, 23, 42, 0.95);
+      background: rgba(15, 23, 42, 0.96);
       color: #94a3b8;
       border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     td {
-      padding: 12px 14px;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.65);
       vertical-align: middle;
       transition: background-color 0.15s ease;
     }
@@ -182,7 +256,7 @@
       gap: 5px;
       padding: 4px 10px;
       border-radius: 9999px;
-      font-size: 10.5px;
+      font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.4px;
@@ -191,20 +265,32 @@
 
     .interview-upcoming {
       background: rgba(59, 130, 246, 0.14);
-      color: #3b82f6;
+      color: #2563eb;
       border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .dark .interview-upcoming {
+      color: #60a5fa;
     }
 
     .interview-today {
       background: rgba(245, 158, 11, 0.16);
-      color: #f59e0b;
+      color: #d97706;
       border: 1px solid rgba(245, 158, 11, 0.35);
+    }
+
+    .dark .interview-today {
+      color: #fbbf24;
     }
 
     .interview-overdue {
       background: rgba(239, 68, 68, 0.14);
-      color: #ef4444;
+      color: #e11d48;
       border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .dark .interview-overdue {
+      color: #f87171;
     }
 
     /* Mode Badges Preserved Classes */
@@ -225,14 +311,22 @@
 
     .mode-physical {
       background: rgba(16, 185, 129, 0.14);
-      color: #10b981;
+      color: #059669;
       border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .dark .mode-physical {
+      color: #10b981;
     }
 
     .mode-online {
       background: rgba(139, 92, 246, 0.14);
-      color: #8b5cf6;
+      color: #7c3aed;
       border: 1px solid rgba(139, 92, 246, 0.25);
+    }
+
+    .dark .mode-online {
+      color: #a78bfa;
     }
 
     /* Popup Overlay Preserved Classes */
@@ -251,17 +345,17 @@
 
     .popup-content {
       width: 100%;
-      max-width: 460px;
+      max-width: 480px;
       border-radius: 24px;
-      padding: 26px;
+      padding: 24px;
       position: relative;
-      max-height: 90vh;
+      max-height: 92vh;
       overflow-y: auto;
       animation: modalSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .popup-content.compact {
-      max-width: 420px;
+      max-width: 430px;
     }
 
     @keyframes modalSlideUp {
@@ -281,145 +375,230 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 selection:bg-blue-500 selection:text-white">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-20 sm:pb-12 selection:bg-blue-500 selection:text-white relative">
+
+  <!-- Ambient Floating Orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
 
   <!-- Non-Blocking Toast Notification Container -->
-  <div id="toastContainer" class="fixed bottom-5 right-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-4 pointer-events-none"></div>
+  <div id="toastContainer" class="fixed bottom-16 sm:bottom-5 right-4 sm:right-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-3 pointer-events-none"></div>
 
   <!-- Sticky Top Header Bar (Preserves .dashboard-header, .home-button, #userTypeBadge) -->
-  <header class="dashboard-header sticky top-0 z-40 glass-card border-b border-slate-200/70 dark:border-slate-800/80 px-4 sm:px-6 py-3">
-    <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-3 w-full">
-      <div class="flex items-center gap-3">
-        <button class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-500/10 hover:bg-amber-500 text-amber-600 dark:text-amber-400 hover:text-white border border-amber-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0" onclick="goHome()" title="Home">
-          <i class="fas fa-house text-base"></i>
+  <header class="dashboard-header sticky top-0 z-40 glass-card border-b border-slate-200/80 dark:border-slate-800/80 px-3 sm:px-6 py-2.5 sm:py-3">
+    <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-2 sm:gap-3 w-full">
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <button
+          class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-500/10 hover:bg-amber-500 text-amber-600 dark:text-amber-400 hover:text-white border border-amber-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0"
+          onclick="goHome()"
+          title="Home"
+          aria-label="Home"
+        >
+          <i class="fas fa-house text-sm sm:text-base"></i>
         </button>
 
         <div class="header-content text-left">
-          <div class="flex flex-wrap items-center gap-2">
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <h2 class="font-display font-extrabold text-sm sm:text-lg text-slate-900 dark:text-white leading-tight flex items-center gap-2">
               <i class="fas fa-calendar-check text-amber-500 hidden sm:inline"></i>
               <span>Scheduled Interviews</span>
             </h2>
             <span id="userTypeBadge" class="user-type-badge"></span>
+            <span class="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25" title="Power Automate flow is disabled and bypassed">
+              <i class="fas fa-bolt-slash text-[9px]"></i> PA Bypassed
+            </span>
           </div>
           <p class="dashboard-subtitle text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-            Real-time interview lineup, status tracking, and instant WhatsApp follow-ups (Supabase)
+            One-view interview lineup, CTC & notice details, and instant WhatsApp follow-ups (Power Automate Bypassed)
           </p>
         </div>
       </div>
 
       <!-- Right Action Controls: Refresh, CSV Export, View Mode Switcher, Theme Toggle -->
-      <div class="flex items-center gap-2">
-        <button type="button" class="refresh-btn px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer" onclick="triggerRefreshInterviews()">
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <button
+          type="button"
+          class="refresh-btn px-2.5 sm:px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+          onclick="triggerRefreshInterviews()"
+          title="Refresh Schedule"
+        >
           <i class="fas fa-sync-alt" id="syncIcon"></i>
           <span class="hidden md:inline">Refresh</span>
         </button>
 
-        <button type="button" onclick="exportInterviewsToCSV()" class="px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer" title="Export Interviews to CSV">
+        <button
+          type="button"
+          onclick="exportInterviewsToCSV()"
+          class="px-2.5 sm:px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
+          title="Export Interviews to Safe CSV"
+        >
           <i class="fas fa-file-csv"></i>
           <span class="hidden md:inline">Export CSV</span>
         </button>
 
         <!-- Table / Card Timeline View Switcher -->
-        <div class="hidden sm:flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-          <button type="button" id="viewTableBtn" onclick="switchInterviewView('table')" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all" title="Table View">
+        <div class="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          <button
+            type="button"
+            id="viewTableBtn"
+            onclick="switchInterviewView('table')"
+            class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all"
+            title="High-Density Table View"
+          >
             <i class="fas fa-table"></i>
           </button>
-          <button type="button" id="viewCardsBtn" onclick="switchInterviewView('cards')" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all" title="Timeline Cards View">
+          <button
+            type="button"
+            id="viewCardsBtn"
+            onclick="switchInterviewView('cards')"
+            class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all"
+            title="Timeline Cards View"
+          >
             <i class="fas fa-grip"></i>
           </button>
         </div>
 
-        <button type="button" onclick="document.documentElement.classList.toggle('dark')" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer" title="Toggle Theme">
+        <button
+          type="button"
+          onclick="toggleTheme()"
+          class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer"
+          title="Toggle Light / Dark Theme"
+        >
           <i class="fas fa-sun text-xs hidden dark:inline text-amber-400"></i>
-          <i class="fas fa-moon text-xs inline dark:hidden"></i>
+          <i class="fas fa-moon text-xs inline dark:hidden text-indigo-600"></i>
         </button>
       </div>
     </div>
   </header>
 
   <!-- ==================== MAIN DASHBOARD (#dashboard) ==================== -->
-  <div id="dashboard" class="max-w-[1600px] mx-auto px-4 sm:px-6 pt-5">
+  <div id="dashboard" class="max-w-[1600px] mx-auto px-3 sm:px-6 pt-4 sm:pt-5 relative z-10">
 
-    <!-- Stats Cards (Preserves #totalInterviews, #todayInterviews, #upcomingInterviews, #overdueInterviews) -->
-    <div class="stats-container grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-5">
-      <button type="button" onclick="quickFilterStatus('')" class="stat-card glass-card rounded-2xl p-4 text-left hover:border-blue-500/50 transition-all group cursor-pointer">
+    <!-- 6-Card One-View KPI Summary Strip (Preserves #totalInterviews, #todayInterviews, #upcomingInterviews, #overdueInterviews) -->
+    <div class="stats-container grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 mb-4 animate-in">
+      <!-- KPI 1: Total Scheduled -->
+      <button type="button" onclick="quickFilterStatus('')" class="stat-card glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-blue-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
-          <span class="stat-label text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Scheduled</span>
-          <span class="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+          <span class="stat-label text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Scheduled</span>
+          <span class="w-7 h-7 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
             <i class="fas fa-calendar-alt"></i>
           </span>
         </div>
-        <div class="stat-number font-display text-2xl font-extrabold text-slate-900 dark:text-white" id="totalInterviews">0</div>
-        <p class="text-[10px] text-slate-400 mt-0.5">Click to view all</p>
+        <div class="stat-number font-display text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white" id="totalInterviews">0</div>
+        <p class="text-[10px] text-slate-400 mt-0.5 truncate">Click to view all</p>
       </button>
 
-      <button type="button" onclick="quickFilterStatus('today')" class="stat-card glass-card rounded-2xl p-4 text-left hover:border-amber-500/50 transition-all group cursor-pointer">
+      <!-- KPI 2: Today's Interviews -->
+      <button type="button" onclick="quickFilterStatus('today')" class="stat-card glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-amber-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
-          <span class="stat-label text-[11px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Today's Interviews</span>
-          <span class="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+          <span class="stat-label text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Today's Lineup</span>
+          <span class="w-7 h-7 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
             <i class="fas fa-bell"></i>
           </span>
         </div>
-        <div class="stat-number font-display text-2xl font-extrabold text-amber-600 dark:text-amber-400" id="todayInterviews">0</div>
-        <p class="text-[10px] text-slate-400 mt-0.5">Happening today</p>
+        <div class="stat-number font-display text-xl sm:text-2xl font-extrabold text-amber-600 dark:text-amber-400" id="todayInterviews">0</div>
+        <p class="text-[10px] text-slate-400 mt-0.5 truncate">Happening today</p>
       </button>
 
-      <button type="button" onclick="quickFilterStatus('upcoming')" class="stat-card glass-card rounded-2xl p-4 text-left hover:border-emerald-500/50 transition-all group cursor-pointer">
+      <!-- KPI 3: Upcoming -->
+      <button type="button" onclick="quickFilterStatus('upcoming')" class="stat-card glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-emerald-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
-          <span class="stat-label text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Upcoming</span>
-          <span class="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+          <span class="stat-label text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Upcoming</span>
+          <span class="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
             <i class="fas fa-clock"></i>
           </span>
         </div>
-        <div class="stat-number font-display text-2xl font-extrabold text-emerald-600 dark:text-emerald-400" id="upcomingInterviews">0</div>
-        <p class="text-[10px] text-slate-400 mt-0.5">Future lineup</p>
+        <div class="stat-number font-display text-xl sm:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400" id="upcomingInterviews">0</div>
+        <p class="text-[10px] text-slate-400 mt-0.5 truncate">Future lineup</p>
       </button>
 
-      <button type="button" onclick="quickFilterStatus('overdue')" class="stat-card glass-card rounded-2xl p-4 text-left hover:border-rose-500/50 transition-all group cursor-pointer">
+      <!-- KPI 4: Overdue / Past -->
+      <button type="button" onclick="quickFilterStatus('overdue')" class="stat-card glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-rose-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
-          <span class="stat-label text-[11px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Overdue / Past</span>
-          <span class="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
+          <span class="stat-label text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Overdue / Past</span>
+          <span class="w-7 h-7 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xs group-hover:scale-110 transition-transform">
             <i class="fas fa-hourglass-end"></i>
           </span>
         </div>
-        <div class="stat-number font-display text-2xl font-extrabold text-rose-600 dark:text-rose-400" id="overdueInterviews">0</div>
-        <p class="text-[10px] text-slate-400 mt-0.5">Needs status update</p>
+        <div class="stat-number font-display text-xl sm:text-2xl font-extrabold text-rose-600 dark:text-rose-400" id="overdueInterviews">0</div>
+        <p class="text-[10px] text-slate-400 mt-0.5 truncate">Needs feedback</p>
       </button>
+
+      <!-- KPI 5: Mode Split (Online vs Physical) -->
+      <div class="glass-card rounded-2xl p-3 sm:p-3.5 text-left">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">Mode Split</span>
+          <span class="w-7 h-7 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs">
+            <i class="fas fa-video"></i>
+          </span>
+        </div>
+        <p class="font-display text-sm sm:text-base font-extrabold text-slate-900 dark:text-white mt-1" id="kpiModeSplitText">0 Onl • 0 Phy</p>
+        <p class="text-[10px] text-slate-400 mt-0.5 truncate">Online vs In-Person</p>
+      </div>
+
+      <!-- KPI 6: Power Automate Status -->
+      <div class="glass-card rounded-2xl p-3 sm:p-3.5 text-left border-amber-500/30 bg-amber-500/5">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">Power Automate</span>
+          <span class="w-7 h-7 rounded-xl bg-amber-500 text-white flex items-center justify-center text-xs">
+            <i class="fas fa-forward-fast"></i>
+          </span>
+        </div>
+        <p class="font-display text-sm sm:text-base font-extrabold text-amber-700 dark:text-amber-400 mt-1">BYPASSED</p>
+        <p class="text-[10px] text-slate-400 mt-0.5 truncate">Direct Supabase Mode</p>
+      </div>
     </div>
 
-    <!-- Filters Card (Preserves #companyFilter, #recruiterFilter, #statusFilter + adds instant candidate search) -->
-    <div class="filters-container glass-card rounded-3xl p-4 sm:p-6 mb-5">
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
-        <h3 class="filters-title font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
+    <!-- Filters Card (Preserves #candidateSearchInput, #companyFilter, #recruiterFilter, #statusFilter + adds #modeFilter & input conditions) -->
+    <div class="filters-container glass-card rounded-3xl p-4 sm:p-5 mb-4 animate-in" id="filterTopAnchor">
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <h3 class="filters-title font-display font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-2">
           <i class="fas fa-filter text-blue-500"></i>
           <span>Filter Interview Lineup</span>
         </h3>
-        <button type="button" onclick="resetInterviewFilters()" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
-          <i class="fas fa-rotate-left text-[10px]"></i>
-          Reset Filters
-        </button>
+        <div class="flex items-center gap-3">
+          <span id="filterCondBadge" class="text-[10px] font-semibold text-slate-400">Ready</span>
+          <button type="button" onclick="resetInterviewFilters()" class="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
+            <i class="fas fa-rotate-left text-[10px]"></i>
+            Reset Filters
+          </button>
+        </div>
       </div>
 
-      <div class="filters grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+      <div class="filters grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <!-- Search Input with Condition Check -->
         <div class="filter-group">
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
-            Search Candidate
-          </label>
+          <div class="flex items-center justify-between mb-1">
+            <label for="candidateSearchInput" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+              Search Candidate
+            </label>
+            <span id="searchCharCounter" class="text-[10px] text-slate-400">0/60</span>
+          </div>
           <div class="relative">
             <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
             <input
               type="text"
               id="candidateSearchInput"
-              oninput="applyFilters()"
-              placeholder="Search name, role, email..."
-              class="form-control-input pl-9"
+              maxlength="60"
+              oninput="validateSearchFilterInput(this); applyFilters()"
+              placeholder="Name, role, email, mobile..."
+              class="form-control-input pl-9 pr-8"
             />
+            <button
+              type="button"
+              id="clearSearchBtn"
+              onclick="clearCandidateSearch()"
+              class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 items-center justify-center text-[10px]"
+              title="Clear search"
+            >
+              <i class="fas fa-times"></i>
+            </button>
           </div>
         </div>
 
+        <!-- Company Filter -->
         <div class="filter-group">
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+          <label for="companyFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
             Company
           </label>
           <select id="companyFilter" onchange="applyFilters()" class="form-control-input">
@@ -427,8 +606,9 @@
           </select>
         </div>
 
+        <!-- Recruiter Filter -->
         <div class="filter-group">
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+          <label for="recruiterFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
             Recruiter
           </label>
           <select id="recruiterFilter" onchange="applyFilters()" class="form-control-input">
@@ -436,8 +616,9 @@
           </select>
         </div>
 
+        <!-- Interview Timeline Filter -->
         <div class="filter-group">
-          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+          <label for="statusFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
             Interview Timeline
           </label>
           <select id="statusFilter" onchange="applyFilters()" class="form-control-input">
@@ -447,19 +628,34 @@
             <option value="overdue">Overdue</option>
           </select>
         </div>
+
+        <!-- Mode Filter (Online / Physical) -->
+        <div class="filter-group">
+          <label for="modeFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
+            Interview Mode
+          </label>
+          <select id="modeFilter" onchange="applyFilters()" class="form-control-input">
+            <option value="">All Modes</option>
+            <option value="online">Online (Video)</option>
+            <option value="physical">Physical (In-Office)</option>
+          </select>
+        </div>
       </div>
     </div>
 
     <!-- Interview Schedule Table Container (Preserves #interviewTable) -->
-    <div class="table-container glass-card rounded-3xl overflow-hidden" id="tableViewWrapper">
-      <div class="table-header px-5 py-4 border-b border-slate-200/70 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-3 bg-slate-100/50 dark:bg-slate-900/40">
-        <div class="flex items-center gap-2.5">
-          <h3 class="table-title font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
+    <div class="table-container glass-card rounded-3xl overflow-hidden animate-in" id="tableViewWrapper">
+      <div class="table-header px-4 sm:px-5 py-3.5 border-b border-slate-200/80 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2.5 bg-slate-100/60 dark:bg-slate-900/40">
+        <div class="flex flex-wrap items-center gap-2">
+          <h3 class="table-title font-display font-bold text-xs sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
             <i class="fas fa-clock text-amber-500"></i>
-            <span>Interview Schedule</span>
+            <span>All-in-One Interview Schedule</span>
           </h3>
-          <span class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline">
-            (Click any candidate name for quick actions)
+          <span id="showingInterviewsBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25">
+            Loading...
+          </span>
+          <span class="text-[11px] text-slate-500 dark:text-slate-400 hidden md:inline">
+            Click candidate name or action buttons for instant status & WhatsApp follow-up
           </span>
         </div>
 
@@ -474,14 +670,14 @@
           <thead>
             <tr>
               <th><i class="fas fa-calendar mr-1"></i> Interview Date</th>
-              <th><i class="fas fa-user mr-1"></i> Candidate</th>
-              <th><i class="fas fa-envelope mr-1"></i> Email</th>
-              <th><i class="fas fa-briefcase mr-1"></i> Position</th>
-              <th><i class="fas fa-building mr-1"></i> Company</th>
+              <th><i class="fas fa-user mr-1"></i> Candidate & Mobile</th>
+              <th><i class="fas fa-briefcase mr-1"></i> Role & Client</th>
+              <th><i class="fas fa-indian-rupee-sign mr-1"></i> CTC & Notice</th>
               <th><i class="fas fa-user-tie mr-1"></i> Recruiter</th>
-              <th><i class="fas fa-map-marker-alt mr-1"></i> Mode</th>
-              <th><i class="fas fa-flag mr-1"></i> Status</th>
-              <th><i class="fas fa-info-circle mr-1"></i> Interview Status</th>
+              <th><i class="fas fa-map-marker-alt mr-1"></i> Mode & Link</th>
+              <th><i class="fas fa-flag mr-1"></i> Pipeline & Notes</th>
+              <th><i class="fas fa-info-circle mr-1"></i> Timeline</th>
+              <th><i class="fas fa-bolt mr-1"></i> Quick Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -497,40 +693,43 @@
     </div>
 
     <!-- Mobile / Timeline Card View Container -->
-    <div id="cardsViewWrapper" class="hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-2"></div>
+    <div id="cardsViewWrapper" class="hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 mt-2"></div>
 
   </div>
 
   <!-- ==================== CANDIDATE OPTIONS POPUP (#candidateOptionsPopup) ==================== -->
   <div class="popup-overlay" id="candidateOptionsPopup">
     <div class="popup-content compact glass-card text-center">
-      <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-500 flex items-center justify-center mx-auto mb-3 text-lg">
+      <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto mb-3 text-lg">
         <i class="fas fa-user-clock"></i>
       </div>
       <h3 class="font-display font-extrabold text-lg text-slate-900 dark:text-white mb-1">
-        Next Action?
+        Candidate Quick Actions
       </h3>
-      <p id="popupCandidateNameDisplay" class="font-bold text-sm text-blue-600 dark:text-blue-400 mb-1"></p>
-      <p id="popupCandidateMetaDisplay" class="text-xs text-slate-500 dark:text-slate-400 mb-5"></p>
+      <p id="popupCandidateNameDisplay" class="font-bold text-sm text-blue-600 dark:text-blue-400 mb-0.5"></p>
+      <p id="popupCandidateMetaDisplay" class="text-xs text-slate-500 dark:text-slate-400 mb-3"></p>
+
+      <!-- One-View Candidate Snapshot inside Action Modal -->
+      <div id="popupCandidateQuickStats" class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] text-left grid grid-cols-2 gap-1.5 mb-4"></div>
 
       <div class="flex flex-col gap-2.5 mb-4">
-        <button class="btn btn-primary w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs sm:text-sm shadow-md shadow-blue-600/20" id="btnUpdateStatus">
+        <button type="button" class="btn btn-primary w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs sm:text-sm shadow-md shadow-blue-600/20" id="btnUpdateStatus">
           <i class="fas fa-edit"></i>
           <span>Update Candidate Status</span>
         </button>
 
-        <button class="btn btn-success w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs sm:text-sm shadow-md shadow-emerald-500/20" id="btnConnectWhatsapp">
+        <button type="button" class="btn btn-success w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs sm:text-sm shadow-md shadow-emerald-500/20" id="btnConnectWhatsapp">
           <i class="fab fa-whatsapp text-base"></i>
           <span>Open Direct WhatsApp</span>
         </button>
 
-        <button type="button" onclick="sendWhatsAppInterviewReminder()" class="btn w-full py-2.5 px-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 text-xs font-bold">
+        <button type="button" onclick="sendWhatsAppInterviewReminder()" class="btn w-full py-2.5 px-4 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/25 text-xs font-bold">
           <i class="fas fa-bell"></i>
           <span>Send Pre-Filled Interview Reminder</span>
         </button>
       </div>
 
-      <button class="btn btn-secondary w-full py-2.5 px-4 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold" onclick="closeCandidateOptionsPopup()">
+      <button type="button" class="btn btn-secondary w-full py-2.5 px-4 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold" onclick="closeCandidateOptionsPopup()">
         <i class="fas fa-times"></i>
         <span>Cancel</span>
       </button>
@@ -542,26 +741,30 @@
     <div class="popup-content glass-card">
       <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-200 dark:border-slate-800">
         <h3 class="font-display font-extrabold text-lg text-slate-900 dark:text-white flex items-center gap-2">
-          <i class="fas fa-edit text-blue-500"></i> Update Status
+          <i class="fas fa-edit text-blue-500"></i> Update Interview Outcome
         </h3>
         <button type="button" onclick="closePopup()" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
           <i class="fas fa-times"></i>
         </button>
       </div>
 
-      <div class="popup-info p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 mb-4 space-y-1.5 text-xs">
-        <p class="flex justify-between"><strong class="text-slate-500 dark:text-slate-400">Name:</strong> <span id="popupCandidateName" class="font-bold text-slate-900 dark:text-white text-right"></span></p>
-        <p class="flex justify-between"><strong class="text-slate-500 dark:text-slate-400">Company:</strong> <span id="popupCompany" class="font-semibold text-slate-800 dark:text-slate-200 text-right"></span></p>
-        <p class="flex justify-between"><strong class="text-slate-500 dark:text-slate-400">Position:</strong> <span id="popupPosition" class="font-semibold text-blue-600 dark:text-blue-400 text-right"></span></p>
+      <div class="popup-info p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 mb-4 space-y-1.5 text-xs">
+        <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">Name:</strong> <span id="popupCandidateName" class="font-bold text-slate-900 dark:text-white text-right"></span></p>
+        <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">Company:</strong> <span id="popupCompany" class="font-semibold text-slate-800 dark:text-slate-200 text-right"></span></p>
+        <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">Position:</strong> <span id="popupPosition" class="font-semibold text-blue-600 dark:text-blue-400 text-right"></span></p>
+        <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">CTC / Notice:</strong> <span id="popupCompDetails" class="font-medium text-slate-700 dark:text-slate-300 text-right">-</span></p>
         <span id="popup__powerappsid__" class="hidden"></span>
       </div>
 
       <div class="space-y-4">
         <div class="form-group">
-          <label for="statusDropdown" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-            <i class="fas fa-flag text-blue-500 mr-1"></i> Status
-          </label>
-          <select id="statusDropdown" onchange="updateFinalStatusOptions()" class="form-control-input">
+          <div class="flex items-center justify-between mb-1">
+            <label for="statusDropdown" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              <i class="fas fa-flag text-blue-500 mr-1"></i> Stage Category <span class="text-rose-500">*</span>
+            </label>
+            <span id="statusCondBadge" class="text-[10px] font-semibold text-slate-400">Required</span>
+          </div>
+          <select id="statusDropdown" onchange="updateFinalStatusOptions(); validateStatusModalInputs()" class="form-control-input">
             <option value="">Select Status</option>
             <option value="Selected">Selected</option>
             <option value="Rejected">Rejected</option>
@@ -570,27 +773,41 @@
         </div>
 
         <div class="form-group">
-          <label for="finalStatusDropdown" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-            <i class="fas fa-check-circle text-emerald-500 mr-1"></i> Final Status
-          </label>
-          <select id="finalStatusDropdown" class="form-control-input">
+          <div class="flex items-center justify-between mb-1">
+            <label for="finalStatusDropdown" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              <i class="fas fa-check-circle text-emerald-500 mr-1"></i> Final Status <span class="text-rose-500">*</span>
+            </label>
+            <span id="finalStatusCondBadge" class="text-[10px] font-semibold text-slate-400">Required</span>
+          </div>
+          <select id="finalStatusDropdown" onchange="validateStatusModalInputs()" class="form-control-input">
             <option value="">Select Final Status</option>
           </select>
         </div>
 
         <div class="form-group">
-          <label for="commentBox" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
-            <i class="fas fa-comment text-indigo-500 mr-1"></i> Comment
-          </label>
-          <textarea id="commentBox" rows="2" placeholder="Optional comment..." class="form-control-input"></textarea>
+          <div class="flex items-center justify-between mb-1">
+            <label for="commentBox" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              <i class="fas fa-comment text-indigo-500 mr-1"></i> Interview Feedback / Notes
+            </label>
+            <span id="commentCharCounter" class="text-[10px] font-semibold text-slate-400">0/300</span>
+          </div>
+          <textarea
+            id="commentBox"
+            rows="2"
+            maxlength="300"
+            oninput="validateCommentInput(this)"
+            placeholder="Optional interview feedback or panel notes..."
+            class="form-control-input"
+          ></textarea>
         </div>
+        <p id="statusModalErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-semibold hidden"></p>
       </div>
 
       <div class="popup-buttons flex items-center justify-end gap-2.5 mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
-        <button class="btn btn-secondary px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold" onclick="closePopup()">
+        <button type="button" class="btn btn-secondary px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold" onclick="closePopup()">
           <i class="fas fa-times"></i> Cancel
         </button>
-        <button class="btn btn-primary px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold shadow-lg shadow-blue-600/25" id="statusSubmitButton" onclick="submitFinalStatusUpdate()">
+        <button type="button" class="btn btn-primary px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold shadow-lg shadow-blue-600/25" id="statusSubmitButton" onclick="submitFinalStatusUpdate()">
           <i class="fas fa-save"></i>
           <span class="btn-text">Update</span>
         </button>
@@ -598,15 +815,99 @@
     </div>
   </div>
 
+  <!-- Mobile-First Bottom Quick Navigation Bar (Thumb-friendly on phones) -->
+  <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 glass-card border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
+    <button type="button" onclick="goHome()" class="flex flex-col items-center gap-0.5 text-amber-600 dark:text-amber-400 text-[10px] font-bold">
+      <i class="fas fa-house text-sm"></i>
+      <span>Home</span>
+    </button>
+    <button type="button" onclick="document.getElementById('filterTopAnchor').scrollIntoView({behavior:'smooth'})" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
+      <i class="fas fa-filter text-sm"></i>
+      <span>Filters</span>
+    </button>
+    <button type="button" onclick="switchInterviewView(currentInterviewView === 'table' ? 'cards' : 'table')" class="flex flex-col items-center gap-0.5 text-blue-600 dark:text-blue-400 text-[10px] font-bold">
+      <i class="fas fa-grip text-sm"></i>
+      <span>View Mode</span>
+    </button>
+    <button type="button" onclick="triggerRefreshInterviews()" class="flex flex-col items-center gap-0.5 text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold">
+      <i class="fas fa-sync-alt text-sm"></i>
+      <span>Refresh</span>
+    </button>
+    <button type="button" onclick="toggleTheme()" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
+      <i class="fas fa-circle-half-stroke text-sm"></i>
+      <span>Theme</span>
+    </button>
+  </nav>
+
   <script>
     // ==================== SUPABASE CONFIGURATION ====================
     const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0'; // Paste your Supabase anon/public key here
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0';
 
     // Initialize Supabase Client
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Non-blocking Toast Notification Helper
+    // ==================== REQUIREMENT #5: POWER AUTOMATE BYPASS ====================
+    window.POWER_AUTOMATE_ENABLED = false;
+    window.BYPASS_POWER_AUTOMATE = true;
+    sessionStorage.setItem('powerAutomateEnabled', 'false');
+    sessionStorage.setItem('bypassPowerAutomate', 'true');
+
+    // Global fetch interceptor to guarantee any Power Automate / Logic App webhook is safely bypassed
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = async function(resource, config) {
+      const urlStr = typeof resource === 'string' ? resource : (resource?.url || '');
+      if (
+        urlStr.includes('powerplatform.com') ||
+        urlStr.includes('powerautomate') ||
+        urlStr.includes('logic.azure.com') ||
+        urlStr.includes('flow.microsoft.com')
+      ) {
+        console.info('[Power Automate Bypassed] Webhook call intercepted and bypassed:', urlStr);
+        return new Response(
+          JSON.stringify({ success: true, bypassed: true, message: 'Power Automate is disabled and bypassed.' }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+      return originalFetch(resource, config);
+    };
+
+    // ==================== REQUIREMENT #1: SECURITY UTILITIES ====================
+    function escapeHtml(unsafe) {
+      if (unsafe === null || unsafe === undefined) return "";
+      return String(unsafe)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Prevent CSV Formula Injection when exporting to Excel/Sheets
+    function sanitizeCsvCell(val) {
+      let str = String(val ?? "").replace(/"/g, '""').trim();
+      if (/^[=+\-@\t\r]/.test(str)) {
+        str = "'" + str;
+      }
+      return `"${str}"`;
+    }
+
+    // Validate external meeting URLs so only safe https:// links are rendered
+    function getSafeHttpsUrl(rawUrl) {
+      const trimmed = String(rawUrl || "").trim();
+      if (/^https:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/\S*)?$/.test(trimmed)) {
+        return trimmed;
+      }
+      return "";
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle('dark');
+      sessionStorage.setItem('tccTheme', isDark ? 'dark' : 'light');
+    }
+
+    // XSS-Safe Non-blocking Toast Notification Helper
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
       if (!container) return;
@@ -622,8 +923,18 @@
         error: 'fa-triangle-exclamation text-white'
       };
       toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl border shadow-xl text-xs sm:text-sm font-semibold transition-all duration-300 ${colors[type] || colors.info}`;
-      toast.innerHTML = `<i class="fas ${icons[type] || icons.info} shrink-0"></i><span class="flex-1">${message}</span>`;
+
+      const iconEl = document.createElement('i');
+      iconEl.className = `fas ${icons[type] || icons.info} shrink-0`;
+
+      const spanEl = document.createElement('span');
+      spanEl.className = 'flex-1';
+      spanEl.textContent = String(message || '');
+
+      toast.appendChild(iconEl);
+      toast.appendChild(spanEl);
       container.appendChild(toast);
+
       setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateY(8px)';
@@ -631,8 +942,79 @@
       }, 3600);
     }
 
+    // ==================== REQUIREMENT #4: INPUT CONDITION CHECKS ====================
+    // 1. Search Input Condition Check
+    function validateSearchFilterInput(inputEl) {
+      if (!inputEl) return;
+      const cleaned = inputEl.value.replace(/[<>"{}`\\]/g, '').slice(0, 60);
+      if (inputEl.value !== cleaned) inputEl.value = cleaned;
+
+      const counter = document.getElementById('searchCharCounter');
+      const clearBtn = document.getElementById('clearSearchBtn');
+      const condBadge = document.getElementById('filterCondBadge');
+
+      if (counter) counter.textContent = `${cleaned.length}/60`;
+      if (clearBtn) clearBtn.style.display = cleaned.length > 0 ? 'inline-flex' : 'none';
+      if (condBadge) condBadge.textContent = cleaned.length > 0 ? 'Filtering active' : 'Ready';
+    }
+
+    function clearCandidateSearch() {
+      const el = document.getElementById('candidateSearchInput');
+      if (el) {
+        el.value = '';
+        validateSearchFilterInput(el);
+        applyFilters();
+      }
+    }
+
+    // 2. Status Update Modal Dropdowns & Comment Condition Check
+    function validateStatusModalInputs() {
+      const stEl = document.getElementById('statusDropdown');
+      const fnEl = document.getElementById('finalStatusDropdown');
+      const stBadge = document.getElementById('statusCondBadge');
+      const fnBadge = document.getElementById('finalStatusCondBadge');
+      const errMsg = document.getElementById('statusModalErrorMsg');
+
+      let valid = true;
+      if (!stEl?.value) {
+        stEl?.classList.remove('input-valid');
+        stEl?.classList.add('input-invalid');
+        if (stBadge) stBadge.textContent = 'Required';
+        valid = false;
+      } else {
+        stEl?.classList.remove('input-invalid');
+        stEl?.classList.add('input-valid');
+        if (stBadge) stBadge.textContent = '✓ Selected';
+      }
+
+      if (!fnEl?.value) {
+        fnEl?.classList.remove('input-valid');
+        fnEl?.classList.add('input-invalid');
+        if (fnBadge) fnBadge.textContent = 'Required';
+        valid = false;
+      } else {
+        fnEl?.classList.remove('input-invalid');
+        fnEl?.classList.add('input-valid');
+        if (fnBadge) fnBadge.textContent = '✓ Selected';
+      }
+
+      if (errMsg && valid) errMsg.classList.add('hidden');
+      return valid;
+    }
+
+    function validateCommentInput(textareaEl) {
+      if (!textareaEl) return true;
+      const cleaned = textareaEl.value.replace(/[<>]/g, '').slice(0, 300);
+      if (textareaEl.value !== cleaned) textareaEl.value = cleaned;
+      const counter = document.getElementById('commentCharCounter');
+      if (counter) counter.textContent = `${cleaned.length}/300`;
+      return true;
+    }
+
     // View Mode Toggle (Table vs Timeline Cards)
+    let currentInterviewView = 'table';
     function switchInterviewView(mode) {
+      currentInterviewView = mode;
       const tableWrapper = document.getElementById('tableViewWrapper');
       const cardsWrapper = document.getElementById('cardsViewWrapper');
       const btnTable = document.getElementById('viewTableBtn');
@@ -642,14 +1024,14 @@
         tableWrapper.classList.add('hidden');
         cardsWrapper.classList.remove('hidden');
         cardsWrapper.classList.add('grid');
-        if (btnCards) btnCards.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
-        if (btnTable) btnTable.className = 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
+        if (btnCards) btnCards.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
+        if (btnTable) btnTable.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
       } else {
         tableWrapper.classList.remove('hidden');
         cardsWrapper.classList.add('hidden');
         cardsWrapper.classList.remove('grid');
-        if (btnTable) btnTable.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
-        if (btnCards) btnCards.className = 'px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
+        if (btnTable) btnTable.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
+        if (btnCards) btnCards.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
       }
     }
 
@@ -665,11 +1047,16 @@
       const companyFilter = document.getElementById('companyFilter');
       const recruiterFilter = document.getElementById('recruiterFilter');
       const statusFilter = document.getElementById('statusFilter');
+      const modeFilter = document.getElementById('modeFilter');
       const searchInput = document.getElementById('candidateSearchInput');
       if (companyFilter) companyFilter.value = '';
       if (recruiterFilter) recruiterFilter.value = '';
       if (statusFilter) statusFilter.value = '';
-      if (searchInput) searchInput.value = '';
+      if (modeFilter) modeFilter.value = '';
+      if (searchInput) {
+        searchInput.value = '';
+        validateSearchFilterInput(searchInput);
+      }
       applyFilters();
       showToast('Filters cleared', 'info');
     }
@@ -688,19 +1075,26 @@
         showToast('No scheduled interviews to export', 'error');
         return;
       }
-      const headers = ['Interview Date', 'Candidate Name', 'Email', 'Position', 'Company', 'Recruiter', 'Mode', 'Final Status', 'Timeline Status'];
+      const headers = ['Interview Date', 'Candidate Name', 'Email', 'Mobile', 'Position', 'Company', 'Current CTC', 'Expected CTC', 'Experience', 'Notice Period', 'Recruiter', 'Mode', 'Final Status', 'Timeline Status', 'Comment'];
       const rows = filteredInterviews.map(item => {
         const st = getInterviewStatus(item.interview_date);
+        const mobileDigits = String(item.Mobile || item.mobile || item.Phone || item.phone || '').replace(/\D/g, '');
         return [
-          `"${formatInterviewDateTime(item.interview_date).replace(/"/g, '""')}"`,
-          `"${(item.name || '').replace(/"/g, '""')}"`,
-          `"${(item.email || '').replace(/"/g, '""')}"`,
-          `"${(item.position || '').replace(/"/g, '""')}"`,
-          `"${(item.company || '').replace(/"/g, '""')}"`,
-          `"${(item.recruiter || item.recruiter_email || '').replace(/"/g, '""')}"`,
-          `"${(item.interview_mode || '').replace(/"/g, '""')}"`,
-          `"${(item.final_status || 'Pending').replace(/"/g, '""')}"`,
-          `"${st.text}"`
+          sanitizeCsvCell(formatInterviewDateTime(item.interview_date)),
+          sanitizeCsvCell(item.name || ''),
+          sanitizeCsvCell(item.email || ''),
+          sanitizeCsvCell(mobileDigits),
+          sanitizeCsvCell(item.position || ''),
+          sanitizeCsvCell(item.company || ''),
+          sanitizeCsvCell(item.current_ctc || ''),
+          sanitizeCsvCell(item.expected_ctc || ''),
+          sanitizeCsvCell(item.experience || ''),
+          sanitizeCsvCell(item.notice_period || ''),
+          sanitizeCsvCell(item.recruiter || item.recruiter_email || ''),
+          sanitizeCsvCell(item.interview_mode || ''),
+          sanitizeCsvCell(item.final_status || 'Pending'),
+          sanitizeCsvCell(st.text),
+          sanitizeCsvCell(item.comment || '')
         ];
       });
       const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
@@ -710,34 +1104,43 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast(`Exported ${filteredInterviews.length} interviews to CSV`, 'success');
+      showToast(`Exported ${filteredInterviews.length} interviews to safe CSV`, 'success');
     }
 
-    function sendWhatsAppInterviewReminder() {
-      if (!currentCandidateForPopup) {
+    function sendWhatsAppInterviewReminder(candidateOverride = null) {
+      const target = candidateOverride || currentCandidateForPopup;
+      if (!target) {
         showToast('No candidate selected', 'error');
         return;
       }
-      const mobileRaw = currentCandidateForPopup.Mobile ||
-                        currentCandidateForPopup.mobile ||
-                        currentCandidateForPopup.Phone ||
-                        currentCandidateForPopup.phone || '';
-      const digitsOnly = mobileRaw.toString().replace(/\D/g, '');
-      if (!digitsOnly) {
-        showToast('Mobile number not available for this candidate', 'error');
+      const mobileRaw = target.Mobile || target.mobile || target.Phone || target.phone || '';
+      const digitsOnly = mobileRaw.toString().replace(/\D/g, '').slice(-10);
+      if (digitsOnly.length !== 10) {
+        showToast('Valid 10-digit mobile number not available for this candidate', 'error');
         return;
       }
       const recruiterName = sessionStorage.getItem('userName') || 'Recruiter';
-      const formattedDT = formatInterviewDateTime(currentCandidateForPopup.interview_date);
-      const modeStr = (currentCandidateForPopup.interview_mode || 'Scheduled').toUpperCase();
-      const msg = `*Hi ${currentCandidateForPopup.name || 'Candidate'}*,\n\nThis is a gentle reminder regarding your scheduled interview for the *${currentCandidateForPopup.position || 'Open'}* role at *${currentCandidateForPopup.company || 'our client'}*.\n\n📅 *Date & Time:* ${formattedDT}\n💼 *Mode:* ${modeStr}\n\nPlease confirm your availability. Wish you all the best!\n\n*Regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
-      window.open(`https://wa.me/91${digitsOnly}?text=${encodeURIComponent(msg)}`, '_blank');
+      const formattedDT = formatInterviewDateTime(target.interview_date);
+      const modeStr = (target.interview_mode || 'Scheduled').toUpperCase();
+      const msg = `*Hi ${target.name || 'Candidate'}*,\n\nThis is a gentle reminder regarding your scheduled interview for the *${target.position || 'Open'}* role at *${target.company || 'our client'}*.\n\n📅 *Date & Time:* ${formattedDT}\n💼 *Mode:* ${modeStr}\n\nPlease confirm your availability. Wish you all the best!\n\n*Regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
+      window.open(`https://wa.me/91${digitsOnly}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
       closeCandidateOptionsPopup();
     }
 
     // ==================== PRESERVED AUTHENTICATION & CORE LOGIC ====================
     window.addEventListener('load', function() {
-      console.log("Scheduled Interviews page loaded - checking authentication...");
+      // Ensure Light Mode is the default unless dark was chosen in session
+      const savedTheme = sessionStorage.getItem('tccTheme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+
+      // Auto-switch to Timeline Cards view on phone screens for optimal mobile UX
+      if (window.innerWidth < 640) {
+        switchInterviewView('cards');
+      }
 
       // Get all user data from sessionStorage
       const isLoggedIn = sessionStorage.getItem('isLoggedIn');
@@ -757,9 +1160,6 @@
         return;
       }
 
-      // User is authenticated
-      console.log('✓ User authenticated successfully');
-
       // Set loggedInEmail to the authenticated user's email
       loggedInEmail = userEmail;
 
@@ -771,7 +1171,8 @@
         contact: userContact,
         designation: userDesignation,
         userType: userType,
-        loginTime: loginTime
+        loginTime: loginTime,
+        powerAutomateBypassed: true
       };
 
       // Display user type badge
@@ -806,10 +1207,8 @@
       };
 
       if (userData.userType && userData.userType.toLowerCase() === 'admin') {
-        console.log('✓ Admin user detected - showing ALL scheduled interviews');
         return data;
       } else {
-        console.log('✓ Regular user detected - filtering by recruiter email');
         return data.filter(c => {
           const recEmail = (c.recruiter || c.recruiter_email || "").toLowerCase();
           return recEmail === (userData.email || "").toLowerCase();
@@ -855,7 +1254,6 @@
 
         return d.toLocaleDateString('en-IN', options);
       } catch (error) {
-        console.error("Error formatting interview date:", error);
         return dt;
       }
     }
@@ -881,20 +1279,12 @@
       }
     }
 
-    function escapeHtml(unsafe) {
-      return (unsafe || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
     // Popup functions
     function openCandidateOptionsPopup(candidate) {
       const popup = getElement('candidateOptionsPopup');
       const nameDisplay = getElement('popupCandidateNameDisplay');
       const metaDisplay = document.getElementById('popupCandidateMetaDisplay');
+      const statsBox = document.getElementById('popupCandidateQuickStats');
 
       if (!popup || !nameDisplay) return;
 
@@ -902,6 +1292,28 @@
       nameDisplay.textContent = candidate.name || "";
       if (metaDisplay) {
         metaDisplay.textContent = `${candidate.position || ''} • ${candidate.company || ''} (${formatInterviewDateTime(candidate.interview_date)})`;
+      }
+      if (statsBox) {
+        const mobileDigits = String(candidate.Mobile || candidate.mobile || candidate.Phone || candidate.phone || '').replace(/\D/g, '').slice(-10);
+        statsBox.innerHTML = '';
+        const items = [
+          ['Cur CTC', candidate.current_ctc || '-'],
+          ['Exp CTC', candidate.expected_ctc || '-'],
+          ['Exp / NP', `${candidate.experience || '-'} / ${candidate.notice_period || '-'}`],
+          ['Mobile', mobileDigits ? `+91 ${mobileDigits}` : '-']
+        ];
+        items.forEach(([label, val]) => {
+          const div = document.createElement('div');
+          const sp1 = document.createElement('span');
+          sp1.className = 'text-slate-400 mr-1';
+          sp1.textContent = `${label}:`;
+          const st1 = document.createElement('strong');
+          st1.className = 'text-slate-800 dark:text-slate-200';
+          st1.textContent = val;
+          div.appendChild(sp1);
+          div.appendChild(st1);
+          statsBox.appendChild(div);
+        });
       }
       popup.style.display = 'flex';
     }
@@ -921,6 +1333,7 @@
         candidateName: getElement("popupCandidateName"),
         company: getElement("popupCompany"),
         position: getElement("popupPosition"),
+        compDetails: document.getElementById("popupCompDetails"),
         powerAppsId: getElement("popup__powerappsid__"),
         statusDropdown: getElement("statusDropdown"),
         finalStatusDropdown: getElement("finalStatusDropdown"),
@@ -931,14 +1344,27 @@
       if (elements.candidateName) elements.candidateName.textContent = candidate.name || "";
       if (elements.company) elements.company.textContent = candidate.company || "";
       if (elements.position) elements.position.textContent = candidate.position || "";
+      if (elements.compDetails) {
+        elements.compDetails.textContent = `${candidate.current_ctc || '-'} → ${candidate.expected_ctc || '-'} | NP: ${candidate.notice_period || '-'}`;
+      }
 
       if (elements.powerAppsId) {
         elements.powerAppsId.textContent = candidate.id || candidate.__powerappsid__ || "Not Available";
       }
 
-      if (elements.statusDropdown) elements.statusDropdown.value = "";
-      if (elements.finalStatusDropdown) elements.finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
-      if (elements.commentBox) elements.commentBox.value = candidate.comment || "";
+      if (elements.statusDropdown) {
+        elements.statusDropdown.value = "";
+        elements.statusDropdown.classList.remove('input-valid', 'input-invalid');
+      }
+      if (elements.finalStatusDropdown) {
+        elements.finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
+        elements.finalStatusDropdown.classList.remove('input-valid', 'input-invalid');
+      }
+      if (elements.commentBox) {
+        elements.commentBox.value = candidate.comment || "";
+        validateCommentInput(elements.commentBox);
+      }
+      document.getElementById('statusModalErrorMsg')?.classList.add('hidden');
       if (elements.popup) elements.popup.style.display = "flex";
     }
 
@@ -980,12 +1406,23 @@
         return;
       }
 
+      if (!validateStatusModalInputs()) {
+        const errMsg = document.getElementById('statusModalErrorMsg');
+        if (errMsg) {
+          errMsg.textContent = "Please select both Stage Category and Final Status.";
+          errMsg.classList.remove('hidden');
+        }
+        showToast("Please select both status and final status.", "error");
+        return;
+      }
+
+      validateCommentInput(commentBox);
       const status = statusDropdown.value;
       const finalStatus = finalStatusDropdown.value;
-      const comment = commentBox.value;
+      const comment = commentBox.value.trim();
 
-      if ((!currentEmail && !currentCandidateId) || !status || !finalStatus) {
-        showToast("Please select both status and final status.", "error");
+      if (!currentEmail && !currentCandidateId) {
+        showToast("No candidate selected.", "error");
         return;
       }
 
@@ -1067,11 +1504,13 @@
       const companyFilter = getElement('companyFilter');
       const recruiterFilter = getElement('recruiterFilter');
       const statusFilter = getElement('statusFilter');
+      const modeFilter = document.getElementById('modeFilter');
       const searchInput = document.getElementById('candidateSearchInput');
 
       const selectedCompany = companyFilter ? companyFilter.value : '';
       const selectedRecruiter = recruiterFilter ? recruiterFilter.value : '';
       const selectedStatus = statusFilter ? statusFilter.value : '';
+      const selectedMode = modeFilter ? modeFilter.value.toLowerCase() : '';
       const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
       filteredInterviews = allScheduledInterviews.filter(interview => {
@@ -1084,12 +1523,16 @@
           matchStatus = interviewStatus.text.toLowerCase() === selectedStatus;
         }
 
+        const matchMode = !selectedMode || (interview.interview_mode || '').toLowerCase() === selectedMode;
+
         const matchSearch = !searchQuery ||
           (interview.name || '').toLowerCase().includes(searchQuery) ||
           (interview.email || '').toLowerCase().includes(searchQuery) ||
-          (interview.position || '').toLowerCase().includes(searchQuery);
+          (interview.position || '').toLowerCase().includes(searchQuery) ||
+          (interview.company || '').toLowerCase().includes(searchQuery) ||
+          String(interview.mobile || interview.Mobile || '').toLowerCase().includes(searchQuery);
 
-        return matchCompany && matchRecruiter && matchStatus && matchSearch;
+        return matchCompany && matchRecruiter && matchStatus && matchMode && matchSearch;
       });
 
       renderInterviewTable();
@@ -1103,8 +1546,14 @@
       let todayCount = 0;
       let upcomingCount = 0;
       let overdueCount = 0;
+      let onlineCount = 0;
+      let physicalCount = 0;
 
       filteredInterviews.forEach(interview => {
+        const mode = (interview.interview_mode || '').toLowerCase();
+        if (mode === 'online') onlineCount++;
+        if (mode === 'physical') physicalCount++;
+
         if (!interview.interview_date) return;
 
         try {
@@ -1119,7 +1568,7 @@
             upcomingCount++;
           }
         } catch (error) {
-          console.error("Error processing interview date:", error);
+          // Ignore malformed date
         }
       });
 
@@ -1127,13 +1576,18 @@
       const todayEl = getElement('todayInterviews');
       const upcomingEl = getElement('upcomingInterviews');
       const overdueEl = getElement('overdueInterviews');
+      const modeSplitEl = document.getElementById('kpiModeSplitText');
+      const showingBadge = document.getElementById('showingInterviewsBadge');
 
       if (totalEl) totalEl.textContent = totalInterviews;
       if (todayEl) todayEl.textContent = todayCount;
       if (upcomingEl) upcomingEl.textContent = upcomingCount;
       if (overdueEl) overdueEl.textContent = overdueCount;
+      if (modeSplitEl) modeSplitEl.textContent = `${onlineCount} Onl • ${physicalCount} Phy`;
+      if (showingBadge) showingBadge.textContent = `${totalInterviews} Scheduled`;
     }
 
+    // ==================== ONE-VIEW HIGH-DENSITY TABLE & TIMELINE CARD RENDERER ====================
     function renderInterviewTable() {
       const tableBody = document.querySelector("#interviewTable tbody");
       const cardsContainer = document.getElementById('cardsViewWrapper');
@@ -1153,9 +1607,21 @@
 
       filteredInterviews.forEach((interview, index) => {
         const row = document.createElement("tr");
-        const safeName = escapeHtml(interview.name || "");
+        const safeName = escapeHtml(interview.name || "Candidate");
+        const safeEmail = escapeHtml(interview.email || "-");
+        const rawMobile = String(interview.Mobile || interview.mobile || interview.Phone || interview.phone || "").replace(/\D/g, '').slice(-10);
+        const safeMobile = escapeHtml(rawMobile);
+        const safePos = escapeHtml(interview.position || "-");
+        const safeComp = escapeHtml(interview.company || "-");
+        const safeCurCtc = escapeHtml(interview.current_ctc || "-");
+        const safeExpCtc = escapeHtml(interview.expected_ctc || "-");
+        const safeExp = escapeHtml(interview.experience || "-");
+        const safeNotice = escapeHtml(interview.notice_period || "-");
+        const safeFinalStatus = escapeHtml(interview.final_status || "Pending");
+        const safeComment = escapeHtml(interview.comment || "");
         const interviewStatus = getInterviewStatus(interview.interview_date);
-        const recDisplay = (interview.recruiter || interview.recruiter_email || '').split("@")[0];
+        const recDisplay = escapeHtml((interview.recruiter || interview.recruiter_email || '').split("@")[0] || "-");
+        const safeMeetingUrl = getSafeHttpsUrl(interview.invite_link);
 
         let modeBadge = '<span class="mode-badge">Unknown</span>';
         if (interview.interview_mode) {
@@ -1168,46 +1634,93 @@
         }
 
         row.innerHTML = `
-          <td class="whitespace-nowrap font-semibold text-slate-800 dark:text-slate-200" title="${formatInterviewDateTime(interview.interview_date)}">
-            <i class="far fa-clock text-amber-500 mr-1.5"></i>${formatInterviewDateTime(interview.interview_date)}
+          <td class="whitespace-nowrap font-semibold text-slate-800 dark:text-slate-200" title="${escapeHtml(formatInterviewDateTime(interview.interview_date))}">
+            <i class="far fa-clock text-amber-500 mr-1.5"></i>${escapeHtml(formatInterviewDateTime(interview.interview_date))}
           </td>
-          <td title="${safeName}" class="candidate-name-clickable" data-index="${index}">
-            <strong>${safeName}</strong>
+          <td>
+            <div title="${safeName}" class="candidate-name-clickable" data-index="${index}">
+              <strong>${safeName}</strong>
+            </div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400 truncate max-w-[165px]" title="${safeEmail}">${safeEmail}</div>
+            <div class="text-[11px] font-semibold text-blue-600 dark:text-blue-400">${safeMobile ? '+91 ' + safeMobile : '-'}</div>
           </td>
-          <td class="text-slate-500 dark:text-slate-400" title="${escapeHtml(interview.email || '')}">${escapeHtml(interview.email || "")}</td>
-          <td class="font-medium text-blue-600 dark:text-blue-400" title="${escapeHtml(interview.position || '')}">${escapeHtml(interview.position || "")}</td>
-          <td class="font-semibold text-slate-800 dark:text-slate-200" title="${escapeHtml(interview.company || '')}">${escapeHtml(interview.company || "")}</td>
-          <td class="text-slate-500 dark:text-slate-400">${escapeHtml(recDisplay)}</td>
-          <td>${modeBadge}</td>
-          <td class="font-medium" title="${escapeHtml(interview.final_status || '')}">${escapeHtml(interview.final_status || "Pending")}</td>
-          <td><span class="interview-badge ${interviewStatus.class}">${interviewStatus.text}</span></td>
+          <td>
+            <div class="font-bold text-blue-600 dark:text-blue-400">${safePos}</div>
+            <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-300">${safeComp}</div>
+          </td>
+          <td class="whitespace-nowrap">
+            <div class="text-[11px] text-slate-600 dark:text-slate-300">${safeCurCtc} → <strong class="text-emerald-600 dark:text-emerald-400">${safeExpCtc}</strong></div>
+            <div class="text-[10px] text-amber-600 dark:text-amber-400 font-semibold">Exp: ${safeExp} • NP: ${safeNotice}</div>
+          </td>
+          <td class="text-slate-600 dark:text-slate-400 font-medium">${recDisplay}</td>
+          <td>
+            <div>${modeBadge}</div>
+            ${safeMeetingUrl ? `<a href="${escapeHtml(safeMeetingUrl)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="inline-flex items-center gap-1 text-[10px] font-bold text-purple-600 dark:text-purple-400 hover:underline mt-1"><i class="fas fa-external-link-alt"></i> Join Link</a>` : ''}
+          </td>
+          <td>
+            <span class="font-bold text-slate-800 dark:text-slate-200">${safeFinalStatus}</span>
+            ${safeComment ? `<div class="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 max-w-[140px] truncate" title="${safeComment}"><i class="fas fa-comment-dots mr-1"></i>${safeComment}</div>` : ''}
+          </td>
+          <td><span class="interview-badge ${interviewStatus.class}">${escapeHtml(interviewStatus.text)}</span></td>
+          <td>
+            <div class="flex items-center gap-1.5" onclick="event.stopPropagation()">
+              <button type="button" onclick="openPopup(filteredInterviews[${index}])" class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white text-[11px] font-bold transition-colors" title="Update Outcome Status">
+                <i class="fas fa-pen-to-square"></i>
+              </button>
+              <button type="button" onclick="sendWhatsAppInterviewReminder(filteredInterviews[${index}])" class="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white text-[11px] font-bold transition-colors" title="Send WhatsApp Interview Reminder">
+                <i class="fab fa-whatsapp"></i>
+              </button>
+            </div>
+          </td>
         `;
 
         tableBody.appendChild(row);
 
-        // Also populate Timeline Card View
+        // Also populate Responsive Mobile-First Timeline Card View
         if (cardsContainer) {
           const card = document.createElement('div');
           card.className = 'glass-card rounded-2xl p-4 flex flex-col justify-between gap-3 border hover:border-blue-500/40 transition-all cursor-pointer';
-          card.onclick = () => openCandidateOptionsPopup(interview);
+          card.onclick = (e) => {
+            if (e.target.closest('button') || e.target.closest('a')) return;
+            openCandidateOptionsPopup(interview);
+          };
           card.innerHTML = `
             <div>
-              <div class="flex items-center justify-between gap-2 mb-2.5">
+              <div class="flex items-center justify-between gap-2 mb-2">
                 <span class="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                  <i class="fas fa-calendar-day"></i> ${formatInterviewDateTime(interview.interview_date)}
+                  <i class="fas fa-calendar-day"></i> ${escapeHtml(formatInterviewDateTime(interview.interview_date))}
                 </span>
-                <span class="interview-badge ${interviewStatus.class}">${interviewStatus.text}</span>
+                <span class="interview-badge ${interviewStatus.class}">${escapeHtml(interviewStatus.text)}</span>
               </div>
               <h4 class="font-display font-bold text-base text-blue-600 dark:text-blue-400 hover:underline">${safeName}</h4>
-              <p class="text-xs font-semibold text-slate-700 dark:text-slate-300 mt-0.5">${escapeHtml(interview.position || "")} • ${escapeHtml(interview.company || "")}</p>
-              <div class="mt-3 space-y-1 text-[11px] text-slate-500 dark:text-slate-400">
-                <p><i class="fas fa-envelope w-4"></i> ${escapeHtml(interview.email || "")}</p>
-                <p><i class="fas fa-user-tie w-4"></i> Recruiter: ${escapeHtml(recDisplay)}</p>
+              <p class="text-xs font-bold text-slate-700 dark:text-slate-300 mt-0.5">${safePos} • ${safeComp}</p>
+
+              <!-- One-View Mini Metrics Grid inside Card -->
+              <div class="grid grid-cols-2 gap-1.5 my-2.5 p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70 text-[11px]">
+                <div><span class="text-slate-400">CTC:</span> <strong class="text-slate-800 dark:text-slate-200">${safeCurCtc} → ${safeExpCtc}</strong></div>
+                <div><span class="text-slate-400">NP / Exp:</span> <strong class="text-amber-600 dark:text-amber-400">${safeNotice} (${safeExp})</strong></div>
+              </div>
+
+              <div class="space-y-1 text-[11px] text-slate-500 dark:text-slate-400">
+                <p><i class="fas fa-envelope w-4 text-slate-400"></i> ${safeEmail}</p>
+                <p><i class="fas fa-phone w-4 text-slate-400"></i> ${safeMobile ? '+91 ' + safeMobile : '-'}</p>
+                <p><i class="fas fa-user-tie w-4 text-slate-400"></i> Recruiter: ${recDisplay} • Stage: <strong>${safeFinalStatus}</strong></p>
+                ${safeComment ? `<p class="italic text-slate-600 dark:text-slate-300"><i class="fas fa-comment w-4 text-indigo-400"></i> "${safeComment}"</p>` : ''}
               </div>
             </div>
-            <div class="pt-3 border-t border-slate-200/70 dark:border-slate-800 flex items-center justify-between">
-              ${modeBadge}
-              <span class="text-xs font-bold text-slate-600 dark:text-slate-300">${escapeHtml(interview.final_status || "Pending")} <i class="fas fa-chevron-right text-[10px] ml-1 text-blue-500"></i></span>
+            <div class="pt-3 border-t border-slate-200/70 dark:border-slate-800 flex items-center justify-between gap-2" onclick="event.stopPropagation()">
+              <div class="flex items-center gap-1.5">
+                ${modeBadge}
+                ${safeMeetingUrl ? `<a href="${escapeHtml(safeMeetingUrl)}" target="_blank" rel="noopener noreferrer" class="px-2 py-1 rounded-lg bg-purple-500/15 text-purple-700 dark:text-purple-300 text-[10px] font-bold">Join</a>` : ''}
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="openPopup(filteredInterviews[${index}])" class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold">
+                  <i class="fas fa-edit mr-1"></i>Status
+                </button>
+                <button type="button" onclick="sendWhatsAppInterviewReminder(filteredInterviews[${index}])" class="px-2.5 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold">
+                  <i class="fab fa-whatsapp mr-1"></i>Remind
+                </button>
+              </div>
             </div>
           `;
           cardsContainer.appendChild(card);
@@ -1231,8 +1744,6 @@
 
     // ==================== SUPABASE LOAD SCHEDULED INTERVIEWS ====================
     async function loadScheduledInterviews() {
-      console.log("Loading scheduled interviews from Supabase...");
-
       try {
         const { data, error } = await supabaseClient
           .from('candidates')
@@ -1250,15 +1761,11 @@
           __powerappsid__: row.id
         }));
 
-        console.log("Raw scheduled records received from Supabase:", normalizedData.length);
-
         const roleFilteredCandidates = filterCandidatesByUserType(normalizedData);
         const userCandidates = roleFilteredCandidates.filter(c => {
           const hasInterviewDate = c.interview_date && c.interview_date.toString().trim() !== "";
           return hasInterviewDate;
         });
-
-        console.log("Role-filtered candidates with interview dates:", userCandidates.length);
 
         allScheduledInterviews = userCandidates.sort((a, b) => {
           try {
@@ -1266,7 +1773,6 @@
             const dateB = new Date(b.interview_date);
             return dateA - dateB;
           } catch (error) {
-            console.error("Error sorting dates:", error);
             return 0;
           }
         });
@@ -1316,20 +1822,18 @@
             return;
           }
 
-          const digitsOnly = mobileRaw.toString().replace(/\D/g, '');
-          if (!digitsOnly) {
-            showToast('Invalid mobile number', 'error');
+          const digitsOnly = mobileRaw.toString().replace(/\D/g, '').slice(-10);
+          if (digitsOnly.length !== 10) {
+            showToast('Invalid 10-digit mobile number', 'error');
             return;
           }
 
           const waUrl = `https://wa.me/91${digitsOnly}`;
-          window.open(waUrl, '_blank');
+          window.open(waUrl, '_blank', 'noopener,noreferrer');
           closeCandidateOptionsPopup();
         });
       }
     });
-
-    console.log('Scheduled Interviews page loaded with Supabase integration, popup functionality, and role-based filtering');
   </script>
 </body>
 </html>
