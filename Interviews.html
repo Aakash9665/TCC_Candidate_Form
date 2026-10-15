@@ -55,7 +55,6 @@
       transition: background-color 0.3s ease, color 0.3s ease;
     }
 
-    /* Ambient Floating Orbs */
     .orb {
       position: fixed;
       border-radius: 50%;
@@ -116,7 +115,6 @@
       animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
     }
 
-    /* User Type Badge Preserved Classes */
     .user-type-badge {
       display: inline-flex;
       align-items: center;
@@ -173,7 +171,6 @@
       border-color: #f43f5e !important;
     }
 
-    /* Table Styling */
     .table-scroll {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
@@ -232,7 +229,6 @@
       background: rgba(59, 130, 246, 0.12);
     }
 
-    /* Clickable Candidate Names Preserved Class */
     .candidate-name-clickable {
       cursor: pointer !important;
       color: #2563eb !important;
@@ -293,7 +289,6 @@
       color: #f87171;
     }
 
-    /* Mode Badges Preserved Classes */
     .mode-badge {
       display: inline-flex;
       align-items: center;
@@ -377,14 +372,12 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-20 sm:pb-12 selection:bg-blue-500 selection:text-white relative">
 
-  <!-- Ambient Floating Orbs -->
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
   <!-- Non-Blocking Toast Notification Container -->
   <div id="toastContainer" class="fixed bottom-16 sm:bottom-5 right-4 sm:right-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-3 pointer-events-none"></div>
 
-  <!-- Sticky Top Header Bar (Preserves .dashboard-header, .home-button, #userTypeBadge) -->
   <header class="dashboard-header sticky top-0 z-40 glass-card border-b border-slate-200/80 dark:border-slate-800/80 px-3 sm:px-6 py-2.5 sm:py-3">
     <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-2 sm:gap-3 w-full">
       <div class="flex items-center gap-2.5 sm:gap-3">
@@ -404,12 +397,15 @@
               <span>Scheduled Interviews</span>
             </h2>
             <span id="userTypeBadge" class="user-type-badge"></span>
+            <span class="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
+              <i class="fas fa-check-circle text-[9px]"></i> Selected Only
+            </span>
             <span class="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25" title="Power Automate flow is disabled and bypassed">
               <i class="fas fa-bolt-slash text-[9px]"></i> PA Bypassed
             </span>
           </div>
           <p class="dashboard-subtitle text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-            One-view interview lineup, CTC & notice details, and instant WhatsApp follow-ups (Power Automate Bypassed)
+            Showing active Selected candidates lineup, rescheduling & instant WhatsApp follow-ups
           </p>
         </div>
       </div>
@@ -471,7 +467,6 @@
     </div>
   </header>
 
-  <!-- ==================== MAIN DASHBOARD (#dashboard) ==================== -->
   <div id="dashboard" class="max-w-[1600px] mx-auto px-3 sm:px-6 pt-4 sm:pt-5 relative z-10">
 
     <!-- 6-Card One-View KPI Summary Strip (Preserves #totalInterviews, #todayInterviews, #upcomingInterviews, #overdueInterviews) -->
@@ -485,7 +480,7 @@
           </span>
         </div>
         <div class="stat-number font-display text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white" id="totalInterviews">0</div>
-        <p class="text-[10px] text-slate-400 mt-0.5 truncate">Click to view all</p>
+        <p class="text-[10px] text-slate-400 mt-0.5 truncate">Selected candidates</p>
       </button>
 
       <!-- KPI 2: Today's Interviews -->
@@ -549,12 +544,11 @@
       </div>
     </div>
 
-    <!-- Filters Card (Preserves #candidateSearchInput, #companyFilter, #recruiterFilter, #statusFilter + adds #modeFilter & input conditions) -->
     <div class="filters-container glass-card rounded-3xl p-4 sm:p-5 mb-4 animate-in" id="filterTopAnchor">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
         <h3 class="filters-title font-display font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-2">
           <i class="fas fa-filter text-blue-500"></i>
-          <span>Filter Interview Lineup</span>
+          <span>Filter Interview Lineup (Status: Selected Only)</span>
         </h3>
         <div class="flex items-center gap-3">
           <span id="filterCondBadge" class="text-[10px] font-semibold text-slate-400">Ready</span>
@@ -643,7 +637,6 @@
       </div>
     </div>
 
-    <!-- Interview Schedule Table Container (Preserves #interviewTable) -->
     <div class="table-container glass-card rounded-3xl overflow-hidden animate-in" id="tableViewWrapper">
       <div class="table-header px-4 sm:px-5 py-3.5 border-b border-slate-200/80 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2.5 bg-slate-100/60 dark:bg-slate-900/40">
         <div class="flex flex-wrap items-center gap-2">
@@ -655,7 +648,7 @@
             Loading...
           </span>
           <span class="text-[11px] text-slate-500 dark:text-slate-400 hidden md:inline">
-            Click candidate name or action buttons for instant status & WhatsApp follow-up
+            Click candidate name or quick action buttons to update status, reschedule, or send WhatsApp
           </span>
         </div>
 
@@ -716,6 +709,12 @@
         <button type="button" class="btn btn-primary w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs sm:text-sm shadow-md shadow-blue-600/20" id="btnUpdateStatus">
           <i class="fas fa-edit"></i>
           <span>Update Candidate Status</span>
+        </button>
+
+        <!-- NEW: Reschedule Interview Button in Candidate Options Popup -->
+        <button type="button" class="btn w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs sm:text-sm shadow-md shadow-amber-500/20" id="btnRescheduleInterview">
+          <i class="fas fa-calendar-plus"></i>
+          <span>Reschedule Interview</span>
         </button>
 
         <button type="button" class="btn btn-success w-full py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs sm:text-sm shadow-md shadow-emerald-500/20" id="btnConnectWhatsapp">
@@ -803,19 +802,124 @@
         <p id="statusModalErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-semibold hidden"></p>
       </div>
 
+      <div class="popup-buttons flex flex-wrap items-center justify-between gap-2 mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
+        <!-- Shortcut to switch directly to Reschedule Popup from Status Popup -->
+        <button type="button" class="btn px-3.5 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500 text-amber-700 dark:text-amber-400 hover:text-white border border-amber-500/25 text-xs font-bold" onclick="switchFromStatusToReschedule()">
+          <i class="fas fa-calendar-plus"></i> Reschedule Instead
+        </button>
+
+        <div class="flex items-center gap-2">
+          <button type="button" class="btn btn-secondary px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold" onclick="closePopup()">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+          <button type="button" class="btn btn-primary px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold shadow-lg shadow-blue-600/25" id="statusSubmitButton" onclick="submitFinalStatusUpdate()">
+            <i class="fas fa-save"></i>
+            <span class="btn-text">Update</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== NEW: RESCHEDULE INTERVIEW POPUP (#reschedulePopup) ==================== -->
+  <div class="popup-overlay" id="reschedulePopup">
+    <div class="popup-content glass-card">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-200 dark:border-slate-800">
+        <h3 class="font-display font-extrabold text-lg text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fas fa-calendar-plus text-amber-500"></i> Reschedule Interview
+        </h3>
+        <button type="button" onclick="closeReschedulePopup()" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Candidate Summary Box -->
+      <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 mb-4 space-y-1.5 text-xs">
+        <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">Candidate:</strong> <span id="rescheduleCandidateName" class="font-bold text-slate-900 dark:text-white text-right"></span></p>
+        <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">Role & Client:</strong> <span id="rescheduleRoleCompany" class="font-semibold text-blue-600 dark:text-blue-400 text-right"></span></p>
+        <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">Current Slot:</strong> <span id="reschedulePreviousSlot" class="font-semibold text-amber-700 dark:text-amber-300 text-right"></span></p>
+      </div>
+
+      <div class="space-y-4">
+        <!-- New Date & Time -->
+        <div class="form-group">
+          <div class="flex items-center justify-between mb-1">
+            <label for="rescheduleDateTimeInput" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              <i class="fas fa-clock text-amber-500 mr-1"></i> New Date & Time <span class="text-rose-500">*</span>
+            </label>
+            <span class="text-[10px] font-semibold text-slate-400">Required</span>
+          </div>
+          <input
+            type="datetime-local"
+            id="rescheduleDateTimeInput"
+            class="form-control-input"
+            required
+          />
+        </div>
+
+        <!-- Interview Mode -->
+        <div class="form-group">
+          <div class="flex items-center justify-between mb-1">
+            <label for="rescheduleModeDropdown" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              <i class="fas fa-video text-purple-500 mr-1"></i> Interview Mode <span class="text-rose-500">*</span>
+            </label>
+            <span class="text-[10px] font-semibold text-slate-400">Required</span>
+          </div>
+          <select id="rescheduleModeDropdown" class="form-control-input">
+            <option value="Online">Online (Video)</option>
+            <option value="Physical">Physical (In-Office)</option>
+          </select>
+        </div>
+
+        <!-- Meeting Link (Optional) -->
+        <div class="form-group">
+          <div class="flex items-center justify-between mb-1">
+            <label for="rescheduleLinkInput" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              <i class="fas fa-link text-blue-500 mr-1"></i> Meeting Link (Optional)
+            </label>
+            <span class="text-[10px] font-semibold text-slate-400">https://</span>
+          </div>
+          <input
+            type="url"
+            id="rescheduleLinkInput"
+            placeholder="https://meet.google.com/... or Zoom link"
+            class="form-control-input"
+          />
+        </div>
+
+        <!-- Reschedule Note / Comment -->
+        <div class="form-group">
+          <div class="flex items-center justify-between mb-1">
+            <label for="rescheduleCommentBox" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              <i class="fas fa-comment-dots text-emerald-500 mr-1"></i> Reschedule Note / Remarks
+            </label>
+            <span class="text-[10px] font-semibold text-slate-400">Optional</span>
+          </div>
+          <textarea
+            id="rescheduleCommentBox"
+            rows="2"
+            maxlength="300"
+            oninput="validateCommentInput(this)"
+            placeholder="Reason for rescheduling or updated instructions..."
+            class="form-control-input"
+          ></textarea>
+        </div>
+
+        <p id="rescheduleErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-semibold hidden"></p>
+      </div>
+
       <div class="popup-buttons flex items-center justify-end gap-2.5 mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
-        <button type="button" class="btn btn-secondary px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold" onclick="closePopup()">
+        <button type="button" class="btn btn-secondary px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold" onclick="closeReschedulePopup()">
           <i class="fas fa-times"></i> Cancel
         </button>
-        <button type="button" class="btn btn-primary px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold shadow-lg shadow-blue-600/25" id="statusSubmitButton" onclick="submitFinalStatusUpdate()">
-          <i class="fas fa-save"></i>
-          <span class="btn-text">Update</span>
+        <button type="button" class="btn px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold shadow-lg shadow-emerald-500/25" id="rescheduleSubmitButton" onclick="submitRescheduleInterview()">
+          <i class="fab fa-whatsapp text-sm"></i>
+          <span>Reschedule & Send WhatsApp</span>
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Mobile-First Bottom Quick Navigation Bar (Thumb-friendly on phones) -->
   <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 glass-card border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
     <button type="button" onclick="goHome()" class="flex flex-col items-center gap-0.5 text-amber-600 dark:text-amber-400 text-[10px] font-bold">
       <i class="fas fa-house text-sm"></i>
@@ -1007,7 +1111,7 @@
       const cleaned = textareaEl.value.replace(/[<>]/g, '').slice(0, 300);
       if (textareaEl.value !== cleaned) textareaEl.value = cleaned;
       const counter = document.getElementById('commentCharCounter');
-      if (counter) counter.textContent = `${cleaned.length}/300`;
+      if (counter && textareaEl.id === 'commentBox') counter.textContent = `${cleaned.length}/300`;
       return true;
     }
 
@@ -1127,6 +1231,26 @@
       closeCandidateOptionsPopup();
     }
 
+    // NEW: Send WhatsApp Reschedule Confirmation Message
+    function sendWhatsAppRescheduleConfirmation(candidate, newDateTimeISO, newMode, newInviteLink) {
+      if (!candidate) return;
+      const mobileRaw = candidate.Mobile || candidate.mobile || candidate.Phone || candidate.phone || '';
+      const digitsOnly = mobileRaw.toString().replace(/\D/g, '').slice(-10);
+      if (digitsOnly.length !== 10) {
+        showToast('Interview rescheduled, but candidate does not have a valid 10-digit mobile number for WhatsApp.', 'info');
+        return;
+      }
+
+      const recruiterName = sessionStorage.getItem('userName') || 'Recruiter';
+      const formattedNewDT = formatInterviewDateTime(newDateTimeISO);
+      const modeStr = (newMode || 'Online').toUpperCase();
+      const safeLink = getSafeHttpsUrl(newInviteLink);
+
+      const msg = `*Hi ${candidate.name || 'Candidate'}*,\n\nYour interview for the position of *${candidate.position || 'Open Role'}* at *${candidate.company || 'our client'}* has been *rescheduled*.\n\n📅 *New Date & Time:* ${formattedNewDT}\n💼 *Interview Mode:* ${modeStr}${safeLink ? `\n🔗 *Meeting Link:* ${safeLink}` : ''}\n\n*_Kindly acknowledge this message and confirm your availability for the rescheduled slot._*\n\n*Best regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
+
+      window.open(`https://wa.me/91${digitsOnly}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+    }
+
     // ==================== PRESERVED AUTHENTICATION & CORE LOGIC ====================
     window.addEventListener('load', function() {
       // Ensure Light Mode is the default unless dark was chosen in session
@@ -1221,6 +1345,8 @@
     let allScheduledInterviews = [];
     let filteredInterviews = [];
     let currentCandidateForPopup = null;
+    let currentCandidateForStatusPopup = null;
+    let currentCandidateForReschedule = null;
     let currentEmail = "";
     let currentCandidateId = "";
 
@@ -1326,6 +1452,7 @@
 
     // Status update functions
     function openPopup(candidate) {
+      currentCandidateForStatusPopup = candidate;
       currentEmail = candidate.email;
       currentCandidateId = candidate.id || "";
 
@@ -1371,6 +1498,148 @@
     function closePopup() {
       const popup = getElement("popup");
       if (popup) popup.style.display = "none";
+      currentCandidateForStatusPopup = null;
+    }
+
+    function switchFromStatusToReschedule() {
+      const cand = currentCandidateForStatusPopup;
+      closePopup();
+      if (cand) {
+        openReschedulePopup(cand);
+      }
+    }
+
+    // ==================== NEW: RESCHEDULE INTERVIEW POPUP FUNCTIONS ====================
+    function toLocalDatetimeInputString(dateVal) {
+      if (!dateVal) return "";
+      try {
+        const d = new Date(dateVal);
+        if (isNaN(d.getTime())) return "";
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      } catch (e) {
+        return "";
+      }
+    }
+
+    function openReschedulePopup(candidate) {
+      if (!candidate) {
+        showToast("No candidate selected for rescheduling", "error");
+        return;
+      }
+      currentCandidateForReschedule = candidate;
+
+      const nameEl = document.getElementById("rescheduleCandidateName");
+      const roleCompEl = document.getElementById("rescheduleRoleCompany");
+      const prevSlotEl = document.getElementById("reschedulePreviousSlot");
+      const dtInput = document.getElementById("rescheduleDateTimeInput");
+      const modeSelect = document.getElementById("rescheduleModeDropdown");
+      const linkInput = document.getElementById("rescheduleLinkInput");
+      const commentInput = document.getElementById("rescheduleCommentBox");
+      const errMsg = document.getElementById("rescheduleErrorMsg");
+      const popup = document.getElementById("reschedulePopup");
+
+      if (nameEl) nameEl.textContent = candidate.name || "Candidate";
+      if (roleCompEl) roleCompEl.textContent = `${candidate.position || '-'} • ${candidate.company || '-'}`;
+      if (prevSlotEl) prevSlotEl.textContent = formatInterviewDateTime(candidate.interview_date);
+
+      if (dtInput) {
+        dtInput.value = toLocalDatetimeInputString(candidate.interview_date);
+      }
+      if (modeSelect) {
+        const existingMode = (candidate.interview_mode || 'Online').toLowerCase();
+        modeSelect.value = existingMode === 'physical' ? 'Physical' : 'Online';
+      }
+      if (linkInput) {
+        linkInput.value = candidate.invite_link || "";
+      }
+      if (commentInput) {
+        commentInput.value = candidate.comment || "";
+      }
+      if (errMsg) errMsg.classList.add('hidden');
+      if (popup) popup.style.display = "flex";
+    }
+
+    function closeReschedulePopup() {
+      const popup = document.getElementById("reschedulePopup");
+      if (popup) popup.style.display = "none";
+      currentCandidateForReschedule = null;
+    }
+
+    async function submitRescheduleInterview() {
+      if (!currentCandidateForReschedule) {
+        showToast("No candidate selected.", "error");
+        return;
+      }
+
+      const dtInput = document.getElementById("rescheduleDateTimeInput");
+      const modeSelect = document.getElementById("rescheduleModeDropdown");
+      const linkInput = document.getElementById("rescheduleLinkInput");
+      const commentInput = document.getElementById("rescheduleCommentBox");
+      const errMsg = document.getElementById("rescheduleErrorMsg");
+      const submitBtn = document.getElementById("rescheduleSubmitButton");
+
+      const rawDt = dtInput ? dtInput.value.trim() : "";
+      const newMode = modeSelect ? modeSelect.value : "Online";
+      const newLink = linkInput ? linkInput.value.trim() : "";
+      const newComment = commentInput ? commentInput.value.trim() : "";
+
+      if (!rawDt || isNaN(new Date(rawDt).getTime())) {
+        if (errMsg) {
+          errMsg.textContent = "Please choose a valid new interview date and time.";
+          errMsg.classList.remove("hidden");
+        }
+        showToast("Please select a valid new interview date and time.", "error");
+        return;
+      }
+
+      const newDateISO = new Date(rawDt).toISOString();
+      const targetCandidate = { ...currentCandidateForReschedule };
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Rescheduling...</span>';
+      }
+
+      try {
+        const updatePayload = {
+          interview_date: newDateISO,
+          interview_mode: newMode,
+          comment: newComment
+        };
+        if (newLink) {
+          updatePayload.invite_link = newLink;
+        }
+
+        let query = supabaseClient
+          .from('candidates')
+          .update(updatePayload);
+
+        if (targetCandidate.id) {
+          query = query.eq('id', targetCandidate.id);
+        } else {
+          query = query.eq('email', targetCandidate.email);
+        }
+
+        const { error } = await query;
+        if (error) throw error;
+
+        showToast("Interview rescheduled in Supabase! Opening WhatsApp confirmation...", "success");
+        closeReschedulePopup();
+
+        // Automatically open WhatsApp with the Reschedule Confirmation message
+        sendWhatsAppRescheduleConfirmation(targetCandidate, newDateISO, newMode, newLink || targetCandidate.invite_link);
+
+        await loadScheduledInterviews();
+      } catch (err) {
+        console.error("Reschedule failed:", err);
+        showToast("Failed to reschedule: " + err.message, "error");
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fab fa-whatsapp text-sm"></i> <span>Reschedule & Send WhatsApp</span>';
+        }
+      }
     }
 
     function updateFinalStatusOptions() {
@@ -1438,8 +1707,7 @@
           .update({
             status: status,
             final_status: finalStatus,
-            comment: comment,
-            updated_at: new Date().toISOString()
+            comment: comment
           });
 
         if (currentCandidateId) {
@@ -1584,7 +1852,7 @@
       if (upcomingEl) upcomingEl.textContent = upcomingCount;
       if (overdueEl) overdueEl.textContent = overdueCount;
       if (modeSplitEl) modeSplitEl.textContent = `${onlineCount} Onl • ${physicalCount} Phy`;
-      if (showingBadge) showingBadge.textContent = `${totalInterviews} Scheduled`;
+      if (showingBadge) showingBadge.textContent = `${totalInterviews} Selected`;
     }
 
     // ==================== ONE-VIEW HIGH-DENSITY TABLE & TIMELINE CARD RENDERER ====================
@@ -1597,7 +1865,7 @@
       if (cardsContainer) cardsContainer.innerHTML = "";
 
       if (filteredInterviews.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="9" class="py-12 text-center text-slate-400"><i class="fas fa-calendar-times text-lg mb-2"></i><br>No scheduled interviews found</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="9" class="py-12 text-center text-slate-400"><i class="fas fa-calendar-times text-lg mb-2"></i><br>No scheduled interviews found for Selected candidates</td></tr>';
         if (cardsContainer) {
           cardsContainer.innerHTML = '<div class="col-span-full glass-card rounded-3xl p-10 text-center text-slate-400">No scheduled interviews found matching current filters</div>';
         }
@@ -1667,6 +1935,9 @@
               <button type="button" onclick="openPopup(filteredInterviews[${index}])" class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white text-[11px] font-bold transition-colors" title="Update Outcome Status">
                 <i class="fas fa-pen-to-square"></i>
               </button>
+              <button type="button" onclick="openReschedulePopup(filteredInterviews[${index}])" class="px-2.5 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-600 dark:text-amber-400 hover:text-white text-[11px] font-bold transition-colors" title="Reschedule Interview & Send WhatsApp">
+                <i class="fas fa-calendar-plus"></i>
+              </button>
               <button type="button" onclick="sendWhatsAppInterviewReminder(filteredInterviews[${index}])" class="px-2.5 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white text-[11px] font-bold transition-colors" title="Send WhatsApp Interview Reminder">
                 <i class="fab fa-whatsapp"></i>
               </button>
@@ -1714,11 +1985,14 @@
                 ${safeMeetingUrl ? `<a href="${escapeHtml(safeMeetingUrl)}" target="_blank" rel="noopener noreferrer" class="px-2 py-1 rounded-lg bg-purple-500/15 text-purple-700 dark:text-purple-300 text-[10px] font-bold">Join</a>` : ''}
               </div>
               <div class="flex items-center gap-1.5">
-                <button type="button" onclick="openPopup(filteredInterviews[${index}])" class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold">
+                <button type="button" onclick="openPopup(filteredInterviews[${index}])" class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold" title="Update Status">
                   <i class="fas fa-edit mr-1"></i>Status
                 </button>
-                <button type="button" onclick="sendWhatsAppInterviewReminder(filteredInterviews[${index}])" class="px-2.5 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold">
-                  <i class="fab fa-whatsapp mr-1"></i>Remind
+                <button type="button" onclick="openReschedulePopup(filteredInterviews[${index}])" class="px-2.5 py-1.5 rounded-lg bg-amber-500/15 text-amber-600 dark:text-amber-400 text-xs font-bold" title="Reschedule Interview">
+                  <i class="fas fa-calendar-plus mr-1"></i>Reschedule
+                </button>
+                <button type="button" onclick="sendWhatsAppInterviewReminder(filteredInterviews[${index}])" class="px-2.5 py-1.5 rounded-lg bg-emerald-500 text-white text-xs font-bold" title="Send Reminder">
+                  <i class="fab fa-whatsapp"></i>
                 </button>
               </div>
             </div>
@@ -1742,13 +2016,15 @@
       updateStats();
     }
 
-    // ==================== SUPABASE LOAD SCHEDULED INTERVIEWS ====================
+    // ==================== SUPABASE LOAD SCHEDULED INTERVIEWS (ONLY STATUS = "Selected") ====================
     async function loadScheduledInterviews() {
       try {
+        // Fetch candidates that have an interview_date and Status = 'Selected'
         const { data, error } = await supabaseClient
           .from('candidates')
           .select('*')
-          .not('interview_date', 'is', null);
+          .not('interview_date', 'is', null)
+          .ilike('status', 'Selected');
 
         if (error) {
           throw error;
@@ -1761,9 +2037,14 @@
         }));
 
         const roleFilteredCandidates = filterCandidatesByUserType(normalizedData);
+
+        // Strictly keep only candidates with a valid interview_date AND status === "Selected" (excludes "Rejected" & "On Hold")
         const userCandidates = roleFilteredCandidates.filter(c => {
-          const hasInterviewDate = c.interview_date && c.interview_date.toString().trim() !== "";
-          return hasInterviewDate;
+          const rawDate = c.interview_date ? c.interview_date.toString().trim() : "";
+          const hasValidDate = rawDate !== "" && !isNaN(new Date(rawDate).getTime());
+          const statusNormalized = (c.status || "").toString().trim().toLowerCase();
+          const isSelectedOnly = statusNormalized === "selected";
+          return hasValidDate && isSelectedOnly;
         });
 
         allScheduledInterviews = userCandidates.sort((a, b) => {
@@ -1800,6 +2081,20 @@
           }
           openPopup(currentCandidateForPopup);
           closeCandidateOptionsPopup();
+        });
+      }
+
+      // NEW: Event listener for Reschedule button inside Candidate Quick Actions Popup
+      const btnRescheduleInterview = document.getElementById('btnRescheduleInterview');
+      if (btnRescheduleInterview) {
+        btnRescheduleInterview.addEventListener('click', () => {
+          if (!currentCandidateForPopup) {
+            showToast('No candidate selected', 'error');
+            return;
+          }
+          const cand = currentCandidateForPopup;
+          closeCandidateOptionsPopup();
+          openReschedulePopup(cand);
         });
       }
 
