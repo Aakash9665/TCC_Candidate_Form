@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<!-- Default theme is explicitly LIGHT (removed "dark" class from html root) -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>TCC Candidate Registration</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS Client SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -32,21 +29,13 @@
         radial-gradient(circle at 90% 85%, rgba(16, 185, 129, 0.12) 0%, transparent 45%),
         radial-gradient(circle at 50% 40%, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
     }
-
     .dark {
       --bg-gradient:
         radial-gradient(circle at 10% 15%, rgba(59, 130, 246, 0.22) 0%, transparent 45%),
         radial-gradient(circle at 90% 85%, rgba(16, 185, 129, 0.18) 0%, transparent 45%),
         radial-gradient(circle at 50% 40%, rgba(99, 102, 241, 0.12) 0%, transparent 60%);
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
@@ -54,8 +43,6 @@
       overflow-x: hidden;
       transition: background-color 0.3s ease, color 0.3s ease;
     }
-
-    /* Animated Ambient Orbs */
     .orb {
       position: fixed;
       border-radius: 50%;
@@ -65,34 +52,15 @@
       opacity: 0.32;
       animation: floatOrb 18s ease-in-out infinite alternate;
     }
-
-    .dark .orb {
-      opacity: 0.42;
-    }
-
-    .orb-1 {
-      width: 300px;
-      height: 300px;
-      background: linear-gradient(135deg, #3b82f6, #6366f1);
-      top: -80px;
-      left: -80px;
-    }
-
-    .orb-2 {
-      width: 260px;
-      height: 260px;
-      background: linear-gradient(135deg, #10b981, #06b6d4);
-      bottom: -60px;
-      right: -60px;
-      animation-delay: -7s;
-    }
+    .dark .orb { opacity: 0.42; }
+    .orb-1 { width: 300px; height: 300px; background: linear-gradient(135deg, #3b82f6, #6366f1); top: -80px; left: -80px; }
+    .orb-2 { width: 260px; height: 260px; background: linear-gradient(135deg, #10b981, #06b6d4); bottom: -60px; right: -60px; animation-delay: -7s; }
 
     @keyframes floatOrb {
       0% { transform: translate(0, 0) scale(1); }
       50% { transform: translate(24px, -28px) scale(1.06); }
       100% { transform: translate(-18px, 20px) scale(0.95); }
     }
-
     .glass-card {
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(22px) saturate(180%);
@@ -100,13 +68,11 @@
       border: 1px solid rgba(226, 232, 240, 0.9);
       box-shadow: 0 14px 34px -10px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
     }
-
     .dark .glass-card {
       background: rgba(15, 23, 42, 0.84);
       border: 1px solid rgba(255, 255, 255, 0.09);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
     }
-
     .form-input {
       width: 100%;
       padding: 11px 14px;
@@ -117,57 +83,31 @@
       font-size: 13.5px;
       transition: all 0.2s ease;
     }
-
     .dark .form-input {
       background: rgba(30, 41, 59, 0.8);
       border-color: rgba(255, 255, 255, 0.12);
       color: #f8fafc;
     }
-
     .form-input:focus {
       outline: none;
       border-color: #3b82f6;
       box-shadow: 0 0 0 3.5px rgba(59, 130, 246, 0.15);
     }
+    .form-input:disabled { opacity: 0.5; cursor: not-allowed; }
+    .input-valid { border-color: #10b981 !important; }
+    .input-invalid { border-color: #f43f5e !important; }
 
-    .form-input:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    /* Input validation states */
-    .input-valid {
-      border-color: #10b981 !important;
-    }
-
-    .input-invalid {
-      border-color: #f43f5e !important;
-    }
-
-    #positionDiv {
-      display: none;
-      animation: slideDown 0.3s ease-out;
-    }
-
+    #positionDiv { display: none; animation: slideDown 0.25s ease-out; }
     @keyframes slideDown {
       from { opacity: 0; transform: translateY(-8px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes fadeSlideUp {
       from { opacity: 0; transform: translateY(14px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    .animate-in { animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
 
-    .animate-in {
-      animation: fadeSlideUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-    }
-
-    .delay-1 { animation-delay: 0.05s; }
-    .delay-2 { animation-delay: 0.10s; }
-    .delay-3 { animation-delay: 0.15s; }
-
-    /* Popup Overlay Preserved Classes */
     .popup-overlay {
       position: fixed;
       inset: 0;
@@ -180,33 +120,25 @@
       padding: 16px;
       overflow-y: auto;
     }
-
     .popup {
       width: 100%;
       max-width: 460px;
       border-radius: 24px;
       padding: 26px;
       position: relative;
-      animation: popupScale 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      animation: popupScale 0.25s cubic-bezier(0.22, 1, 0.36, 1);
     }
-
     .popup.manage-popup {
       max-width: 680px;
       max-height: 90vh;
       overflow-y: auto;
     }
-
     @keyframes popupScale {
       from { opacity: 0; transform: translateY(20px) scale(0.95); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
+    .loading { opacity: 0.55; pointer-events: none; }
 
-    .loading {
-      opacity: 0.55;
-      pointer-events: none;
-    }
-
-    /* Dynamic File Upload Styles for JS-generated inputs */
     .file-input-group {
       display: flex;
       flex-direction: column;
@@ -217,11 +149,7 @@
       border: 1px dashed rgba(16, 185, 129, 0.35);
       margin-bottom: 8px;
     }
-
-    .file-input {
-      display: none;
-    }
-
+    .file-input { display: none; }
     .file-input-label {
       display: inline-flex;
       align-items: center;
@@ -237,42 +165,21 @@
       color: #059669;
       transition: all 0.2s ease;
     }
-
-    .dark .file-input-label {
-      color: #10b981;
-    }
-
-    .file-input-label:hover {
-      background: rgba(16, 185, 129, 0.25);
-    }
-
-    .file-status {
-      font-size: 11px;
-      color: #64748b;
-      text-align: center;
-    }
-
-    .file-status.success {
-      color: #10b981;
-      font-weight: 600;
-    }
-
-    .file-status.error {
-      color: #ef4444;
-      font-weight: 600;
-    }
+    .dark .file-input-label { color: #10b981; }
+    .file-input-label:hover { background: rgba(16, 185, 129, 0.25); }
+    .file-status { font-size: 11px; color: #64748b; text-align: center; }
+    .file-status.success { color: #10b981; font-weight: 600; }
+    .file-status.error { color: #ef4444; font-weight: 600; }
   </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-20 sm:pb-10 selection:bg-blue-500 selection:text-white relative">
 
-  <!-- Ambient Floating Orbs -->
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
-  <!-- Custom Toast Container -->
   <div id="toastContainer" class="fixed bottom-16 sm:bottom-5 right-4 sm:right-5 z-[2000] flex flex-col gap-2.5 max-w-sm w-full px-3 pointer-events-none"></div>
 
-  <!-- Custom Confirmation Dialog Modal (Replaces native confirm()) -->
+  <!-- Confirmation Dialog Modal -->
   <div id="confirmDialogModal" class="fixed inset-0 z-[2100] bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="glass-card rounded-3xl max-w-md w-full p-6 text-center">
       <div class="w-12 h-12 rounded-2xl bg-rose-500/15 text-rose-500 flex items-center justify-center mx-auto mb-4 text-xl">
@@ -291,11 +198,10 @@
     </div>
   </div>
 
-  <!-- Sticky Top Navigation Header -->
+  <!-- Top Navigation Header -->
   <header class="sticky top-0 z-40 glass-card border-b border-slate-200/80 dark:border-slate-800/80 px-3 sm:px-6 py-2.5 sm:py-3">
     <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-3">
       <div class="flex items-center gap-2.5 sm:gap-3">
-        <!-- Home Button (Preserves .home-button and onclick="goHome()") -->
         <button
           class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0"
           onclick="goHome()"
@@ -312,17 +218,13 @@
             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
               Entry Module
             </span>
-            <span class="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25" title="Power Automate webhook is disabled and bypassed">
-              <i class="fas fa-bolt-slash text-[9px]"></i> PA Bypassed
-            </span>
           </div>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-            Direct Supabase Entry & Instant WhatsApp Confirmation (Power Automate Bypassed)
+            Direct Supabase Entry & Instant WhatsApp Confirmation
           </p>
         </div>
       </div>
 
-      <!-- Progress Pill & Controls -->
       <div class="flex items-center gap-2">
         <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
           <span class="text-[11px] font-semibold text-slate-500">Readiness</span>
@@ -356,9 +258,8 @@
 
   <main class="max-w-7xl mx-auto px-3 sm:px-6 pt-4 sm:pt-5 relative z-10">
 
-    <!-- ==================== ONE-VIEW KPI & CONTEXT RIBBON (6 Cards in One Glance) ==================== -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 mb-5 animate-in">
-      <!-- KPI 1: Client Companies -->
+    <!-- KPI & CONTEXT RIBBON -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 mb-5 animate-in">
       <div class="glass-card p-3 rounded-2xl flex items-center gap-2.5">
         <div class="w-9 h-9 rounded-xl bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
           <i class="fas fa-building text-sm"></i>
@@ -369,7 +270,6 @@
         </div>
       </div>
 
-      <!-- KPI 2: Total Open Positions -->
       <div class="glass-card p-3 rounded-2xl flex items-center gap-2.5">
         <div class="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
           <i class="fas fa-briefcase text-sm"></i>
@@ -380,7 +280,6 @@
         </div>
       </div>
 
-      <!-- KPI 3: Total Candidates in DB -->
       <div class="glass-card p-3 rounded-2xl flex items-center gap-2.5">
         <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
           <i class="fas fa-database text-sm"></i>
@@ -391,7 +290,6 @@
         </div>
       </div>
 
-      <!-- KPI 4: Session Submissions -->
       <div class="glass-card p-3 rounded-2xl flex items-center gap-2.5">
         <div class="w-9 h-9 rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
           <i class="fas fa-paper-plane text-sm"></i>
@@ -402,19 +300,7 @@
         </div>
       </div>
 
-      <!-- KPI 5: Power Automate Status -->
-      <div class="glass-card p-3 rounded-2xl border-amber-500/30 bg-amber-500/5 flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
-          <i class="fas fa-forward-fast text-xs"></i>
-        </div>
-        <div class="min-w-0">
-          <p class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300 truncate">Power Automate</p>
-          <p class="text-xs font-extrabold text-amber-700 dark:text-amber-400 truncate">BYPASSED</p>
-        </div>
-      </div>
-
-      <!-- KPI 6: Active Recruiter -->
-      <div class="glass-card p-3 rounded-2xl flex items-center gap-2.5">
+      <div class="glass-card p-3 rounded-2xl flex items-center gap-2.5 col-span-2 sm:col-span-1">
         <div class="w-9 h-9 rounded-xl bg-teal-500/15 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
           <i class="fas fa-user-shield text-sm"></i>
         </div>
@@ -427,10 +313,9 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
-      <!-- ==================== LEFT / MAIN COLUMN: REGISTRATION FORM (#jobForm) ==================== -->
-      <div class="lg:col-span-7 xl:col-span-8 animate-in delay-1" id="formTopAnchor">
+      <!-- LEFT COLUMN: REGISTRATION FORM (#jobForm) -->
+      <div class="lg:col-span-7 xl:col-span-8 animate-in" id="formTopAnchor">
         <form id="jobForm" class="glass-card rounded-3xl p-4 sm:p-7 relative overflow-hidden" novalidate>
-          <!-- Top Gradient Highlight -->
           <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-emerald-500"></div>
 
           <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-slate-200/80 dark:border-slate-800/80">
@@ -458,14 +343,13 @@
             </div>
           </div>
 
-          <!-- Section 1: Personal & Contact Info (With Real-Time Condition Checks) -->
+          <!-- Section 1: Personal & Contact Info -->
           <div class="mb-5">
             <p class="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-3 flex items-center gap-1.5">
               <i class="fas fa-address-card"></i>
               1. Personal & Contact Information
             </p>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <!-- Full Name -->
               <div class="sm:col-span-2">
                 <div class="flex items-center justify-between mb-1">
                   <label for="name" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -487,7 +371,6 @@
                 <p id="nameErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
               </div>
 
-              <!-- Email Address -->
               <div>
                 <div class="flex items-center justify-between mb-1">
                   <label for="email" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -509,7 +392,6 @@
                 <p id="emailErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
               </div>
 
-              <!-- Contact Number -->
               <div>
                 <div class="flex items-center justify-between mb-1">
                   <label for="contact" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -538,21 +420,19 @@
             </div>
           </div>
 
-          <!-- Section 2: Compensation & Experience (With Condition Validation) -->
+          <!-- Section 2: Compensation & Experience -->
           <div class="mb-5 pt-4 border-t border-slate-200/70 dark:border-slate-800/80">
             <div class="flex items-center justify-between mb-3">
               <p class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                 <i class="fas fa-indian-rupee-sign"></i>
                 2. Compensation & Experience
               </p>
-              <!-- Live Calculated Hike Badge -->
               <span id="liveHikeBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 hidden">
                 Hike: 0%
               </span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <!-- Current CTC -->
               <div>
                 <div class="flex items-center justify-between mb-1">
                   <label for="currentCTC" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -580,7 +460,6 @@
                 <p id="currentCtcErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
               </div>
 
-              <!-- Expected CTC -->
               <div>
                 <div class="flex items-center justify-between mb-1">
                   <label for="expectedCTC" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -614,7 +493,6 @@
                 </div>
               </div>
 
-              <!-- Total Experience -->
               <div>
                 <div class="flex items-center justify-between mb-1">
                   <label for="experience" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -648,7 +526,6 @@
                 </div>
               </div>
 
-              <!-- Notice Period -->
               <div>
                 <div class="flex items-center justify-between mb-1">
                   <label for="noticePeriod" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -730,7 +607,6 @@
             </div>
           </div>
 
-          <!-- Action Buttons (Preserves #submitBtn and #manageCompanyBtn) -->
           <div class="flex flex-col sm:flex-row gap-3 pt-2">
             <button
               type="submit"
@@ -751,7 +627,7 @@
             </button>
           </div>
 
-          <!-- ==================== WHATSAPP POPUP (#popupOverlay) ==================== -->
+          <!-- WHATSAPP POPUP (#popupOverlay) -->
           <div class="popup-overlay" id="popupOverlay">
             <div class="popup glass-card text-center">
               <div class="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4">
@@ -760,8 +636,8 @@
               <h3 class="font-display font-extrabold text-xl text-slate-900 dark:text-white mb-1.5">
                 <i class="fab fa-whatsapp text-emerald-500 mr-1"></i> Application Submitted!
               </h3>
-              <p class="text-[11px] font-semibold text-amber-600 dark:text-amber-400 mb-2">
-                Saved directly to Supabase • Power Automate Flow Bypassed
+              <p class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mb-2">
+                Saved directly to Supabase
               </p>
               <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-6">
                 Candidate profile has been logged. Click below to open WhatsApp with the pre-filled acknowledgement message.
@@ -779,7 +655,7 @@
             </div>
           </div>
 
-          <!-- ==================== MANAGE COMPANIES POPUP (#manageOverlay) ==================== -->
+          <!-- MANAGE COMPANIES POPUP (#manageOverlay) -->
           <div class="popup-overlay" id="manageOverlay">
             <div class="popup manage-popup glass-card text-left">
               <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200 dark:border-slate-800">
@@ -903,14 +779,14 @@
         </form>
       </div>
 
-      <!-- ==================== RIGHT SIDEBAR: ONE-VIEW ANALYTICS, WHATSAPP PREVIEW & LIVE DB FEED ==================== -->
-      <div class="lg:col-span-5 xl:col-span-4 space-y-4 animate-in delay-2">
+      <!-- RIGHT SIDEBAR: ANALYTICS, WHATSAPP PREVIEW & LIVE DB FEED -->
+      <div class="lg:col-span-5 xl:col-span-4 space-y-4 animate-in">
 
-        <!-- Card 1: One-View Live Candidate Compensation & Profile Matrix -->
+        <!-- Card 1: Live Candidate Snapshot -->
         <div class="glass-card rounded-3xl p-4 sm:p-5">
           <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-200/80 dark:border-slate-800">
             <h3 class="font-display font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-2">
-              <i class="fas fa-chart-Simple text-indigo-500"></i>
+              <i class="fas fa-chart-simple text-indigo-500"></i>
               Live Candidate Snapshot
             </h3>
             <span id="matrixStatusBadge" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
@@ -971,22 +847,10 @@
             </div>
           </div>
 
-          <div class="p-3.5 rounded-2xl bg-[#e7ffdb] dark:bg-emerald-950/50 border border-emerald-500/20 text-slate-800 dark:text-slate-200 text-xs leading-relaxed whitespace-pre-line font-sans shadow-inner max-h-60 overflow-y-auto" id="liveWaPreviewBox">
-*Hi Candidate*,
-
-As per our recent discussion regarding the position of *Position*, we have successfully submitted your profile for shortlisting to our client, *Company*, with the following details:
-
-*Current CTC : -*
-*Expected CTC : -*
-*Notice Period : -*
-
-We have also shared the *Job Description* with you via email.
-
-*_Kindly acknowledge this and share your updated resume for further processing._*
-          </div>
+          <div class="p-3.5 rounded-2xl bg-[#e7ffdb] dark:bg-emerald-950/50 border border-emerald-500/20 text-slate-800 dark:text-slate-200 text-xs leading-relaxed whitespace-pre-line font-sans shadow-inner max-h-60 overflow-y-auto" id="liveWaPreviewBox"></div>
         </div>
 
-        <!-- Card 3: Session Submissions + Recent Database Feed in One View -->
+        <!-- Card 3: Session Submissions + Recent Database Feed -->
         <div class="glass-card rounded-3xl p-4 sm:p-5">
           <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-200/80 dark:border-slate-800">
             <h3 class="font-display font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-2">
@@ -996,12 +860,10 @@ We have also shared the *Job Description* with you via email.
             <span id="sessionCountBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-600 dark:text-blue-400">0</span>
           </div>
 
-          <!-- Session Submissions Container -->
           <div id="recentSubmissionsList" class="space-y-2 text-xs text-slate-500 dark:text-slate-400 max-h-48 overflow-y-auto">
             <p class="text-center py-2 italic text-[11px]">Candidates submitted in this session will appear here.</p>
           </div>
 
-          <!-- Live Recent Database Entries (One-View Duplicate Guard & Visibility) -->
           <div class="mt-3 pt-3 border-t border-slate-200/70 dark:border-slate-800">
             <div class="flex items-center justify-between mb-2">
               <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Latest in Supabase DB</span>
@@ -1020,7 +882,7 @@ We have also shared the *Job Description* with you via email.
     </div>
   </main>
 
-  <!-- Mobile-First Bottom Quick Action Bar (Thumb-friendly navigation on phones) -->
+  <!-- Mobile Bottom Quick Action Bar -->
   <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 glass-card border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
     <button type="button" onclick="goHome()" class="flex flex-col items-center gap-0.5 text-blue-600 dark:text-blue-400 text-[10px] font-bold">
       <i class="fas fa-house text-sm"></i>
@@ -1045,79 +907,39 @@ We have also shared the *Job Description* with you via email.
   </nav>
 
   <script>
-    // ==================== SUPABASE CONFIGURATION ====================
     const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0';
-
-    // Initialize Supabase Client
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // PRESERVED GOOGLE APPS SCRIPT WEB APP URL (Used strictly for Google Drive JD PDF file uploads/deletions)
+    // Google Apps Script endpoint for Google Drive JD PDF file uploads/deletions
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxyo19lD_6WHXwCkpcIXrfV38pAobEjiO6sYhYBFh-nId-YWdGHNPJF_Rh9IQBchSd/exec';
 
-    // ==================== REQUIREMENT #5: POWER AUTOMATE BYPASS ====================
-    window.POWER_AUTOMATE_ENABLED = false;
-    window.BYPASS_POWER_AUTOMATE = true;
-    sessionStorage.setItem('powerAutomateEnabled', 'false');
-    sessionStorage.setItem('bypassPowerAutomate', 'true');
+    let companies = {};
+    let newCompanyFiles = {};
+    let existingCompanyFiles = {};
+    const sessionSubmissions = [];
 
-    // Global fetch interceptor to ensure any Power Automate / Logic App webhook is safely bypassed
-    const originalFetch = window.fetch.bind(window);
-    window.fetch = async function(resource, config) {
-      const urlStr = typeof resource === 'string' ? resource : (resource?.url || '');
-      if (
-        urlStr.includes('powerplatform.com') ||
-        urlStr.includes('powerautomate') ||
-        urlStr.includes('logic.azure.com') ||
-        urlStr.includes('flow.microsoft.com')
-      ) {
-        console.info('[Power Automate Bypassed] Webhook call intercepted and bypassed:', urlStr);
-        return new Response(
-          JSON.stringify({ success: true, bypassed: true, message: 'Power Automate is disabled and bypassed.' }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
-        );
-      }
-      return originalFetch(resource, config);
-    };
-
-    // ==================== REQUIREMENT #1: SECURITY UTILITIES ====================
-    function escapeHTML(str) {
-      if (str === null || str === undefined) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    // Verify PDF magic header bytes (%PDF-) to prevent disguised malicious uploads
     function verifyPdfMagicHeader(file) {
       return new Promise((resolve) => {
         try {
-          const slice = file.slice(0, 5);
           const reader = new FileReader();
-          reader.onload = function(e) {
-            const bytes = new Uint8Array(e.target.result);
-            const header = String.fromCharCode(...bytes);
+          reader.onload = (e) => {
+            const header = String.fromCharCode(...new Uint8Array(e.target.result));
             resolve(header === '%PDF-');
           };
           reader.onerror = () => resolve(false);
-          reader.readAsArrayBuffer(slice);
-        } catch (err) {
+          reader.readAsArrayBuffer(file.slice(0, 5));
+        } catch {
           resolve(false);
         }
       });
     }
 
-    // Theme Switcher (Default is Light Mode)
     function toggleTheme() {
-      const html = document.documentElement;
-      const isDark = html.classList.toggle('dark');
+      const isDark = document.documentElement.classList.toggle('dark');
       sessionStorage.setItem('tccTheme', isDark ? 'dark' : 'light');
     }
 
-    // Custom XSS-safe non-blocking toast notification
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
       if (!container) return;
@@ -1136,13 +958,11 @@ We have also shared the *Job Description* with you via email.
 
       const iconEl = document.createElement('i');
       iconEl.className = `fas ${icons[type] || icons.info} shrink-0`;
-
       const spanEl = document.createElement('span');
       spanEl.className = 'flex-1';
       spanEl.textContent = String(message || '');
 
-      toast.appendChild(iconEl);
-      toast.appendChild(spanEl);
+      toast.append(iconEl, spanEl);
       container.appendChild(toast);
 
       setTimeout(() => {
@@ -1151,7 +971,6 @@ We have also shared the *Job Description* with you via email.
       }, 3800);
     }
 
-    // Custom Confirmation Dialog Promise (replaces native confirm)
     function askConfirmation(message) {
       return new Promise((resolve) => {
         const modal = document.getElementById('confirmDialogModal');
@@ -1166,8 +985,7 @@ We have also shared the *Job Description* with you via email.
         const cleanup = (result) => {
           modal.classList.add('hidden');
           modal.classList.remove('flex');
-          cancelBtn.onclick = null;
-          acceptBtn.onclick = null;
+          cancelBtn.onclick = acceptBtn.onclick = null;
           resolve(result);
         };
 
@@ -1176,12 +994,24 @@ We have also shared the *Job Description* with you via email.
       });
     }
 
-    // ==================== REQUIREMENT #4: INPUT CONDITION CHECKS ====================
-    // 1. Candidate Name Condition Check
+    // Unified validation UI state helper
+    function setFieldState(el, isValid, errEl, errMsg = '', badgeEl = null, badgeText = '') {
+      if (el) {
+        el.classList.toggle('input-valid', isValid);
+        el.classList.toggle('input-invalid', !isValid);
+      }
+      if (errEl) {
+        errEl.textContent = errMsg;
+        errEl.classList.toggle('hidden', isValid || !errMsg);
+      }
+      if (badgeEl && badgeText) badgeEl.textContent = badgeText;
+      updateLivePreviewAndProgress();
+      return isValid;
+    }
+
     function validateNameField(inputEl) {
       const el = inputEl || document.getElementById('name');
       if (!el) return false;
-      // Strip angle brackets immediately
       const cleaned = el.value.replace(/[<>"{}`]/g, '');
       if (el.value !== cleaned) el.value = cleaned;
 
@@ -1189,40 +1019,13 @@ We have also shared the *Job Description* with you via email.
       const errEl = document.getElementById('nameErrorMsg');
       const badgeEl = document.getElementById('nameCondBadge');
 
-      if (!val) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = 'Candidate full name is required.';
-          errEl.classList.remove('hidden');
-        }
-        if (badgeEl) badgeEl.textContent = 'Required';
-        updateLivePreviewAndProgress();
-        return false;
+      if (!val) return setFieldState(el, false, errEl, 'Candidate full name is required.', badgeEl, 'Required');
+      if (!/^[a-zA-Z\s.'-]{2,80}$/.test(val)) {
+        return setFieldState(el, false, errEl, 'Enter a valid name (2–80 characters, letters and spaces only).', badgeEl, 'Invalid name');
       }
-
-      const nameRegex = /^[a-zA-Z\s.'-]{2,80}$/;
-      if (!nameRegex.test(val)) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = 'Enter a valid name (2–80 characters, letters and spaces only).';
-          errEl.classList.remove('hidden');
-        }
-        if (badgeEl) badgeEl.textContent = 'Invalid name';
-        updateLivePreviewAndProgress();
-        return false;
-      }
-
-      el.classList.remove('input-invalid');
-      el.classList.add('input-valid');
-      if (errEl) errEl.classList.add('hidden');
-      if (badgeEl) badgeEl.textContent = '✓ Valid';
-      updateLivePreviewAndProgress();
-      return true;
+      return setFieldState(el, true, errEl, '', badgeEl, '✓ Valid');
     }
 
-    // 2. Candidate Email Condition Check
     function validateEmailField(inputEl) {
       const el = inputEl || document.getElementById('email');
       if (!el) return false;
@@ -1230,53 +1033,19 @@ We have also shared the *Job Description* with you via email.
       const errEl = document.getElementById('emailErrorMsg');
       const badgeEl = document.getElementById('emailCondBadge');
 
-      const hasForbidden = /[<>'";\\]/.test(val);
-      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-      if (!val) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = 'Candidate email address is required.';
-          errEl.classList.remove('hidden');
-        }
-        if (badgeEl) badgeEl.textContent = 'Required';
-        updateLivePreviewAndProgress();
-        return false;
-      }
-
-      if (hasForbidden || !emailRegex.test(val) || val.length > 120) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = 'Please enter a valid email address (e.g. rahul@domain.com).';
-          errEl.classList.remove('hidden');
-        }
-        if (badgeEl) badgeEl.textContent = 'Invalid format';
-        updateLivePreviewAndProgress();
-        return false;
-      }
-
-      el.classList.remove('input-invalid');
-      el.classList.add('input-valid');
-      if (errEl) errEl.classList.add('hidden');
-      if (badgeEl) badgeEl.textContent = '✓ Valid';
-      updateLivePreviewAndProgress();
-      return true;
+      if (!val) return setFieldState(el, false, errEl, 'Candidate email address is required.', badgeEl, 'Required');
+      const isValid = !/[<>'";\\]/.test(val) && /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val) && val.length <= 120;
+      if (!isValid) return setFieldState(el, false, errEl, 'Please enter a valid email address (e.g. rahul@domain.com).', badgeEl, 'Invalid format');
+      return setFieldState(el, true, errEl, '', badgeEl, '✓ Valid');
     }
 
-    // 3. Contact Number Condition Check (10-digit Indian Mobile)
     function validateContactField(inputEl) {
       const el = inputEl || document.getElementById('contact');
       if (!el) return false;
 
       let digits = el.value.replace(/\D/g, '');
-      if (digits.startsWith('91') && digits.length > 10) {
-        digits = digits.slice(2);
-      }
-      if (digits.startsWith('0') && digits.length > 10) {
-        digits = digits.slice(1);
-      }
+      if (digits.startsWith('91') && digits.length > 10) digits = digits.slice(2);
+      if (digits.startsWith('0') && digits.length > 10) digits = digits.slice(1);
       digits = digits.slice(0, 10);
       el.value = digits;
 
@@ -1284,36 +1053,11 @@ We have also shared the *Job Description* with you via email.
       const errEl = document.getElementById('contactErrorMsg');
       if (counterEl) counterEl.textContent = `${digits.length}/10 digits`;
 
-      if (!digits) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = '10-digit mobile number is required.';
-          errEl.classList.remove('hidden');
-        }
-        updateLivePreviewAndProgress();
-        return false;
-      }
-
-      if (!/^[6-9]\d{9}$/.test(digits)) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = 'Mobile must be 10 digits starting with 6, 7, 8, or 9.';
-          errEl.classList.remove('hidden');
-        }
-        updateLivePreviewAndProgress();
-        return false;
-      }
-
-      el.classList.remove('input-invalid');
-      el.classList.add('input-valid');
-      if (errEl) errEl.classList.add('hidden');
-      updateLivePreviewAndProgress();
-      return true;
+      if (!digits) return setFieldState(el, false, errEl, '10-digit mobile number is required.');
+      if (!/^[6-9]\d{9}$/.test(digits)) return setFieldState(el, false, errEl, 'Mobile must be 10 digits starting with 6, 7, 8, or 9.');
+      return setFieldState(el, true, errEl);
     }
 
-    // 4. Current CTC Condition Check
     function validateCurrentCtcField() {
       const el = document.getElementById('currentCTC');
       const unit = document.getElementById('currentCTCUnit')?.value || 'LPA';
@@ -1323,29 +1067,15 @@ We have also shared the *Job Description* with you via email.
 
       const val = parseFloat(el.value);
       const maxLimit = unit === 'LPA' ? 500 : 5000000;
-      if (hintEl) hintEl.textContent = unit === 'LPA' ? '0 - 500 LPA' : '₹1k - ₹50L /mo';
+      const hintText = unit === 'LPA' ? '0 - 500 LPA' : '₹1k - ₹50L /mo';
 
       if (el.value.trim() === '' || isNaN(val) || val < 0 || val > maxLimit) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = unit === 'LPA'
-            ? 'Enter a valid Current CTC between 0 and 500 LPA.'
-            : 'Enter a valid Monthly CTC between 0 and 50,00,000.';
-          errEl.classList.remove('hidden');
-        }
-        updateLivePreviewAndProgress();
-        return false;
+        const msg = unit === 'LPA' ? 'Enter a valid Current CTC between 0 and 500 LPA.' : 'Enter a valid Monthly CTC between 0 and 50,00,000.';
+        return setFieldState(el, false, errEl, msg, hintEl, hintText);
       }
-
-      el.classList.remove('input-invalid');
-      el.classList.add('input-valid');
-      if (errEl) errEl.classList.add('hidden');
-      updateLivePreviewAndProgress();
-      return true;
+      return setFieldState(el, true, errEl, '', hintEl, hintText);
     }
 
-    // 5. Expected CTC Condition Check
     function validateExpectedCtcField() {
       const el = document.getElementById('expectedCTC');
       const unit = document.getElementById('expectedCTCUnit')?.value || 'LPA';
@@ -1364,29 +1094,17 @@ We have also shared the *Job Description* with you via email.
 
       const val = parseFloat(el.value);
       const maxLimit = unit === 'LPA' ? 500 : 5000000;
-      if (hintEl) hintEl.textContent = unit === 'LPA' ? '0 - 500 LPA' : '₹1k - ₹50L /mo';
+      const hintText = unit === 'LPA' ? '0 - 500 LPA' : '₹1k - ₹50L /mo';
 
       if (el.value.trim() === '' || isNaN(val) || val <= 0 || val > maxLimit) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = unit === 'LPA'
-            ? 'Enter a valid Expected CTC (0.1 to 500 LPA) or check "As per company".'
-            : 'Enter a valid Monthly Expected CTC or check "As per company".';
-          errEl.classList.remove('hidden');
-        }
-        updateLivePreviewAndProgress();
-        return false;
+        const msg = unit === 'LPA'
+          ? 'Enter a valid Expected CTC (0.1 to 500 LPA) or check "As per company".'
+          : 'Enter a valid Monthly Expected CTC or check "As per company".';
+        return setFieldState(el, false, errEl, msg, hintEl, hintText);
       }
-
-      el.classList.remove('input-invalid');
-      el.classList.add('input-valid');
-      if (errEl) errEl.classList.add('hidden');
-      updateLivePreviewAndProgress();
-      return true;
+      return setFieldState(el, true, errEl, '', hintEl, hintText);
     }
 
-    // 6. Experience Condition Check
     function validateExperienceField() {
       const el = document.getElementById('experience');
       const unit = document.getElementById('experienceUnit')?.value || 'Years';
@@ -1405,27 +1123,14 @@ We have also shared the *Job Description* with you via email.
 
       const val = parseFloat(el.value);
       const maxExp = unit === 'Years' ? 50 : 600;
-      if (hintEl) hintEl.textContent = unit === 'Years' ? '0 - 50 Yrs' : '0 - 600 Mos';
+      const hintText = unit === 'Years' ? '0 - 50 Yrs' : '0 - 600 Mos';
 
       if (el.value.trim() === '' || isNaN(val) || val < 0 || val > maxExp) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = `Enter valid experience (0 to ${maxExp} ${unit}) or select Fresh Graduate.`;
-          errEl.classList.remove('hidden');
-        }
-        updateLivePreviewAndProgress();
-        return false;
+        return setFieldState(el, false, errEl, `Enter valid experience (0 to ${maxExp} ${unit}) or select Fresh Graduate.`, hintEl, hintText);
       }
-
-      el.classList.remove('input-invalid');
-      el.classList.add('input-valid');
-      if (errEl) errEl.classList.add('hidden');
-      updateLivePreviewAndProgress();
-      return true;
+      return setFieldState(el, true, errEl, '', hintEl, hintText);
     }
 
-    // 7. Notice Period Condition Check
     function validateNoticeField() {
       const el = document.getElementById('noticePeriod');
       const unit = document.getElementById('noticePeriodUnit')?.value || 'Days';
@@ -1444,65 +1149,30 @@ We have also shared the *Job Description* with you via email.
 
       const val = parseFloat(el.value);
       const maxNotice = unit === 'Days' ? 365 : 12;
-      if (hintEl) hintEl.textContent = unit === 'Days' ? '0 - 365 Days' : '0 - 12 Mos';
+      const hintText = unit === 'Days' ? '0 - 365 Days' : '0 - 12 Mos';
 
       if (el.value.trim() === '' || isNaN(val) || val < 0 || val > maxNotice) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = `Enter a valid notice period (0 to ${maxNotice} ${unit}) or check Immediate.`;
-          errEl.classList.remove('hidden');
-        }
-        updateLivePreviewAndProgress();
-        return false;
+        return setFieldState(el, false, errEl, `Enter a valid notice period (0 to ${maxNotice} ${unit}) or check Immediate.`, hintEl, hintText);
       }
-
-      el.classList.remove('input-invalid');
-      el.classList.add('input-valid');
-      if (errEl) errEl.classList.add('hidden');
-      updateLivePreviewAndProgress();
-      return true;
+      return setFieldState(el, true, errEl, '', hintEl, hintText);
     }
 
-    // 8. Company & Position Selection Condition Check
     function validateCompanyPositionFields() {
       const compEl = document.getElementById('company');
       const posEl = document.getElementById('position');
       const compErr = document.getElementById('companyErrorMsg');
       const posErr = document.getElementById('positionErrorMsg');
 
-      let valid = true;
-      if (!compEl?.value) {
-        compEl?.classList.add('input-invalid');
-        if (compErr) {
-          compErr.textContent = 'Please select a client company.';
-          compErr.classList.remove('hidden');
-        }
-        valid = false;
-      } else {
-        compEl?.classList.remove('input-invalid');
-        compEl?.classList.add('input-valid');
-        if (compErr) compErr.classList.add('hidden');
-      }
+      const hasComp = Boolean(compEl?.value);
+      const hasPos = Boolean(posEl?.value);
 
-      if (compEl?.value && !posEl?.value) {
-        posEl?.classList.add('input-invalid');
-        if (posErr) {
-          posErr.textContent = 'Please select an open position.';
-          posErr.classList.remove('hidden');
-        }
-        valid = false;
-      } else if (posEl?.value) {
-        posEl?.classList.remove('input-invalid');
-        posEl?.classList.add('input-valid');
-        if (posErr) posErr.classList.add('hidden');
+      setFieldState(compEl, hasComp, compErr, hasComp ? '' : 'Please select a client company.');
+      if (hasComp) {
+        setFieldState(posEl, hasPos, posErr, hasPos ? '' : 'Please select an open position.');
       }
-
-      updateLivePreviewAndProgress();
-      return valid;
+      return hasComp && hasPos;
     }
 
-    // 9. Admin Modal Text Sanitizer
     function sanitizeAdminTextInput(inputEl) {
       if (!inputEl) return;
       const clean = inputEl.value.replace(/[<>"{}`\\]/g, '');
@@ -1510,18 +1180,18 @@ We have also shared the *Job Description* with you via email.
     }
 
     function validateAllCandidateFields() {
-      const v1 = validateNameField();
-      const v2 = validateEmailField();
-      const v3 = validateContactField();
-      const v4 = validateCurrentCtcField();
-      const v5 = validateExpectedCtcField();
-      const v6 = validateExperienceField();
-      const v7 = validateNoticeField();
-      const v8 = validateCompanyPositionFields();
-      return v1 && v2 && v3 && v4 && v5 && v6 && v7 && v8;
+      return [
+        validateNameField(),
+        validateEmailField(),
+        validateContactField(),
+        validateCurrentCtcField(),
+        validateExpectedCtcField(),
+        validateExperienceField(),
+        validateNoticeField(),
+        validateCompanyPositionFields()
+      ].every(Boolean);
     }
 
-    // ==================== SMART HELPER FUNCTIONS ====================
     function cleanPhoneNumber() {
       const input = document.getElementById('contact');
       if (!input) return;
@@ -1530,9 +1200,7 @@ We have also shared the *Job Description* with you via email.
     }
 
     function copyWhatsAppPreview() {
-      const previewEl = document.getElementById('liveWaPreviewBox');
-      if (!previewEl) return;
-      const text = previewEl.textContent || '';
+      const text = document.getElementById('liveWaPreviewBox')?.textContent || '';
       navigator.clipboard?.writeText(text).then(() => {
         showToast('WhatsApp message copied to clipboard!', 'success');
       }).catch(() => {
@@ -1540,24 +1208,23 @@ We have also shared the *Job Description* with you via email.
       });
     }
 
+    function buildWhatsAppMessage(d) {
+      return `*Hi ${d.name}*,\n\nAs per our recent discussion regarding the position of *${d.position}*, we have successfully submitted your profile for shortlisting to our client, *${d.company}*, with the following details:\n\n*Current CTC : ${d.currentCTC} ${d.currentCTCUnit}*\n*Expected CTC : ${d.expectedCTC}* ${d.expectedCTCUnit}\n*Notice Period : ${d.noticePeriod}* ${d.noticePeriodUnit}\n\nWe have also shared the *Job Description* with you via email at ${d.email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n*${d.recruiterName}*\n*Talent Connect Consultancy*`;
+    }
+
     function resetCandidateFormClean() {
       const form = document.getElementById('jobForm');
       if (form) form.reset();
       document.getElementById('positionDiv').style.display = 'none';
-      document.getElementById('expectedCTC').disabled = false;
-      document.getElementById('expectedCTCUnit').disabled = false;
-      document.getElementById('experience').disabled = false;
-      document.getElementById('experienceUnit').disabled = false;
-      document.getElementById('noticePeriod').disabled = false;
-      document.getElementById('noticePeriodUnit').disabled = false;
+      ['expectedCTC', 'expectedCTCUnit', 'experience', 'experienceUnit', 'noticePeriod', 'noticePeriodUnit'].forEach(id => {
+        document.getElementById(id).disabled = false;
+      });
 
-      // Clear validation borders & messages
       document.querySelectorAll('#jobForm .form-input').forEach(el => {
         el.classList.remove('input-valid', 'input-invalid');
       });
       ['nameErrorMsg', 'emailErrorMsg', 'contactErrorMsg', 'currentCtcErrorMsg', 'expectedCtcErrorMsg', 'experienceErrorMsg', 'noticeErrorMsg', 'companyErrorMsg', 'positionErrorMsg'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('hidden');
+        document.getElementById(id)?.classList.add('hidden');
       });
 
       const userData = getUserData();
@@ -1566,7 +1233,6 @@ We have also shared the *Job Description* with you via email.
       updateLivePreviewAndProgress();
     }
 
-    // Live Preview, One-View Matrix, Hike Badge & Completion Progress Updater
     function updateLivePreviewAndProgress() {
       const name = document.getElementById('name')?.value.trim() || 'Candidate';
       const email = document.getElementById('email')?.value.trim() || 'candidate@email.com';
@@ -1586,34 +1252,29 @@ We have also shared the *Job Description* with you via email.
       const position = document.getElementById('position')?.value || 'Position';
       const recruiterName = sessionStorage.getItem('userName') || 'Recruiter';
 
-      // Update WhatsApp Live Preview
       const previewEl = document.getElementById('liveWaPreviewBox');
       if (previewEl) {
-        previewEl.textContent = `*Hi ${name}*,\n\nAs per our recent discussion regarding the position of *${position}*, we have successfully submitted your profile for shortlisting to our client, *${company}*, with the following details:\n\n*Current CTC : ${curCTC} ${curUnit}*\n*Expected CTC : ${expCTC}* ${expUnit}\n*Notice Period : ${notice}* ${noticeUnit}\n\nWe have also shared the *Job Description* with you via email at ${email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
+        previewEl.textContent = buildWhatsAppMessage({
+          name, position, company,
+          currentCTC: curCTC, currentCTCUnit: curUnit,
+          expectedCTC: expCTC, expectedCTCUnit: expUnit,
+          noticePeriod: notice, noticePeriodUnit: noticeUnit,
+          email, recruiterName
+        });
       }
 
-      // Update Live Hike % Badge & One-View Snapshot Matrix
       const hikeBadge = document.getElementById('liveHikeBadge');
       const cVal = parseFloat(curCTC);
       const eVal = parseFloat(expCTC);
       const cAnnual = !isNaN(cVal) && cVal > 0 ? (curUnit === 'Monthly' ? (cVal * 12) / 100000 : cVal) : 0;
       const eAnnual = !asPerComp && !isNaN(eVal) && eVal > 0 ? (expUnit === 'Monthly' ? (eVal * 12) / 100000 : eVal) : 0;
 
-      const matCur = document.getElementById('matrixCurAnnual');
-      const matExp = document.getElementById('matrixExpAnnual');
-      const matMo = document.getElementById('matrixExpMonthly');
       const matHike = document.getElementById('matrixHikePct');
-      const matExpSum = document.getElementById('matrixExpSummary');
-      const matNoticeSum = document.getElementById('matrixNoticeSummary');
-
-      if (matCur) matCur.textContent = cAnnual > 0 ? `₹${cAnnual.toFixed(2)} LPA` : '₹0 LPA';
-      if (matExp) matExp.textContent = asPerComp ? 'As Per Company' : (eAnnual > 0 ? `₹${eAnnual.toFixed(2)} LPA` : '₹0 LPA');
-      if (matMo) {
-        const monthlyGross = eAnnual > 0 ? Math.round((eAnnual * 100000) / 12) : 0;
-        matMo.textContent = asPerComp ? 'Negotiable' : `₹${monthlyGross.toLocaleString('en-IN')} /mo`;
-      }
-      if (matExpSum) matExpSum.textContent = isFresher ? 'Fresh Graduate' : (expVal !== '-' ? `${expVal} ${expTimeUnit}` : '-');
-      if (matNoticeSum) matNoticeSum.textContent = immJoin ? 'Immediate Joiner' : (notice !== '-' ? `${notice} ${noticeUnit}` : '-');
+      document.getElementById('matrixCurAnnual').textContent = cAnnual > 0 ? `₹${cAnnual.toFixed(2)} LPA` : '₹0 LPA';
+      document.getElementById('matrixExpAnnual').textContent = asPerComp ? 'As Per Company' : (eAnnual > 0 ? `₹${eAnnual.toFixed(2)} LPA` : '₹0 LPA');
+      document.getElementById('matrixExpMonthly').textContent = asPerComp ? 'Negotiable' : `₹${(eAnnual > 0 ? Math.round((eAnnual * 100000) / 12) : 0).toLocaleString('en-IN')} /mo`;
+      document.getElementById('matrixExpSummary').textContent = isFresher ? 'Fresh Graduate' : (expVal !== '-' ? `${expVal} ${expTimeUnit}` : '-');
+      document.getElementById('matrixNoticeSummary').textContent = immJoin ? 'Immediate Joiner' : (notice !== '-' ? `${notice} ${noticeUnit}` : '-');
 
       if (hikeBadge && !asPerComp && cAnnual > 0 && eAnnual > 0) {
         const hikePct = (((eAnnual - cAnnual) / cAnnual) * 100).toFixed(1);
@@ -1622,88 +1283,78 @@ We have also shared the *Job Description* with you via email.
         hikeBadge.classList.remove('hidden');
         if (matHike) matHike.textContent = formattedHike;
       } else {
-        if (hikeBadge) hikeBadge.classList.add('hidden');
+        hikeBadge?.classList.add('hidden');
         if (matHike) matHike.textContent = asPerComp ? 'Budget Fit' : '0%';
       }
 
-      // Calculate Form Completion %
-      let filled = 0;
-      const total = 8;
-      if (/^[a-zA-Z\s.'-]{2,80}$/.test(document.getElementById('name')?.value.trim() || '')) filled++;
-      if (/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(document.getElementById('email')?.value.trim() || '')) filled++;
-      if (/^[6-9]\d{9}$/.test(contact)) filled++;
-      if (document.getElementById('currentCTC')?.value.trim() !== '' && cVal >= 0) filled++;
-      if (asPerComp || (document.getElementById('expectedCTC')?.value.trim() !== '' && eVal > 0)) filled++;
-      if (isFresher || (document.getElementById('experience')?.value.trim() !== '' && parseFloat(expVal) >= 0)) filled++;
-      if (immJoin || (document.getElementById('noticePeriod')?.value.trim() !== '' && parseFloat(notice) >= 0)) filled++;
-      if (document.getElementById('company')?.value && document.getElementById('position')?.value) filled++;
+      const checks = [
+        /^[a-zA-Z\s.'-]{2,80}$/.test(document.getElementById('name')?.value.trim() || ''),
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(document.getElementById('email')?.value.trim() || ''),
+        /^[6-9]\d{9}$/.test(contact),
+        document.getElementById('currentCTC')?.value.trim() !== '' && cVal >= 0,
+        asPerComp || (document.getElementById('expectedCTC')?.value.trim() !== '' && eVal > 0),
+        isFresher || (document.getElementById('experience')?.value.trim() !== '' && parseFloat(expVal) >= 0),
+        immJoin || (document.getElementById('noticePeriod')?.value.trim() !== '' && parseFloat(notice) >= 0),
+        Boolean(document.getElementById('company')?.value && document.getElementById('position')?.value)
+      ];
+      const filled = checks.filter(Boolean).length;
+      const pct = Math.round((filled / checks.length) * 100);
 
-      const pct = Math.round((filled / total) * 100);
       const bar = document.getElementById('formProgressBar');
       const txt = document.getElementById('formProgressText');
       const summaryPill = document.getElementById('validationSummaryPill');
       if (bar) bar.style.width = `${pct}%`;
       if (txt) txt.textContent = `${pct}%`;
       if (summaryPill) {
-        summaryPill.textContent = `${filled}/${total} Validated`;
-        summaryPill.className = filled === total
+        summaryPill.textContent = `${filled}/${checks.length} Validated`;
+        summaryPill.className = filled === checks.length
           ? 'px-2.5 py-1 rounded-xl text-[11px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
           : 'px-2.5 py-1 rounded-xl text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
       }
     }
 
-    // XSS-Safe Session Submission Logger
-    const sessionSubmissions = [];
     function logSessionSubmission(data, whatsappLink) {
       sessionSubmissions.unshift({
         name: data.name,
         position: data.position,
         company: data.company,
-        whatsappLink: whatsappLink,
+        whatsappLink,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       });
 
-      const badge = document.getElementById('sessionCountBadge');
-      const kpiSess = document.getElementById('kpiSessionCount');
+      document.getElementById('sessionCountBadge').textContent = String(sessionSubmissions.length);
+      document.getElementById('kpiSessionCount').textContent = String(sessionSubmissions.length);
+
       const list = document.getElementById('recentSubmissionsList');
-      if (badge) badge.textContent = String(sessionSubmissions.length);
-      if (kpiSess) kpiSess.textContent = String(sessionSubmissions.length);
+      if (!list) return;
+      list.innerHTML = '';
 
-      if (list) {
-        list.innerHTML = '';
-        sessionSubmissions.forEach(item => {
-          const row = document.createElement('div');
-          row.className = 'p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2';
+      sessionSubmissions.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2';
 
-          const infoDiv = document.createElement('div');
-          infoDiv.className = 'min-w-0';
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'min-w-0';
+        const nameP = document.createElement('p');
+        nameP.className = 'font-bold text-slate-900 dark:text-white truncate';
+        nameP.textContent = item.name;
+        const subP = document.createElement('p');
+        subP.className = 'text-[10px] text-slate-500 truncate';
+        subP.textContent = `${item.position} • ${item.company} (${item.time})`;
+        infoDiv.append(nameP, subP);
 
-          const nameP = document.createElement('p');
-          nameP.className = 'font-bold text-slate-900 dark:text-white truncate';
-          nameP.textContent = item.name;
+        const linkA = document.createElement('a');
+        linkA.href = item.whatsappLink;
+        linkA.target = '_blank';
+        linkA.rel = 'noopener noreferrer';
+        linkA.className = 'px-2.5 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-bold text-[11px] flex items-center gap-1 shrink-0';
+        linkA.innerHTML = '<i class="fab fa-whatsapp"></i> Send';
 
-          const subP = document.createElement('p');
-          subP.className = 'text-[10px] text-slate-500 truncate';
-          subP.textContent = `${item.position} • ${item.company} (${item.time})`;
-
-          infoDiv.appendChild(nameP);
-          infoDiv.appendChild(subP);
-
-          const linkA = document.createElement('a');
-          linkA.href = item.whatsappLink;
-          linkA.target = '_blank';
-          linkA.rel = 'noopener noreferrer';
-          linkA.className = 'px-2.5 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-bold text-[11px] flex items-center gap-1 shrink-0';
-          linkA.innerHTML = '<i class="fab fa-whatsapp"></i> Send';
-
-          row.appendChild(infoDiv);
-          row.appendChild(linkA);
-          list.appendChild(row);
-        });
-      }
+        row.append(infoDiv, linkA);
+        list.appendChild(row);
+      });
     }
 
-    // Load Recent Candidates from Supabase for One-View Context & Duplicate Awareness
     async function loadRecentDbCandidates() {
       const listEl = document.getElementById('liveDbRecentList');
       const kpiDbEl = document.getElementById('kpiTotalDbCount');
@@ -1714,13 +1365,10 @@ We have also shared the *Job Description* with you via email.
           .order('id', { ascending: false })
           .limit(5);
 
-        if (kpiDbEl && typeof count === 'number') {
-          kpiDbEl.textContent = String(count);
-        }
-
+        if (kpiDbEl && typeof count === 'number') kpiDbEl.textContent = String(count);
         if (error || !listEl) return;
 
-        if (!rows || rows.length === 0) {
+        if (!rows || !rows.length) {
           listEl.innerHTML = '<p class="text-center py-2 text-slate-400">No candidates in database yet.</p>';
           return;
         }
@@ -1735,127 +1383,73 @@ We have also shared the *Job Description* with you via email.
           const title = document.createElement('p');
           title.className = 'font-bold text-slate-800 dark:text-slate-200 truncate';
           title.textContent = r.name || 'Candidate';
-
           const meta = document.createElement('p');
           meta.className = 'text-[10px] text-slate-400 truncate';
           meta.textContent = `${r.position || '-'} @ ${r.company || '-'}`;
-
-          left.appendChild(title);
-          left.appendChild(meta);
+          left.append(title, meta);
 
           const statusSpan = document.createElement('span');
           statusSpan.className = 'px-2 py-0.5 rounded text-[9px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 shrink-0';
           statusSpan.textContent = r.status || 'Submitted';
 
-          item.appendChild(left);
-          item.appendChild(statusSpan);
+          item.append(left, statusSpan);
           listEl.appendChild(item);
         });
-      } catch (err) {
+      } catch {
         // Silent fallback
       }
     }
 
     async function refreshAllWorkspaceData() {
       const icon = document.getElementById('syncHeaderIcon');
-      if (icon) icon.classList.add('fa-spin');
+      icon?.classList.add('fa-spin');
       await Promise.all([loadData(), loadRecentDbCandidates()]);
-      setTimeout(() => {
-        if (icon) icon.classList.remove('fa-spin');
-      }, 400);
+      setTimeout(() => icon?.classList.remove('fa-spin'), 400);
     }
 
-    // ==================== PRESERVED AUTHENTICATION & LOGIC ====================
     window.addEventListener('load', function() {
-      // Ensure Light Mode is the default unless dark was chosen in session
-      const savedTheme = sessionStorage.getItem('tccTheme');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+      document.documentElement.classList.toggle('dark', sessionStorage.getItem('tccTheme') === 'dark');
 
-      // Attach live preview listeners to all form inputs
       document.querySelectorAll('#jobForm input, #jobForm select').forEach(el => {
         el.addEventListener('input', updateLivePreviewAndProgress);
         el.addEventListener('change', updateLivePreviewAndProgress);
       });
 
-      // Get all user data from sessionStorage
-      const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-      const userEmail = sessionStorage.getItem('userEmail');
-      const userName = sessionStorage.getItem('userName');
-      const userContact = sessionStorage.getItem('userContact');
-      const userDesignation = sessionStorage.getItem('userDesignation');
-      const userType = sessionStorage.getItem('userType');
-      const loginTime = sessionStorage.getItem('loginTime');
-
-      // Check if user is authenticated
-      if (isLoggedIn !== 'true') {
-        showToast("Session expired or not logged in. Redirecting to login page.", "error");
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 1200);
+      const userData = getUserData();
+      if (!userData.isLoggedIn) {
+        showToast('Session expired or not logged in. Redirecting to login page.', 'error');
+        setTimeout(() => { window.location.href = 'index.html'; }, 1200);
         return;
       }
 
-      // Set recruiter information from logged-in user
       const recruiterDisplay = document.getElementById('recruiterDisplay');
       const recruiterEmail = document.getElementById('recruiterEmail');
       const kpiRecruiter = document.getElementById('kpiRecruiterShort');
 
       if (recruiterDisplay && recruiterEmail) {
-        recruiterDisplay.value = `${userName} (${userEmail})${userContact ? ' - ' + userContact : ''}`;
-        recruiterEmail.value = `${userEmail},${userName},${userContact || ''}`;
+        recruiterDisplay.value = `${userData.name} (${userData.email})${userData.contact ? ' - ' + userData.contact : ''}`;
+        recruiterEmail.value = `${userData.email},${userData.name},${userData.contact || ''}`;
       }
-      if (kpiRecruiter) {
-        kpiRecruiter.textContent = (userName || 'Recruiter').split(' ')[0];
-      }
+      if (kpiRecruiter) kpiRecruiter.textContent = (userData.name || 'Recruiter').split(' ')[0];
 
-      // Store user data globally
-      window.USER_DATA = {
-        isLoggedIn: isLoggedIn === 'true',
-        email: userEmail,
-        name: userName,
-        contact: userContact,
-        designation: userDesignation,
-        userType: userType,
-        loginTime: loginTime,
-        powerAutomateBypassed: true
-      };
+      window.USER_DATA = userData;
 
-      // Load companies & recent DB entries from Supabase after authentication is confirmed
       loadData();
       loadRecentDbCandidates();
-
-      // Update manage button visibility based on user type
       updateManageButtonVisibility();
       updateLivePreviewAndProgress();
     });
 
-    // Function to show/hide manage button based on user type
     function updateManageButtonVisibility() {
       const userType = sessionStorage.getItem('userType') || sessionStorage.getItem('User_Type') || '';
-      const isAdmin = userType.toLowerCase() === 'admin';
-
       const manageBtn = document.getElementById('manageCompanyBtn');
-      if (manageBtn) {
-        manageBtn.style.display = isAdmin ? 'inline-flex' : 'none';
-      }
+      if (manageBtn) manageBtn.style.display = userType.toLowerCase() === 'admin' ? 'inline-flex' : 'none';
     }
 
-    // Global functions
     function logout() {
-      sessionStorage.removeItem('isLoggedIn');
-      sessionStorage.removeItem('userEmail');
-      sessionStorage.removeItem('userName');
-      sessionStorage.removeItem('userContact');
-      sessionStorage.removeItem('userDesignation');
-      sessionStorage.removeItem('userType');
-      sessionStorage.removeItem('loginTime');
-      sessionStorage.removeItem('userRowIndex');
-
-      showToast("Logged out successfully", "info");
+      ['isLoggedIn', 'userEmail', 'userName', 'userContact', 'userDesignation', 'userType', 'loginTime', 'userRowIndex']
+        .forEach(k => sessionStorage.removeItem(k));
+      showToast('Logged out successfully', 'info');
       window.location.href = 'index.html';
     }
 
@@ -1863,7 +1457,6 @@ We have also shared the *Job Description* with you via email.
       window.location.href = 'index.html';
     }
 
-    // Helper function to get complete user data
     function getUserData() {
       return {
         isLoggedIn: sessionStorage.getItem('isLoggedIn') === 'true',
@@ -1876,35 +1469,17 @@ We have also shared the *Job Description* with you via email.
       };
     }
 
-    let companies = {};
-    let newCompanyFiles = {};
-    let existingCompanyFiles = {};
-
-    // Call Google Apps Script (Strictly for Google Drive JD PDF uploads & Drive cleanup)
     async function callGoogleScript(action, data = {}) {
       try {
-        const payload = { action, ...data };
-
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
           mode: 'cors',
-          headers: {
-            'Content-Type': 'text/plain',
-          },
-          body: JSON.stringify(payload)
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action, ...data })
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const text = await response.text();
-        const result = JSON.parse(text);
-
-        if (!result.success) {
-          throw new Error(result.error || 'Unknown error');
-        }
-
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const result = JSON.parse(await response.text());
+        if (!result.success) throw new Error(result.error || 'Unknown error');
         return result;
       } catch (error) {
         console.error('Error calling Google Drive Script:', error);
@@ -1913,7 +1488,17 @@ We have also shared the *Job Description* with you via email.
       }
     }
 
-    // ==================== SUPABASE DATA LOADING (COMPANIES & POSITIONS) ====================
+    function fillSelectOptions(selectEl, placeholder, items = []) {
+      if (!selectEl) return;
+      selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+      items.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item;
+        option.textContent = item;
+        selectEl.appendChild(option);
+      });
+    }
+
     async function loadData() {
       try {
         const { data: rows, error } = await supabaseClient
@@ -1921,28 +1506,20 @@ We have also shared the *Job Description* with you via email.
           .select('company_name, positions')
           .order('company_name', { ascending: true });
 
-        if (error) {
-          throw error;
-        }
+        if (error) throw error;
 
         companies = {};
         let totalPositionsCount = 0;
-        if (Array.isArray(rows)) {
-          rows.forEach(row => {
-            if (row.company_name) {
-              const posList = Array.isArray(row.positions) ? row.positions : [];
-              companies[row.company_name] = posList;
-              totalPositionsCount += posList.length;
-            }
-          });
-        }
+        (rows || []).forEach(row => {
+          if (row.company_name) {
+            const posList = Array.isArray(row.positions) ? row.positions : [];
+            companies[row.company_name] = posList;
+            totalPositionsCount += posList.length;
+          }
+        });
 
-        // Update One-View KPI Ribbon counts
-        const clientCountEl = document.getElementById('kpiClientCount');
-        const posCountEl = document.getElementById('kpiPositionsCount');
-        if (clientCountEl) clientCountEl.textContent = String(Object.keys(companies).length);
-        if (posCountEl) posCountEl.textContent = String(totalPositionsCount);
-
+        document.getElementById('kpiClientCount').textContent = String(Object.keys(companies).length);
+        document.getElementById('kpiPositionsCount').textContent = String(totalPositionsCount);
         populateCompanies();
       } catch (error) {
         console.error('Error loading companies from Supabase:', error);
@@ -1952,42 +1529,23 @@ We have also shared the *Job Description* with you via email.
       }
     }
 
-    // Populate company dropdown
     function populateCompanies() {
-      const companySelect = document.getElementById('company');
-      companySelect.innerHTML = '<option value="">-- Choose Company --</option>';
-      Object.keys(companies).forEach(company => {
-        const option = document.createElement('option');
-        option.value = company;
-        option.textContent = company;
-        companySelect.appendChild(option);
-      });
+      fillSelectOptions(document.getElementById('company'), '-- Choose Company --', Object.keys(companies));
     }
 
-    // Populate positions
     function populatePositions() {
       const company = document.getElementById('company').value;
       const positionSelect = document.getElementById('position');
       const positionDiv = document.getElementById('positionDiv');
       const roleBadge = document.getElementById('companyRoleCountBadge');
-      positionSelect.innerHTML = '<option value="">-- Choose Position --</option>';
-      if (company && companies[company]) {
-        companies[company].forEach(position => {
-          const option = document.createElement('option');
-          option.value = position;
-          option.textContent = position;
-          positionSelect.appendChild(option);
-        });
-        positionDiv.style.display = 'block';
-        if (roleBadge) roleBadge.textContent = `${companies[company].length} role(s)`;
-      } else {
-        positionDiv.style.display = 'none';
-        if (roleBadge) roleBadge.textContent = 'Required';
-      }
+      const list = (company && companies[company]) ? companies[company] : [];
+
+      fillSelectOptions(positionSelect, '-- Choose Position --', list);
+      positionDiv.style.display = company && companies[company] ? 'block' : 'none';
+      if (roleBadge) roleBadge.textContent = company && companies[company] ? `${list.length} role(s)` : 'Required';
       validateCompanyPositionFields();
     }
 
-    // File handling for JD PDFs with Security Magic-Byte Check
     function fileToBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -2023,203 +1581,148 @@ We have also shared the *Job Description* with you via email.
       statusDiv.id = `status-${safePosSlug}`;
       statusDiv.textContent = 'No file selected';
 
-      fileInputGroup.appendChild(labelEl);
-      fileInputGroup.appendChild(fileInput);
-      fileInputGroup.appendChild(statusDiv);
+      fileInputGroup.append(labelEl, fileInput, statusDiv);
       container.appendChild(fileInputGroup);
 
       fileInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
-        if (file) {
-          if (file.type !== 'application/pdf' || !file.name.toLowerCase().endsWith('.pdf')) {
-            statusDiv.textContent = 'Only valid .pdf files allowed';
-            statusDiv.className = 'file-status error';
-            return;
-          }
-
-          if (file.size > 10 * 1024 * 1024) {
-            statusDiv.textContent = 'File too large (max 10MB)';
-            statusDiv.className = 'file-status error';
-            return;
-          }
-
-          // Security check: verify PDF magic bytes (%PDF-)
-          const isRealPdf = await verifyPdfMagicHeader(file);
-          if (!isRealPdf) {
-            statusDiv.textContent = 'Invalid or corrupted PDF header rejected';
-            statusDiv.className = 'file-status error';
-            return;
-          }
-
-          try {
-            statusDiv.textContent = 'Processing...';
-            statusDiv.className = 'file-status';
-
-            const base64 = await fileToBase64(file);
-            filesObject[position] = {
-              position: position,
-              data: base64,
-              name: file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
-            };
-
-            statusDiv.textContent = `✓ ${file.name} verified`;
-            statusDiv.className = 'file-status success';
-          } catch (error) {
-            statusDiv.textContent = 'Error processing file';
-            statusDiv.className = 'file-status error';
-          }
-        } else {
+        if (!file) {
           delete filesObject[position];
           statusDiv.textContent = 'No file selected';
           statusDiv.className = 'file-status';
+          return;
+        }
+        if (file.type !== 'application/pdf' || !file.name.toLowerCase().endsWith('.pdf')) {
+          statusDiv.textContent = 'Only valid .pdf files allowed';
+          statusDiv.className = 'file-status error';
+          return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+          statusDiv.textContent = 'File too large (max 10MB)';
+          statusDiv.className = 'file-status error';
+          return;
+        }
+        if (!(await verifyPdfMagicHeader(file))) {
+          statusDiv.textContent = 'Invalid or corrupted PDF header rejected';
+          statusDiv.className = 'file-status error';
+          return;
+        }
+        try {
+          statusDiv.textContent = 'Processing...';
+          statusDiv.className = 'file-status';
+          filesObject[position] = {
+            position,
+            data: await fileToBase64(file),
+            name: file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+          };
+          statusDiv.textContent = `✓ ${file.name} verified`;
+          statusDiv.className = 'file-status success';
+        } catch {
+          statusDiv.textContent = 'Error processing file';
+          statusDiv.className = 'file-status error';
         }
       });
     }
 
+    function renderDynamicFileInputs(inputId, containerId, targetStore) {
+      const positions = document.getElementById(inputId).value.split(',').map(p => p.trim()).filter(Boolean);
+      document.getElementById(containerId).innerHTML = '';
+      Object.keys(targetStore).forEach(k => delete targetStore[k]);
+      positions.forEach(pos => generateFileInput(pos, containerId, targetStore));
+    }
+
     function generateNewCompanyFileInputs() {
-      const positions = document.getElementById('newCompanyPositions').value
-        .split(',')
-        .map(p => p.trim())
-        .filter(p => p);
-      const container = document.getElementById('newCompanyFileInputs');
-      container.innerHTML = '';
-      newCompanyFiles = {};
-      positions.forEach(position => {
-        generateFileInput(position, 'newCompanyFileInputs', newCompanyFiles);
-      });
+      renderDynamicFileInputs('newCompanyPositions', 'newCompanyFileInputs', newCompanyFiles);
     }
 
     function generateExistingCompanyFileInputs() {
-      const positions = document.getElementById('addPositionsInput').value
-        .split(',')
-        .map(p => p.trim())
-        .filter(p => p);
-      const container = document.getElementById('existingCompanyFileInputs');
-      container.innerHTML = '';
-      existingCompanyFiles = {};
-      positions.forEach(position => {
-        generateFileInput(position, 'existingCompanyFileInputs', existingCompanyFiles);
-      });
+      renderDynamicFileInputs('addPositionsInput', 'existingCompanyFileInputs', existingCompanyFiles);
     }
 
-    // Event listeners
     document.getElementById('company').addEventListener('change', populatePositions);
     document.getElementById('newCompanyPositions').addEventListener('input', generateNewCompanyFileInputs);
     document.getElementById('addPositionsInput').addEventListener('input', generateExistingCompanyFileInputs);
 
-    document.getElementById("immediateJoiner").addEventListener("change", function () {
-      document.getElementById("noticePeriod").disabled = this.checked;
-      document.getElementById("noticePeriodUnit").disabled = this.checked;
-      validateNoticeField();
+    [
+      ['immediateJoiner', 'noticePeriod', 'noticePeriodUnit', validateNoticeField],
+      ['isFresher', 'experience', 'experienceUnit', validateExperienceField],
+      ['asPerCompany', 'expectedCTC', 'expectedCTCUnit', validateExpectedCtcField]
+    ].forEach(([chkId, inpId, unitId, validator]) => {
+      document.getElementById(chkId).addEventListener('change', function () {
+        document.getElementById(inpId).disabled = this.checked;
+        document.getElementById(unitId).disabled = this.checked;
+        validator();
+      });
     });
 
-    document.getElementById("isFresher").addEventListener("change", function () {
-      document.getElementById("experience").disabled = this.checked;
-      document.getElementById("experienceUnit").disabled = this.checked;
-      validateExperienceField();
-    });
-
-    document.getElementById("asPerCompany").addEventListener("change", function () {
-      document.getElementById("expectedCTC").disabled = this.checked;
-      document.getElementById("expectedCTCUnit").disabled = this.checked;
-      validateExpectedCtcField();
-    });
-
-    // ==================== SELF-HEALING SUPABASE CANDIDATE INSERT ====================
-    // Automatically strips any column not present in the Supabase 'candidates' table schema cache
     async function insertCandidateSafe(initialPayload) {
       const payload = { ...initialPayload };
-      const maxAttempts = 8;
+      for (let attempt = 0; attempt < 8; attempt++) {
+        const { error } = await supabaseClient.from('candidates').insert([payload]);
+        if (!error) return { error: null };
 
-      for (let attempt = 0; attempt < maxAttempts; attempt++) {
-        const { error } = await supabaseClient
-          .from('candidates')
-          .insert([payload]);
-
-        if (!error) {
-          return { error: null };
-        }
-
-        // Check if PostgREST reported an unknown column in the schema cache
         const match = error.message && error.message.match(/Could not find the '([^']+)' column/i);
         if (match && match[1] && Object.prototype.hasOwnProperty.call(payload, match[1])) {
-          console.warn(`[Supabase Schema Guard] Stripping unmapped column '${match[1]}' and retrying insert...`);
           delete payload[match[1]];
           continue;
         }
-
         return { error };
       }
-
       return { error: new Error('Failed to insert candidate after schema adaptation.') };
     }
 
-    // ==================== FORM SUBMISSION (SUPABASE INSERT + POWER AUTOMATE BYPASSED) ====================
     let lastSubmitTimestamp = 0;
-    document.getElementById("jobForm").addEventListener("submit", async function (e) {
+    document.getElementById('jobForm').addEventListener('submit', async function (e) {
       e.preventDefault();
 
-      // Anti-double-submit rate guard (2.5 seconds)
       if (Date.now() - lastSubmitTimestamp < 2500) {
-        showToast("Please wait a moment before submitting again.", "info");
-        return;
+        return showToast('Please wait a moment before submitting again.', 'info');
       }
-
-      // Run all input condition validations before submitting
       if (!validateAllCandidateFields()) {
-        showToast("Please fix the highlighted input fields before submitting.", "error");
-        return;
+        return showToast('Please fix the highlighted input fields before submitting.', 'error');
       }
 
       lastSubmitTimestamp = Date.now();
-      const submitBtn = document.getElementById("submitBtn");
+      const submitBtn = document.getElementById('submitBtn');
       const originalBtnHTML = submitBtn.innerHTML;
       submitBtn.disabled = true;
       submitBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> <span>Submitting...</span>`;
 
-      // Get recruiter information from hidden field
-      const recruiterInfo = document.getElementById("recruiterEmail").value;
-      const recruiterParts = recruiterInfo.split(",");
-      const recruiterEmail = recruiterParts[0] ? recruiterParts[0].trim() : "";
-      const recruiterName = recruiterParts[1] ? recruiterParts[1].trim() : "Recruiter";
-      const recruiterMobile = recruiterParts[2] ? recruiterParts[2].trim() : "";
+      const [recruiterEmail = '', recruiterName = 'Recruiter', recruiterMobile = ''] =
+        document.getElementById('recruiterEmail').value.split(',').map(s => s.trim());
+
+      const asPerComp = document.getElementById('asPerCompany').checked;
+      const isFresher = document.getElementById('isFresher').checked;
+      const immJoin = document.getElementById('immediateJoiner').checked;
 
       const data = {
-        name: document.getElementById("name").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        contact: document.getElementById("contact").value.trim(),
-        currentCTC: document.getElementById("currentCTC").value,
-        currentCTCUnit: document.getElementById("currentCTCUnit").value,
-        expectedCTC: document.getElementById("asPerCompany").checked ? "As Per Company" : document.getElementById("expectedCTC").value,
-        expectedCTCUnit: document.getElementById("asPerCompany").checked ? "" : document.getElementById("expectedCTCUnit").value,
-        experience: document.getElementById("isFresher").checked ? "Fresher" : document.getElementById("experience").value,
-        experienceUnit: document.getElementById("isFresher").checked ? "" : document.getElementById("experienceUnit").value,
-        noticePeriod: document.getElementById("immediateJoiner").checked ? "Immediate" : document.getElementById("noticePeriod").value,
-        noticePeriodUnit: document.getElementById("immediateJoiner").checked ? "" : document.getElementById("noticePeriodUnit").value,
-        company: document.getElementById("company").value,
-        position: document.getElementById("position").value,
-        recruiterEmail: recruiterEmail,
-        recruiterName: recruiterName,
-        recruiterMobile: recruiterMobile
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        contact: document.getElementById('contact').value.trim(),
+        currentCTC: document.getElementById('currentCTC').value,
+        currentCTCUnit: document.getElementById('currentCTCUnit').value,
+        expectedCTC: asPerComp ? 'As Per Company' : document.getElementById('expectedCTC').value,
+        expectedCTCUnit: asPerComp ? '' : document.getElementById('expectedCTCUnit').value,
+        experience: isFresher ? 'Fresher' : document.getElementById('experience').value,
+        experienceUnit: isFresher ? '' : document.getElementById('experienceUnit').value,
+        noticePeriod: immJoin ? 'Immediate' : document.getElementById('noticePeriod').value,
+        noticePeriodUnit: immJoin ? '' : document.getElementById('noticePeriodUnit').value,
+        company: document.getElementById('company').value,
+        position: document.getElementById('position').value,
+        recruiterEmail,
+        recruiterName,
+        recruiterMobile
       };
 
-      // Format combined strings (value + unit) stored directly in the main columns
-      const formattedCurrentCTC = `${data.currentCTC} ${data.currentCTCUnit}`.trim();
-      const formattedExpectedCTC = `${data.expectedCTC} ${data.expectedCTCUnit}`.trim();
-      const formattedExperience = `${data.experience} ${data.experienceUnit}`.trim();
-      const formattedNoticePeriod = `${data.noticePeriod} ${data.noticePeriodUnit}`.trim();
-
       try {
-        // 1. Insert candidate record into Supabase 'candidates' table
-        // Removed non-existent *_unit columns since units are already combined into current_ctc, expected_ctc, experience, and notice_period
         const candidatePayload = {
           name: data.name,
           email: data.email,
           mobile: data.contact,
-          current_ctc: formattedCurrentCTC,
-          expected_ctc: formattedExpectedCTC,
-          experience: formattedExperience,
-          notice_period: formattedNoticePeriod,
+          current_ctc: `${data.currentCTC} ${data.currentCTCUnit}`.trim(),
+          expected_ctc: `${data.expectedCTC} ${data.expectedCTCUnit}`.trim(),
+          experience: `${data.experience} ${data.experienceUnit}`.trim(),
+          notice_period: `${data.noticePeriod} ${data.noticePeriodUnit}`.trim(),
           company: data.company,
           position: data.position,
           recruiter: recruiterEmail,
@@ -2231,88 +1734,61 @@ We have also shared the *Job Description* with you via email.
         };
 
         const { error: sbError } = await insertCandidateSafe(candidatePayload);
-
-        if (sbError) {
-          throw new Error(sbError.message || 'Failed to save candidate to Supabase');
-        }
-
-        // 2. Requirement #5: Power Automate Webhook is DISABLED & BYPASSED
-        console.info("Power Automate JD email trigger bypassed as configured.");
+        if (sbError) throw new Error(sbError.message || 'Failed to save candidate to Supabase');
 
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalBtnHTML;
 
-        const msg = `*Hi ${data.name}*,\n\nAs per our recent discussion regarding the position of *${data.position}*, we have successfully submitted your profile for shortlisting to our client, *${data.company}*, with the following details:\n\n*Current CTC : ${data.currentCTC} ${data.currentCTCUnit}*\n*Expected CTC : ${data.expectedCTC}* ${data.expectedCTCUnit}\n*Notice Period : ${data.noticePeriod}* ${data.noticePeriodUnit}\n\nWe have also shared the *Job Description* with you via email at ${data.email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
+        const msg = buildWhatsAppMessage(data);
         const whatsappLink = `https://wa.me/91${data.contact}?text=${encodeURIComponent(msg)}`;
 
         logSessionSubmission(data, whatsappLink);
         loadRecentDbCandidates();
-        showToast("Candidate saved to Supabase! (Power Automate Bypassed)", "success");
+        showToast('Candidate saved to Supabase!', 'success');
 
-        // XSS-Safe button label update
-        const sendBtn = document.getElementById("sendBtn");
+        const sendBtn = document.getElementById('sendBtn');
         sendBtn.innerHTML = '<i class="fab fa-whatsapp"></i> ';
         const btnSpan = document.createElement('span');
         btnSpan.textContent = `Send to ${data.name}`;
         sendBtn.appendChild(btnSpan);
 
         sendBtn.onclick = () => {
-          document.getElementById("popupOverlay").style.display = "none";
-          window.open(whatsappLink, "_blank", "noopener,noreferrer");
+          document.getElementById('popupOverlay').style.display = 'none';
+          window.open(whatsappLink, '_blank', 'noopener,noreferrer');
           resetCandidateFormClean();
         };
-        document.getElementById("popupOverlay").style.display = "flex";
-
+        document.getElementById('popupOverlay').style.display = 'flex';
       } catch (err) {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalBtnHTML;
-        showToast(err.message || "Failed to submit candidate.", "error");
-        console.error("Submission error:", err);
+        showToast(err.message || 'Failed to submit candidate.', 'error');
+        console.error('Submission error:', err);
       }
     });
 
-    document.getElementById("cancelBtn").addEventListener("click", () => {
-      document.getElementById("popupOverlay").style.display = "none";
+    document.getElementById('cancelBtn').addEventListener('click', () => {
+      document.getElementById('popupOverlay').style.display = 'none';
       resetCandidateFormClean();
     });
 
-    // ==================== COMPANY & JD MANAGEMENT (SUPABASE + DRIVE JD UPLOAD) ====================
     function refreshManagementDropdowns() {
-      const existingCompanySelect = document.getElementById('existingCompanySelect');
-      existingCompanySelect.innerHTML = '<option value="">-- Select Company --</option>';
-      Object.keys(companies).forEach(company => {
-        const option = document.createElement('option');
-        option.value = company;
-        option.textContent = company;
-        existingCompanySelect.appendChild(option);
-      });
+      fillSelectOptions(document.getElementById('existingCompanySelect'), '-- Select Company --', Object.keys(companies));
       refreshPositionDropdown();
     }
 
     function refreshPositionDropdown() {
       const company = document.getElementById('existingCompanySelect').value;
-      const positionSelect = document.getElementById('existingPositionSelect');
-      positionSelect.innerHTML = '<option value="">-- Select Position --</option>';
-      if (company && companies[company]) {
-        companies[company].forEach(position => {
-          const option = document.createElement('option');
-          option.value = position;
-          option.textContent = position;
-          positionSelect.appendChild(option);
-        });
-      }
+      fillSelectOptions(
+        document.getElementById('existingPositionSelect'),
+        '-- Select Position --',
+        (company && companies[company]) ? companies[company] : []
+      );
     }
 
     function setManageLoading(isLoading) {
-      const popup = document.querySelector('.manage-popup');
-      if (isLoading) {
-        popup.classList.add('loading');
-      } else {
-        popup.classList.remove('loading');
-      }
+      document.querySelector('.manage-popup')?.classList.toggle('loading', Boolean(isLoading));
     }
 
-    // Management popup events
     document.getElementById('manageCompanyBtn').addEventListener('click', () => {
       refreshManagementDropdowns();
       document.getElementById('manageOverlay').style.display = 'flex';
@@ -2328,43 +1804,29 @@ We have also shared the *Job Description* with you via email.
 
     document.getElementById('existingCompanySelect').addEventListener('change', refreshPositionDropdown);
 
-    // 1. Add new company (Saves company & positions to Supabase + uploads JD PDFs to Google Drive)
     document.getElementById('addCompanyBtn').addEventListener('click', async () => {
       const nameInput = document.getElementById('newCompanyName');
       sanitizeAdminTextInput(nameInput);
       const name = nameInput.value.trim();
 
       if (!name || name.length < 2) {
-        showToast('Please enter a valid company name (min 2 characters)', 'error');
-        return;
+        return showToast('Please enter a valid company name (min 2 characters)', 'error');
       }
-      const positions = document.getElementById('newCompanyPositions').value
-        .split(',')
-        .map(p => p.trim())
-        .filter(p => p);
+      const positions = document.getElementById('newCompanyPositions').value.split(',').map(p => p.trim()).filter(Boolean);
 
       setManageLoading(true);
-
       try {
-        // A. Save Company & Positions to Supabase 'companies' table
         const { error: sbError } = await supabaseClient
           .from('companies')
-          .upsert({ company_name: name, positions: positions }, { onConflict: 'company_name' });
-
+          .upsert({ company_name: name, positions }, { onConflict: 'company_name' });
         if (sbError) throw sbError;
 
-        // B. Upload JD PDFs to Google Drive via existing Apps Script (if any files attached)
         const files = Object.values(newCompanyFiles);
         if (files.length > 0) {
-          await callGoogleScript('addCompany', {
-            company: name,
-            positions: positions,
-            files: files
-          });
+          await callGoogleScript('addCompany', { company: name, positions, files });
         }
 
         showToast(`Company "${name}" saved to Supabase!`, 'success');
-
         await loadData();
         refreshManagementDropdowns();
 
@@ -2380,58 +1842,35 @@ We have also shared the *Job Description* with you via email.
       }
     });
 
-    // 2. Add positions to existing company (Updates Supabase array + uploads JD PDFs to Google Drive)
     document.getElementById('addPositionsBtn').addEventListener('click', async () => {
       const company = document.getElementById('existingCompanySelect').value;
-      if (!company) {
-        showToast('Please select a company first', 'error');
-        return;
-      }
+      if (!company) return showToast('Please select a company first', 'error');
+
       const posInput = document.getElementById('addPositionsInput');
       sanitizeAdminTextInput(posInput);
-      const newPositions = posInput.value
-        .split(',')
-        .map(p => p.trim())
-        .filter(p => p);
+      const newPositions = posInput.value.split(',').map(p => p.trim()).filter(Boolean);
 
-      if (newPositions.length === 0) {
-        showToast('Please enter at least one valid position', 'error');
-        return;
-      }
+      if (!newPositions.length) return showToast('Please enter at least one valid position', 'error');
 
       setManageLoading(true);
-
       try {
-        const currentPositions = companies[company] || [];
-        const updatedPositions = [...new Set([...currentPositions, ...newPositions])];
-
-        // A. Update positions array in Supabase
+        const updatedPositions = [...new Set([...(companies[company] || []), ...newPositions])];
         const { error: sbError } = await supabaseClient
           .from('companies')
           .update({ positions: updatedPositions })
           .eq('company_name', company);
-
         if (sbError) throw sbError;
 
-        // B. Upload JD PDFs to Google Drive via existing Apps Script
         const files = Object.values(existingCompanyFiles);
         if (files.length > 0) {
-          await callGoogleScript('addPositions', {
-            company: company,
-            positions: newPositions,
-            files: files
-          });
+          await callGoogleScript('addPositions', { company, positions: newPositions, files });
         }
 
         showToast(`Added ${newPositions.length} position(s) to ${company}!`, 'success');
-
         await loadData();
         document.getElementById('existingCompanySelect').value = company;
         refreshPositionDropdown();
-
-        if (document.getElementById('company').value === company) {
-          populatePositions();
-        }
+        if (document.getElementById('company').value === company) populatePositions();
 
         document.getElementById('addPositionsInput').value = '';
         document.getElementById('existingCompanyFileInputs').innerHTML = '';
@@ -2444,45 +1883,28 @@ We have also shared the *Job Description* with you via email.
       }
     });
 
-    // 3. Delete position (Removes position from Supabase array + deletes JD file from Google Drive)
     document.getElementById('deletePositionBtn').addEventListener('click', async () => {
       const company = document.getElementById('existingCompanySelect').value;
       const position = document.getElementById('existingPositionSelect').value;
-      if (!company || !position) {
-        showToast('Please select both company and position', 'error');
-        return;
-      }
-      const confirmed = await askConfirmation(`Delete position "${position}" from "${company}" and its JD file?`);
-      if (!confirmed) return;
+      if (!company || !position) return showToast('Please select both company and position', 'error');
+      if (!(await askConfirmation(`Delete position "${position}" from "${company}" and its JD file?`))) return;
 
       setManageLoading(true);
-
       try {
         const updatedPositions = (companies[company] || []).filter(p => p !== position);
-
-        // A. Update Supabase
         const { error: sbError } = await supabaseClient
           .from('companies')
           .update({ positions: updatedPositions })
           .eq('company_name', company);
-
         if (sbError) throw sbError;
 
-        // B. Delete JD file from Google Drive
-        await callGoogleScript('deletePosition', {
-          company: company,
-          position: position
-        });
-
+        await callGoogleScript('deletePosition', { company, position });
         showToast(`Deleted position "${position}" from ${company}`, 'success');
 
         await loadData();
         document.getElementById('existingCompanySelect').value = company;
         refreshPositionDropdown();
-
-        if (document.getElementById('company').value === company) {
-          populatePositions();
-        }
+        if (document.getElementById('company').value === company) populatePositions();
       } catch (err) {
         console.error('Error deleting position:', err);
         showToast('Error deleting position: ' + err.message, 'error');
@@ -2491,37 +1913,24 @@ We have also shared the *Job Description* with you via email.
       }
     });
 
-    // 4. Delete company (Deletes company row from Supabase + deletes JD folder/files from Google Drive)
     document.getElementById('deleteCompanyBtn').addEventListener('click', async () => {
       const company = document.getElementById('existingCompanySelect').value;
-      if (!company) {
-        showToast('Please select a company', 'error');
-        return;
-      }
-      const confirmed = await askConfirmation(`Delete company "${company}" and ALL its positions and JD files?`);
-      if (!confirmed) return;
+      if (!company) return showToast('Please select a company', 'error');
+      if (!(await askConfirmation(`Delete company "${company}" and ALL its positions and JD files?`))) return;
 
       setManageLoading(true);
-
       try {
-        // A. Delete company from Supabase
         const { error: sbError } = await supabaseClient
           .from('companies')
           .delete()
           .eq('company_name', company);
-
         if (sbError) throw sbError;
 
-        // B. Delete company JD files from Google Drive
-        await callGoogleScript('deleteCompany', {
-          company: company
-        });
-
+        await callGoogleScript('deleteCompany', { company });
         showToast(`Deleted company "${company}"`, 'success');
 
         await loadData();
         refreshManagementDropdowns();
-
         if (document.getElementById('company').value === company) {
           document.getElementById('company').value = '';
           populatePositions();
