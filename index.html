@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<!-- Default theme is now explicitly LIGHT (removed "dark" class from html root) -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>TCC Portal - Login & Workspace</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS Client SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
   <script>
@@ -21,15 +18,6 @@
           fontFamily: {
             sans: ['Inter', 'sans-serif'],
             display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
-          },
-          colors: {
-            brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
-            }
           }
         }
       }
@@ -42,32 +30,19 @@
                      radial-gradient(circle at 88% 82%, rgba(168, 85, 247, 0.14) 0%, transparent 45%),
                      radial-gradient(circle at 50% 45%, rgba(16, 185, 129, 0.08) 0%, transparent 60%);
     }
-
     .dark {
       --bg-gradient: radial-gradient(circle at 15% 20%, rgba(99, 102, 241, 0.25) 0%, transparent 45%),
                      radial-gradient(circle at 85% 80%, rgba(168, 85, 247, 0.25) 0%, transparent 45%),
                      radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.12) 0%, transparent 60%);
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Inter', sans-serif;
       min-height: 100vh;
       overflow-x: hidden;
+      background-image: var(--bg-gradient);
       transition: background-color 0.3s ease, color 0.3s ease;
     }
-
-    .ambient-bg {
-      background-image: var(--bg-gradient);
-    }
-
-    /* Animated ambient mesh orbs */
     .orb {
       position: fixed;
       border-radius: 50%;
@@ -77,44 +52,16 @@
       opacity: 0.35;
       animation: floatOrb 18s ease-in-out infinite alternate;
     }
-
-    .dark .orb {
-      opacity: 0.45;
-    }
-
-    .orb-1 {
-      width: 320px;
-      height: 320px;
-      background: linear-gradient(135deg, #6366f1, #8b5cf6);
-      top: -80px;
-      left: -80px;
-    }
-
-    .orb-2 {
-      width: 280px;
-      height: 280px;
-      background: linear-gradient(135deg, #ec4899, #8b5cf6);
-      bottom: -60px;
-      right: -60px;
-      animation-delay: -6s;
-    }
-
-    .orb-3 {
-      width: 240px;
-      height: 240px;
-      background: linear-gradient(135deg, #06b6d4, #3b82f6);
-      top: 40%;
-      left: 55%;
-      animation-delay: -12s;
-    }
+    .dark .orb { opacity: 0.45; }
+    .orb-1 { width: 320px; height: 320px; background: linear-gradient(135deg, #6366f1, #8b5cf6); top: -80px; left: -80px; }
+    .orb-2 { width: 280px; height: 280px; background: linear-gradient(135deg, #ec4899, #8b5cf6); bottom: -60px; right: -60px; animation-delay: -6s; }
+    .orb-3 { width: 240px; height: 240px; background: linear-gradient(135deg, #06b6d4, #3b82f6); top: 40%; left: 55%; animation-delay: -12s; }
 
     @keyframes floatOrb {
       0% { transform: translate(0, 0) scale(1); }
       50% { transform: translate(28px, -32px) scale(1.07); }
       100% { transform: translate(-22px, 22px) scale(0.95); }
     }
-
-    /* Light-first Glassmorphic Card */
     .glass-panel {
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(20px) saturate(180%);
@@ -122,78 +69,27 @@
       border: 1px solid rgba(226, 232, 240, 0.9);
       box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
     }
-
     .dark .glass-panel {
       background: rgba(15, 23, 42, 0.82);
       border: 1px solid rgba(255, 255, 255, 0.1);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
     }
-
-    /* Module Action Card with Shimmer & Lift */
     .nav-button {
       position: relative;
       overflow: hidden;
-      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
       text-align: left;
     }
+    .nav-button:hover { transform: translateY(-3px); }
+    .nav-button:active { transform: scale(0.98); }
 
-    .nav-button::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-      transform: translateX(-100%);
-      transition: transform 0.55s ease;
-      pointer-events: none;
-    }
-
-    .dark .nav-button::before {
-      background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.12), transparent);
-    }
-
-    .nav-button:hover::before {
-      transform: translateX(100%);
-    }
-
-    .nav-button:hover {
-      transform: translateY(-3px);
-    }
-
-    .nav-button:active {
-      transform: scale(0.98);
-    }
-
-    /* Staggered Entrance Animation for Cards */
     @keyframes slideUpFade {
-      from {
-        opacity: 0;
-        transform: translateY(14px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
     }
+    .animate-card { animation: slideUpFade 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
 
-    .animate-card {
-      animation: slideUpFade 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-    }
-
-    .delay-1 { animation-delay: 0.04s; }
-    .delay-2 { animation-delay: 0.08s; }
-    .delay-3 { animation-delay: 0.12s; }
-    .delay-4 { animation-delay: 0.16s; }
-    .delay-5 { animation-delay: 0.20s; }
-    .delay-6 { animation-delay: 0.24s; }
-    .delay-7 { animation-delay: 0.28s; }
-
-    /* Loading Spinner inside Login Button */
-    .loading {
-      position: relative;
-      pointer-events: none;
-      opacity: 0.9;
-    }
-
+    .loading { position: relative; pointer-events: none; opacity: 0.9; }
     .loading::after {
       content: '';
       width: 18px;
@@ -206,72 +102,40 @@
       margin-left: 10px;
       vertical-align: middle;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .fade-transition {
-      animation: fadeTransition 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
+    .fade-transition { animation: fadeTransition 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
     @keyframes fadeTransition {
       0% { opacity: 1; transform: scale(1); }
       45% { opacity: 0; transform: scale(0.98) translateY(6px); }
       100% { opacity: 1; transform: scale(1) translateY(0); }
     }
-
     @keyframes shakeError {
       0%, 100% { transform: translateX(0); }
       25% { transform: translateX(-6px); }
       75% { transform: translateX(6px); }
     }
-
-    .error-shake {
-      animation: shakeError 0.4s ease-in-out;
-    }
-
-    /* Input validation state borders */
-    .input-valid {
-      border-color: #10b981 !important;
-    }
-
-    .input-invalid {
-      border-color: #f43f5e !important;
-    }
-
-    /* Custom subtle scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.4);
-      border-radius: 9999px;
-    }
+    .error-shake { animation: shakeError 0.4s ease-in-out; }
+    .input-valid { border-color: #10b981 !important; }
+    .input-invalid { border-color: #f43f5e !important; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 9999px; }
   </style>
 </head>
 
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 ambient-bg flex flex-col min-h-screen justify-between relative selection:bg-indigo-500 selection:text-white pb-16 sm:pb-0">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col min-h-screen justify-between relative selection:bg-indigo-500 selection:text-white pb-16 sm:pb-0">
 
   <!-- Background Ambient Orbs -->
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
-  <div class="floating-element hidden"></div>
-  <div class="floating-element hidden"></div>
-  <div class="floating-element hidden"></div>
 
-  <!-- Custom Toast Notification Container -->
+  <!-- Toast Notification Container -->
   <div id="toastContainer" class="fixed bottom-16 sm:bottom-5 right-4 sm:right-5 z-[2000] flex flex-col gap-2 max-w-sm w-full px-3 pointer-events-none"></div>
 
-  <!-- Top Navigation Header (Mobile-First Responsive) -->
   <header class="w-full max-w-7xl mx-auto px-3 sm:px-6 pt-3 sm:pt-4 z-30 flex items-center justify-between gap-2">
     <div class="flex items-center gap-2 sm:gap-2.5">
-      <!-- Home Button (Preserves .home-button and onclick="goHome()") -->
       <button
         class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl glass-panel flex items-center justify-center text-indigo-600 dark:text-indigo-400 hover:scale-105 active:scale-95 transition-all shadow-sm cursor-pointer"
         onclick="goHome()"
@@ -281,47 +145,18 @@
         <i class="fas fa-house text-base sm:text-lg"></i>
       </button>
 
-      <!-- Brand Identity Pill -->
       <div class="flex items-center gap-2 px-3 py-1.5 sm:py-2 rounded-2xl glass-panel">
         <div class="w-7 h-7 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-extrabold text-xs shadow-sm">
           TCC
         </div>
         <div>
-          <div class="flex items-center gap-1.5">
-            <p class="text-xs font-extrabold tracking-tight leading-none text-slate-900 dark:text-white">Talent Connect</p>
-            <span class="hidden md:inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
-              v2.5 Secure
-            </span>
-          </div>
+          <p class="text-xs font-extrabold tracking-tight leading-none text-slate-900 dark:text-white">Talent Connect</p>
           <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Consultancy Command Center</p>
         </div>
       </div>
-
-      <!-- Power Automate Bypass Status Pill (Requirement #5) -->
-      <button
-        type="button"
-        onclick="toggleSecurityModal(true)"
-        class="hidden lg:inline-flex items-center gap-1.5 px-3 py-2 rounded-2xl glass-panel text-[11px] font-bold text-amber-700 dark:text-amber-300 hover:border-amber-500/40 transition-all cursor-pointer"
-        title="Power Automate is Disabled & Bypassed. Click to view system & security status."
-      >
-        <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-        <span>Power Automate: <strong class="underline decoration-dotted">BYPASSED</strong></span>
-      </button>
     </div>
 
-    <!-- Right Controls: Quick Tools, Theme Switcher, & User Info Bar -->
     <div class="flex items-center gap-1.5 sm:gap-2">
-      <!-- Security & System Audit Button -->
-      <button
-        type="button"
-        onclick="toggleSecurityModal(true)"
-        class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl glass-panel flex items-center justify-center text-emerald-600 dark:text-emerald-400 hover:scale-105 transition-all"
-        title="Security & Power Automate Bypass Status"
-        aria-label="Security Status"
-      >
-        <i class="fas fa-shield-halved text-sm"></i>
-      </button>
-
       <!-- Quick CTC Calculator Trigger -->
       <button
         type="button"
@@ -333,7 +168,7 @@
         <i class="fas fa-calculator text-sm"></i>
       </button>
 
-      <!-- Theme Switcher (Default Light Mode, toggles Dark Mode) -->
+      <!-- Theme Switcher -->
       <button
         type="button"
         onclick="toggleTheme()"
@@ -346,7 +181,7 @@
         <i class="fas fa-moon text-sm inline-block dark:hidden text-indigo-600"></i>
       </button>
 
-      <!-- User Info Bar (Preserves #userInfo, #loginSuccess, #userName, logout()) -->
+      <!-- User Info Bar -->
       <div class="user-info glass-panel px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl items-center gap-2 sm:gap-3 text-xs font-medium" id="userInfo" style="display: none;">
         <div class="inline-flex items-center gap-1.5 sm:gap-2">
           <span class="success-checkmark w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse" style="display: none;" id="loginSuccess"></span>
@@ -374,29 +209,14 @@
     </div>
   </header>
 
-  <!-- Main Content Wrapper (Preserves .container class for existing JS transitions) -->
   <main class="flex-1 flex items-center justify-center px-3 sm:px-6 py-4 sm:py-5 z-20">
     <div class="container w-full max-w-7xl mx-auto transition-all duration-500">
 
-      <!-- ==================== LOGIN SCREEN (#loginContainer) ==================== -->
+      <!-- LOGIN SCREEN (#loginContainer) -->
       <div class="login-container max-w-md mx-auto glass-panel rounded-3xl p-5 sm:p-8 relative overflow-hidden" id="loginContainer">
-        <!-- Decorative Top Accent Bar -->
         <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500"></div>
 
-        <!-- Security & Bypass Status Strip on Login Card -->
-        <div class="flex items-center justify-between gap-2 mb-5 px-3 py-2 rounded-2xl bg-slate-100/90 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 text-[11px]">
-          <span class="inline-flex items-center gap-1.5 font-semibold text-emerald-700 dark:text-emerald-400">
-            <i class="fas fa-shield-check"></i>
-            Input Guard Active
-          </span>
-          <span class="inline-flex items-center gap-1 font-semibold text-amber-700 dark:text-amber-400">
-            <i class="fas fa-bolt-slash text-[10px]"></i>
-            PA Flow: Bypassed
-          </span>
-        </div>
-
-        <!-- Logo & Heading -->
-        <div class="text-center mb-6">
+        <div class="text-center mb-6 pt-2">
           <div class="logo w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 mx-auto mb-4 flex items-center justify-center text-white text-xl sm:text-2xl font-extrabold shadow-xl shadow-indigo-500/25 ring-4 ring-indigo-500/15">
             TCC
           </div>
@@ -408,10 +228,9 @@
           </p>
         </div>
 
-        <!-- Login Form (Preserves onsubmit="handleLogin(event)", #email, #password, #loginBtn, #loginText, #errorMessage) -->
         <div class="form-container">
           <form onsubmit="handleLogin(event)" class="space-y-4" novalidate>
-            <!-- Email Field with Condition Check -->
+            <!-- Email Field -->
             <div class="input-group text-left">
               <div class="flex items-center justify-between mb-1.5">
                 <label for="email" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -438,7 +257,7 @@
               <p id="emailValidationMsg" class="text-[11px] text-rose-600 dark:text-rose-400 mt-1 hidden"></p>
             </div>
 
-            <!-- Password Field with Condition Check & CapsLock Detector -->
+            <!-- Password Field -->
             <div class="input-group text-left">
               <div class="flex items-center justify-between mb-1.5">
                 <label for="password" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -477,7 +296,6 @@
               </p>
             </div>
 
-            <!-- Submit Button -->
             <button
               type="submit"
               class="login-btn w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-sm sm:text-base shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center"
@@ -487,12 +305,10 @@
               <span id="loginText">Login</span>
             </button>
 
-            <!-- Rate Limit / Cooldown Notice -->
             <div id="lockoutBanner" class="hidden rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-300 px-3.5 py-2.5 text-xs font-semibold text-center">
               Too many failed attempts. Please wait <span id="lockoutCountdown">30</span>s.
             </div>
 
-            <!-- Error Message Box -->
             <div
               class="error-message rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 px-4 py-3 text-xs sm:text-sm font-medium text-center"
               id="errorMessage"
@@ -505,7 +321,7 @@
         </div>
 
         <div class="footer mt-6 pt-4 border-t border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-          <span>TCC Portal v2.5</span>
+          <span>TCC Portal</span>
           <span class="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
             Supabase Connected
@@ -513,12 +329,10 @@
         </div>
       </div>
 
-      <!-- ==================== MAIN PORTAL SCREEN (#mainContainer) ==================== -->
       <div class="main-container glass-panel rounded-3xl p-4 sm:p-6 lg:p-7 relative overflow-hidden" id="mainContainer" style="display: none;">
-        <!-- Decorative Top Accent Bar -->
         <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-emerald-500 to-amber-500"></div>
 
-        <!-- TOP ROW: Compact Header + Search + Quick Actions -->
+        <!-- TOP ROW: Header + Search + Quick Actions -->
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-200/80 dark:border-slate-800">
           <div class="flex items-center gap-3">
             <div class="logo w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white text-lg sm:text-xl font-extrabold shadow-md shadow-indigo-500/20 shrink-0">
@@ -531,9 +345,6 @@
                 </span>
                 <span class="text-xs text-slate-300 dark:text-slate-600">•</span>
                 <span id="liveClock" class="text-[11px] font-semibold text-slate-600 dark:text-slate-400"></span>
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">
-                  <i class="fas fa-ban text-[9px]"></i> PA Bypassed
-                </span>
               </div>
               <h1 class="font-display text-lg sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
                 TCC Workspace
@@ -544,7 +355,6 @@
             </div>
           </div>
 
-          <!-- Filter Input with Condition Check + Quick Actions -->
           <div class="flex flex-wrap items-center gap-2">
             <div class="relative flex-1 sm:w-60 min-w-[180px]">
               <input
@@ -590,9 +400,8 @@
           </div>
         </div>
 
-        <!-- ONE-VIEW DATA RIBBON: 6 High-Density Live Metrics in One Glance -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 mb-5">
-          <!-- KPI 1: Total Candidates -->
+        <!-- LIVE METRICS RIBBON -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 mb-5">
           <div class="p-3 rounded-2xl bg-white/90 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 flex items-center gap-2.5 shadow-sm">
             <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
               <i class="fas fa-users text-sm"></i>
@@ -606,7 +415,6 @@
             </div>
           </div>
 
-          <!-- KPI 2: Scheduled Interviews -->
           <div class="p-3 rounded-2xl bg-white/90 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 flex items-center gap-2.5 shadow-sm">
             <div class="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
               <i class="fas fa-calendar-day text-sm"></i>
@@ -620,7 +428,6 @@
             </div>
           </div>
 
-          <!-- KPI 3: Team / Active Users -->
           <div class="p-3 rounded-2xl bg-white/90 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 flex items-center gap-2.5 shadow-sm">
             <div class="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
               <i class="fas fa-user-tie text-sm"></i>
@@ -634,7 +441,6 @@
             </div>
           </div>
 
-          <!-- KPI 4: Active Role & Access Level -->
           <div class="p-3 rounded-2xl bg-white/90 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800 flex items-center gap-2.5 shadow-sm">
             <div class="w-9 h-9 rounded-xl bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
               <i class="fas fa-id-card-clip text-sm"></i>
@@ -644,34 +450,11 @@
               <p class="text-xs sm:text-sm font-extrabold text-purple-700 dark:text-purple-300 truncate" id="kpiAccessRole">Recruiter</p>
             </div>
           </div>
-
-          <!-- KPI 5: Power Automate Bypass Indicator -->
-          <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-center gap-2.5 shadow-sm">
-            <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
-              <i class="fas fa-forward-fast text-xs"></i>
-            </div>
-            <div class="min-w-0">
-              <p class="text-[10px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 truncate">Power Automate</p>
-              <p class="text-xs font-extrabold text-amber-700 dark:text-amber-400 truncate" id="kpiPaStatus">BYPASSED</p>
-            </div>
-          </div>
-
-          <!-- KPI 6: Security & Session Health -->
-          <div class="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 flex items-center gap-2.5 shadow-sm">
-            <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
-              <i class="fas fa-lock text-xs"></i>
-            </div>
-            <div class="min-w-0">
-              <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 truncate">Security Guard</p>
-              <p class="text-xs font-extrabold text-emerald-700 dark:text-emerald-400 truncate" id="kpiSecurityHealth">Protected</p>
-            </div>
-          </div>
         </div>
 
-        <!-- MAIN BENTO GRID: Left 8 Cols = Modules Grid | Right 4 Cols = Live One-View Details & Inline Tools -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
 
-          <!-- LEFT ZONE (8 Cols on Desktop): Module Cards Grid (Preserves .button-container and #modulesGrid) -->
+          <!-- LEFT ZONE: Module Cards Grid -->
           <div class="lg:col-span-8">
             <div class="flex items-center justify-between mb-2.5 px-1">
               <h2 class="text-xs font-extrabold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
@@ -685,7 +468,7 @@
 
               <!-- 1. Candidates Entry -->
               <button
-                class="nav-button entry-btn animate-card delay-1 group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-emerald-500/30 hover:border-emerald-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-emerald-500/10 cursor-pointer"
+                class="nav-button entry-btn animate-card group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-emerald-500/30 hover:border-emerald-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-emerald-500/10 cursor-pointer"
                 onclick="navigateToEntry()"
                 data-module-title="candidates entry registration form add new"
               >
@@ -711,7 +494,7 @@
 
               <!-- 2. Candidates Management -->
               <button
-                class="nav-button management-btn animate-card delay-2 group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-blue-500/30 hover:border-blue-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-blue-500/10 cursor-pointer"
+                class="nav-button management-btn animate-card group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-blue-500/30 hover:border-blue-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-blue-500/10 cursor-pointer"
                 onclick="navigateToManagement()"
                 data-module-title="candidates management pipeline database status"
               >
@@ -737,7 +520,7 @@
 
               <!-- 3. Scheduled Interviews -->
               <button
-                class="nav-button interviews-btn animate-card delay-3 group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-amber-500/30 hover:border-amber-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-amber-500/10 cursor-pointer"
+                class="nav-button interviews-btn animate-card group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-amber-500/30 hover:border-amber-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-amber-500/10 cursor-pointer"
                 onclick="navigateToInterviews()"
                 data-module-title="scheduled interviews calendar lineup"
               >
@@ -761,9 +544,9 @@
                 </div>
               </button>
 
-              <!-- 4. Sourced Profiles (Admin Only - Preserves #sourcedProfilesBtn) -->
+              <!-- 4. Sourced Profiles (Admin Only) -->
               <button
-                class="nav-button sourced-profiles-btn animate-card delay-4 group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-purple-500/30 hover:border-purple-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-purple-500/10 cursor-pointer"
+                class="nav-button sourced-profiles-btn animate-card group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-purple-500/30 hover:border-purple-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-purple-500/10 cursor-pointer"
                 id="sourcedProfilesBtn"
                 onclick="navigateToSourcedProfiles()"
                 style="display: none;"
@@ -788,9 +571,9 @@
                 </div>
               </button>
 
-              <!-- 5. WhatsApp Sender (Preserves .Whatsapp-btn and navigateToWhatsapp()) -->
+              <!-- 5. WhatsApp Sender -->
               <button
-                class="nav-button Whatsapp-btn animate-card delay-5 group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-teal-500/30 hover:border-teal-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-teal-500/10 cursor-pointer"
+                class="nav-button Whatsapp-btn animate-card group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-teal-500/30 hover:border-teal-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-teal-500/10 cursor-pointer"
                 onclick="navigateToWhatsapp()"
                 data-module-title="whatsapp sender bulk broadcast messages"
               >
@@ -798,10 +581,7 @@
                   <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center text-base shadow-md shadow-teal-500/20 group-hover:scale-110 transition-transform">
                     <i class="fab fa-whatsapp"></i>
                   </div>
-                  <div class="flex items-center gap-1">
-                    <span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300">PA Bypassed</span>
-                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-teal-500/15 text-teal-700 dark:text-teal-300">Key: 5</span>
-                  </div>
+                  <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-teal-500/15 text-teal-700 dark:text-teal-300">Key: 5</span>
                 </div>
                 <div>
                   <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors flex items-center justify-between">
@@ -809,14 +589,14 @@
                     <i class="fas fa-arrow-right text-xs opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all"></i>
                   </h3>
                   <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                    Direct candidate messaging utility (Power Automate cloud flow bypassed).
+                    Direct candidate messaging and broadcast utility.
                   </p>
                 </div>
               </button>
 
-              <!-- 6. Manage Employees & Locations (Admin Only - #manageEmpLocationsBtn) -->
+              <!-- 6. Manage Employees & Locations (Admin Only) -->
               <button
-                class="nav-button manage-emp-locations-btn animate-card delay-6 group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-rose-500/30 hover:border-rose-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-rose-500/10 cursor-pointer"
+                class="nav-button manage-emp-locations-btn animate-card group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-rose-500/30 hover:border-rose-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-rose-500/10 cursor-pointer"
                 id="manageEmpLocationsBtn"
                 onclick="navigateToAdminManage()"
                 style="display: none;"
@@ -845,7 +625,7 @@
               <button
                 type="button"
                 onclick="toggleCalculatorModal(true)"
-                class="nav-button animate-card delay-7 group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-indigo-500/30 hover:border-indigo-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-indigo-500/10 cursor-pointer"
+                class="nav-button animate-card group p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-indigo-500/30 hover:border-indigo-500 flex flex-col justify-between min-h-[132px] shadow-sm hover:shadow-lg hover:shadow-indigo-500/10 cursor-pointer"
                 data-module-title="ctc hike calculator toolkit salary converter"
               >
                 <div class="flex items-start justify-between w-full mb-2.5">
@@ -879,10 +659,10 @@
             </div>
           </div>
 
-          <!-- RIGHT ZONE (4 Cols on Desktop): One-View Details Dock (Profile + Mini Calculator + Quick Notes) -->
+          <!-- RIGHT ZONE: Active Session Overview, Mini Calculator & Scratchpad -->
           <div class="lg:col-span-4 flex flex-col gap-3">
 
-            <!-- Card A: One-View Active Recruiter Session & System Details -->
+            <!-- Card A: Active Session Overview -->
             <div class="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800 shadow-sm">
               <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
                 <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
@@ -914,7 +694,7 @@
               </div>
             </div>
 
-            <!-- Card B: Inline Instant Hike & CTC Estimator (With Input Condition Validation) -->
+            <!-- Card B: Inline Instant Hike & CTC Estimator -->
             <div class="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800 shadow-sm">
               <div class="flex items-center justify-between mb-2.5">
                 <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
@@ -968,7 +748,7 @@
               </div>
             </div>
 
-            <!-- Card C: Quick Call Scratchpad with Condition Checks -->
+            <!-- Card C: Quick Call Scratchpad -->
             <div class="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200/90 dark:border-slate-800 shadow-sm">
               <div class="flex items-center justify-between mb-1.5">
                 <label for="quickScratchpad" class="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
@@ -999,18 +779,14 @@
         <!-- Session Status Footer Bar -->
         <div class="footer mt-5 pt-4 border-t border-slate-200/80 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
           <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-            <span class="font-bold text-slate-700 dark:text-slate-300">TCC Portal v2.5</span>
+            <span class="font-bold text-slate-700 dark:text-slate-300">TCC Portal</span>
             <span>•</span>
             <button type="button" onclick="toggleProfileModal(true)" class="text-indigo-600 dark:text-indigo-400 hover:underline font-semibold">
               View Session Profile
             </button>
-            <span>•</span>
-            <button type="button" onclick="toggleSecurityModal(true)" class="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold">
-              Security & Bypass Log
-            </button>
           </div>
           <div class="flex items-center gap-2">
-            <i class="fas fa-shield-halved text-emerald-500"></i>
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span id="sessionTimerDisplay" class="font-medium">Session Active</span>
           </div>
         </div>
@@ -1019,7 +795,6 @@
     </div>
   </main>
 
-  <!-- Mobile-First Bottom Dock (Visible on Phone screens for instant thumb reach) -->
   <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
     <button type="button" onclick="goHome()" class="flex flex-col items-center gap-0.5 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold">
       <i class="fas fa-house text-sm"></i>
@@ -1033,19 +808,15 @@
       <i class="fab fa-whatsapp text-sm"></i>
       <span>Quick WA</span>
     </button>
-    <button type="button" onclick="toggleSecurityModal(true)" class="flex flex-col items-center gap-0.5 text-amber-600 dark:text-amber-400 text-[10px] font-semibold">
-      <i class="fas fa-bolt-slash text-sm"></i>
-      <span>PA Bypass</span>
-    </button>
     <button type="button" onclick="toggleTheme()" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
       <i class="fas fa-circle-half-stroke text-sm"></i>
       <span>Theme</span>
     </button>
   </nav>
 
-  <!-- ==================== USER PROFILE MODAL ==================== -->
+  <!-- USER PROFILE MODAL -->
   <div id="profileModal" class="fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="glass-panel rounded-3xl max-w-md w-full p-6 sm:p-7 relative animate-[fadeTransition_0.25s_ease-out]">
+    <div class="glass-panel rounded-3xl max-w-md w-full p-6 sm:p-7 relative">
       <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
         <h3 class="font-display font-bold text-lg flex items-center gap-2 text-slate-900 dark:text-white">
           <i class="fas fa-id-badge text-indigo-500"></i>
@@ -1076,10 +847,6 @@
           <span class="text-slate-500">Access Role</span>
           <span class="font-bold text-indigo-600 dark:text-indigo-400 text-right" id="modalProfileRole">-</span>
         </div>
-        <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex justify-between gap-2">
-          <span class="text-amber-800 dark:text-amber-300 font-medium">Power Automate</span>
-          <span class="font-bold text-amber-700 dark:text-amber-400">Disabled (Bypassed)</span>
-        </div>
       </div>
       <div class="mt-5 flex justify-end gap-2">
         <button type="button" onclick="toggleProfileModal(false)" class="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold">
@@ -1089,7 +856,7 @@
     </div>
   </div>
 
-  <!-- ==================== QUICK CTC & HIKE CALCULATOR MODAL ==================== -->
+  <!-- QUICK CTC & HIKE CALCULATOR MODAL -->
   <div id="calculatorModal" class="fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="glass-panel rounded-3xl max-w-md w-full p-6 sm:p-7 relative">
       <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
@@ -1149,7 +916,7 @@
     </div>
   </div>
 
-  <!-- ==================== QUICK WHATSAPP DIRECT CHAT MODAL ==================== -->
+  <!-- QUICK WHATSAPP DIRECT CHAT MODAL -->
   <div id="quickWaModal" class="fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="glass-panel rounded-3xl max-w-md w-full p-6 sm:p-7 relative">
       <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
@@ -1182,7 +949,6 @@
             <label for="quickWaMessage" class="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Optional Message</label>
             <span id="waMsgCounter" class="text-[10px] font-semibold text-slate-400">0/500</span>
           </div>
-          <!-- Quick Template Pills -->
           <div class="flex flex-wrap gap-1.5 mb-2">
             <button type="button" onclick="setWaTemplate('Hi, connecting from Talent Connect Consultancy regarding a job opportunity matching your profile.')" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-indigo-500/15 text-[10px] font-semibold text-slate-600 dark:text-slate-300">
               + Job Intro
@@ -1209,128 +975,21 @@
           class="w-full py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all"
         >
           <i class="fab fa-whatsapp text-base"></i>
-          Open WhatsApp Chat (Direct Bypass)
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== SECURITY & POWER AUTOMATE BYPASS AUDIT MODAL ==================== -->
-  <div id="securityModal" class="fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
-    <div class="glass-panel rounded-3xl max-w-lg w-full p-6 sm:p-7 relative">
-      <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
-        <h3 class="font-display font-bold text-lg flex items-center gap-2 text-slate-900 dark:text-white">
-          <i class="fas fa-shield-halved text-emerald-500"></i>
-          Security Hardening & Bypass Status
-        </h3>
-        <button type="button" onclick="toggleSecurityModal(false)" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="space-y-2.5 text-xs">
-        <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-start gap-3">
-          <i class="fas fa-bolt-slash text-amber-600 dark:text-amber-400 text-base mt-0.5"></i>
-          <div>
-            <p class="font-bold text-slate-900 dark:text-white">Power Automate Feature: DISABLED (Bypassed)</p>
-            <p class="text-slate-600 dark:text-slate-300 mt-0.5">
-              All Power Automate webhook/flow triggers (`*.logic.azure.com` / `flow.microsoft.com`) are intercepted and bypassed. Portal operates in direct Supabase & direct WhatsApp mode.
-            </p>
-          </div>
-        </div>
-        <div class="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 flex items-start gap-3">
-          <i class="fas fa-code text-emerald-600 dark:text-emerald-400 text-base mt-0.5"></i>
-          <div>
-            <p class="font-bold text-slate-900 dark:text-white">DOM XSS Sanitization & Input Guards</p>
-            <p class="text-slate-600 dark:text-slate-300 mt-0.5">
-              Toast notifications, search filters, and user profile fields use strict HTML entity escaping (`textContent`) and regex condition checks.
-            </p>
-          </div>
-        </div>
-        <div class="p-3 rounded-2xl bg-indigo-500/10 border border-indigo-500/25 flex items-start gap-3">
-          <i class="fas fa-user-lock text-indigo-600 dark:text-indigo-400 text-base mt-0.5"></i>
-          <div>
-            <p class="font-bold text-slate-900 dark:text-white">Brute-Force Rate Limiter & Credential Hygiene</p>
-            <p class="text-slate-600 dark:text-slate-300 mt-0.5">
-              Login attempts are guarded by a 5-attempt lockout timer, password fields are stripped from memory post-authentication, and external links enforce `noopener,noreferrer`.
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="mt-5 flex justify-end">
-        <button type="button" onclick="toggleSecurityModal(false)" class="px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 text-white text-xs font-bold">
-          Got It
+          Open WhatsApp Chat
         </button>
       </div>
     </div>
   </div>
 
   <script>
-    // ==================== SUPABASE CONFIGURATION ====================
     const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0';
-
-    // Initialize Supabase Client
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // ==================== REQUIREMENT #5: POWER AUTOMATE BYPASS ====================
-    // Explicitly disable and bypass Power Automate across session and window
-    window.POWER_AUTOMATE_ENABLED = false;
-    window.BYPASS_POWER_AUTOMATE = true;
-
-    function enforcePowerAutomateBypass() {
-      sessionStorage.setItem('powerAutomateEnabled', 'false');
-      sessionStorage.setItem('bypassPowerAutomate', 'true');
-      sessionStorage.setItem('powerAutomateStatus', 'BYPASSED');
-    }
-    enforcePowerAutomateBypass();
-
-    // Global helper if any module calls Power Automate directly
-    window.triggerPowerAutomateFlow = async function(payload = {}, flowUrl = '') {
-      console.info('[Bypass] Power Automate flow call intercepted and bypassed:', { bypassed: true });
-      return {
-        ok: true,
-        status: 200,
-        bypassed: true,
-        message: 'Power Automate is disabled and bypassed.'
-      };
-    };
-
-    // Intercept any accidental fetch calls to Power Automate / Azure Logic Apps endpoints
-    const originalFetch = window.fetch.bind(window);
-    window.fetch = async function(resource, config) {
-      const urlStr = typeof resource === 'string' ? resource : (resource?.url || '');
-      if (
-        urlStr.includes('logic.azure.com') ||
-        urlStr.includes('powerautomate') ||
-        urlStr.includes('flow.microsoft.com')
-      ) {
-        console.warn('[Power Automate Bypassed] Blocked external flow request:', urlStr);
-        return new Response(
-          JSON.stringify({ success: true, bypassed: true, message: 'Power Automate bypassed' }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
-        );
-      }
-      return originalFetch(resource, config);
-    };
-
-    // ==================== REQUIREMENT #1: SECURITY UTILITIES ====================
-    // HTML Entity Sanitizer to prevent DOM XSS
-    function escapeHTML(str) {
-      if (str === null || str === undefined) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    // Brute-force login rate limiter state
     let failedLoginAttempts = 0;
     let lockoutUntilTimestamp = 0;
     let lockoutTimerInterval = null;
 
-    // Non-blocking XSS-safe custom notification system
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
       if (!container) return;
@@ -1349,14 +1008,11 @@
 
       const iconEl = document.createElement('i');
       iconEl.className = `fas ${icons[type] || icons.info} text-base shrink-0`;
-
       const textEl = document.createElement('span');
       textEl.className = 'flex-1';
-      // Safe textContent assignment prevents XSS injection
       textEl.textContent = String(message || '');
 
-      toast.appendChild(iconEl);
-      toast.appendChild(textEl);
+      toast.append(iconEl, textEl);
       container.appendChild(toast);
 
       setTimeout(() => {
@@ -1366,8 +1022,18 @@
       }, 3500);
     }
 
-    // ==================== REQUIREMENT #4: INPUT CONDITION CHECKS ====================
-    // 1. Login Email / Username Validation
+    function setInputState(inputEl, isValid, msgEl, errorText, badgeEl, badgeText, iconEl) {
+      inputEl.classList.toggle('input-valid', isValid);
+      inputEl.classList.toggle('input-invalid', !isValid);
+      if (msgEl) {
+        msgEl.textContent = errorText || '';
+        msgEl.classList.toggle('hidden', isValid);
+      }
+      if (badgeEl && badgeText) badgeEl.textContent = badgeText;
+      if (iconEl) iconEl.classList.toggle('hidden', !isValid);
+      return isValid;
+    }
+
     function validateEmailInput(inputEl) {
       if (!inputEl) return false;
       const rawVal = inputEl.value.trim();
@@ -1375,103 +1041,46 @@
       const iconEl = document.getElementById('emailStatusIcon');
       const badgeEl = document.getElementById('emailConditionBadge');
 
-      // Disallow dangerous injection characters
-      const hasForbiddenChars = /[<>'";\\]/.test(rawVal);
-      // Accept standard email or alphanumeric username >= 3 chars
-      const isValidEmailOrUser = /^[a-zA-Z0-9._%+-]+(@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})?$/.test(rawVal) && rawVal.length >= 3 && rawVal.length <= 120;
-
       if (!rawVal) {
-        inputEl.classList.remove('input-valid');
-        inputEl.classList.add('input-invalid');
-        if (msgEl) {
-          msgEl.textContent = 'Email address or username is required.';
-          msgEl.classList.remove('hidden');
-        }
-        if (iconEl) iconEl.classList.add('hidden');
-        if (badgeEl) badgeEl.textContent = 'Required';
-        return false;
+        return setInputState(inputEl, false, msgEl, 'Email address or username is required.', badgeEl, 'Required', iconEl);
       }
-
-      if (hasForbiddenChars || !isValidEmailOrUser) {
-        inputEl.classList.remove('input-valid');
-        inputEl.classList.add('input-invalid');
-        if (msgEl) {
-          msgEl.textContent = hasForbiddenChars
-            ? 'Invalid special characters detected.'
-            : 'Enter a valid email (e.g. user@company.com) or username (min 3 chars).';
-          msgEl.classList.remove('hidden');
-        }
-        if (iconEl) iconEl.classList.add('hidden');
-        if (badgeEl) badgeEl.textContent = 'Invalid format';
-        return false;
+      const hasForbiddenChars = /[<>'";\\]/.test(rawVal);
+      const isValid = !hasForbiddenChars && /^[a-zA-Z0-9._%+-]+(@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})?$/.test(rawVal) && rawVal.length >= 3 && rawVal.length <= 120;
+      if (!isValid) {
+        const err = hasForbiddenChars ? 'Invalid special characters detected.' : 'Enter a valid email (e.g. user@company.com) or username (min 3 chars).';
+        return setInputState(inputEl, false, msgEl, err, badgeEl, 'Invalid format', iconEl);
       }
-
-      inputEl.classList.remove('input-invalid');
-      inputEl.classList.add('input-valid');
-      if (msgEl) msgEl.classList.add('hidden');
-      if (iconEl) iconEl.classList.remove('hidden');
-      if (badgeEl) badgeEl.textContent = 'Valid';
-      return true;
+      return setInputState(inputEl, true, msgEl, '', badgeEl, 'Valid', iconEl);
     }
 
-    // 2. Login Password Validation
     function validatePasswordInput(inputEl) {
       if (!inputEl) return false;
       const val = inputEl.value;
       const msgEl = document.getElementById('passwordValidationMsg');
       const badgeEl = document.getElementById('passwordConditionBadge');
 
-      if (!val || val.trim().length === 0) {
-        inputEl.classList.remove('input-valid');
-        inputEl.classList.add('input-invalid');
-        if (msgEl) {
-          msgEl.textContent = 'Password cannot be empty.';
-          msgEl.classList.remove('hidden');
-        }
-        if (badgeEl) badgeEl.textContent = 'Required';
-        return false;
+      if (!val || !val.trim()) {
+        return setInputState(inputEl, false, msgEl, 'Password cannot be empty.', badgeEl, 'Required');
       }
-
       if (val.length < 4 || val.length > 128) {
-        inputEl.classList.remove('input-valid');
-        inputEl.classList.add('input-invalid');
-        if (msgEl) {
-          msgEl.textContent = 'Password must be between 4 and 128 characters.';
-          msgEl.classList.remove('hidden');
-        }
-        if (badgeEl) badgeEl.textContent = `${val.length}/4 chars`;
-        return false;
+        return setInputState(inputEl, false, msgEl, 'Password must be between 4 and 128 characters.', badgeEl, `${val.length}/4 chars`);
       }
-
-      inputEl.classList.remove('input-invalid');
-      inputEl.classList.add('input-valid');
-      if (msgEl) msgEl.classList.add('hidden');
-      if (badgeEl) badgeEl.textContent = 'Ready';
-      return true;
+      return setInputState(inputEl, true, msgEl, '', badgeEl, 'Ready');
     }
 
     function checkCapsLock(event) {
       const warning = document.getElementById('capsLockWarning');
-      if (!warning || !event.getModifierState) return;
-      if (event.getModifierState('CapsLock')) {
-        warning.classList.remove('hidden');
-      } else {
-        warning.classList.add('hidden');
+      if (warning && event.getModifierState) {
+        warning.classList.toggle('hidden', !event.getModifierState('CapsLock'));
       }
     }
 
-    // 3. Module Filter Input Condition Check
     function validateAndFilterModules(inputEl) {
       if (!inputEl) return;
-      // Strip angle brackets or script chars immediately
       const cleanVal = inputEl.value.replace(/[<>"{}`]/g, '').slice(0, 50);
-      if (inputEl.value !== cleanVal) {
-        inputEl.value = cleanVal;
-      }
+      if (inputEl.value !== cleanVal) inputEl.value = cleanVal;
       const clearBtn = document.getElementById('clearFilterBtn');
-      if (clearBtn) {
-        clearBtn.style.display = cleanVal.length > 0 ? 'inline-flex' : 'none';
-      }
+      if (clearBtn) clearBtn.style.display = cleanVal.length > 0 ? 'inline-flex' : 'none';
       filterModules(cleanVal);
     }
 
@@ -1483,14 +1092,10 @@
       }
     }
 
-    // 4. WhatsApp Mobile & Message Input Condition Checks
     function validateWaNumberInput(inputEl) {
       if (!inputEl) return false;
-      // Allow digits only, strip +91 if pasted
       let digits = inputEl.value.replace(/\D/g, '');
-      if (digits.startsWith('91') && digits.length > 10) {
-        digits = digits.slice(2);
-      }
+      if (digits.startsWith('91') && digits.length > 10) digits = digits.slice(2);
       digits = digits.slice(0, 10);
       inputEl.value = digits;
 
@@ -1498,32 +1103,21 @@
       const errEl = document.getElementById('waNumberErrorMsg');
       if (counterEl) counterEl.textContent = `${digits.length}/10 digits`;
 
-      const isValidIndianMobile = /^[6-9]\d{9}$/.test(digits);
-      if (digits.length === 0) {
+      if (!digits.length) {
         inputEl.classList.remove('input-valid', 'input-invalid');
         if (errEl) errEl.classList.add('hidden');
         return false;
       }
-
-      if (!isValidIndianMobile) {
-        inputEl.classList.remove('input-valid');
-        inputEl.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = 'Enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.';
-          errEl.classList.remove('hidden');
-        }
-        return false;
-      }
-
-      inputEl.classList.remove('input-invalid');
-      inputEl.classList.add('input-valid');
-      if (errEl) errEl.classList.add('hidden');
-      return true;
+      return setInputState(
+        inputEl,
+        /^[6-9]\d{9}$/.test(digits),
+        errEl,
+        'Enter a valid 10-digit mobile number starting with 6, 7, 8, or 9.'
+      );
     }
 
     function validateWaMessageInput(textareaEl) {
       if (!textareaEl) return true;
-      // Strip script tags
       const clean = textareaEl.value.replace(/<\/?script[^>]*>/gi, '').slice(0, 500);
       if (textareaEl.value !== clean) textareaEl.value = clean;
       const counter = document.getElementById('waMsgCounter');
@@ -1539,7 +1133,6 @@
       }
     }
 
-    // 5. Scratchpad Condition Validation
     function validateScratchpadInput(textareaEl) {
       if (!textareaEl) return;
       const clean = textareaEl.value.replace(/[<>]/g, '').slice(0, 300);
@@ -1551,37 +1144,33 @@
 
     function copyScratchpad() {
       const el = document.getElementById('quickScratchpad');
-      if (!el || !el.value.trim()) {
-        showToast('Scratchpad is empty', 'error');
-        return;
-      }
+      if (!el || !el.value.trim()) return showToast('Scratchpad is empty', 'error');
       el.select();
       document.execCommand('copy');
       showToast('Scratchpad notes copied to clipboard!', 'success');
     }
 
-    // ==================== STREAMING_CHUNK:Configuring theme, calculators, and modal toggles... ====================
-    // Theme Switcher (Default is Light Mode)
     function toggleTheme() {
-      const html = document.documentElement;
-      const isDark = html.classList.toggle('dark');
+      const isDark = document.documentElement.classList.toggle('dark');
       sessionStorage.setItem('tccTheme', isDark ? 'dark' : 'light');
     }
 
     function togglePasswordVisibility() {
       const pwd = document.getElementById('password');
       const icon = document.getElementById('passwordEyeIcon');
-      if (pwd.type === 'password') {
-        pwd.type = 'text';
-        icon.classList.replace('fa-eye', 'fa-eye-slash');
-      } else {
-        pwd.type = 'password';
-        icon.classList.replace('fa-eye-slash', 'fa-eye');
-      }
+      const isPwd = pwd.type === 'password';
+      pwd.type = isPwd ? 'text' : 'password';
+      icon.classList.replace(isPwd ? 'fa-eye' : 'fa-eye-slash', isPwd ? 'fa-eye-slash' : 'fa-eye');
+    }
+
+    function setModalVisibility(modalId, show) {
+      const modal = document.getElementById(modalId);
+      if (!modal) return;
+      modal.classList.toggle('hidden', !show);
+      modal.classList.toggle('flex', Boolean(show));
     }
 
     function toggleProfileModal(show) {
-      const modal = document.getElementById('profileModal');
       if (show) {
         const data = window.getUserData();
         document.getElementById('modalProfileName').textContent = data.name || '-';
@@ -1589,130 +1178,64 @@
         document.getElementById('modalProfileContact').textContent = data.contact || '-';
         document.getElementById('modalProfileDesignation').textContent = data.designation || '-';
         document.getElementById('modalProfileRole').textContent = data.userType || 'Recruiter';
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      } else {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
       }
-    }
-
-    function toggleSecurityModal(show) {
-      const modal = document.getElementById('securityModal');
-      if (!modal) return;
-      if (show) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      } else {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-      }
+      setModalVisibility('profileModal', show);
     }
 
     function toggleCalculatorModal(show) {
-      const modal = document.getElementById('calculatorModal');
-      if (show) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      } else {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
-      }
+      setModalVisibility('calculatorModal', show);
     }
 
-    // Modal CTC Calculator with Condition Validation
+    function toggleQuickWaModal(show) {
+      setModalVisibility('quickWaModal', show);
+    }
+
+    function computeCtcMetrics(curVal, expVal) {
+      const cur = parseFloat(curVal);
+      const exp = parseFloat(expVal);
+      const outOfBounds = (curVal && (isNaN(cur) || cur < 0 || cur > 500)) || (expVal && (isNaN(exp) || exp < 0 || exp > 500));
+      if (outOfBounds) return { error: 'Values must be between 0 and 500 LPA.', hike: '0%', monthly: '₹0', diff: '₹0L' };
+
+      const pct = (cur > 0 && exp > 0) ? (((exp - cur) / cur) * 100).toFixed(1) : null;
+      const diff = (cur > 0 && exp > 0) ? (exp - cur).toFixed(1) : null;
+      const monthly = exp > 0 ? '₹' + Math.round((exp * 100000) / 12).toLocaleString('en-IN') : '₹0';
+      return {
+        error: '',
+        warn: (cur > 0 && exp > 0 && exp < cur) ? 'Note: Expected CTC is lower than Current CTC.' : '',
+        hike: pct !== null ? `${pct > 0 ? '+' : ''}${pct}%` : '0%',
+        monthly,
+        diff: diff !== null ? `${diff > 0 ? '+' : ''}₹${diff}L` : '₹0L'
+      };
+    }
+
     function runCtcCalculation() {
       const curInput = document.getElementById('calcCurrentLpa');
       const expInput = document.getElementById('calcExpectedLpa');
       const msgEl = document.getElementById('calcModalValidationMsg');
-      const hikeEl = document.getElementById('calcHikeResult');
-      const monthlyEl = document.getElementById('calcMonthlyResult');
-
-      const cur = parseFloat(curInput.value);
-      const exp = parseFloat(expInput.value);
-
-      if ((curInput.value && (isNaN(cur) || cur < 0 || cur > 500)) ||
-          (expInput.value && (isNaN(exp) || exp < 0 || exp > 500))) {
-        if (msgEl) {
-          msgEl.textContent = 'Please enter a realistic CTC value between 0 and 500 LPA.';
-          msgEl.classList.remove('hidden');
-        }
-        hikeEl.textContent = 'Invalid';
-        monthlyEl.textContent = '₹0';
-        return;
-      }
+      const res = computeCtcMetrics(curInput?.value, expInput?.value);
 
       if (msgEl) {
-        if (cur > 0 && exp > 0 && exp < cur) {
-          msgEl.textContent = 'Note: Expected CTC is lower than Current CTC.';
-          msgEl.classList.remove('hidden');
-        } else {
-          msgEl.classList.add('hidden');
-        }
+        msgEl.textContent = res.error || res.warn || '';
+        msgEl.classList.toggle('hidden', !res.error && !res.warn);
       }
-
-      if (cur > 0 && exp > 0) {
-        const pct = (((exp - cur) / cur) * 100).toFixed(1);
-        hikeEl.textContent = `${pct > 0 ? '+' : ''}${pct}%`;
-      } else {
-        hikeEl.textContent = '0%';
-      }
-
-      if (exp > 0) {
-        const monthly = Math.round((exp * 100000) / 12);
-        monthlyEl.textContent = '₹' + monthly.toLocaleString('en-IN');
-      } else {
-        monthlyEl.textContent = '₹0';
-      }
+      document.getElementById('calcHikeResult').textContent = res.error ? 'Invalid' : res.hike;
+      document.getElementById('calcMonthlyResult').textContent = res.monthly;
     }
 
-    // Inline Dashboard Calculator with Condition Validation
     function runInlineCalculation() {
       const curEl = document.getElementById('inlineCurrentLpa');
       const expEl = document.getElementById('inlineExpectedLpa');
       const msgEl = document.getElementById('inlineCalcConditionMsg');
-      const hikeEl = document.getElementById('inlineHikeVal');
-      const moEl = document.getElementById('inlineMonthlyVal');
-      const diffEl = document.getElementById('inlineDiffVal');
+      const res = computeCtcMetrics(curEl?.value, expEl?.value);
 
-      const cur = parseFloat(curEl?.value);
-      const exp = parseFloat(expEl?.value);
-
-      if ((curEl?.value && (cur < 0 || cur > 500)) || (expEl?.value && (exp < 0 || exp > 500))) {
-        if (msgEl) {
-          msgEl.textContent = 'Values must be between 0 and 500 LPA.';
-          msgEl.classList.remove('hidden');
-        }
-        return;
+      if (msgEl) {
+        msgEl.textContent = res.error;
+        msgEl.classList.toggle('hidden', !res.error);
       }
-      if (msgEl) msgEl.classList.add('hidden');
-
-      if (cur > 0 && exp > 0) {
-        const pct = (((exp - cur) / cur) * 100).toFixed(1);
-        hikeEl.textContent = `${pct > 0 ? '+' : ''}${pct}%`;
-        const diff = (exp - cur).toFixed(1);
-        diffEl.textContent = `${diff > 0 ? '+' : ''}₹${diff}L`;
-      } else {
-        hikeEl.textContent = '0%';
-        diffEl.textContent = '₹0L';
-      }
-
-      if (exp > 0) {
-        const monthly = Math.round((exp * 100000) / 12);
-        moEl.textContent = '₹' + monthly.toLocaleString('en-IN');
-      } else {
-        moEl.textContent = '₹0';
-      }
-    }
-
-    function toggleQuickWaModal(show) {
-      const modal = document.getElementById('quickWaModal');
-      if (show) {
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-      } else {
-        modal.classList.add('hidden');
-        modal.classList.remove('flex');
+      if (!res.error) {
+        document.getElementById('inlineHikeVal').textContent = res.hike;
+        document.getElementById('inlineMonthlyVal').textContent = res.monthly;
+        document.getElementById('inlineDiffVal').textContent = res.diff;
       }
     }
 
@@ -1720,23 +1243,19 @@
       const numInput = document.getElementById('quickWaNumber');
       const msgInput = document.getElementById('quickWaMessage');
       if (!validateWaNumberInput(numInput)) {
-        showToast('Please enter a valid 10-digit Indian mobile number (starts with 6-9)', 'error');
-        return;
+        return showToast('Please enter a valid 10-digit Indian mobile number (starts with 6-9)', 'error');
       }
       validateWaMessageInput(msgInput);
-      const rawNum = numInput.value;
       const msg = (msgInput.value || '').trim();
-      const url = `https://wa.me/91${rawNum}${msg ? '?text=' + encodeURIComponent(msg) : ''}`;
-      // Security Fix: Prevent reverse tabnabbing with noopener,noreferrer
+      const url = `https://wa.me/91${numInput.value}${msg ? '?text=' + encodeURIComponent(msg) : ''}`;
       window.open(url, '_blank', 'noopener,noreferrer');
       toggleQuickWaModal(false);
     }
 
-    // ==================== STREAMING_CHUNK:Implementing module filtering and live Supabase metrics sync... ====================
     function filterModules(query) {
       const q = (query || '').toLowerCase().trim();
       const cards = document.querySelectorAll('#modulesGrid .nav-button');
-      const isAdmin = (sessionStorage.getItem('userType') || '').toLowerCase() === 'admin';
+      const isAdmin = window.isAdminUser();
       let visibleCount = 0;
       let totalEligible = 0;
 
@@ -1753,90 +1272,58 @@
       });
 
       const countBadge = document.getElementById('moduleFilterCount');
-      if (countBadge) {
-        countBadge.textContent = q ? `${visibleCount}/${totalEligible}` : 'All';
-      }
+      if (countBadge) countBadge.textContent = q ? `${visibleCount}/${totalEligible}` : 'All';
 
       const emptyBox = document.getElementById('noModulesMatchBox');
-      if (emptyBox) {
-        emptyBox.classList.toggle('hidden', visibleCount > 0);
-      }
+      if (emptyBox) emptyBox.classList.toggle('hidden', visibleCount > 0);
     }
 
-    // Fetch live overview counts for One-View KPI Ribbon
     async function refreshLiveWorkspaceMetrics() {
       const spinner = document.getElementById('syncSpinnerIcon');
       if (spinner) spinner.classList.add('fa-spin');
 
       try {
-        // Count portal users
-        const { count: userCount } = await supabaseClient
-          .from('users')
-          .select('*', { count: 'exact', head: true });
+        const [{ count: userCount }, { count: candCount, error: candErr }] = await Promise.all([
+          supabaseClient.from('users').select('*', { count: 'exact', head: true }),
+          supabaseClient.from('candidates').select('*', { count: 'exact', head: true })
+        ]);
 
         const teamEl = document.getElementById('kpiTeamCount');
         if (teamEl) teamEl.textContent = typeof userCount === 'number' ? String(userCount) : 'Active';
 
-        // Try fetching candidates count if table exists
-        const { count: candCount, error: candErr } = await supabaseClient
-          .from('candidates')
-          .select('*', { count: 'exact', head: true });
-
         const candEl = document.getElementById('kpiTotalCandidates');
-        if (candEl) {
-          candEl.textContent = (!candErr && typeof candCount === 'number') ? String(candCount) : 'Ready';
-        }
+        if (candEl) candEl.textContent = (!candErr && typeof candCount === 'number') ? String(candCount) : 'Ready';
 
-        // Try fetching interviews count or fallback cleanly
         const intEl = document.getElementById('kpiInterviewsCount');
-        if (intEl && intEl.textContent === '--') {
-          intEl.textContent = 'Live';
-        }
+        if (intEl && intEl.textContent === '--') intEl.textContent = 'Live';
       } catch (e) {
-        // Silent graceful fallback if table names vary
+        // Silent fallback if table permissions or names vary
       } finally {
-        setTimeout(() => {
-          if (spinner) spinner.classList.remove('fa-spin');
-        }, 400);
+        setTimeout(() => spinner?.classList.remove('fa-spin'), 400);
       }
     }
 
     function syncDashboardHeaderUI() {
-      const name = sessionStorage.getItem('userName') || 'User';
-      const email = sessionStorage.getItem('userEmail') || '-';
-      const contact = sessionStorage.getItem('userContact') || '-';
-      const designation = sessionStorage.getItem('userDesignation') || 'Recruiter';
-      const userType = sessionStorage.getItem('userType') || 'Recruiter';
+      const data = window.getUserData();
+      const name = data.name || 'User';
+      const designation = data.designation || 'Recruiter';
+      const userType = data.userType || 'Recruiter';
 
       const initialsEl = document.getElementById('userAvatarInitials');
-      if (initialsEl) {
-        initialsEl.textContent = name.trim().charAt(0).toUpperCase() || 'U';
-      }
+      if (initialsEl) initialsEl.textContent = name.trim().charAt(0).toUpperCase() || 'U';
 
       const roleBadge = document.getElementById('roleBadgeHeader');
-      if (roleBadge) {
-        roleBadge.textContent = userType;
-      }
+      if (roleBadge) roleBadge.textContent = userType;
 
       const subtitle = document.getElementById('userSubtitleInfo');
-      if (subtitle && designation) {
-        subtitle.textContent = `${designation} • ${userType} Access • Power Automate Bypassed`;
-      }
+      if (subtitle && designation) subtitle.textContent = `${designation} • ${userType} Access`;
 
-      // Sync One-View Inline Profile Cards
-      const inName = document.getElementById('inlineProfileName');
-      const inDesig = document.getElementById('inlineProfileDesignation');
-      const inContact = document.getElementById('inlineProfileContact');
-      const inEmail = document.getElementById('inlineProfileEmail');
-      const kpiRole = document.getElementById('kpiAccessRole');
+      document.getElementById('inlineProfileName').textContent = name;
+      document.getElementById('inlineProfileDesignation').textContent = designation;
+      document.getElementById('inlineProfileContact').textContent = data.contact || '-';
+      document.getElementById('inlineProfileEmail').textContent = data.email || '-';
+      document.getElementById('kpiAccessRole').textContent = userType;
 
-      if (inName) inName.textContent = name;
-      if (inDesig) inDesig.textContent = designation || '-';
-      if (inContact) inContact.textContent = contact || '-';
-      if (inEmail) inEmail.textContent = email || '-';
-      if (kpiRole) kpiRole.textContent = userType;
-
-      // Restore scratchpad if saved
       const savedNote = sessionStorage.getItem('recruiterScratchpad');
       const padEl = document.getElementById('quickScratchpad');
       if (padEl && savedNote) {
@@ -1852,44 +1339,39 @@
       refreshLiveWorkspaceMetrics();
     }
 
-    // Live Clock & Session Uptime Counter
     setInterval(() => {
       const clockEl = document.getElementById('liveClock');
-      if (clockEl) {
-        clockEl.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      }
+      if (clockEl) clockEl.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
       const loginTimeStr = sessionStorage.getItem('loginTime');
       const timerEl = document.getElementById('sessionTimerDisplay');
-      if (loginTimeStr && timerEl && sessionStorage.getItem('isLoggedIn') === 'true') {
-        const diffMs = Date.now() - new Date(loginTimeStr).getTime();
-        const mins = Math.max(0, Math.floor(diffMs / 60000));
-        // Auto-expire session if older than 12 hours for security
+      if (loginTimeStr && timerEl && window.isUserLoggedIn()) {
+        const mins = Math.max(0, Math.floor((Date.now() - new Date(loginTimeStr).getTime()) / 60000));
         if (mins > 720) {
           logout();
           showToast('Session expired after 12 hours for security. Please login again.', 'info');
           return;
         }
-        timerEl.textContent = `Session Active (${mins}m) • PA Bypassed`;
+        timerEl.textContent = `Session Active (${mins}m)`;
       }
     }, 1000);
 
-    // ==================== STREAMING_CHUNK:Preserving core authentication, admin check, and navigation logic... ====================
+    function setWorkspaceView(loggedIn) {
+      document.getElementById('loginContainer').style.display = loggedIn ? 'none' : 'block';
+      document.getElementById('mainContainer').style.display = loggedIn ? 'block' : 'none';
+      document.getElementById('userInfo').style.display = loggedIn ? 'block' : 'none';
+    }
+
     function goHome() {
       const homeButton = document.querySelector('.home-button');
       if (homeButton) homeButton.style.transform = 'scale(0.9) rotate(10deg)';
 
       setTimeout(() => {
         if (homeButton) homeButton.style.transform = '';
-
-        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+        if (window.isUserLoggedIn()) {
           document.querySelector('.container').classList.add('fade-transition');
-
           setTimeout(() => {
-            document.getElementById('loginContainer').style.display = 'none';
-            document.getElementById('mainContainer').style.display = 'block';
-            document.getElementById('userInfo').style.display = 'block';
-
+            setWorkspaceView(true);
             checkAdminAccess();
             syncDashboardHeaderUI();
           }, 400);
@@ -1898,24 +1380,15 @@
         }
       }, 150);
 
-      if (navigator.vibrate) {
-        navigator.vibrate(30);
-      }
+      if (navigator.vibrate) navigator.vibrate(30);
     }
 
-    // Function to check admin access and show/hide admin-only buttons
     function checkAdminAccess() {
-      const userType = sessionStorage.getItem('userType') || '';
+      const displayVal = window.isAdminUser() ? 'flex' : 'none';
       const sourcedProfilesBtn = document.getElementById('sourcedProfilesBtn');
       const manageEmpLocationsBtn = document.getElementById('manageEmpLocationsBtn');
-
-      if (userType.toLowerCase() === 'admin') {
-        if (sourcedProfilesBtn) sourcedProfilesBtn.style.display = 'flex';
-        if (manageEmpLocationsBtn) manageEmpLocationsBtn.style.display = 'flex';
-      } else {
-        if (sourcedProfilesBtn) sourcedProfilesBtn.style.display = 'none';
-        if (manageEmpLocationsBtn) manageEmpLocationsBtn.style.display = 'none';
-      }
+      if (sourcedProfilesBtn) sourcedProfilesBtn.style.display = displayVal;
+      if (manageEmpLocationsBtn) manageEmpLocationsBtn.style.display = displayVal;
     }
 
     function startLockoutCountdown() {
@@ -1941,14 +1414,11 @@
       }, 500);
     }
 
-    // Updated handleLogin function with Input Condition Validation, Brute-Force Protection & Supabase authentication
     async function handleLogin(event) {
       event.preventDefault();
 
-      // Check rate-limit lockout
       if (Date.now() < lockoutUntilTimestamp) {
-        showToast('Please wait for the security cooldown timer to finish.', 'error');
-        return;
+        return showToast('Please wait for the security cooldown timer to finish.', 'error');
       }
 
       const emailInput = document.getElementById('email');
@@ -1957,10 +1427,7 @@
       const loginBtn = document.getElementById('loginBtn');
       const loginText = document.getElementById('loginText');
 
-      // Validate input conditions before sending network request
-      const isEmailValid = validateEmailInput(emailInput);
-      const isPwdValid = validatePasswordInput(passwordInput);
-      if (!isEmailValid || !isPwdValid) {
+      if (!validateEmailInput(emailInput) | !validatePasswordInput(passwordInput)) {
         errorMessage.textContent = 'Please fix the highlighted input fields before logging in.';
         errorMessage.style.display = 'block';
         errorMessage.classList.add('error-shake');
@@ -1970,14 +1437,12 @@
       const email = emailInput.value.trim();
       const password = passwordInput.value.trim();
 
-      // Add loading state
       loginBtn.classList.add('loading');
       loginText.textContent = 'Authenticating...';
       loginBtn.disabled = true;
       errorMessage.style.display = 'none';
 
       try {
-        // Query Supabase 'users' table directly (keeping current logic intact)
         const { data: user, error } = await supabaseClient
           .from('users')
           .select('*')
@@ -1985,18 +1450,12 @@
           .eq('password', password)
           .single();
 
-        if (error || !user) {
-          throw new Error('Invalid email or password. Please try again.');
-        }
+        if (error || !user) throw new Error('Invalid email or password. Please try again.');
 
-        // Security hygiene: immediately delete plaintext password property from in-memory user object
         delete user.password;
         failedLoginAttempts = 0;
-
-        // Normalize role (e.g. 'Admin' or 'User')
         const resolvedUserType = user.user_type || user.userType || 'User';
 
-        // Login successful
         loginText.textContent = 'Success!';
         loginBtn.classList.remove('loading');
 
@@ -2004,13 +1463,10 @@
           document.querySelector('.container').classList.add('fade-transition');
 
           setTimeout(() => {
-            document.getElementById('loginContainer').style.display = 'none';
-            document.getElementById('mainContainer').style.display = 'block';
-            document.getElementById('userInfo').style.display = 'block';
+            setWorkspaceView(true);
             document.getElementById('loginSuccess').style.display = 'inline-block';
             document.getElementById('userName').textContent = user.name;
 
-            // Clear form & validation states
             emailInput.value = '';
             passwordInput.value = '';
             emailInput.classList.remove('input-valid', 'input-invalid');
@@ -2019,7 +1475,6 @@
             loginBtn.disabled = false;
             loginText.textContent = 'Login';
 
-            // Store complete user information from Supabase into sessionStorage
             sessionStorage.setItem('isLoggedIn', 'true');
             sessionStorage.setItem('userEmail', user.email || email);
             sessionStorage.setItem('userName', user.name || '');
@@ -2029,10 +1484,6 @@
             sessionStorage.setItem('loginTime', new Date().toISOString());
             sessionStorage.setItem('userRowIndex', user.id || '');
 
-            // Ensure Power Automate bypass flags remain set in sessionStorage
-            enforcePowerAutomateBypass();
-
-            // Check admin access after login
             checkAdminAccess();
             syncDashboardHeaderUI();
             showToast(`Welcome back, ${user.name || 'Recruiter'}!`, 'success');
@@ -2040,13 +1491,11 @@
         }, 600);
 
       } catch (error) {
-        // Login or network error
         loginBtn.classList.remove('loading');
         loginText.textContent = 'Login';
         loginBtn.disabled = false;
 
-        failedLoginAttempts++;
-        if (failedLoginAttempts >= 5) {
+        if (++failedLoginAttempts >= 5) {
           lockoutUntilTimestamp = Date.now() + 30000;
           startLockoutCountdown();
         }
@@ -2054,7 +1503,7 @@
         errorMessage.textContent = error.message || 'Invalid email or password. Please try again.';
         errorMessage.style.display = 'block';
         errorMessage.classList.remove('error-shake');
-        void errorMessage.offsetWidth; // trigger reflow for animation
+        void errorMessage.offsetWidth;
         errorMessage.classList.add('error-shake');
       }
     }
@@ -2063,145 +1512,39 @@
       document.querySelector('.container').classList.add('fade-transition');
 
       setTimeout(() => {
-        document.getElementById('loginContainer').style.display = 'block';
-        document.getElementById('mainContainer').style.display = 'none';
-        document.getElementById('userInfo').style.display = 'none';
-
-        // Clear all session data
-        sessionStorage.removeItem('isLoggedIn');
-        sessionStorage.removeItem('userEmail');
-        sessionStorage.removeItem('userName');
-        sessionStorage.removeItem('userContact');
-        sessionStorage.removeItem('userDesignation');
-        sessionStorage.removeItem('userType');
-        sessionStorage.removeItem('loginTime');
-        sessionStorage.removeItem('userRowIndex');
-
-        enforcePowerAutomateBypass();
+        setWorkspaceView(false);
+        ['isLoggedIn', 'userEmail', 'userName', 'userContact', 'userDesignation', 'userType', 'loginTime', 'userRowIndex']
+          .forEach(key => sessionStorage.removeItem(key));
         showToast('Logged out safely', 'info');
       }, 400);
     }
 
-    // Updated navigation functions for web hosting (Preserving all existing URLs & logic)
-    function navigateToEntry() {
-      const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.querySelector('.entry-btn');
+    // Unified navigation handler preserving all module routes & role checks
+    function navigateModule(targetUrl, selector, requireAdmin = false) {
+      const button = (typeof event !== 'undefined' && event?.currentTarget) ? event.currentTarget : document.querySelector(selector);
       if (button) button.style.transform = 'scale(0.95)';
 
       setTimeout(() => {
         if (button) button.style.transform = '';
-
-        if (sessionStorage.getItem('isLoggedIn') === 'true') {
-          enforcePowerAutomateBypass();
-          window.location.href = 'entry.html';
-        } else {
-          showToast("Please login first", "error");
+        if (!window.isUserLoggedIn()) return showToast('Please login first', 'error');
+        if (requireAdmin && !window.isAdminUser()) {
+          return showToast('Access denied. This feature is only available for Admin users.', 'error');
         }
+        window.location.href = targetUrl;
       }, 150);
     }
 
-    function navigateToManagement() {
-      const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.querySelector('.management-btn');
-      if (button) button.style.transform = 'scale(0.95)';
+    function navigateToEntry() { navigateModule('entry.html', '.entry-btn', false); }
+    function navigateToManagement() { navigateModule('management.html', '.management-btn', false); }
+    function navigateToInterviews() { navigateModule('interviews.html', '.interviews-btn', false); }
+    function navigateToSourcedProfiles() { navigateModule('sourced_profile.html', '#sourcedProfilesBtn', true); }
+    function navigateToWhatsapp() { navigateModule('Whatsapp_Sender.html', '.Whatsapp-btn', true); }
+    function navigateToAdminManage() { navigateModule('admin_manage.html', '#manageEmpLocationsBtn', true); }
 
-      setTimeout(() => {
-        if (button) button.style.transform = '';
-
-        if (sessionStorage.getItem('isLoggedIn') === 'true') {
-          enforcePowerAutomateBypass();
-          window.location.href = 'management.html';
-        } else {
-          showToast("Please login first", "error");
-        }
-      }, 150);
-    }
-
-    function navigateToInterviews() {
-      const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.querySelector('.interviews-btn');
-      if (button) button.style.transform = 'scale(0.95)';
-
-      setTimeout(() => {
-        if (button) button.style.transform = '';
-
-        if (sessionStorage.getItem('isLoggedIn') === 'true') {
-          enforcePowerAutomateBypass();
-          window.location.href = 'interviews.html';
-        } else {
-          showToast("Please login first", "error");
-        }
-      }, 150);
-    }
-
-    function navigateToSourcedProfiles() {
-      const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.getElementById('sourcedProfilesBtn');
-      if (button) button.style.transform = 'scale(0.95)';
-
-      setTimeout(() => {
-        if (button) button.style.transform = '';
-
-        if (sessionStorage.getItem('isLoggedIn') === 'true') {
-          const userType = sessionStorage.getItem('userType') || '';
-
-          if (userType.toLowerCase() === 'admin') {
-            enforcePowerAutomateBypass();
-            window.location.href = 'sourced_profile.html';
-          } else {
-            showToast("Access denied. This feature is only available for Admin users.", "error");
-          }
-        } else {
-          showToast("Please login first", "error");
-        }
-      }, 150);
-    }
-
-    function navigateToWhatsapp() {
-      const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.querySelector('.Whatsapp-btn');
-      if (button) button.style.transform = 'scale(0.95)';
-
-      setTimeout(() => {
-        if (button) button.style.transform = '';
-
-        if (sessionStorage.getItem('isLoggedIn') === 'true') {
-          const userType = sessionStorage.getItem('userType') || '';
-
-          if (userType.toLowerCase() === 'admin') {
-            enforcePowerAutomateBypass();
-            window.location.href = 'Whatsapp_Sender.html';
-          } else {
-            showToast("Access denied. This feature is only available for Admin users.", "error");
-          }
-        } else {
-          showToast("Please login first", "error");
-        }
-      }, 150);
-    }
-
-    function navigateToAdminManage() {
-      const button = typeof event !== 'undefined' && event?.currentTarget ? event.currentTarget : document.getElementById('manageEmpLocationsBtn');
-      if (button) button.style.transform = 'scale(0.95)';
-
-      setTimeout(() => {
-        if (button) button.style.transform = '';
-
-        if (sessionStorage.getItem('isLoggedIn') === 'true') {
-          const userType = sessionStorage.getItem('userType') || '';
-
-          if (userType.toLowerCase() === 'admin') {
-            enforcePowerAutomateBypass();
-            window.location.href = 'admin_manage.html';
-          } else {
-            showToast("Access denied. This feature is only available for Admin users.", "error");
-          }
-        } else {
-          showToast("Please login first", "error");
-        }
-      }, 150);
-    }
-
-    // Keyboard shortcuts (1-6) when logged in
     window.addEventListener('keydown', function(e) {
-      if (sessionStorage.getItem('isLoggedIn') !== 'true') return;
+      if (!window.isUserLoggedIn()) return;
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
-      const isAdmin = (sessionStorage.getItem('userType') || '').toLowerCase() === 'admin';
+      const isAdmin = window.isAdminUser();
       if (e.key === '1') navigateToEntry();
       if (e.key === '2') navigateToManagement();
       if (e.key === '3') navigateToInterviews();
@@ -2210,31 +1553,16 @@
       if (e.key === '6' && isAdmin) navigateToAdminManage();
     });
 
-    // Check login state & default Light theme on page load
     window.addEventListener('load', function() {
-      // Ensure Light Mode is the default unless the user explicitly switched to dark in this session
-      const savedTheme = sessionStorage.getItem('tccTheme');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+      document.documentElement.classList.toggle('dark', sessionStorage.getItem('tccTheme') === 'dark');
 
-      enforcePowerAutomateBypass();
-
-      if (sessionStorage.getItem('isLoggedIn') === 'true') {
-        const userName = sessionStorage.getItem('userName');
-
-        document.getElementById('loginContainer').style.display = 'none';
-        document.getElementById('mainContainer').style.display = 'block';
-        document.getElementById('userInfo').style.display = 'block';
-        document.getElementById('userName').textContent = userName;
-
+      if (window.isUserLoggedIn()) {
+        setWorkspaceView(true);
+        document.getElementById('userName').textContent = sessionStorage.getItem('userName');
         checkAdminAccess();
         syncDashboardHeaderUI();
       }
 
-      // Entrance animation
       const container = document.querySelector('.container');
       container.style.opacity = '0';
       container.style.transform = 'translateY(20px) scale(0.99)';
@@ -2246,7 +1574,6 @@
       }, 80);
     });
 
-    // Helper functions for accessing user data globally
     window.getUserData = function() {
       return {
         isLoggedIn: sessionStorage.getItem('isLoggedIn') === 'true',
@@ -2256,8 +1583,7 @@
         designation: sessionStorage.getItem('userDesignation'),
         userType: sessionStorage.getItem('userType'),
         loginTime: sessionStorage.getItem('loginTime'),
-        rowIndex: sessionStorage.getItem('userRowIndex'),
-        powerAutomateBypassed: true
+        rowIndex: sessionStorage.getItem('userRowIndex')
       };
     };
 
