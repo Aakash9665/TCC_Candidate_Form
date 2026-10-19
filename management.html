@@ -1,19 +1,15 @@
 <!DOCTYPE html>
-<!-- Default theme is explicitly LIGHT (removed "dark" class from html root) -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>TCC Candidate Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS Client SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- jsPDF & jsPDF-AutoTable CDN for Official Invoice PDF Generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -35,21 +31,13 @@
         radial-gradient(circle at 88% 85%, rgba(99, 102, 241, 0.12) 0%, transparent 45%),
         radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.07) 0%, transparent 60%);
     }
-
     .dark {
       --bg-gradient:
         radial-gradient(circle at 12% 15%, rgba(59, 130, 246, 0.22) 0%, transparent 45%),
         radial-gradient(circle at 88% 85%, rgba(99, 102, 241, 0.20) 0%, transparent 45%),
         radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.10) 0%, transparent 60%);
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
@@ -57,8 +45,6 @@
       overflow-x: hidden;
       transition: background-color 0.3s ease, color 0.3s ease;
     }
-
-    /* Ambient Floating Orbs */
     .orb {
       position: fixed;
       border-radius: 50%;
@@ -68,34 +54,15 @@
       opacity: 0.32;
       animation: floatOrb 18s ease-in-out infinite alternate;
     }
-
-    .dark .orb {
-      opacity: 0.42;
-    }
-
-    .orb-1 {
-      width: 300px;
-      height: 300px;
-      background: linear-gradient(135deg, #3b82f6, #6366f1);
-      top: -80px;
-      left: -80px;
-    }
-
-    .orb-2 {
-      width: 260px;
-      height: 260px;
-      background: linear-gradient(135deg, #10b981, #06b6d4);
-      bottom: -60px;
-      right: -60px;
-      animation-delay: -7s;
-    }
+    .dark .orb { opacity: 0.42; }
+    .orb-1 { width: 300px; height: 300px; background: linear-gradient(135deg, #3b82f6, #6366f1); top: -80px; left: -80px; }
+    .orb-2 { width: 260px; height: 260px; background: linear-gradient(135deg, #10b981, #06b6d4); bottom: -60px; right: -60px; animation-delay: -7s; }
 
     @keyframes floatOrb {
       0% { transform: translate(0, 0) scale(1); }
       50% { transform: translate(24px, -28px) scale(1.06); }
       100% { transform: translate(-18px, 20px) scale(0.95); }
     }
-
     .glass-card {
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(22px) saturate(180%);
@@ -103,14 +70,11 @@
       border: 1px solid rgba(226, 232, 240, 0.9);
       box-shadow: 0 14px 34px -10px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
     }
-
     .dark .glass-card {
       background: rgba(15, 23, 42, 0.84);
       border: 1px solid rgba(255, 255, 255, 0.09);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
     }
-
-    /* User Type Badge Preserved Classes */
     .user-type-badge {
       display: inline-flex;
       align-items: center;
@@ -121,24 +85,10 @@
       text-transform: uppercase;
       letter-spacing: 0.6px;
     }
+    .user-type-admin { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .user-type-user { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
 
-    .user-type-admin {
-      background: rgba(239, 68, 68, 0.15);
-      color: #ef4444;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
-    .user-type-user {
-      background: rgba(59, 130, 246, 0.15);
-      color: #3b82f6;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-    }
-
-    /* Loading Spinner Preserved Class */
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
+    @keyframes spin { to { transform: rotate(360deg); } }
     .loading-spinner {
       display: inline-block;
       width: 15px;
@@ -148,7 +98,6 @@
       border-top-color: white;
       animation: spin 0.8s ease-in-out infinite;
     }
-
     .bulk-update-btn {
       display: none;
       align-items: center;
@@ -164,40 +113,22 @@
       box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
       transition: all 0.25s ease;
     }
-
     .bulk-update-btn.show {
       display: inline-flex;
       animation: bulkPop 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
-
     @keyframes bulkPop {
       from { opacity: 0; transform: translateY(8px) scale(0.96); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
-
     @keyframes fadeSlideUp {
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    .animate-in { animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
 
-    .animate-in {
-      animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-    }
-
-    /* Table Styling */
-    .table-scroll-wrapper {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      max-height: 70vh;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      font-size: 12px;
-    }
-
+    .table-scroll-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; max-height: 70vh; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
     th {
       background: rgba(241, 245, 249, 0.96);
       color: #475569;
@@ -205,7 +136,7 @@
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      padding: 12px 12px;
+      padding: 12px;
       text-align: left;
       border-bottom: 1px solid rgba(226, 232, 240, 0.95);
       white-space: nowrap;
@@ -213,53 +144,16 @@
       top: 0;
       z-index: 10;
     }
+    .dark th { background: rgba(15, 23, 42, 0.96); color: #94a3b8; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(226, 232, 240, 0.65); vertical-align: middle; transition: background-color 0.15s ease; }
+    .dark td { border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    tbody tr { cursor: pointer; transition: all 0.15s ease; }
+    tbody tr:hover { background: rgba(59, 130, 246, 0.06); }
+    .dark tbody tr:hover { background: rgba(59, 130, 246, 0.12); }
+    tbody tr.selected { background: rgba(59, 130, 246, 0.12) !important; }
+    .dark tbody tr.selected { background: rgba(59, 130, 246, 0.22) !important; }
 
-    .dark th {
-      background: rgba(15, 23, 42, 0.96);
-      color: #94a3b8;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    td {
-      padding: 10px 12px;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.65);
-      vertical-align: middle;
-      transition: background-color 0.15s ease;
-    }
-
-    .dark td {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    tbody tr {
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-
-    tbody tr:hover {
-      background: rgba(59, 130, 246, 0.06);
-    }
-
-    .dark tbody tr:hover {
-      background: rgba(59, 130, 246, 0.12);
-    }
-
-    tbody tr.selected {
-      background: rgba(59, 130, 246, 0.12) !important;
-    }
-
-    .dark tbody tr.selected {
-      background: rgba(59, 130, 246, 0.22) !important;
-    }
-
-    .candidate-checkbox {
-      width: 16px;
-      height: 16px;
-      accent-color: #2563eb;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-
+    .candidate-checkbox { width: 16px; height: 16px; accent-color: #2563eb; cursor: pointer; border-radius: 4px; }
     .status-badge {
       display: inline-flex;
       align-items: center;
@@ -275,78 +169,20 @@
       color: #64748b;
       border: 1px solid rgba(100, 116, 139, 0.25);
     }
+    .status-selected { background: rgba(16, 185, 129, 0.14); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .dark .status-selected { color: #10b981; }
+    .status-rejected { background: rgba(239, 68, 68, 0.14); color: #e11d48; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .dark .status-rejected { color: #ef4444; }
+    .status-hold { background: rgba(245, 158, 11, 0.14); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .dark .status-hold { color: #f59e0b; }
 
-    .status-selected {
-      background: rgba(16, 185, 129, 0.14);
-      color: #059669;
-      border: 1px solid rgba(16, 185, 129, 0.3);
-    }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-weight: 600; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; }
+    .btn-sm { padding: 6px 10px; font-size: 11px; border-radius: 10px; }
+    .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); }
+    .btn-success:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35); }
+    .btn-invoice { background: linear-gradient(135deg, #2563eb, #4f46e5); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28); }
+    .btn-invoice:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4); }
 
-    .dark .status-selected {
-      color: #10b981;
-    }
-
-    .status-rejected {
-      background: rgba(239, 68, 68, 0.14);
-      color: #e11d48;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
-    .dark .status-rejected {
-      color: #ef4444;
-    }
-
-    .status-hold {
-      background: rgba(245, 158, 11, 0.14);
-      color: #d97706;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-    }
-
-    .dark .status-hold {
-      color: #f59e0b;
-    }
-
-    /* Action Buttons inside Table */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      font-weight: 600;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .btn-sm {
-      padding: 6px 10px;
-      font-size: 11px;
-      border-radius: 10px;
-    }
-
-    .btn-success {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: white;
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-    }
-
-    .btn-success:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
-    }
-
-    .btn-invoice {
-      background: linear-gradient(135deg, #2563eb, #4f46e5);
-      color: white;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
-    }
-
-    .btn-invoice:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
-    }
-
-    /* Popup Overlay Preserved Classes */
     .popup-overlay {
       position: fixed;
       inset: 0;
@@ -359,7 +195,6 @@
       padding: 16px;
       overflow-y: auto;
     }
-
     .popup-content {
       width: 100%;
       max-width: 490px;
@@ -370,20 +205,12 @@
       overflow-y: auto;
       animation: modalSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
-
-    .popup-content.compact {
-      max-width: 480px;
-    }
-
-    .popup-content.invoice-modal {
-      max-width: 540px;
-    }
-
+    .popup-content.compact { max-width: 480px; }
+    .popup-content.invoice-modal { max-width: 540px; }
     @keyframes modalSlideUp {
       from { opacity: 0; transform: translateY(20px) scale(0.96); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
-
     .bulk-candidates-list {
       max-height: 140px;
       overflow-y: auto;
@@ -393,22 +220,10 @@
       background: rgba(15, 23, 42, 0.05);
       border: 1px solid rgba(148, 163, 184, 0.2);
     }
+    .dark .bulk-candidates-list { background: rgba(15, 23, 42, 0.6); }
+    .bulk-candidate-item { font-size: 11.5px; padding: 5px 0; border-bottom: 1px solid rgba(148, 163, 184, 0.15); }
+    .bulk-candidate-item:last-child { border-bottom: none; }
 
-    .dark .bulk-candidates-list {
-      background: rgba(15, 23, 42, 0.6);
-    }
-
-    .bulk-candidate-item {
-      font-size: 11.5px;
-      padding: 5px 0;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
-    }
-
-    .bulk-candidate-item:last-child {
-      border-bottom: none;
-    }
-
-    /* Floating WhatsApp Button (#waFloatBtn) */
     #waFloatBtn {
       position: fixed;
       right: 20px;
@@ -427,21 +242,9 @@
       align-items: center;
       gap: 8px;
     }
-
-    @media (min-width: 640px) {
-      #waFloatBtn {
-        bottom: 24px;
-      }
-    }
-
-    #waFloatBtn.show {
-      display: inline-flex !important;
-      animation: bulkPop 0.4s ease-out;
-    }
-
-    #waFloatBtn:hover {
-      transform: translateY(-3px) scale(1.03);
-    }
+    @media (min-width: 640px) { #waFloatBtn { bottom: 24px; } }
+    #waFloatBtn.show { display: inline-flex !important; animation: bulkPop 0.4s ease-out; }
+    #waFloatBtn:hover { transform: translateY(-3px) scale(1.03); }
 
     .form-control-input {
       width: 100%;
@@ -453,69 +256,29 @@
       font-size: 13px;
       transition: all 0.2s ease;
     }
+    .dark .form-control-input { background: rgba(30, 41, 59, 0.8); border-color: rgba(255, 255, 255, 0.12); color: #f8fafc; }
+    .form-control-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
 
-    .dark .form-control-input {
-      background: rgba(30, 41, 59, 0.8);
-      border-color: rgba(255, 255, 255, 0.12);
-      color: #f8fafc;
-    }
+    .inv-prefilled-grey { color: #94a3b8 !important; background: rgba(241, 245, 249, 0.85) !important; border-style: dashed !important; }
+    .dark .inv-prefilled-grey { color: #64748b !important; background: rgba(15, 23, 42, 0.65) !important; }
+    .inv-prefilled-grey:focus, .inv-prefilled-grey.user-edited { color: #0f172a !important; background: #ffffff !important; border-style: solid !important; }
+    .dark .inv-prefilled-grey:focus, .dark .inv-prefilled-grey.user-edited { color: #f8fafc !important; background: rgba(30, 41, 59, 0.9) !important; border-style: solid !important; }
 
-    .form-control-input:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-    }
-
-    /* Pre-filled grey editable invoice number style */
-    .inv-prefilled-grey {
-      color: #94a3b8 !important;
-      background: rgba(241, 245, 249, 0.85) !important;
-      border-style: dashed !important;
-    }
-
-    .dark .inv-prefilled-grey {
-      color: #64748b !important;
-      background: rgba(15, 23, 42, 0.65) !important;
-    }
-
-    .inv-prefilled-grey:focus,
-    .inv-prefilled-grey.user-edited {
-      color: #0f172a !important;
-      background: #ffffff !important;
-      border-style: solid !important;
-    }
-
-    .dark .inv-prefilled-grey:focus,
-    .dark .inv-prefilled-grey.user-edited {
-      color: #f8fafc !important;
-      background: rgba(30, 41, 59, 0.9) !important;
-      border-style: solid !important;
-    }
-
-    /* Input validation states */
-    .input-valid {
-      border-color: #10b981 !important;
-    }
-
-    .input-invalid {
-      border-color: #f43f5e !important;
-    }
+    .input-valid { border-color: #10b981 !important; }
+    .input-invalid { border-color: #f43f5e !important; }
   </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-20 sm:pb-12 selection:bg-blue-500 selection:text-white relative">
 
-  <!-- Ambient Floating Orbs -->
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
-  <!-- Custom Non-Blocking Toast Container -->
   <div id="toastContainer" class="fixed bottom-16 sm:bottom-5 left-4 sm:left-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-3 pointer-events-none"></div>
 
   <!-- Sticky Top Header Bar -->
   <header class="sticky top-0 z-40 glass-card border-b border-slate-200/80 dark:border-slate-800/80 px-3 sm:px-6 py-2.5 sm:py-3">
     <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-2 sm:gap-3">
       <div class="flex items-center gap-2.5 sm:gap-3">
-        <!-- Home Button (Preserves .home-button and onclick="goHome()") -->
         <button
           class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0"
           onclick="goHome()"
@@ -532,17 +295,13 @@
               <span>TCC Candidate Management</span>
             </h1>
             <span id="userTypeBadge" class="user-type-badge"></span>
-            <span class="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25" title="Power Automate flow is disabled and bypassed">
-              <i class="fas fa-bolt-slash text-[9px]"></i> PA Bypassed
-            </span>
           </div>
           <p class="dashboard-subtitle text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-            One-view pipeline tracking, bulk status updates, interview scheduling & Joined candidate invoice generator
+            Pipeline tracking, bulk status updates, interview scheduling &amp; Joined candidate invoice generator
           </p>
         </div>
       </div>
 
-      <!-- Right Action Controls: Refresh, Export CSV, View Toggle, Dark/Light Theme -->
       <div class="flex items-center gap-1.5 sm:gap-2">
         <button
           type="button"
@@ -558,20 +317,19 @@
           type="button"
           onclick="exportFilteredToCSV()"
           class="px-2.5 sm:px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
-          title="Export Filtered Candidates to Safe CSV"
+          title="Export Filtered Candidates to CSV"
         >
           <i class="fas fa-file-csv"></i>
           <span class="hidden md:inline">Export CSV</span>
         </button>
 
-        <!-- Table / Card View Switcher -->
         <div class="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
           <button
             type="button"
             id="viewTableBtn"
             onclick="switchDisplayMode('table')"
             class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all"
-            title="High-Density Table View"
+            title="Table View"
           >
             <i class="fas fa-table"></i>
           </button>
@@ -580,7 +338,7 @@
             id="viewCardsBtn"
             onclick="switchDisplayMode('cards')"
             class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all"
-            title="Mobile / Grid Card View"
+            title="Card View"
           >
             <i class="fas fa-grip"></i>
           </button>
@@ -599,12 +357,11 @@
     </div>
   </header>
 
-  <!-- ==================== MAIN DASHBOARD CONTAINER (#dashboard) ==================== -->
+  <!-- MAIN DASHBOARD CONTAINER (#dashboard) -->
   <div id="dashboard" class="max-w-[1600px] mx-auto px-3 sm:px-6 pt-4 sm:pt-5 relative z-10">
 
-    <!-- Live Pipeline One-View 6-Card KPI Summary Strip (Clickable Quick Filters) -->
+    <!-- 6-Card KPI Summary Strip -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 mb-4 animate-in">
-      <!-- KPI 1: Total Pipeline -->
       <button type="button" onclick="quickFilterByCategory('')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-blue-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
           <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Pipeline</span>
@@ -616,7 +373,6 @@
         <p class="text-[10px] text-slate-400 mt-0.5 truncate">Click to show all</p>
       </button>
 
-      <!-- KPI 2: Selected / Shortlisted -->
       <button type="button" onclick="quickFilterByCategory('select')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-emerald-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
           <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Shortlisted</span>
@@ -628,7 +384,6 @@
         <p class="text-[10px] text-slate-400 mt-0.5 truncate">Active &amp; Joined</p>
       </button>
 
-      <!-- KPI 3: On Hold / Pending -->
       <button type="button" onclick="quickFilterByCategory('hold')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-amber-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
           <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">On Hold</span>
@@ -640,7 +395,6 @@
         <p class="text-[10px] text-slate-400 mt-0.5 truncate">Awaiting feedback</p>
       </button>
 
-      <!-- KPI 4: Rejected / Dropped -->
       <button type="button" onclick="quickFilterByCategory('reject')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-rose-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
           <span class="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Rejected</span>
@@ -652,7 +406,6 @@
         <p class="text-[10px] text-slate-400 mt-0.5 truncate">Dropped / L1-L3</p>
       </button>
 
-      <!-- KPI 5: Interviews Scheduled -->
       <button type="button" onclick="quickFilterByCategory('interview')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-purple-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
           <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">Interviews</span>
@@ -664,7 +417,6 @@
         <p class="text-[10px] text-slate-400 mt-0.5 truncate">Scheduled lineup</p>
       </button>
 
-      <!-- KPI 6: Joined Candidates (Quick Filter for Invoice Ready) -->
       <button type="button" onclick="quickFilterByCategory('joined')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left border-indigo-500/30 bg-indigo-500/5 hover:border-indigo-500/60 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
           <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">Joined (Invoice)</span>
@@ -677,7 +429,7 @@
       </button>
     </div>
 
-    <!-- Search & Filters Card (Preserves #nameSearch, #searchButton, #companySelect, #statusSelect) -->
+    <!-- Search & Filters Card -->
     <div class="filters-container glass-card rounded-3xl p-4 sm:p-5 mb-4 animate-in" id="filterTopAnchor">
       <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
         <h3 class="filters-title font-display font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-2">
@@ -750,7 +502,7 @@
       </div>
     </div>
 
-    <!-- Bulk Update Floating/Inline Bar (Preserves #bulkUpdateBtn and #bulkUpdateText) -->
+    <!-- Bulk Update Bar -->
     <div class="bulk-update-container my-3 flex justify-center">
       <button class="bulk-update-btn" id="bulkUpdateBtn" onclick="openBulkUpdatePopup()">
         <i class="fas fa-pen-to-square"></i>
@@ -758,7 +510,7 @@
       </button>
     </div>
 
-    <!-- Candidate Database Table Container (Preserves #candidateTable, #selectAllCheckbox) -->
+    <!-- Candidate Database Table Container -->
     <div class="table-container glass-card rounded-3xl overflow-hidden animate-in" id="tableViewWrapper">
       <div class="table-header px-4 sm:px-5 py-3.5 border-b border-slate-200/80 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2.5 bg-slate-100/60 dark:bg-slate-900/40">
         <div class="flex flex-wrap items-center gap-2">
@@ -808,10 +560,10 @@
       </div>
     </div>
 
-    <!-- Mobile / Grid Card View Container (Synced with filteredCandidates) -->
+    <!-- Mobile / Grid Card View Container -->
     <div id="cardsViewWrapper" class="hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 mt-2"></div>
 
-    <!-- ==================== STATUS UPDATE POPUP (#popup) ==================== -->
+    <!-- STATUS UPDATE POPUP (#popup) -->
     <div class="popup-overlay" id="popup">
       <div class="popup-content glass-card">
         <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-200 dark:border-slate-800">
@@ -823,7 +575,6 @@
           </button>
         </div>
 
-        <!-- Single Candidate One-View Info -->
         <div class="popup-info p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 mb-4 space-y-1.5 text-xs" id="singleCandidateInfo">
           <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">Name:</strong> <span id="popupCandidateName" class="font-bold text-slate-900 dark:text-white text-right"></span></p>
           <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">Company:</strong> <span id="popupCompany" class="font-semibold text-slate-800 dark:text-slate-200 text-right"></span></p>
@@ -832,7 +583,6 @@
           <span id="popup__powerappsid__" class="hidden"></span>
         </div>
 
-        <!-- Bulk Update Info -->
         <div class="bulk-info p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 mb-4 text-xs" id="bulkUpdateInfo" style="display: none;">
           <p class="mb-1"><strong>Selected Candidates:</strong> <span id="bulkCandidateCount" class="font-bold text-emerald-600 dark:text-emerald-400"></span></p>
           <p class="mb-2"><strong>Companies:</strong> <span id="bulkCompanies" class="font-semibold"></span></p>
@@ -898,7 +648,7 @@
       </div>
     </div>
 
-    <!-- ==================== INTERVIEW SCHEDULING POPUP (#extraPopup) ==================== -->
+    <!-- INTERVIEW SCHEDULING POPUP (#extraPopup) -->
     <div class="popup-overlay" id="extraPopup">
       <div class="popup-content compact glass-card">
         <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
@@ -906,8 +656,8 @@
             <h3 class="font-display font-extrabold text-base sm:text-lg text-slate-900 dark:text-white flex items-center gap-2">
               <i class="fas fa-calendar-plus text-emerald-500"></i> Schedule Interview
             </h3>
-            <p class="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
-              Direct Supabase Save &amp; WhatsApp Invite • Power Automate Bypassed
+            <p class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+              Direct Supabase Save &amp; WhatsApp Invite
             </p>
           </div>
           <button type="button" onclick="closeExtraPopup()" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
@@ -927,9 +677,9 @@
           <div class="compact-row p-3 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <span class="font-bold text-slate-600 dark:text-slate-300"><i class="fas fa-paper-plane text-indigo-500 mr-1.5"></i> Channel:</span>
             <div class="checkbox-group flex items-center gap-3.5">
-              <label class="checkbox-item flex items-center gap-1.5 font-semibold cursor-pointer" title="Power Automate Email Flow is bypassed">
+              <label class="checkbox-item flex items-center gap-1.5 font-semibold cursor-pointer">
                 <input type="checkbox" id="sendEmail" class="w-4 h-4 accent-blue-600 rounded">
-                <i class="fas fa-envelope text-blue-500"></i> Email <span class="text-[9px] px-1 py-0.5 rounded bg-amber-500/15 text-amber-700 dark:text-amber-300">PA Bypassed</span>
+                <i class="fas fa-envelope text-blue-500"></i> Email
               </label>
               <label class="checkbox-item flex items-center gap-1.5 font-semibold cursor-pointer">
                 <input type="checkbox" id="sendWhatsapp" checked class="w-4 h-4 accent-emerald-600 rounded">
@@ -1017,7 +767,7 @@
       </div>
     </div>
 
-    <!-- ==================== OFFICIAL INVOICE GENERATOR POPUP (#invoicePopup) ==================== -->
+    <!-- OFFICIAL INVOICE GENERATOR POPUP (#invoicePopup) -->
     <div class="popup-overlay" id="invoicePopup">
       <div class="popup-content invoice-modal glass-card">
         <div class="flex items-center justify-between pb-3 mb-3.5 border-b border-slate-200 dark:border-slate-800">
@@ -1040,7 +790,6 @@
           </button>
         </div>
 
-        <!-- Candidate Snapshot Banner -->
         <div class="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 mb-4 flex items-center justify-between gap-2 text-xs">
           <div>
             <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Joined Candidate</span>
@@ -1059,7 +808,6 @@
         </div>
 
         <div class="space-y-3.5 text-xs">
-          <!-- 1. Select Company Name & Address Dropdown -->
           <div>
             <div class="flex items-center justify-between mb-1">
               <label for="invCompanyAddressSelect" class="block text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -1067,12 +815,9 @@
               </label>
               <span class="text-[10px] font-semibold text-blue-600 dark:text-blue-400">Auto-fills Billed To</span>
             </div>
-            <select id="invCompanyAddressSelect" onchange="onInvoiceCompanyAddressSelect()" class="form-control-input font-semibold">
-              <!-- Populated dynamically from Supabase office_locations + defaults -->
-            </select>
+            <select id="invCompanyAddressSelect" onchange="onInvoiceCompanyAddressSelect()" class="form-control-input font-semibold"></select>
           </div>
 
-          <!-- Editable Client Company Name & Address Preview -->
           <div class="grid grid-cols-1 gap-2.5 p-3 rounded-2xl bg-slate-100/80 dark:bg-slate-900/70 border border-slate-200/80 dark:border-slate-800">
             <div>
               <label for="invCompanyNameInput" class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
@@ -1098,7 +843,6 @@
             </div>
           </div>
 
-          <!-- 2. Invoice No (Pre-filled in Grey & Editable) + Joining Date (DOJ) -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <div class="flex items-center justify-between mb-1">
@@ -1134,7 +878,6 @@
             </div>
           </div>
 
-          <!-- 3. Annual CTC (INR) + % of Service Fee -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <div class="flex items-center justify-between mb-1">
@@ -1174,7 +917,6 @@
             </div>
           </div>
 
-          <!-- Live Calculated Invoice Tax & Payable Summary -->
           <div class="p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
             <div class="flex justify-between text-slate-600 dark:text-slate-300">
               <span>Service Fee (<span id="invSummaryRateText">8.33</span>% of CTC):</span>
@@ -1205,13 +947,13 @@
 
   </div>
 
-  <!-- WhatsApp Float Button (Preserves #waFloatBtn and #waButtonText) -->
+  <!-- WhatsApp Float Button -->
   <a id="waFloatBtn" href="#" target="_blank" rel="noopener noreferrer">
     <i class="fab fa-whatsapp text-lg"></i>
     <span id="waButtonText">Send WhatsApp</span>
   </a>
 
-  <!-- Mobile-First Bottom Quick Navigation Bar (Thumb-friendly on phones) -->
+  <!-- Mobile Bottom Quick Navigation Bar -->
   <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 glass-card border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
     <button type="button" onclick="goHome()" class="flex flex-col items-center gap-0.5 text-blue-600 dark:text-blue-400 text-[10px] font-bold">
       <i class="fas fa-house text-sm"></i>
@@ -1236,30 +978,25 @@
   </nav>
 
   <script>
-    // ==================== SUPABASE CONFIGURATION ====================
     const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0';
-
-    // Initialize Supabase Client
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Official TCC Remittance & Company Configuration for PDF Generation
     const REMITTANCE_CONFIG = {
       email: "ruchi.mishra@talentconnectconsultancy.com",
       phone: "+91 8600550467",
       accountName: "TALENT CONNECT CONSULTANCY",
       bankName: "CENTRAL BANK OF INDIA",
-      accountNo: ["58271", "87120"].join(""),
-      ifsc: ["CBIN0", "280641"].join(""),
+      accountNo: "5827187120",
+      ifsc: "CBIN0280641",
       branch: "VIRAR EAST",
       panHolder: "Ruchi Aakash Mishra",
-      panNo: ["BHHPT", "2097K"].join(""),
+      panNo: "BHHPT2097K",
       signatory: "Ruchi Mishra",
       regNo: "MH-17-0142203",
       regOffice: "1918, Phase 1, Suraksha Smart City, Vasai East, Palghar 401 208."
     };
 
-    // Built-in Default Client Billing Addresses
     const DEFAULT_CLIENT_ADDRESSES = [
       {
         company: "Angel Portal Private Limited",
@@ -1273,32 +1010,29 @@
       }
     ];
 
-    // ==================== REQUIREMENT #5: POWER AUTOMATE BYPASS ====================
-    window.POWER_AUTOMATE_ENABLED = false;
-    window.BYPASS_POWER_AUTOMATE = true;
-    sessionStorage.setItem('powerAutomateEnabled', 'false');
-    sessionStorage.setItem('bypassPowerAutomate', 'true');
+    let loggedInEmail = "";
+    let candidates = [];
+    let filteredCandidates = [];
+    let selectedCandidates = [];
+    let currentEmail = "";
+    let currentCandidateId = "";
+    let currentCandidate = null;
+    let currentInvoiceCandidate = null;
+    let locationRows = [];
+    let companyAddressList = [];
+    let lastWhatsAppLink = "";
+    let isBulkUpdate = false;
+    let currentDisplayMode = 'table';
 
-    // Global fetch interceptor to ensure any Power Automate / Logic App webhook is safely bypassed
-    const originalFetch = window.fetch.bind(window);
-    window.fetch = async function(resource, config) {
-      const urlStr = typeof resource === 'string' ? resource : (resource?.url || '');
-      if (
-        urlStr.includes('powerplatform.com') ||
-        urlStr.includes('powerautomate') ||
-        urlStr.includes('logic.azure.com') ||
-        urlStr.includes('flow.microsoft.com')
-      ) {
-        console.info('[Power Automate Bypassed] Webhook call intercepted and bypassed:', urlStr);
-        return new Response(
-          JSON.stringify({ success: true, bypassed: true, message: 'Power Automate is disabled and bypassed.' }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
-        );
-      }
-      return originalFetch(resource, config);
-    };
+    function getElement(id) {
+      return document.getElementById(id);
+    }
 
-    // ==================== REQUIREMENT #1: SECURITY UTILITIES ====================
+    const tableBody = document.querySelector("#candidateTable tbody");
+    const companySelect = getElement("companySelect");
+    const statusSelect = getElement("statusSelect");
+    const nameSearchInput = getElement("nameSearch");
+
     function escapeHtml(unsafe) {
       if (unsafe === null || unsafe === undefined) return "";
       return String(unsafe)
@@ -1309,24 +1043,19 @@
         .replace(/'/g, "&#039;");
     }
 
-    // Prevent CSV Formula Injection (CSV Injection) when exporting to Excel/Sheets
     function sanitizeCsvCell(val) {
       let str = String(val ?? "").replace(/"/g, '""').trim();
-      if (/^[=+\-@\t\r]/.test(str)) {
-        str = "'" + str;
-      }
+      if (/^[=+\-@\t\r]/.test(str)) str = "'" + str;
       return `"${str}"`;
     }
 
     function toggleTheme() {
-      const html = document.documentElement;
-      const isDark = html.classList.toggle('dark');
+      const isDark = document.documentElement.classList.toggle('dark');
       sessionStorage.setItem('tccTheme', isDark ? 'dark' : 'light');
     }
 
-    // Custom XSS-Safe Toast Notification Helper
     function showToast(message, type = 'info') {
-      const container = document.getElementById('toastContainer');
+      const container = getElement('toastContainer');
       if (!container) return;
       const toast = document.createElement('div');
       const colors = {
@@ -1343,13 +1072,11 @@
 
       const iconEl = document.createElement('i');
       iconEl.className = `fas ${icons[type] || icons.info} shrink-0`;
-
       const textSpan = document.createElement('span');
       textSpan.className = 'flex-1';
       textSpan.textContent = String(message || '');
 
-      toast.appendChild(iconEl);
-      toast.appendChild(textSpan);
+      toast.append(iconEl, textSpan);
       container.appendChild(toast);
 
       setTimeout(() => {
@@ -1359,16 +1086,27 @@
       }, 3800);
     }
 
-    // ==================== REQUIREMENT #4: INPUT CONDITION CHECKS ====================
-    // 1. Search Input Condition Check
+    function setValidationState(el, isValid, errEl = null, errMsg = '', badgeEl = null, badgeText = '') {
+      if (el) {
+        el.classList.toggle('input-valid', isValid);
+        el.classList.toggle('input-invalid', !isValid);
+      }
+      if (errEl) {
+        if (errMsg) errEl.textContent = errMsg;
+        errEl.classList.toggle('hidden', isValid || !errMsg);
+      }
+      if (badgeEl && badgeText) badgeEl.textContent = badgeText;
+      return isValid;
+    }
+
     function validateSearchInput(inputEl) {
       if (!inputEl) return;
       const cleaned = inputEl.value.replace(/[<>"{}`\\]/g, '').slice(0, 60);
       if (inputEl.value !== cleaned) inputEl.value = cleaned;
 
-      const counterEl = document.getElementById('nameSearchCounter');
-      const clearBtn = document.getElementById('clearNameSearchBtn');
-      const badgeEl = document.getElementById('searchCondBadge');
+      const counterEl = getElement('nameSearchCounter');
+      const clearBtn = getElement('clearNameSearchBtn');
+      const badgeEl = getElement('searchCondBadge');
 
       if (counterEl) counterEl.textContent = `${cleaned.length}/60`;
       if (clearBtn) clearBtn.style.display = cleaned.length > 0 ? 'inline-flex' : 'none';
@@ -1376,169 +1114,91 @@
     }
 
     function clearSearchField() {
-      const el = document.getElementById('nameSearch');
-      if (el) {
-        el.value = '';
-        validateSearchInput(el);
+      if (nameSearchInput) {
+        nameSearchInput.value = '';
+        validateSearchInput(nameSearchInput);
         applyFilters(false);
       }
     }
 
-    // 2. Status Update Modal Dropdowns & Comment Condition Check
     function validateStatusModalInputs() {
-      const stEl = document.getElementById('statusDropdown');
-      const fnEl = document.getElementById('finalStatusDropdown');
-      const stBadge = document.getElementById('statusStageBadge');
-      const fnBadge = document.getElementById('finalStatusCondBadge');
-      const errMsg = document.getElementById('statusModalErrorMsg');
-
-      let valid = true;
-      if (!stEl?.value) {
-        stEl?.classList.remove('input-valid');
-        stEl?.classList.add('input-invalid');
-        if (stBadge) stBadge.textContent = 'Required';
-        valid = false;
-      } else {
-        stEl?.classList.remove('input-invalid');
-        stEl?.classList.add('input-valid');
-        if (stBadge) stBadge.textContent = '✓ Selected';
-      }
-
-      if (!fnEl?.value) {
-        fnEl?.classList.remove('input-valid');
-        fnEl?.classList.add('input-invalid');
-        if (fnBadge) fnBadge.textContent = 'Required';
-        valid = false;
-      } else {
-        fnEl?.classList.remove('input-invalid');
-        fnEl?.classList.add('input-valid');
-        if (fnBadge) fnBadge.textContent = '✓ Selected';
-      }
-
-      if (errMsg && valid) errMsg.classList.add('hidden');
-      return valid;
+      const stEl = getElement('statusDropdown');
+      const fnEl = getElement('finalStatusDropdown');
+      const stValid = setValidationState(stEl, Boolean(stEl?.value), null, '', getElement('statusStageBadge'), stEl?.value ? '✓ Selected' : 'Required');
+      const fnValid = setValidationState(fnEl, Boolean(fnEl?.value), null, '', getElement('finalStatusCondBadge'), fnEl?.value ? '✓ Selected' : 'Required');
+      if (stValid && fnValid) getElement('statusModalErrorMsg')?.classList.add('hidden');
+      return stValid && fnValid;
     }
 
     function validateCommentInput(textareaEl) {
       if (!textareaEl) return true;
       const cleaned = textareaEl.value.replace(/[<>]/g, '').slice(0, 300);
       if (textareaEl.value !== cleaned) textareaEl.value = cleaned;
-      const counter = document.getElementById('commentCharCounter');
+      const counter = getElement('commentCharCounter');
       if (counter) counter.textContent = `${cleaned.length}/300`;
       return true;
     }
 
-    // 3. Interview Date & Time Condition Check
     function validateInterviewDateTime(inputEl) {
-      const el = inputEl || document.getElementById('extraDateTime');
-      const errEl = document.getElementById('extraDateTimeErrorMsg');
-      const badgeEl = document.getElementById('dateTimeCondBadge');
+      const el = inputEl || getElement('extraDateTime');
+      const errEl = getElement('extraDateTimeErrorMsg');
+      const badgeEl = getElement('dateTimeCondBadge');
       if (!el) return false;
 
       if (!el.value) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = 'Please select an interview date and time.';
-          errEl.classList.remove('hidden');
-        }
-        if (badgeEl) badgeEl.textContent = 'Required';
-        return false;
+        return setValidationState(el, false, errEl, 'Please select an interview date and time.', badgeEl, 'Required');
       }
-
       const selectedDate = new Date(el.value);
-      const nowMinus5Min = new Date(Date.now() - 5 * 60 * 1000);
-      if (isNaN(selectedDate.getTime()) || selectedDate < nowMinus5Min) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = 'Interview date/time cannot be in the past.';
-          errEl.classList.remove('hidden');
-        }
-        if (badgeEl) badgeEl.textContent = 'Past date invalid';
-        return false;
+      if (isNaN(selectedDate.getTime()) || selectedDate < new Date(Date.now() - 5 * 60 * 1000)) {
+        return setValidationState(el, false, errEl, 'Interview date/time cannot be in the past.', badgeEl, 'Past date invalid');
       }
-
-      el.classList.remove('input-invalid');
-      el.classList.add('input-valid');
-      if (errEl) errEl.classList.add('hidden');
-      if (badgeEl) badgeEl.textContent = '✓ Valid schedule';
-      return true;
+      return setValidationState(el, true, errEl, '', badgeEl, '✓ Valid schedule');
     }
 
-    // 4. Physical Location Condition Check & Live Address Preview
     function validateLocationSelection() {
-      const select = document.getElementById('locationSelect');
-      const preview = document.getElementById('selectedLocationPreview');
-      const badge = document.getElementById('locationCondBadge');
+      const select = getElement('locationSelect');
+      const preview = getElement('selectedLocationPreview');
+      const badge = getElement('locationCondBadge');
       if (!select) return false;
 
       const val = (select.value || '').trim();
       if (!val) {
-        select.classList.remove('input-valid');
-        select.classList.add('input-invalid');
-        if (preview) preview.classList.add('hidden');
-        if (badge) badge.textContent = 'Required';
-        return false;
+        preview?.classList.add('hidden');
+        return setValidationState(select, false, null, '', badge, 'Required');
       }
 
-      select.classList.remove('input-invalid');
-      select.classList.add('input-valid');
-      if (badge) badge.textContent = '✓ Verified';
-
+      setValidationState(select, true, null, '', badge, '✓ Verified');
       const normalize = str => (str || "").toString().trim().toLowerCase();
-      const loc = (locationRows || []).find(r => {
-        const locName = normalize(r.office_locations ?? r.Office_Locations ?? r.Location ?? "");
-        return locName === normalize(val);
-      });
+      const loc = (locationRows || []).find(r => normalize(r.office_locations ?? r.Office_Locations ?? r.Location ?? "") === normalize(val));
 
       if (loc && preview) {
-        const spoc = getVal(loc, "Spoc_Name", "spoc_name") || "-";
-        const phone = getVal(loc, "Spoc_Number", "spoc_number") || "-";
-        const addr = getVal(loc, "Address", "address") || "-";
         preview.innerHTML = '';
         const p1 = document.createElement('p');
         p1.className = 'font-bold text-slate-900 dark:text-white';
-        p1.textContent = `SPOC: ${spoc} (${phone})`;
+        p1.textContent = `SPOC: ${getVal(loc, "Spoc_Name", "spoc_name") || "-"} (${getVal(loc, "Spoc_Number", "spoc_number") || "-"})`;
         const p2 = document.createElement('p');
         p2.className = 'text-[10px] text-slate-500 dark:text-slate-400';
-        p2.textContent = `Address: ${addr}`;
-        preview.appendChild(p1);
-        preview.appendChild(p2);
+        p2.textContent = `Address: ${getVal(loc, "Address", "address") || "-"}`;
+        preview.append(p1, p2);
         preview.classList.remove('hidden');
       }
       return true;
     }
 
-    // 5. Online Meeting Link Condition Check
     function validateInviteLinkField(inputEl) {
-      const el = inputEl || document.getElementById('inviteLink');
-      const errEl = document.getElementById('inviteLinkErrorMsg');
-      const badgeEl = document.getElementById('inviteLinkCondBadge');
+      const el = inputEl || getElement('inviteLink');
       if (!el) return false;
-
-      const val = el.value.trim();
-      const urlRegex = /^https:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/\S*)?$/;
-
-      if (!val || !urlRegex.test(val)) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = 'Enter a secure meeting URL starting with https:// (e.g. Google Meet, Zoom, Teams).';
-          errEl.classList.remove('hidden');
-        }
-        if (badgeEl) badgeEl.textContent = 'Invalid URL';
-        return false;
-      }
-
-      el.classList.remove('input-invalid');
-      el.classList.add('input-valid');
-      if (errEl) errEl.classList.add('hidden');
-      if (badgeEl) badgeEl.textContent = '✓ Valid URL';
-      return true;
+      const isValid = /^https:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/\S*)?$/.test(el.value.trim());
+      return setValidationState(
+        el,
+        isValid,
+        getElement('inviteLinkErrorMsg'),
+        isValid ? '' : 'Enter a secure meeting URL starting with https:// (e.g. Google Meet, Zoom, Teams).',
+        getElement('inviteLinkCondBadge'),
+        isValid ? '✓ Valid URL' : 'Invalid URL'
+      );
     }
 
-    // Helper to check if a candidate's status or final_status (sub-status) is "Joined"
     function isCandidateJoined(c) {
       if (!c) return false;
       const st = (c.status || '').toString().trim().toLowerCase();
@@ -1546,81 +1206,51 @@
       return st === 'joined' || fn === 'joined';
     }
 
-    // View Mode Toggle (Table vs Cards)
-    let currentDisplayMode = 'table';
     function switchDisplayMode(mode) {
       currentDisplayMode = mode;
-      const tableWrapper = document.getElementById('tableViewWrapper');
-      const cardsWrapper = document.getElementById('cardsViewWrapper');
-      const btnTable = document.getElementById('viewTableBtn');
-      const btnCards = document.getElementById('viewCardsBtn');
+      const tableWrapper = getElement('tableViewWrapper');
+      const cardsWrapper = getElement('cardsViewWrapper');
+      const btnTable = getElement('viewTableBtn');
+      const btnCards = getElement('viewCardsBtn');
+      const activeCls = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
+      const inactiveCls = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
 
-      if (mode === 'cards') {
-        tableWrapper.classList.add('hidden');
-        cardsWrapper.classList.remove('hidden');
-        cardsWrapper.classList.add('grid');
-        if (btnCards) btnCards.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
-        if (btnTable) btnTable.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
-      } else {
-        tableWrapper.classList.remove('hidden');
-        cardsWrapper.classList.add('hidden');
-        cardsWrapper.classList.remove('grid');
-        if (btnTable) btnTable.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
-        if (btnCards) btnCards.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
-      }
+      const isCards = mode === 'cards';
+      tableWrapper?.classList.toggle('hidden', isCards);
+      cardsWrapper?.classList.toggle('hidden', !isCards);
+      cardsWrapper?.classList.toggle('grid', isCards);
+      if (btnCards) btnCards.className = isCards ? activeCls : inactiveCls;
+      if (btnTable) btnTable.className = isCards ? inactiveCls : activeCls;
     }
 
-    // Update KPI Cards & Showing Count
     function updateDashboardKPIs(dataList) {
       const list = Array.isArray(dataList) ? dataList : [];
-      let selectedCount = 0;
-      let holdCount = 0;
-      let rejectedCount = 0;
-      let interviewCount = 0;
-      let joinedCount = 0;
+      let selectedCount = 0, holdCount = 0, rejectedCount = 0, interviewCount = 0, joinedCount = 0;
 
       list.forEach(c => {
         const st = (c.final_status || c.status || '').toLowerCase();
-        if (st.includes('select') || st.includes('shortlist') || st.includes('join')) {
-          selectedCount++;
-        } else if (st.includes('hold') || st.includes('delay')) {
-          holdCount++;
-        } else if (st.includes('reject') || st.includes('not')) {
-          rejectedCount++;
-        }
-        if (c.interview_date) {
-          interviewCount++;
-        }
-        if (isCandidateJoined(c)) {
-          joinedCount++;
-        }
+        if (st.includes('select') || st.includes('shortlist') || st.includes('join')) selectedCount++;
+        else if (st.includes('hold') || st.includes('delay')) holdCount++;
+        else if (st.includes('reject') || st.includes('not')) rejectedCount++;
+        if (c.interview_date) interviewCount++;
+        if (isCandidateJoined(c)) joinedCount++;
       });
 
-      const totalEl = document.getElementById('kpiTotalCount');
-      const selEl = document.getElementById('kpiSelectedCount');
-      const holdEl = document.getElementById('kpiHoldCount');
-      const rejEl = document.getElementById('kpiRejectedCount');
-      const intEl = document.getElementById('kpiInterviewsCount');
-      const joinEl = document.getElementById('kpiJoinedCount');
-      const badgeEl = document.getElementById('showingCountBadge');
-
-      if (totalEl) totalEl.textContent = list.length;
-      if (selEl) selEl.textContent = selectedCount;
-      if (holdEl) holdEl.textContent = holdCount;
-      if (rejEl) rejEl.textContent = rejectedCount;
-      if (intEl) intEl.textContent = interviewCount;
-      if (joinEl) joinEl.textContent = joinedCount;
-      if (badgeEl) badgeEl.textContent = `${list.length} Candidate${list.length === 1 ? '' : 's'}`;
+      getElement('kpiTotalCount').textContent = list.length;
+      getElement('kpiSelectedCount').textContent = selectedCount;
+      getElement('kpiHoldCount').textContent = holdCount;
+      getElement('kpiRejectedCount').textContent = rejectedCount;
+      getElement('kpiInterviewsCount').textContent = interviewCount;
+      getElement('kpiJoinedCount').textContent = joinedCount;
+      getElement('showingCountBadge').textContent = `${list.length} Candidate${list.length === 1 ? '' : 's'}`;
     }
 
     function quickFilterByCategory(keyword) {
-      const statusSel = document.getElementById('statusSelect');
       if (!keyword) {
-        if (statusSel) statusSel.value = '';
-        applyFilters(false);
-        return;
+        if (statusSelect) statusSelect.value = '';
+        return applyFilters(false);
       }
-      const filtered = candidates.filter(c => {
+      filteredCandidates = candidates.filter(c => {
         const st = (c.final_status || c.status || '').toLowerCase();
         if (keyword === 'joined') return isCandidateJoined(c);
         if (keyword === 'select') return st.includes('select') || st.includes('shortlist') || st.includes('join');
@@ -1629,9 +1259,8 @@
         if (keyword === 'interview') return Boolean(c.interview_date);
         return true;
       });
-      filteredCandidates = filtered;
       clearAllSelections();
-      renderTable(filtered);
+      renderTable(filteredCandidates);
     }
 
     function resetAllFilters() {
@@ -1646,18 +1275,17 @@
     }
 
     function refreshCandidateData() {
-      const icon = document.getElementById('refreshIcon');
-      if (icon) icon.classList.add('fa-spin');
+      const icon = getElement('refreshIcon');
+      icon?.classList.add('fa-spin');
       loadDashboard().finally(() => {
-        if (icon) icon.classList.remove('fa-spin');
+        icon?.classList.remove('fa-spin');
         showToast('Candidate database synced with Supabase', 'success');
       });
     }
 
     function exportFilteredToCSV() {
-      if (!filteredCandidates || filteredCandidates.length === 0) {
-        showToast('No candidates to export', 'error');
-        return;
+      if (!filteredCandidates || !filteredCandidates.length) {
+        return showToast('No candidates to export', 'error');
       }
       const headers = ['Updated', 'Name', 'Email', 'Mobile', 'Position', 'Company', 'Current CTC', 'Expected CTC', 'Experience', 'Notice Period', 'Recruiter', 'Final Status', 'Comment'];
       const rows = filteredCandidates.map(c => [
@@ -1676,102 +1304,47 @@
         sanitizeCsvCell(c.comment || '')
       ]);
       const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
-      const encodedUri = encodeURI(csvContent);
       const link = document.createElement('a');
-      link.setAttribute('href', encodedUri);
-      link.setAttribute('download', `TCC_Candidates_${new Date().toISOString().slice(0,10)}.csv`);
+      link.setAttribute('href', encodeURI(csvContent));
+      link.setAttribute('download', `TCC_Candidates_${new Date().toISOString().slice(0, 10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast(`Exported ${filteredCandidates.length} candidates to safe CSV`, 'success');
+      showToast(`Exported ${filteredCandidates.length} candidates to CSV`, 'success');
     }
 
-    // ==================== PRESERVED AUTHENTICATION & CORE LOGIC ====================
     window.addEventListener('load', function() {
-      // Ensure Light Mode is the default unless dark was chosen in session
-      const savedTheme = sessionStorage.getItem('tccTheme');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+      document.documentElement.classList.toggle('dark', sessionStorage.getItem('tccTheme') === 'dark');
+      if (window.innerWidth < 640) switchDisplayMode('cards');
 
-      // Auto-switch to cards view on small mobile screens for optimal UX
-      if (window.innerWidth < 640) {
-        switchDisplayMode('cards');
-      }
-
-      // Get all user data from sessionStorage
-      const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-      const userEmail = sessionStorage.getItem('userEmail');
-      const userName = sessionStorage.getItem('userName');
-      const userContact = sessionStorage.getItem('userContact');
-      const userDesignation = sessionStorage.getItem('userDesignation');
-      const userType = sessionStorage.getItem('userType');
-      const loginTime = sessionStorage.getItem('loginTime');
-
-      // Check if user is authenticated
-      if (isLoggedIn !== 'true') {
+      const userData = getUserData();
+      if (!userData.isLoggedIn) {
         showToast("Session expired or not logged in. Redirecting to login page.", "error");
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 1000);
+        setTimeout(() => { window.location.href = 'index.html'; }, 1000);
         return;
       }
 
-      // Set loggedInEmail to the authenticated user's email
-      loggedInEmail = userEmail;
+      loggedInEmail = userData.email;
+      window.USER_DATA = userData;
 
-      // Store user data globally for easy access
-      window.USER_DATA = {
-        isLoggedIn: isLoggedIn === 'true',
-        email: userEmail,
-        name: userName,
-        contact: userContact,
-        designation: userDesignation,
-        userType: userType,
-        loginTime: loginTime,
-        powerAutomateBypassed: true
-      };
-
-      // Display user type badge
       displayUserTypeBadge();
-
-      // Preload office locations for both Interview Scheduling & Invoice Address Dropdown
       preloadAllOfficeLocations();
-
-      // Load dashboard with authenticated user's data from Supabase
       loadDashboard();
     });
 
-    // Display user type badge
     function displayUserTypeBadge() {
-      const badge = document.getElementById('userTypeBadge');
+      const badge = getElement('userTypeBadge');
       const userData = getUserData();
-
       if (badge && userData.userType) {
-        const userType = userData.userType.toLowerCase();
+        const isAdmin = userData.userType.toLowerCase() === 'admin';
         badge.textContent = userData.userType.toUpperCase();
-
-        if (userType === 'admin') {
-          badge.className = 'user-type-badge user-type-admin';
-        } else {
-          badge.className = 'user-type-badge user-type-user';
-        }
+        badge.className = `user-type-badge ${isAdmin ? 'user-type-admin' : 'user-type-user'}`;
       }
     }
 
-    // Global functions
     function logout() {
-      sessionStorage.removeItem('isLoggedIn');
-      sessionStorage.removeItem('userEmail');
-      sessionStorage.removeItem('userName');
-      sessionStorage.removeItem('userContact');
-      sessionStorage.removeItem('userDesignation');
-      sessionStorage.removeItem('userType');
-      sessionStorage.removeItem('loginTime');
-      sessionStorage.removeItem('userRowIndex');
-
+      ['isLoggedIn', 'userEmail', 'userName', 'userContact', 'userDesignation', 'userType', 'loginTime', 'userRowIndex']
+        .forEach(k => sessionStorage.removeItem(k));
       showToast("Logged out successfully", "info");
       window.location.href = 'index.html';
     }
@@ -1780,7 +1353,6 @@
       window.location.href = 'index.html';
     }
 
-    // Helper function to get complete user data
     function getUserData() {
       return {
         isLoggedIn: sessionStorage.getItem('isLoggedIn') === 'true',
@@ -1793,91 +1365,45 @@
       };
     }
 
-    // Role-based candidate filtering function
     function filterCandidatesByUserType(data) {
       const userData = getUserData();
-
-      if (userData.userType && userData.userType.toLowerCase() === 'admin') {
-        return data;
-      } else {
-        return data.filter(c => {
-          const recEmail = (c.recruiter || c.recruiter_email || "").toLowerCase();
-          return recEmail === (loggedInEmail || "").toLowerCase();
-        });
-      }
+      if (userData.userType && userData.userType.toLowerCase() === 'admin') return data;
+      return data.filter(c => (c.recruiter || c.recruiter_email || "").toLowerCase() === (loggedInEmail || "").toLowerCase());
     }
 
-    // Variables
-    let loggedInEmail = "";
-    let candidates = [];
-    let filteredCandidates = [];
-    let selectedCandidates = [];
-    let currentEmail = "";
-    let currentCandidateId = "";
-    let currentCandidate = null;
-    let currentInvoiceCandidate = null;
-    let locationRows = [];
-    let companyAddressList = [];
-    let lastWhatsAppLink = "";
-    let isBulkUpdate = false;
-
-    function getElement(id) {
-      const element = document.getElementById(id);
-      if (!element) {
-        console.error(`Element with id '${id}' not found`);
-      }
-      return element;
-    }
-
-    const tableBody = document.querySelector("#candidateTable tbody");
-    const companySelect = getElement("companySelect");
-    const statusSelect = getElement("statusSelect");
-    const nameSearchInput = getElement("nameSearch");
-
-    // Enhanced button loading state
     function setButtonLoading(buttonId, isLoading, loadingText = "Processing...") {
       const button = getElement(buttonId);
       if (!button) return;
 
       const btnText = button.querySelector('.btn-text');
       const icon = button.querySelector('i');
+      button.disabled = isLoading;
 
       if (isLoading) {
-        button.disabled = true;
         if (btnText) btnText.textContent = loadingText;
-        if (icon) {
-          icon.className = 'loading-spinner';
-        }
+        if (icon) icon.className = 'loading-spinner';
       } else {
-        button.disabled = false;
-        if (buttonId === 'searchButton') {
-          if (btnText) btnText.textContent = 'Search';
-          if (icon) icon.className = 'fas fa-search';
-        } else if (buttonId === 'statusSubmitButton') {
-          if (btnText) btnText.textContent = 'Update';
-          if (icon) icon.className = 'fas fa-save';
-        } else if (buttonId === 'interviewSubmitButton') {
-          if (btnText) btnText.textContent = 'Send Invitation';
-          if (icon) icon.className = 'fas fa-paper-plane';
+        const defaults = {
+          searchButton: ['Search', 'fas fa-search'],
+          statusSubmitButton: ['Update', 'fas fa-save'],
+          interviewSubmitButton: ['Send Invitation', 'fas fa-paper-plane']
+        }[buttonId];
+        if (defaults) {
+          if (btnText) btnText.textContent = defaults[0];
+          if (icon) icon.className = defaults[1];
         }
       }
     }
 
-    // Preload office_locations from Supabase so Invoice popup has all company names & addresses ready
     async function preloadAllOfficeLocations() {
       try {
-        const { data, error } = await supabaseClient
-          .from('office_locations')
-          .select('*');
-        if (!error && Array.isArray(data)) {
-          locationRows = data;
-        }
+        const { data, error } = await supabaseClient.from('office_locations').select('*');
+        if (!error && Array.isArray(data)) locationRows = data;
       } catch (e) {
         console.warn("Could not preload office_locations:", e);
       }
     }
 
-    // ==================== SUPABASE LOAD DASHBOARD ====================
     async function loadDashboard() {
       try {
         const { data, error } = await supabaseClient
@@ -1885,9 +1411,7 @@
           .select('*')
           .order('timestamp', { ascending: false });
 
-        if (error) {
-          throw error;
-        }
+        if (error) throw error;
 
         const normalizedData = (data || []).map(row => ({
           ...row,
@@ -1897,7 +1421,6 @@
         }));
 
         candidates = filterCandidatesByUserType(normalizedData);
-
         loadCompanyOptions();
         loadStatusOptions();
         applyFilters();
@@ -1910,47 +1433,39 @@
       }
     }
 
-    function loadCompanyOptions() {
-      if (!companySelect) return;
-      const currentVal = companySelect.value;
-      const companies = [...new Set(candidates.map(c => c.company).filter(Boolean))];
-      companySelect.innerHTML = '<option value="">All Companies</option>';
-      companies.forEach(company => {
+    function populateFilterSelect(selectEl, defaultLabel, values, formatFn = v => v) {
+      if (!selectEl) return;
+      const currentVal = selectEl.value;
+      selectEl.innerHTML = `<option value="">${defaultLabel}</option>`;
+      values.forEach(val => {
         const opt = document.createElement("option");
-        opt.value = company;
-        opt.textContent = company;
-        companySelect.appendChild(opt);
+        opt.value = val;
+        opt.textContent = formatFn(val);
+        selectEl.appendChild(opt);
       });
-      if (companies.includes(currentVal)) companySelect.value = currentVal;
+      if (values.includes(currentVal)) selectEl.value = currentVal;
+    }
+
+    function loadCompanyOptions() {
+      const companies = [...new Set(candidates.map(c => c.company).filter(Boolean))];
+      populateFilterSelect(companySelect, 'All Companies', companies);
     }
 
     function loadStatusOptions() {
-      if (!statusSelect) return;
-      const currentVal = statusSelect.value;
       const statuses = [...new Set(candidates.map(c => (c.final_status || '').toLowerCase()).filter(Boolean))];
-      statusSelect.innerHTML = '<option value="">All Status</option>';
-      statuses.forEach(status => {
-        const opt = document.createElement("option");
-        opt.value = status;
-        opt.textContent = status.charAt(0).toUpperCase() + status.slice(1);
-        statusSelect.appendChild(opt);
-      });
-      if (statuses.includes(currentVal)) statusSelect.value = currentVal;
+      populateFilterSelect(statusSelect, 'All Status', statuses, s => s.charAt(0).toUpperCase() + s.slice(1));
     }
 
     function applyFilters(isNameSearch = false) {
       if (!companySelect || !statusSelect || !nameSearchInput) return;
-
-      if (isNameSearch) {
-        setButtonLoading('searchButton', true, 'Searching...');
-      }
+      if (isNameSearch) setButtonLoading('searchButton', true, 'Searching...');
 
       const selectedCompany = companySelect.value;
       const selectedStatus = statusSelect.value;
       const nameQuery = nameSearchInput.value.toLowerCase().trim();
 
       setTimeout(() => {
-        const filtered = candidates.filter(c => {
+        filteredCandidates = candidates.filter(c => {
           const matchCompany = !selectedCompany || c.company === selectedCompany;
           const matchStatus = !selectedStatus || (c.final_status || '').toLowerCase() === selectedStatus;
           const matchQuery = !nameQuery ||
@@ -1961,50 +1476,37 @@
           return matchCompany && matchStatus && matchQuery;
         });
 
-        filteredCandidates = filtered;
         clearAllSelections();
-        renderTable(filtered);
-
-        if (isNameSearch) {
-          setButtonLoading('searchButton', false);
-        }
+        renderTable(filteredCandidates);
+        if (isNameSearch) setButtonLoading('searchButton', false);
       }, isNameSearch ? 180 : 0);
     }
 
-    // Checkbox and bulk update functions
     function toggleSelectAll() {
       const selectAllCheckbox = getElement("selectAllCheckbox");
-      const candidateCheckboxes = document.querySelectorAll('.candidate-checkbox');
-
       if (!selectAllCheckbox) return;
-
       const isChecked = selectAllCheckbox.checked;
 
-      candidateCheckboxes.forEach((checkbox, index) => {
+      document.querySelectorAll('.candidate-checkbox').forEach((checkbox, index) => {
         checkbox.checked = isChecked;
         toggleCandidateSelection(index, isChecked);
       });
-
       updateBulkUpdateButton();
     }
 
     function toggleCandidateSelection(candidateIndex, isSelected) {
       if (candidateIndex >= filteredCandidates.length) return;
-
       const candidate = filteredCandidates[candidateIndex];
       const row = tableBody.children[candidateIndex];
       const uniqueKey = candidate.id || candidate.email;
 
       if (isSelected) {
-        if (!selectedCandidates.some(c => (c.id || c.email) === uniqueKey)) {
-          selectedCandidates.push(candidate);
-        }
-        if (row) row.classList.add('selected');
+        if (!selectedCandidates.some(c => (c.id || c.email) === uniqueKey)) selectedCandidates.push(candidate);
+        row?.classList.add('selected');
       } else {
         selectedCandidates = selectedCandidates.filter(c => (c.id || c.email) !== uniqueKey);
-        if (row) row.classList.remove('selected');
+        row?.classList.remove('selected');
       }
-
       updateSelectAllCheckbox();
       updateBulkUpdateButton();
     }
@@ -2012,33 +1514,22 @@
     function updateSelectAllCheckbox() {
       const selectAllCheckbox = getElement("selectAllCheckbox");
       const candidateCheckboxes = document.querySelectorAll('.candidate-checkbox');
-
-      if (!selectAllCheckbox || candidateCheckboxes.length === 0) return;
+      if (!selectAllCheckbox || !candidateCheckboxes.length) return;
 
       const checkedCount = Array.from(candidateCheckboxes).filter(cb => cb.checked).length;
-
-      if (checkedCount === 0) {
-        selectAllCheckbox.indeterminate = false;
-        selectAllCheckbox.checked = false;
-      } else if (checkedCount === candidateCheckboxes.length) {
-        selectAllCheckbox.indeterminate = false;
-        selectAllCheckbox.checked = true;
-      } else {
-        selectAllCheckbox.indeterminate = true;
-      }
+      selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < candidateCheckboxes.length;
+      selectAllCheckbox.checked = checkedCount === candidateCheckboxes.length;
     }
 
     function updateBulkUpdateButton() {
       const bulkUpdateBtn = getElement("bulkUpdateBtn");
       const bulkUpdateText = getElement("bulkUpdateText");
-
       if (!bulkUpdateBtn || !bulkUpdateText) return;
 
-      if (selectedCandidates.length > 0) {
-        bulkUpdateBtn.classList.add('show');
-        bulkUpdateText.textContent = `Update Status for ${selectedCandidates.length} Selected Candidate${selectedCandidates.length > 1 ? 's' : ''}`;
-      } else {
-        bulkUpdateBtn.classList.remove('show');
+      const count = selectedCandidates.length;
+      bulkUpdateBtn.classList.toggle('show', count > 0);
+      if (count > 0) {
+        bulkUpdateText.textContent = `Update Status for ${count} Selected Candidate${count > 1 ? 's' : ''}`;
       }
     }
 
@@ -2049,51 +1540,11 @@
         selectAllCheckbox.checked = false;
         selectAllCheckbox.indeterminate = false;
       }
-
-      const rows = tableBody.querySelectorAll('tr');
-      rows.forEach(row => row.classList.remove('selected'));
-
+      tableBody?.querySelectorAll('tr').forEach(row => row.classList.remove('selected'));
       updateBulkUpdateButton();
     }
 
-    // XSS-Safe Bulk Update Popup
-    function openBulkUpdatePopup() {
-      if (selectedCandidates.length === 0) {
-        showToast("Please select at least one candidate to update.", "error");
-        return;
-      }
-
-      isBulkUpdate = true;
-
-      const uniqueCompanies = [...new Set(selectedCandidates.map(c => c.company).filter(Boolean))];
-
-      const popupTitle = getElement("popupTitle");
-      const singleCandidateInfo = getElement("singleCandidateInfo");
-      const bulkUpdateInfo = getElement("bulkUpdateInfo");
-      const bulkCandidateCount = getElement("bulkCandidateCount");
-      const bulkCompanies = getElement("bulkCompanies");
-      const bulkCandidatesList = getElement("bulkCandidatesList");
-
-      if (popupTitle) popupTitle.innerHTML = '<i class="fas fa-edit text-blue-500"></i> Bulk Update Status';
-      if (singleCandidateInfo) singleCandidateInfo.style.display = "none";
-      if (bulkUpdateInfo) bulkUpdateInfo.style.display = "block";
-
-      if (bulkCandidateCount) bulkCandidateCount.textContent = selectedCandidates.length;
-      if (bulkCompanies) bulkCompanies.textContent = uniqueCompanies.join(", ");
-
-      if (bulkCandidatesList) {
-        bulkCandidatesList.innerHTML = "";
-        selectedCandidates.forEach(candidate => {
-          const item = document.createElement("div");
-          item.className = "bulk-candidate-item";
-          const strongEl = document.createElement("strong");
-          strongEl.textContent = candidate.name || 'N/A';
-          item.appendChild(strongEl);
-          item.appendChild(document.createTextNode(` - ${candidate.company || 'N/A'} (${candidate.position || 'N/A'})`));
-          bulkCandidatesList.appendChild(item);
-        });
-      }
-
+    function resetStatusModalFields(commentVal = "") {
       const statusDropdown = getElement("statusDropdown");
       const finalStatusDropdown = getElement("finalStatusDropdown");
       const commentBox = getElement("commentBox");
@@ -2107,48 +1558,61 @@
         finalStatusDropdown.classList.remove('input-valid', 'input-invalid');
       }
       if (commentBox) {
-        commentBox.value = "";
+        commentBox.value = commentVal;
         validateCommentInput(commentBox);
       }
+      getElement('statusModalErrorMsg')?.classList.add('hidden');
+    }
 
-      const popup = getElement("popup");
-      if (popup) popup.style.display = "flex";
+    function openBulkUpdatePopup() {
+      if (!selectedCandidates.length) {
+        return showToast("Please select at least one candidate to update.", "error");
+      }
+      isBulkUpdate = true;
+      const uniqueCompanies = [...new Set(selectedCandidates.map(c => c.company).filter(Boolean))];
+
+      getElement("popupTitle").innerHTML = '<i class="fas fa-edit text-blue-500"></i> Bulk Update Status';
+      getElement("singleCandidateInfo").style.display = "none";
+      getElement("bulkUpdateInfo").style.display = "block";
+      getElement("bulkCandidateCount").textContent = selectedCandidates.length;
+      getElement("bulkCompanies").textContent = uniqueCompanies.join(", ");
+
+      const bulkCandidatesList = getElement("bulkCandidatesList");
+      if (bulkCandidatesList) {
+        bulkCandidatesList.innerHTML = "";
+        selectedCandidates.forEach(candidate => {
+          const item = document.createElement("div");
+          item.className = "bulk-candidate-item";
+          const strongEl = document.createElement("strong");
+          strongEl.textContent = candidate.name || 'N/A';
+          item.append(strongEl, document.createTextNode(` - ${candidate.company || 'N/A'} (${candidate.position || 'N/A'})`));
+          bulkCandidatesList.appendChild(item);
+        });
+      }
+
+      resetStatusModalFields("");
+      getElement("popup").style.display = "flex";
     }
 
     function formatTimestamp(ts) {
       if (!ts) return "N/A";
-      try {
-        const date = new Date(ts);
-        if (isNaN(date.getTime())) return ts;
-
-        const dd = String(date.getDate()).padStart(2, '0');
-        const mm = String(date.getMonth() + 1).padStart(2, '0');
-        const yy = String(date.getFullYear()).slice(-2);
-
-        return `${dd}/${mm}/${yy}`;
-      } catch (error) {
-        return ts;
-      }
+      const date = new Date(ts);
+      if (isNaN(date.getTime())) return ts;
+      return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${String(date.getFullYear()).slice(-2)}`;
     }
 
     function formatInterviewDT(dt) {
       if (!dt) return "N/A";
-      try {
-        const d = new Date(dt);
-        if (isNaN(d.getTime())) return dt;
-
-        const dd = String(d.getDate()).padStart(2,'0');
-        const mm = String(d.getMonth()+1).padStart(2,'0');
-        const yy = String(d.getFullYear()).slice(-2);
-        let h = d.getHours();
-        const m = String(d.getMinutes()).padStart(2,'0');
-        const ampm = h >= 12 ? 'PM' : 'AM';
-        h = h % 12 || 12;
-
-        return `${dd}-${mm}-${yy} ${h}:${m} ${ampm}`;
-      } catch (error) {
-        return dt;
-      }
+      const d = new Date(dt);
+      if (isNaN(d.getTime())) return dt;
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yy = String(d.getFullYear()).slice(-2);
+      let h = d.getHours();
+      const m = String(d.getMinutes()).padStart(2, '0');
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      return `${dd}-${mm}-${yy} ${h}:${m} ${ampm}`;
     }
 
     function getVal(obj, ...keys) {
@@ -2163,28 +1627,21 @@
       if (!status) return '<span class="status-badge">Pending</span>';
       const lowerStatus = status.toLowerCase();
       let badgeClass = 'status-badge';
-
-      if (lowerStatus.includes('select') || lowerStatus.includes('shortlist') || lowerStatus.includes('join')) {
-        badgeClass += ' status-selected';
-      } else if (lowerStatus.includes('reject') || lowerStatus.includes('not')) {
-        badgeClass += ' status-rejected';
-      } else if (lowerStatus.includes('hold')) {
-        badgeClass += ' status-hold';
-      }
-
+      if (lowerStatus.includes('select') || lowerStatus.includes('shortlist') || lowerStatus.includes('join')) badgeClass += ' status-selected';
+      else if (lowerStatus.includes('reject') || lowerStatus.includes('not')) badgeClass += ' status-rejected';
+      else if (lowerStatus.includes('hold')) badgeClass += ' status-hold';
       return `<span class="${badgeClass}">${escapeHtml(status)}</span>`;
     }
 
-    // ==================== ONE-VIEW HIGH-DENSITY TABLE & CARD RENDERER ====================
     function renderTable(data) {
       if (!tableBody) return;
       tableBody.innerHTML = "";
-      const cardsContainer = document.getElementById('cardsViewWrapper');
+      const cardsContainer = getElement('cardsViewWrapper');
       if (cardsContainer) cardsContainer.innerHTML = "";
 
       updateDashboardKPIs(data);
 
-      if (data.length === 0) {
+      if (!data.length) {
         tableBody.innerHTML = '<tr><td colspan="10" class="py-12 text-center text-slate-400"><i class="fas fa-search text-lg mb-2"></i><br>No candidates found matching current filters</td></tr>';
         if (cardsContainer) {
           cardsContainer.innerHTML = '<div class="col-span-full glass-card rounded-3xl p-10 text-center text-slate-400">No candidates found matching current filters</div>';
@@ -2268,19 +1725,14 @@
           </td>
         `;
 
-        if (isSelected) {
-          row.classList.add('selected');
-        }
+        if (isSelected) row.classList.add('selected');
 
         row.addEventListener("click", (event) => {
-          if (event.target.type === 'checkbox' || event.target.closest('button') || event.target.closest('a')) {
-            return;
-          }
+          if (event.target.type === 'checkbox' || event.target.closest('button') || event.target.closest('a')) return;
           openPopup(c);
         });
         tableBody.appendChild(row);
 
-        // Also populate Responsive Mobile-First Card View with Full One-View Data
         if (cardsContainer) {
           const card = document.createElement('div');
           card.className = `glass-card rounded-2xl p-4 flex flex-col justify-between gap-3 border transition-all cursor-pointer hover:border-blue-500/40 ${isSelected ? 'ring-2 ring-blue-500' : ''}`;
@@ -2300,15 +1752,12 @@
                 </div>
                 ${getStatusBadge(c.final_status || c.status || '')}
               </div>
-
-              <!-- One-View Mini Metrics Grid inside Card -->
               <div class="grid grid-cols-2 gap-1.5 my-2.5 p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70 text-[11px]">
                 <div><span class="text-slate-400">Cur CTC:</span> <strong class="text-slate-800 dark:text-slate-200">${safeCurCtc}</strong></div>
                 <div><span class="text-slate-400">Exp CTC:</span> <strong class="text-emerald-600 dark:text-emerald-400">${safeExpCtc}</strong></div>
                 <div><span class="text-slate-400">Exp:</span> <strong class="text-slate-800 dark:text-slate-200">${safeExp}</strong></div>
                 <div><span class="text-slate-400">Notice:</span> <strong class="text-amber-600 dark:text-amber-400">${safeNotice}</strong></div>
               </div>
-
               <div class="space-y-1 text-[11px] text-slate-500 dark:text-slate-400">
                 <p><i class="fas fa-envelope w-4 text-slate-400"></i> ${safeEmail}</p>
                 <p><i class="fas fa-phone w-4 text-slate-400"></i> ${safePhone !== '-' ? '+91 ' + safePhone : '-'}</p>
@@ -2353,50 +1802,18 @@
       currentEmail = candidate.email;
       currentCandidateId = candidate.id || "";
 
-      const popupTitle = getElement("popupTitle");
-      const singleCandidateInfo = getElement("singleCandidateInfo");
-      const bulkUpdateInfo = getElement("bulkUpdateInfo");
+      getElement("popupTitle").innerHTML = '<i class="fas fa-edit text-blue-500"></i> Update Status';
+      getElement("singleCandidateInfo").style.display = "block";
+      getElement("bulkUpdateInfo").style.display = "none";
 
-      if (popupTitle) popupTitle.innerHTML = '<i class="fas fa-edit text-blue-500"></i> Update Status';
-      if (singleCandidateInfo) singleCandidateInfo.style.display = "block";
-      if (bulkUpdateInfo) bulkUpdateInfo.style.display = "none";
+      getElement("popupCandidateName").textContent = candidate.name || "";
+      getElement("popupCompany").textContent = candidate.company || "";
+      getElement("popupPosition").textContent = candidate.position || "";
+      getElement("popupCompSummary").textContent = `${candidate.current_ctc || '-'} → ${candidate.expected_ctc || '-'} | NP: ${candidate.notice_period || '-'}`;
+      getElement("popup__powerappsid__").textContent = candidate.id || candidate.__powerappsid__ || "";
 
-      const elements = {
-        candidateName: getElement("popupCandidateName"),
-        company: getElement("popupCompany"),
-        position: getElement("popupPosition"),
-        compSummary: getElement("popupCompSummary"),
-        powerAppsId: getElement("popup__powerappsid__"),
-        statusDropdown: getElement("statusDropdown"),
-        finalStatusDropdown: getElement("finalStatusDropdown"),
-        commentBox: getElement("commentBox"),
-        popup: getElement("popup")
-      };
-
-      if (elements.candidateName) elements.candidateName.textContent = candidate.name || "";
-      if (elements.company) elements.company.textContent = candidate.company || "";
-      if (elements.position) elements.position.textContent = candidate.position || "";
-      if (elements.compSummary) {
-        elements.compSummary.textContent = `${candidate.current_ctc || '-'} → ${candidate.expected_ctc || '-'} | NP: ${candidate.notice_period || '-'}`;
-      }
-      if (elements.powerAppsId) {
-        elements.powerAppsId.textContent = candidate.id || candidate.__powerappsid__ || "";
-      }
-      if (elements.statusDropdown) {
-        elements.statusDropdown.value = "";
-        elements.statusDropdown.classList.remove('input-valid', 'input-invalid');
-      }
-      if (elements.finalStatusDropdown) {
-        elements.finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
-        elements.finalStatusDropdown.classList.remove('input-valid', 'input-invalid');
-      }
-      if (elements.commentBox) {
-        elements.commentBox.value = candidate.comment || "";
-        validateCommentInput(elements.commentBox);
-      }
-      const errMsg = document.getElementById('statusModalErrorMsg');
-      if (errMsg) errMsg.classList.add('hidden');
-      if (elements.popup) elements.popup.style.display = "flex";
+      resetStatusModalFields(candidate.comment || "");
+      getElement("popup").style.display = "flex";
     }
 
     function closePopup() {
@@ -2409,40 +1826,31 @@
       const statusDropdown = getElement("statusDropdown");
       const finalStatusDropdown = getElement("finalStatusDropdown");
       if (!statusDropdown || !finalStatusDropdown) return;
-      const status = statusDropdown.value;
-      finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
+
       const statusOptions = {
         "Selected": ["Shortlisted", "L1 Selected", "L2 Selected", "L3 Selected", "Final Select", "Joined"],
         "Rejected": ["Not Shortlisted", "L1 Reject", "L2 Reject", "L3 Reject", "Not Joined"],
         "On Hold": ["Position On Hold", "Candidate On Hold", "Delayed by Candidate"]
       };
-      (statusOptions[status] || []).forEach(s => {
-        const opt = document.createElement("option");
-        opt.value = s;
-        opt.textContent = s;
-        finalStatusDropdown.appendChild(opt);
-      });
+      populateFilterSelect(finalStatusDropdown, 'Select Final Status', statusOptions[statusDropdown.value] || []);
     }
 
-    // ==================== SUPABASE STATUS UPDATES (SINGLE & BULK) ====================
     function submitStatusUpdate() {
       const statusDropdown = getElement("statusDropdown");
       const finalStatusDropdown = getElement("finalStatusDropdown");
       const commentBox = getElement("commentBox");
 
       if (!statusDropdown || !finalStatusDropdown || !commentBox) {
-        showToast("Form elements not found", "error");
-        return;
+        return showToast("Form elements not found", "error");
       }
 
       if (!validateStatusModalInputs()) {
-        const errMsg = document.getElementById('statusModalErrorMsg');
+        const errMsg = getElement('statusModalErrorMsg');
         if (errMsg) {
           errMsg.textContent = "Please select both Stage Category and Final Status.";
           errMsg.classList.remove('hidden');
         }
-        showToast("Please select both status and final status.", "error");
-        return;
+        return showToast("Please select both status and final status.", "error");
       }
 
       validateCommentInput(commentBox);
@@ -2451,72 +1859,41 @@
       const comment = commentBox.value.trim();
 
       if (isBulkUpdate) {
-        if (selectedCandidates.length === 0) {
-          showToast("No candidates selected for bulk update.", "error");
-          return;
-        }
+        if (!selectedCandidates.length) return showToast("No candidates selected for bulk update.", "error");
         submitBulkStatusUpdate(status, finalStatus, comment);
       } else {
-        if (!currentEmail && !currentCandidateId) {
-          showToast("No candidate selected for update.", "error");
-          return;
-        }
+        if (!currentEmail && !currentCandidateId) return showToast("No candidate selected for update.", "error");
         submitSingleStatusUpdate(currentCandidateId, currentEmail, status, finalStatus, comment);
       }
     }
 
     async function submitSingleStatusUpdate(candidateId, email, status, finalStatus, comment) {
       setButtonLoading('statusSubmitButton', true, 'Updating...');
-
       try {
-        let query = supabaseClient
-          .from('candidates')
-          .update({
-            status: status,
-            final_status: finalStatus,
-            comment: comment
-          });
-
-        if (candidateId) {
-          query = query.eq('id', candidateId);
-        } else {
-          query = query.eq('email', email);
-        }
-
+        let query = supabaseClient.from('candidates').update({ status, final_status: finalStatus, comment });
+        query = candidateId ? query.eq('id', candidateId) : query.eq('email', email);
         const { error } = await query;
         if (error) throw error;
 
         showToast("Status updated in Supabase!", "success");
         closePopup();
-        setButtonLoading('statusSubmitButton', false);
         await loadDashboard();
       } catch (error) {
         console.error("Supabase status update failed:", error);
         showToast("Update failed: " + error.message, "error");
+      } finally {
         setButtonLoading('statusSubmitButton', false);
       }
     }
 
     async function submitBulkStatusUpdate(status, finalStatus, comment) {
       setButtonLoading('statusSubmitButton', true, `Updating ${selectedCandidates.length} candidates...`);
-
       try {
         const ids = selectedCandidates.map(c => c.id).filter(Boolean);
         const emails = selectedCandidates.map(c => c.email).filter(Boolean);
 
-        let query = supabaseClient
-          .from('candidates')
-          .update({
-            status: status,
-            final_status: finalStatus,
-            comment: comment
-          });
-
-        if (ids.length === selectedCandidates.length) {
-          query = query.in('id', ids);
-        } else {
-          query = query.in('email', emails);
-        }
+        let query = supabaseClient.from('candidates').update({ status, final_status: finalStatus, comment });
+        query = (ids.length === selectedCandidates.length) ? query.in('id', ids) : query.in('email', emails);
 
         const { error } = await query;
         if (error) throw error;
@@ -2524,11 +1901,11 @@
         showToast(`Successfully updated ${selectedCandidates.length} candidate${selectedCandidates.length > 1 ? 's' : ''} in Supabase!`, "success");
         clearAllSelections();
         closePopup();
-        setButtonLoading('statusSubmitButton', false);
         await loadDashboard();
       } catch (error) {
         console.error("Bulk update failed:", error);
         showToast("Bulk update failed: " + error.message, "error");
+      } finally {
         setButtonLoading('statusSubmitButton', false);
       }
     }
@@ -2541,13 +1918,9 @@
       if (inviteBox) inviteBox.style.display = (mode === "online") ? "block" : "none";
     }
 
-    // ==================== SUPABASE FETCH OFFICE LOCATIONS ====================
     async function fetchLocations(candidateCompany) {
       try {
-        const { data, error } = await supabaseClient
-          .from('office_locations')
-          .select('*');
-
+        const { data, error } = await supabaseClient.from('office_locations').select('*');
         if (error) throw error;
 
         locationRows = Array.isArray(data) ? data : [];
@@ -2561,11 +1934,10 @@
           return code && code === want;
         });
         const locations = [...new Set(
-          vendorMatches
-            .map(r => (r.office_locations ?? r.Office_Locations ?? r.Location ?? "").toString().trim())
-            .filter(Boolean)
+          vendorMatches.map(r => (r.office_locations ?? r.Office_Locations ?? r.Location ?? "").toString().trim()).filter(Boolean)
         )];
-        if (locations.length === 0) {
+
+        if (!locations.length) {
           const opt = document.createElement("option");
           opt.value = "";
           opt.textContent = "No locations available";
@@ -2585,24 +1957,18 @@
     }
 
     function openExtraPopup(idx) {
-      const extraCandidateName = getElement("extraCandidateName");
-      const extraRoleSub = document.getElementById("extraCandidateRoleSub");
-      const extraPopup = getElement("extraPopup");
+      currentCandidate = filteredCandidates[idx] || null;
+      if (!currentCandidate) return showToast("Candidate not found.", "error");
+
+      getElement("extraCandidateName").textContent = currentCandidate.name || "";
+      getElement("extraCandidateRoleSub").textContent = `${currentCandidate.position || ''} @ ${currentCandidate.company || ''}`;
+
       const sendEmail = getElement("sendEmail");
       const sendWhatsapp = getElement("sendWhatsapp");
       const extraDateTime = getElement("extraDateTime");
       const locationSelect = getElement("locationSelect");
       const inviteLink = getElement("inviteLink");
       const waBtn = getElement("waFloatBtn");
-      const locPreview = document.getElementById("selectedLocationPreview");
-
-      currentCandidate = filteredCandidates[idx] || null;
-      if (!currentCandidate) {
-        showToast("Candidate not found.", "error");
-        return;
-      }
-      if (extraCandidateName) extraCandidateName.textContent = currentCandidate.name || "";
-      if (extraRoleSub) extraRoleSub.textContent = `${currentCandidate.position || ''} @ ${currentCandidate.company || ''}`;
 
       if (sendEmail) sendEmail.checked = false;
       if (sendWhatsapp) sendWhatsapp.checked = true;
@@ -2618,9 +1984,9 @@
         locationSelect.innerHTML = '<option value="">Select Location</option>';
         locationSelect.classList.remove('input-valid', 'input-invalid');
       }
-      if (locPreview) locPreview.classList.add('hidden');
-      document.getElementById('extraDateTimeErrorMsg')?.classList.add('hidden');
-      document.getElementById('inviteLinkErrorMsg')?.classList.add('hidden');
+      getElement("selectedLocationPreview")?.classList.add('hidden');
+      getElement('extraDateTimeErrorMsg')?.classList.add('hidden');
+      getElement('inviteLinkErrorMsg')?.classList.add('hidden');
 
       if (waBtn) {
         waBtn.classList.remove('show');
@@ -2628,16 +1994,11 @@
       }
       lastWhatsAppLink = "";
 
-      const radios = document.querySelectorAll('input[name="interviewMode"]');
-      radios.forEach(r => r.checked = false);
-      const physicalRadio = Array.from(radios).find(r => r.value === "physical");
-      if (physicalRadio) physicalRadio.checked = true;
+      document.querySelectorAll('input[name="interviewMode"]').forEach(r => { r.checked = r.value === "physical"; });
       toggleMode();
 
-      if (currentCandidate && currentCandidate.company) {
-        fetchLocations(currentCandidate.company);
-      }
-      if (extraPopup) extraPopup.style.display = "flex";
+      if (currentCandidate.company) fetchLocations(currentCandidate.company);
+      getElement("extraPopup").style.display = "flex";
     }
 
     function closeExtraPopup() {
@@ -2649,7 +2010,6 @@
       return (s || "").toString().replace(/\D/g, "");
     }
 
-    // ==================== SUPABASE SAVE INTERVIEW (POWER AUTOMATE BYPASSED) ====================
     async function submitExtraPopup() {
       const extraCandidateName = getElement("extraCandidateName");
       const extraDateTime = getElement("extraDateTime");
@@ -2657,51 +2017,29 @@
       const sendWhatsapp = getElement("sendWhatsapp");
       const locationSelect = getElement("locationSelect");
       const inviteLink = getElement("inviteLink");
+
       if (!extraCandidateName || !extraDateTime || !sendEmail || !sendWhatsapp) {
-        showToast("Required form elements not found", "error");
-        return;
-      }
-      const rawMode = document.querySelector('input[name="interviewMode"]:checked')?.value;
-      const mode = rawMode === "physical" || rawMode === "online" ? rawMode : null;
-      if (!mode) {
-        showToast("Please select interview mode (Physical or Online).", "error");
-        return;
+        return showToast("Required form elements not found", "error");
       }
 
-      if (!validateInterviewDateTime(extraDateTime)) {
-        showToast("Please select a valid upcoming interview date & time.", "error");
-        return;
-      }
+      const rawMode = document.querySelector('input[name="interviewMode"]:checked')?.value;
+      const mode = (rawMode === "physical" || rawMode === "online") ? rawMode : null;
+      if (!mode) return showToast("Please select interview mode (Physical or Online).", "error");
+      if (!validateInterviewDateTime(extraDateTime)) return showToast("Please select a valid upcoming interview date & time.", "error");
 
       const dt = extraDateTime.value;
       const isoDt = new Date(dt).toISOString();
-      const emailChecked = sendEmail.checked;
       const whatsappChecked = sendWhatsapp.checked;
       let loc = null;
 
       if (mode === "physical") {
-        if (!validateLocationSelection()) {
-          showToast("Please select a physical office location.", "error");
-          return;
-        }
-        const selectedLoc = (locationSelect?.value || "").toString().trim();
+        if (!validateLocationSelection()) return showToast("Please select a physical office location.", "error");
         const normalize = str => (str || "").toString().trim().toLowerCase();
-        const targetLocation = normalize(selectedLoc);
-
-        loc = (locationRows || []).find(r => {
-          const locName = normalize(r.office_locations ?? r.Office_Locations ?? r.Location ?? "");
-          return locName === targetLocation;
-        });
-
-        if (!loc) {
-          showToast("Selected location not found in configuration. Please try again.", "error");
-          return;
-        }
-      } else if (mode === "online") {
-        if (!validateInviteLinkField(inviteLink)) {
-          showToast("Please enter a valid https:// online meeting link.", "error");
-          return;
-        }
+        const targetLocation = normalize(locationSelect?.value);
+        loc = (locationRows || []).find(r => normalize(r.office_locations ?? r.Office_Locations ?? r.Location ?? "") === targetLocation);
+        if (!loc) return showToast("Selected location not found in configuration. Please try again.", "error");
+      } else if (!validateInviteLinkField(inviteLink)) {
+        return showToast("Please enter a valid https:// online meeting link.", "error");
       }
 
       setButtonLoading('interviewSubmitButton', true, 'Saving...');
@@ -2715,11 +2053,9 @@
             invite_link: mode === "online" ? String((inviteLink?.value || "").trim()) : ""
           });
 
-        if (currentCandidate?.id) {
-          updateQuery = updateQuery.eq('id', currentCandidate.id);
-        } else {
-          updateQuery = updateQuery.eq('email', currentCandidate.email);
-        }
+        updateQuery = currentCandidate?.id
+          ? updateQuery.eq('id', currentCandidate.id)
+          : updateQuery.eq('email', currentCandidate.email);
 
         const { error: sbErr } = await updateQuery;
         if (sbErr) throw sbErr;
@@ -2730,15 +2066,9 @@
         return;
       }
 
-      const mobile = onlyDigits(
-        currentCandidate?.Mobile || currentCandidate?.mobile ||
-        currentCandidate?.phone || currentCandidate?.Phone || ""
-      );
+      const mobile = onlyDigits(currentCandidate?.Mobile || currentCandidate?.mobile || currentCandidate?.phone || currentCandidate?.Phone || "");
+      const recruiterName = getUserData().name || (loggedInEmail || "").split("@")[0] || "Recruiter";
 
-      const userData = getUserData();
-      const recruiterName = userData.name || (loggedInEmail || "").split("@")[0] || "Recruiter";
-
-      // WhatsApp message preparation
       if (whatsappChecked && mobile) {
         let msg = `*Hi ${currentCandidate?.name}*,\n\n` +
                   `We are pleased to schedule your interview for the *${currentCandidate?.position || ""}* role at *${currentCandidate?.company || ""}*.\n\n` +
@@ -2748,11 +2078,11 @@
 
         if (mode === "physical" && loc) {
           msg += `*Company Details:*\n` +
-                 `🏢 *Company:* ${getVal(loc,"Company_Name","company_name")}\n` +
-                 `👤 *HR Name:* ${getVal(loc,"Spoc_Name","spoc_name")}\n` +
-                 `📞 *HR Contact:* +91 ${getVal(loc,"Spoc_Number","spoc_number")}\n` +
-                 `📍 *Address:* ${getVal(loc,"Address","address")}\n` +
-                 `🗺 *Google Map:* ${getVal(loc,"Google_Map","google_map")}\n` +
+                 `🏢 *Company:* ${getVal(loc, "Company_Name", "company_name")}\n` +
+                 `👤 *HR Name:* ${getVal(loc, "Spoc_Name", "spoc_name")}\n` +
+                 `📞 *HR Contact:* +91 ${getVal(loc, "Spoc_Number", "spoc_number")}\n` +
+                 `📍 *Address:* ${getVal(loc, "Address", "address")}\n` +
+                 `🗺 *Google Map:* ${getVal(loc, "Google_Map", "google_map")}\n` +
                  `\n*Note:*\n✅ Please carry your updated resume\n⏰ Be on time\n`;
         } else if (mode === "online") {
           msg += `🔗 *Meeting Link:* ${(inviteLink?.value || "").trim()}\n\n` +
@@ -2760,6 +2090,7 @@
         }
         msg += `\n*Regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
         lastWhatsAppLink = `https://wa.me/91${mobile}?text=${encodeURIComponent(msg)}`;
+
         const waBtn = getElement("waFloatBtn");
         const waButtonText = getElement("waButtonText");
         if (waBtn && waButtonText) {
@@ -2769,15 +2100,11 @@
         }
       }
 
-      if (emailChecked) {
-        console.info("Power Automate interview email flow is disabled and bypassed.");
-      }
-
       setTimeout(() => {
         showToast(
           whatsappChecked
-            ? "Interview saved in Supabase! Click the green WhatsApp button to send invite. (PA Bypassed)"
-            : "Interview scheduled in Supabase! (Power Automate Bypassed)",
+            ? "Interview saved in Supabase! Click the green WhatsApp button to send invite."
+            : "Interview scheduled in Supabase!",
           "success"
         );
         closeExtraPopup();
@@ -2791,7 +2118,6 @@
       return Math.round(Number(amount) || 0).toLocaleString("en-IN");
     }
 
-    // Converts TCC Portal CTC strings ("5.04 LPA", "45000 Monthly", "504000") into Annual INR integer
     function parseAnnualCtcToINR(rawCtc) {
       if (typeof rawCtc === "number" && !isNaN(rawCtc)) return Math.round(rawCtc);
       const str = String(rawCtc || "").trim().toLowerCase();
@@ -2801,23 +2127,17 @@
       if (!numMatch) return 504000;
       const val = parseFloat(numMatch[1]);
 
-      if (str.includes("lpa") || str.includes("lakh") || (val > 0 && val <= 150)) {
-        return Math.round(val * 100000);
-      }
-      if (str.includes("month") || str.includes("/mo")) {
-        return Math.round(val * 12);
-      }
+      if (str.includes("lpa") || str.includes("lakh") || (val > 0 && val <= 150)) return Math.round(val * 100000);
+      if (str.includes("month") || str.includes("/mo")) return Math.round(val * 12);
       return Math.round(val);
     }
 
-    // Build combined list of Company Name + Address options from Supabase office_locations + defaults + candidate company
     function populateInvoiceCompanyDropdown(candidate) {
-      const select = document.getElementById("invCompanyAddressSelect");
+      const select = getElement("invCompanyAddressSelect");
       if (!select) return;
 
       companyAddressList = [...DEFAULT_CLIENT_ADDRESSES];
 
-      // Add entries from Supabase office_locations table
       (locationRows || []).forEach(r => {
         const compName = (getVal(r, "Company_Name", "company_name", "Company_code", "Company_Code", "company_code") || "").toString().trim();
         const branchName = (getVal(r, "office_locations", "Office_Locations", "Location") || "").toString().trim();
@@ -2836,17 +2156,13 @@
         }
       });
 
-      // Ensure candidate's own company is always in the dropdown
       const candComp = (candidate?.company || "").trim();
-      if (candComp) {
-        const hasCandComp = companyAddressList.some(item => item.company.toLowerCase() === candComp.toLowerCase());
-        if (!hasCandComp) {
-          companyAddressList.unshift({
-            company: candComp,
-            label: `${candComp} — Corporate Billing Address`,
-            address: `${candComp}, Corporate Office, Mumbai - 400065.`
-          });
-        }
+      if (candComp && !companyAddressList.some(item => item.company.toLowerCase() === candComp.toLowerCase())) {
+        companyAddressList.unshift({
+          company: candComp,
+          label: `${candComp} — Corporate Billing Address`,
+          address: `${candComp}, Corporate Office, Mumbai - 400065.`
+        });
       }
 
       select.innerHTML = "";
@@ -2857,59 +2173,40 @@
         select.appendChild(opt);
       });
 
-      // Auto-select matching candidate company
       const matchIdx = companyAddressList.findIndex(item => item.company.toLowerCase() === candComp.toLowerCase());
       select.value = matchIdx >= 0 ? String(matchIdx) : "0";
       onInvoiceCompanyAddressSelect();
     }
 
     function onInvoiceCompanyAddressSelect() {
-      const select = document.getElementById("invCompanyAddressSelect");
-      const nameInput = document.getElementById("invCompanyNameInput");
-      const addrInput = document.getElementById("invCompanyAddressInput");
+      const select = getElement("invCompanyAddressSelect");
       if (!select) return;
-
-      const idx = parseInt(select.value, 10);
-      const chosen = companyAddressList[idx] || companyAddressList[0];
+      const chosen = companyAddressList[parseInt(select.value, 10)] || companyAddressList[0];
       if (chosen) {
-        if (nameInput) nameInput.value = chosen.company;
-        if (addrInput) addrInput.value = chosen.address;
+        getElement("invCompanyNameInput").value = chosen.company;
+        getElement("invCompanyAddressInput").value = chosen.address;
       }
     }
 
     function openInvoicePopup(idx) {
       const candidate = filteredCandidates[idx];
-      if (!candidate) {
-        showToast("Candidate not found.", "error");
-        return;
-      }
+      if (!candidate) return showToast("Candidate not found.", "error");
       currentInvoiceCandidate = candidate;
 
-      // Populate Candidate Name & Role
-      const nameDisp = document.getElementById("invCandidateNameDisplay");
-      const roleDisp = document.getElementById("invCandidateRoleDisplay");
-      if (nameDisp) nameDisp.textContent = candidate.name || "Candidate";
-      if (roleDisp) roleDisp.textContent = `${candidate.position || "Open Role"} • ${candidate.company || ""}`;
+      getElement("invCandidateNameDisplay").textContent = candidate.name || "Candidate";
+      getElement("invCandidateRoleDisplay").textContent = `${candidate.position || "Open Role"} • ${candidate.company || ""}`;
 
-      // Set Invoice Date to today's formatted date
-      const todayFormatted = new Date().toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric"
-      }).replace(/ /g, "-");
-      const invDateEl = document.getElementById("invDateInput");
-      if (invDateEl) invDateEl.value = todayFormatted;
+      const todayFormatted = new Date().toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }).replace(/ /g, "-");
+      getElement("invDateInput").value = todayFormatted;
 
-      // Pre-fill Invoice No in grey & editable
-      const invNoEl = document.getElementById("invNumberInput");
+      const invNoEl = getElement("invNumberInput");
       if (invNoEl) {
         const suffix = String(candidate.id || (idx + 42)).padStart(3, "0");
         invNoEl.value = `TC/INV/${new Date().getFullYear()}/${suffix}`;
         invNoEl.classList.remove("user-edited");
       }
 
-      // Pre-fill Joining Date (DOJ)
-      const dojEl = document.getElementById("invJoiningDateInput");
+      const dojEl = getElement("invJoiningDateInput");
       if (dojEl) {
         let defaultDoj = todayFormatted;
         const rawDate = candidate.interview_date || candidate.updated_at || candidate.timestamp;
@@ -2922,76 +2219,52 @@
         dojEl.value = defaultDoj;
       }
 
-      // Pre-fill Annual CTC (parsed from expected_ctc or current_ctc)
-      const ctcEl = document.getElementById("invCtcInput");
-      const ctcHint = document.getElementById("invCtcRawHint");
       const rawCtcStr = candidate.expected_ctc || candidate.current_ctc || "5.04 LPA";
-      if (ctcEl) ctcEl.value = parseAnnualCtcToINR(rawCtcStr);
-      if (ctcHint) ctcHint.textContent = `Source: ${rawCtcStr}`;
+      getElement("invCtcInput").value = parseAnnualCtcToINR(rawCtcStr);
+      getElement("invCtcRawHint").textContent = `Source: ${rawCtcStr}`;
+      getElement("invFeePercentInput").value = "8.33";
 
-      // Pre-fill Service Fee % (8.33%)
-      const feeEl = document.getElementById("invFeePercentInput");
-      if (feeEl) feeEl.value = "8.33";
-
-      // Populate Company & Address Dropdown
       populateInvoiceCompanyDropdown(candidate);
-
-      // Calculate initial fee & TDS breakdown
       recalculateInvoicePopup();
-
-      const popup = document.getElementById("invoicePopup");
-      if (popup) popup.style.display = "flex";
+      getElement("invoicePopup").style.display = "flex";
     }
 
     function closeInvoicePopup() {
-      const popup = document.getElementById("invoicePopup");
+      const popup = getElement("invoicePopup");
       if (popup) popup.style.display = "none";
       currentInvoiceCandidate = null;
     }
 
     function recalculateInvoicePopup() {
-      const ctcVal = Math.max(0, Number(document.getElementById("invCtcInput")?.value) || 0);
-      const feeRate = Math.max(0, parseFloat(document.getElementById("invFeePercentInput")?.value) || 8.33);
+      const ctcVal = Math.max(0, Number(getElement("invCtcInput")?.value) || 0);
+      const feeRate = Math.max(0, parseFloat(getElement("invFeePercentInput")?.value) || 8.33);
 
       const grossFee = Math.round((ctcVal * feeRate) / 100);
       const tds = Math.round(grossFee * 0.10);
       const netPayable = grossFee - tds;
 
-      const rateTxt = document.getElementById("invSummaryRateText");
-      const grossTxt = document.getElementById("invSummaryGrossFee");
-      const tdsTxt = document.getElementById("invSummaryTds");
-      const netTxt = document.getElementById("invSummaryNetPayable");
-
-      if (rateTxt) rateTxt.textContent = String(feeRate);
-      if (grossTxt) grossTxt.textContent = `₹${formatINR(grossFee)}`;
-      if (tdsTxt) tdsTxt.textContent = `- ₹${formatINR(tds)}`;
-      if (netTxt) netTxt.textContent = `₹${formatINR(netPayable)}`;
+      getElement("invSummaryRateText").textContent = String(feeRate);
+      getElement("invSummaryGrossFee").textContent = `₹${formatINR(grossFee)}`;
+      getElement("invSummaryTds").textContent = `- ₹${formatINR(tds)}`;
+      getElement("invSummaryNetPayable").textContent = `₹${formatINR(netPayable)}`;
     }
 
     function downloadCandidateInvoicePdf() {
       try {
         const { jsPDF } = window.jspdf;
-        if (!jsPDF) {
-          showToast("jsPDF library failed to load. Please check your internet connection.", "error");
-          return;
-        }
+        if (!jsPDF) return showToast("jsPDF library failed to load. Please check your internet connection.", "error");
+        if (!currentInvoiceCandidate) return showToast("No candidate selected for invoice.", "error");
 
-        if (!currentInvoiceCandidate) {
-          showToast("No candidate selected for invoice.", "error");
-          return;
-        }
-
-        const compName = (document.getElementById("invCompanyNameInput")?.value || currentInvoiceCandidate.company || "Client Company").trim();
-        const compAddress = (document.getElementById("invCompanyAddressInput")?.value || "").trim();
-        const invNo = (document.getElementById("invNumberInput")?.value || "TC/INV/2026/042").trim();
-        const invDate = (document.getElementById("invDateInput")?.value || "19-Oct-2026").trim();
-        const doj = (document.getElementById("invJoiningDateInput")?.value || "02-06-2025").trim();
-        const ctcVal = Math.max(0, Number(document.getElementById("invCtcInput")?.value) || 0);
-        const feeRate = Math.max(0.1, parseFloat(document.getElementById("invFeePercentInput")?.value) || 8.33);
+        const compName = (getElement("invCompanyNameInput")?.value || currentInvoiceCandidate.company || "Client Company").trim();
+        const compAddress = (getElement("invCompanyAddressInput")?.value || "").trim();
+        const invNo = (getElement("invNumberInput")?.value || "TC/INV/2026/042").trim();
+        const invDate = (getElement("invDateInput")?.value || "19-Oct-2026").trim();
+        const doj = (getElement("invJoiningDateInput")?.value || "02-06-2025").trim();
+        const ctcVal = Math.max(0, Number(getElement("invCtcInput")?.value) || 0);
+        const feeRate = Math.max(0.1, parseFloat(getElement("invFeePercentInput")?.value) || 8.33);
 
         if (!compName || !invNo || !doj || ctcVal <= 0) {
-          showToast("Please fill in Company, Invoice No, Joining Date, and a valid CTC.", "error");
-          return;
+          return showToast("Please fill in Company, Invoice No, Joining Date, and a valid CTC.", "error");
         }
 
         const totalFee = Math.round((ctcVal * feeRate) / 100);
@@ -3000,7 +2273,6 @@
 
         const doc = new jsPDF();
 
-        // Header Branding
         doc.setFont("helvetica", "bold");
         doc.setFontSize(22);
         doc.setTextColor(15, 23, 42);
@@ -3018,7 +2290,6 @@
         doc.setDrawColor(203, 213, 225);
         doc.line(14, 34, 196, 34);
 
-        // Invoice Title & Meta
         doc.setFont("helvetica", "bold");
         doc.setFontSize(14);
         doc.setTextColor(15, 23, 42);
@@ -3030,7 +2301,6 @@
         doc.text(`Invoice Date: ${invDate}`, 135, 48);
         doc.text(`Total Service Fee: Rs. ${formatINR(totalFee)}`, 135, 54);
 
-        // Billed To Client
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
         doc.text("To:", 14, 62);
@@ -3038,19 +2308,13 @@
         doc.setFont("helvetica", "normal");
         doc.setFontSize(9);
         doc.setTextColor(71, 85, 105);
-        const splitAddress = doc.splitTextToSize(compAddress, 175);
-        doc.text(splitAddress, 14, 74);
+        doc.text(doc.splitTextToSize(compAddress, 175), 14, 74);
 
-        // Line Items Table
         const candidateLine = `${currentInvoiceCandidate.name || "Candidate"} (${currentInvoiceCandidate.position || "Joined Role"})`;
-        const tableRows = [
-          [1, candidateLine, doj, formatINR(totalFee)]
-        ];
-
         doc.autoTable({
           startY: 84,
           head: [["S. No.", "Candidate Name & Position", "DOJ", `Service Fee ${feeRate}% of CTC (INR)`]],
-          body: tableRows,
+          body: [[1, candidateLine, doj, formatINR(totalFee)]],
           theme: "grid",
           headStyles: { fillColor: [30, 41, 59], textColor: 255, fontStyle: "bold" },
           columnStyles: {
@@ -3061,7 +2325,7 @@
           styles: { fontSize: 9.5, cellPadding: 4 }
         });
 
-        let taxY = doc.lastAutoTable.finalY + 8;
+        const taxY = doc.lastAutoTable.finalY + 8;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
         doc.setTextColor(15, 23, 42);
@@ -3082,7 +2346,7 @@
           styles: { fontSize: 9.5, cellPadding: 2 }
         });
 
-        let bankY = doc.lastAutoTable.finalY + 8;
+        const bankY = doc.lastAutoTable.finalY + 8;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
         doc.text("Bank Details:", 14, bankY);
@@ -3093,7 +2357,7 @@
         doc.text(`Account Number: ${REMITTANCE_CONFIG.accountNo}`, 14, bankY + 18);
         doc.text(`IFSC Code: ${REMITTANCE_CONFIG.ifsc} | Branch: ${REMITTANCE_CONFIG.branch}`, 14, bankY + 24);
 
-        let clauseY = bankY + 32;
+        const clauseY = bankY + 32;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(9.5);
         doc.text("TDS Clause:", 14, clauseY);
@@ -3102,8 +2366,7 @@
         doc.text("Kindly deduct TDS @10% under section 194J on the service fee amount and issue Form 16A in the name of:", 14, clauseY + 5);
         doc.text(`Name: ${REMITTANCE_CONFIG.panHolder} | PAN: ${REMITTANCE_CONFIG.panNo} | Business Name: Talent Connect Consultancy`, 14, clauseY + 10);
 
-        // Signatory
-        let sigY = clauseY + 24;
+        const sigY = clauseY + 24;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
         doc.text("Authorized Signatory", 150, sigY);
@@ -3112,7 +2375,6 @@
         doc.setFontSize(8.5);
         doc.text("Talent Connect Consultancy", 150, sigY + 11);
 
-        // Footer
         doc.setFontSize(8);
         doc.setTextColor(120, 116, 139);
         doc.text(`Company Reg no: ${REMITTANCE_CONFIG.regNo} | Reg Office: ${REMITTANCE_CONFIG.regOffice}`, 14, 285);
@@ -3128,14 +2390,9 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-      const nameSearch = getElement("nameSearch");
-      if (nameSearch) {
-        nameSearch.addEventListener('keypress', function(e) {
-          if (e.key === 'Enter') {
-            applyFilters(true);
-          }
-        });
-      }
+      nameSearchInput?.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') applyFilters(true);
+      });
     });
   </script>
 </body>
