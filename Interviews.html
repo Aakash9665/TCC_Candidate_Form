@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<!-- Default theme is explicitly LIGHT (removed "dark" class from html root) -->
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>TCC Scheduled Interviews</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS Client SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -32,21 +29,13 @@
         radial-gradient(circle at 88% 85%, rgba(59, 130, 246, 0.14) 0%, transparent 45%),
         radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.07) 0%, transparent 60%);
     }
-
     .dark {
       --bg-gradient:
         radial-gradient(circle at 12% 15%, rgba(245, 158, 11, 0.20) 0%, transparent 45%),
         radial-gradient(circle at 88% 85%, rgba(59, 130, 246, 0.22) 0%, transparent 45%),
         radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.10) 0%, transparent 60%);
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
@@ -54,7 +43,6 @@
       overflow-x: hidden;
       transition: background-color 0.3s ease, color 0.3s ease;
     }
-
     .orb {
       position: fixed;
       border-radius: 50%;
@@ -64,34 +52,15 @@
       opacity: 0.32;
       animation: floatOrb 18s ease-in-out infinite alternate;
     }
-
-    .dark .orb {
-      opacity: 0.42;
-    }
-
-    .orb-1 {
-      width: 300px;
-      height: 300px;
-      background: linear-gradient(135deg, #f59e0b, #3b82f6);
-      top: -80px;
-      left: -80px;
-    }
-
-    .orb-2 {
-      width: 260px;
-      height: 260px;
-      background: linear-gradient(135deg, #6366f1, #10b981);
-      bottom: -60px;
-      right: -60px;
-      animation-delay: -7s;
-    }
+    .dark .orb { opacity: 0.42; }
+    .orb-1 { width: 300px; height: 300px; background: linear-gradient(135deg, #f59e0b, #3b82f6); top: -80px; left: -80px; }
+    .orb-2 { width: 260px; height: 260px; background: linear-gradient(135deg, #6366f1, #10b981); bottom: -60px; right: -60px; animation-delay: -7s; }
 
     @keyframes floatOrb {
       0% { transform: translate(0, 0) scale(1); }
       50% { transform: translate(24px, -28px) scale(1.06); }
       100% { transform: translate(-18px, 20px) scale(0.95); }
     }
-
     .glass-card {
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(22px) saturate(180%);
@@ -99,21 +68,16 @@
       border: 1px solid rgba(226, 232, 240, 0.9);
       box-shadow: 0 14px 34px -10px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
     }
-
     .dark .glass-card {
       background: rgba(15, 23, 42, 0.84);
       border: 1px solid rgba(255, 255, 255, 0.09);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
     }
-
     @keyframes fadeSlideUp {
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
-    .animate-in {
-      animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-    }
+    .animate-in { animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
 
     .user-type-badge {
       display: inline-flex;
@@ -125,20 +89,9 @@
       text-transform: uppercase;
       letter-spacing: 0.6px;
     }
+    .user-type-admin { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .user-type-user { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
 
-    .user-type-admin {
-      background: rgba(239, 68, 68, 0.15);
-      color: #ef4444;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
-    .user-type-user {
-      background: rgba(59, 130, 246, 0.15);
-      color: #3b82f6;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-    }
-
-    /* Form Controls */
     .form-control-input {
       width: 100%;
       padding: 10px 14px;
@@ -149,41 +102,14 @@
       font-size: 13px;
       transition: all 0.2s ease;
     }
+    .dark .form-control-input { background: rgba(30, 41, 59, 0.8); border-color: rgba(255, 255, 255, 0.12); color: #f8fafc; }
+    .form-control-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
 
-    .dark .form-control-input {
-      background: rgba(30, 41, 59, 0.8);
-      border-color: rgba(255, 255, 255, 0.12);
-      color: #f8fafc;
-    }
+    .input-valid { border-color: #10b981 !important; }
+    .input-invalid { border-color: #f43f5e !important; }
 
-    .form-control-input:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-    }
-
-    /* Input validation states */
-    .input-valid {
-      border-color: #10b981 !important;
-    }
-
-    .input-invalid {
-      border-color: #f43f5e !important;
-    }
-
-    .table-scroll {
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      max-height: 70vh;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      font-size: 12px;
-    }
-
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; max-height: 70vh; }
+    table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
     th {
       background: rgba(241, 245, 249, 0.96);
       color: #475569;
@@ -191,7 +117,7 @@
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      padding: 12px 12px;
+      padding: 12px;
       text-align: left;
       border-bottom: 1px solid rgba(226, 232, 240, 0.95);
       white-space: nowrap;
@@ -199,35 +125,12 @@
       top: 0;
       z-index: 10;
     }
-
-    .dark th {
-      background: rgba(15, 23, 42, 0.96);
-      color: #94a3b8;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    td {
-      padding: 10px 12px;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.65);
-      vertical-align: middle;
-      transition: background-color 0.15s ease;
-    }
-
-    .dark td {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    tbody tr {
-      transition: all 0.15s ease;
-    }
-
-    tbody tr:hover {
-      background: rgba(59, 130, 246, 0.06);
-    }
-
-    .dark tbody tr:hover {
-      background: rgba(59, 130, 246, 0.12);
-    }
+    .dark th { background: rgba(15, 23, 42, 0.96); color: #94a3b8; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    td { padding: 10px 12px; border-bottom: 1px solid rgba(226, 232, 240, 0.65); vertical-align: middle; transition: background-color 0.15s ease; }
+    .dark td { border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    tbody tr { transition: all 0.15s ease; }
+    tbody tr:hover { background: rgba(59, 130, 246, 0.06); }
+    .dark tbody tr:hover { background: rgba(59, 130, 246, 0.12); }
 
     .candidate-name-clickable {
       cursor: pointer !important;
@@ -235,17 +138,9 @@
       font-weight: 700 !important;
       transition: all 0.2s ease;
     }
+    .dark .candidate-name-clickable { color: #60a5fa !important; }
+    .candidate-name-clickable:hover { text-decoration: underline; color: #1d4ed8 !important; }
 
-    .dark .candidate-name-clickable {
-      color: #60a5fa !important;
-    }
-
-    .candidate-name-clickable:hover {
-      text-decoration: underline;
-      color: #1d4ed8 !important;
-    }
-
-    /* Interview Status Badges Preserved Classes */
     .interview-badge {
       display: inline-flex;
       align-items: center;
@@ -258,36 +153,12 @@
       letter-spacing: 0.4px;
       white-space: nowrap;
     }
-
-    .interview-upcoming {
-      background: rgba(59, 130, 246, 0.14);
-      color: #2563eb;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-    }
-
-    .dark .interview-upcoming {
-      color: #60a5fa;
-    }
-
-    .interview-today {
-      background: rgba(245, 158, 11, 0.16);
-      color: #d97706;
-      border: 1px solid rgba(245, 158, 11, 0.35);
-    }
-
-    .dark .interview-today {
-      color: #fbbf24;
-    }
-
-    .interview-overdue {
-      background: rgba(239, 68, 68, 0.14);
-      color: #e11d48;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-    }
-
-    .dark .interview-overdue {
-      color: #f87171;
-    }
+    .interview-upcoming { background: rgba(59, 130, 246, 0.14); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .dark .interview-upcoming { color: #60a5fa; }
+    .interview-today { background: rgba(245, 158, 11, 0.16); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.35); }
+    .dark .interview-today { color: #fbbf24; }
+    .interview-overdue { background: rgba(239, 68, 68, 0.14); color: #e11d48; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .dark .interview-overdue { color: #f87171; }
 
     .mode-badge {
       display: inline-flex;
@@ -303,28 +174,11 @@
       background: rgba(100, 116, 139, 0.12);
       color: #64748b;
     }
+    .mode-physical { background: rgba(16, 185, 129, 0.14); color: #059669; border: 1px solid rgba(16, 185, 129, 0.25); }
+    .dark .mode-physical { color: #10b981; }
+    .mode-online { background: rgba(139, 92, 246, 0.14); color: #7c3aed; border: 1px solid rgba(139, 92, 246, 0.25); }
+    .dark .mode-online { color: #a78bfa; }
 
-    .mode-physical {
-      background: rgba(16, 185, 129, 0.14);
-      color: #059669;
-      border: 1px solid rgba(16, 185, 129, 0.25);
-    }
-
-    .dark .mode-physical {
-      color: #10b981;
-    }
-
-    .mode-online {
-      background: rgba(139, 92, 246, 0.14);
-      color: #7c3aed;
-      border: 1px solid rgba(139, 92, 246, 0.25);
-    }
-
-    .dark .mode-online {
-      color: #a78bfa;
-    }
-
-    /* Popup Overlay Preserved Classes */
     .popup-overlay {
       position: fixed;
       inset: 0;
@@ -337,7 +191,6 @@
       padding: 16px;
       overflow-y: auto;
     }
-
     .popup-content {
       width: 100%;
       max-width: 480px;
@@ -348,16 +201,11 @@
       overflow-y: auto;
       animation: modalSlideUp 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
-
-    .popup-content.compact {
-      max-width: 430px;
-    }
-
+    .popup-content.compact { max-width: 430px; }
     @keyframes modalSlideUp {
       from { opacity: 0; transform: translateY(20px) scale(0.96); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
-
     .btn {
       display: inline-flex;
       align-items: center;
@@ -375,7 +223,6 @@
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
-  <!-- Non-Blocking Toast Notification Container -->
   <div id="toastContainer" class="fixed bottom-16 sm:bottom-5 right-4 sm:right-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-3 pointer-events-none"></div>
 
   <header class="dashboard-header sticky top-0 z-40 glass-card border-b border-slate-200/80 dark:border-slate-800/80 px-3 sm:px-6 py-2.5 sm:py-3">
@@ -400,17 +247,13 @@
             <span class="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/25">
               <i class="fas fa-check-circle text-[9px]"></i> Selected Only
             </span>
-            <span class="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25" title="Power Automate flow is disabled and bypassed">
-              <i class="fas fa-bolt-slash text-[9px]"></i> PA Bypassed
-            </span>
           </div>
           <p class="dashboard-subtitle text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-            Showing active Selected candidates lineup, rescheduling & instant WhatsApp follow-ups
+            Active Selected candidates lineup, rescheduling &amp; instant WhatsApp follow-ups
           </p>
         </div>
       </div>
 
-      <!-- Right Action Controls: Refresh, CSV Export, View Mode Switcher, Theme Toggle -->
       <div class="flex items-center gap-1.5 sm:gap-2">
         <button
           type="button"
@@ -426,20 +269,19 @@
           type="button"
           onclick="exportInterviewsToCSV()"
           class="px-2.5 sm:px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
-          title="Export Interviews to Safe CSV"
+          title="Export Interviews to CSV"
         >
           <i class="fas fa-file-csv"></i>
           <span class="hidden md:inline">Export CSV</span>
         </button>
 
-        <!-- Table / Card Timeline View Switcher -->
         <div class="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
           <button
             type="button"
             id="viewTableBtn"
             onclick="switchInterviewView('table')"
             class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all"
-            title="High-Density Table View"
+            title="Table View"
           >
             <i class="fas fa-table"></i>
           </button>
@@ -469,9 +311,8 @@
 
   <div id="dashboard" class="max-w-[1600px] mx-auto px-3 sm:px-6 pt-4 sm:pt-5 relative z-10">
 
-    <!-- 6-Card One-View KPI Summary Strip (Preserves #totalInterviews, #todayInterviews, #upcomingInterviews, #overdueInterviews) -->
-    <div class="stats-container grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 mb-4 animate-in">
-      <!-- KPI 1: Total Scheduled -->
+    <!-- KPI Summary Strip -->
+    <div class="stats-container grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3 mb-4 animate-in">
       <button type="button" onclick="quickFilterStatus('')" class="stat-card glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-blue-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
           <span class="stat-label text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Scheduled</span>
@@ -483,7 +324,6 @@
         <p class="text-[10px] text-slate-400 mt-0.5 truncate">Selected candidates</p>
       </button>
 
-      <!-- KPI 2: Today's Interviews -->
       <button type="button" onclick="quickFilterStatus('today')" class="stat-card glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-amber-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
           <span class="stat-label text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Today's Lineup</span>
@@ -495,7 +335,6 @@
         <p class="text-[10px] text-slate-400 mt-0.5 truncate">Happening today</p>
       </button>
 
-      <!-- KPI 3: Upcoming -->
       <button type="button" onclick="quickFilterStatus('upcoming')" class="stat-card glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-emerald-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
           <span class="stat-label text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Upcoming</span>
@@ -507,7 +346,6 @@
         <p class="text-[10px] text-slate-400 mt-0.5 truncate">Future lineup</p>
       </button>
 
-      <!-- KPI 4: Overdue / Past -->
       <button type="button" onclick="quickFilterStatus('overdue')" class="stat-card glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-rose-500/50 transition-all group cursor-pointer">
         <div class="flex items-center justify-between mb-1">
           <span class="stat-label text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Overdue / Past</span>
@@ -519,8 +357,7 @@
         <p class="text-[10px] text-slate-400 mt-0.5 truncate">Needs feedback</p>
       </button>
 
-      <!-- KPI 5: Mode Split (Online vs Physical) -->
-      <div class="glass-card rounded-2xl p-3 sm:p-3.5 text-left">
+      <div class="glass-card rounded-2xl p-3 sm:p-3.5 text-left col-span-2 sm:col-span-1">
         <div class="flex items-center justify-between mb-1">
           <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">Mode Split</span>
           <span class="w-7 h-7 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs">
@@ -529,18 +366,6 @@
         </div>
         <p class="font-display text-sm sm:text-base font-extrabold text-slate-900 dark:text-white mt-1" id="kpiModeSplitText">0 Onl • 0 Phy</p>
         <p class="text-[10px] text-slate-400 mt-0.5 truncate">Online vs In-Person</p>
-      </div>
-
-      <!-- KPI 6: Power Automate Status -->
-      <div class="glass-card rounded-2xl p-3 sm:p-3.5 text-left border-amber-500/30 bg-amber-500/5">
-        <div class="flex items-center justify-between mb-1">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">Power Automate</span>
-          <span class="w-7 h-7 rounded-xl bg-amber-500 text-white flex items-center justify-center text-xs">
-            <i class="fas fa-forward-fast"></i>
-          </span>
-        </div>
-        <p class="font-display text-sm sm:text-base font-extrabold text-amber-700 dark:text-amber-400 mt-1">BYPASSED</p>
-        <p class="text-[10px] text-slate-400 mt-0.5 truncate">Direct Supabase Mode</p>
       </div>
     </div>
 
@@ -560,7 +385,6 @@
       </div>
 
       <div class="filters grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        <!-- Search Input with Condition Check -->
         <div class="filter-group">
           <div class="flex items-center justify-between mb-1">
             <label for="candidateSearchInput" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
@@ -590,7 +414,6 @@
           </div>
         </div>
 
-        <!-- Company Filter -->
         <div class="filter-group">
           <label for="companyFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
             Company
@@ -600,7 +423,6 @@
           </select>
         </div>
 
-        <!-- Recruiter Filter -->
         <div class="filter-group">
           <label for="recruiterFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
             Recruiter
@@ -610,7 +432,6 @@
           </select>
         </div>
 
-        <!-- Interview Timeline Filter -->
         <div class="filter-group">
           <label for="statusFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
             Interview Timeline
@@ -623,7 +444,6 @@
           </select>
         </div>
 
-        <!-- Mode Filter (Online / Physical) -->
         <div class="filter-group">
           <label for="modeFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
             Interview Mode
@@ -663,12 +483,12 @@
           <thead>
             <tr>
               <th><i class="fas fa-calendar mr-1"></i> Interview Date</th>
-              <th><i class="fas fa-user mr-1"></i> Candidate & Mobile</th>
-              <th><i class="fas fa-briefcase mr-1"></i> Role & Client</th>
-              <th><i class="fas fa-indian-rupee-sign mr-1"></i> CTC & Notice</th>
+              <th><i class="fas fa-user mr-1"></i> Candidate &amp; Mobile</th>
+              <th><i class="fas fa-briefcase mr-1"></i> Role &amp; Client</th>
+              <th><i class="fas fa-indian-rupee-sign mr-1"></i> CTC &amp; Notice</th>
               <th><i class="fas fa-user-tie mr-1"></i> Recruiter</th>
-              <th><i class="fas fa-map-marker-alt mr-1"></i> Mode & Link</th>
-              <th><i class="fas fa-flag mr-1"></i> Pipeline & Notes</th>
+              <th><i class="fas fa-map-marker-alt mr-1"></i> Mode &amp; Link</th>
+              <th><i class="fas fa-flag mr-1"></i> Pipeline &amp; Notes</th>
               <th><i class="fas fa-info-circle mr-1"></i> Timeline</th>
               <th><i class="fas fa-bolt mr-1"></i> Quick Actions</th>
             </tr>
@@ -685,12 +505,10 @@
       </div>
     </div>
 
-    <!-- Mobile / Timeline Card View Container -->
     <div id="cardsViewWrapper" class="hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 mt-2"></div>
-
   </div>
 
-  <!-- ==================== CANDIDATE OPTIONS POPUP (#candidateOptionsPopup) ==================== -->
+  <!-- CANDIDATE OPTIONS POPUP (#candidateOptionsPopup) -->
   <div class="popup-overlay" id="candidateOptionsPopup">
     <div class="popup-content compact glass-card text-center">
       <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto mb-3 text-lg">
@@ -702,7 +520,6 @@
       <p id="popupCandidateNameDisplay" class="font-bold text-sm text-blue-600 dark:text-blue-400 mb-0.5"></p>
       <p id="popupCandidateMetaDisplay" class="text-xs text-slate-500 dark:text-slate-400 mb-3"></p>
 
-      <!-- One-View Candidate Snapshot inside Action Modal -->
       <div id="popupCandidateQuickStats" class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[11px] text-left grid grid-cols-2 gap-1.5 mb-4"></div>
 
       <div class="flex flex-col gap-2.5 mb-4">
@@ -711,7 +528,6 @@
           <span>Update Candidate Status</span>
         </button>
 
-        <!-- NEW: Reschedule Interview Button in Candidate Options Popup -->
         <button type="button" class="btn w-full py-3 px-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs sm:text-sm shadow-md shadow-amber-500/20" id="btnRescheduleInterview">
           <i class="fas fa-calendar-plus"></i>
           <span>Reschedule Interview</span>
@@ -735,7 +551,7 @@
     </div>
   </div>
 
-  <!-- ==================== STATUS UPDATE POPUP (#popup) ==================== -->
+  <!-- STATUS UPDATE POPUP (#popup) -->
   <div class="popup-overlay" id="popup">
     <div class="popup-content glass-card">
       <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-200 dark:border-slate-800">
@@ -803,7 +619,6 @@
       </div>
 
       <div class="popup-buttons flex flex-wrap items-center justify-between gap-2 mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
-        <!-- Shortcut to switch directly to Reschedule Popup from Status Popup -->
         <button type="button" class="btn px-3.5 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500 text-amber-700 dark:text-amber-400 hover:text-white border border-amber-500/25 text-xs font-bold" onclick="switchFromStatusToReschedule()">
           <i class="fas fa-calendar-plus"></i> Reschedule Instead
         </button>
@@ -821,7 +636,7 @@
     </div>
   </div>
 
-  <!-- ==================== NEW: RESCHEDULE INTERVIEW POPUP (#reschedulePopup) ==================== -->
+  <!-- RESCHEDULE INTERVIEW POPUP (#reschedulePopup) -->
   <div class="popup-overlay" id="reschedulePopup">
     <div class="popup-content glass-card">
       <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-200 dark:border-slate-800">
@@ -833,19 +648,17 @@
         </button>
       </div>
 
-      <!-- Candidate Summary Box -->
       <div class="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/25 mb-4 space-y-1.5 text-xs">
         <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">Candidate:</strong> <span id="rescheduleCandidateName" class="font-bold text-slate-900 dark:text-white text-right"></span></p>
-        <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">Role & Client:</strong> <span id="rescheduleRoleCompany" class="font-semibold text-blue-600 dark:text-blue-400 text-right"></span></p>
+        <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">Role &amp; Client:</strong> <span id="rescheduleRoleCompany" class="font-semibold text-blue-600 dark:text-blue-400 text-right"></span></p>
         <p class="flex justify-between gap-2"><strong class="text-slate-500 dark:text-slate-400">Current Slot:</strong> <span id="reschedulePreviousSlot" class="font-semibold text-amber-700 dark:text-amber-300 text-right"></span></p>
       </div>
 
       <div class="space-y-4">
-        <!-- New Date & Time -->
         <div class="form-group">
           <div class="flex items-center justify-between mb-1">
             <label for="rescheduleDateTimeInput" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-              <i class="fas fa-clock text-amber-500 mr-1"></i> New Date & Time <span class="text-rose-500">*</span>
+              <i class="fas fa-clock text-amber-500 mr-1"></i> New Date &amp; Time <span class="text-rose-500">*</span>
             </label>
             <span class="text-[10px] font-semibold text-slate-400">Required</span>
           </div>
@@ -857,7 +670,6 @@
           />
         </div>
 
-        <!-- Interview Mode -->
         <div class="form-group">
           <div class="flex items-center justify-between mb-1">
             <label for="rescheduleModeDropdown" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -871,7 +683,6 @@
           </select>
         </div>
 
-        <!-- Meeting Link (Optional) -->
         <div class="form-group">
           <div class="flex items-center justify-between mb-1">
             <label for="rescheduleLinkInput" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -887,7 +698,6 @@
           />
         </div>
 
-        <!-- Reschedule Note / Comment -->
         <div class="form-group">
           <div class="flex items-center justify-between mb-1">
             <label for="rescheduleCommentBox" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -914,12 +724,13 @@
         </button>
         <button type="button" class="btn px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold shadow-lg shadow-emerald-500/25" id="rescheduleSubmitButton" onclick="submitRescheduleInterview()">
           <i class="fab fa-whatsapp text-sm"></i>
-          <span>Reschedule & Send WhatsApp</span>
+          <span>Reschedule &amp; Send WhatsApp</span>
         </button>
       </div>
     </div>
   </div>
 
+  <!-- Mobile Bottom Navigation -->
   <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 glass-card border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
     <button type="button" onclick="goHome()" class="flex flex-col items-center gap-0.5 text-amber-600 dark:text-amber-400 text-[10px] font-bold">
       <i class="fas fa-house text-sm"></i>
@@ -944,39 +755,24 @@
   </nav>
 
   <script>
-    // ==================== SUPABASE CONFIGURATION ====================
     const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0';
-
-    // Initialize Supabase Client
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // ==================== REQUIREMENT #5: POWER AUTOMATE BYPASS ====================
-    window.POWER_AUTOMATE_ENABLED = false;
-    window.BYPASS_POWER_AUTOMATE = true;
-    sessionStorage.setItem('powerAutomateEnabled', 'false');
-    sessionStorage.setItem('bypassPowerAutomate', 'true');
+    let loggedInEmail = "";
+    let allScheduledInterviews = [];
+    let filteredInterviews = [];
+    let currentCandidateForPopup = null;
+    let currentCandidateForStatusPopup = null;
+    let currentCandidateForReschedule = null;
+    let currentEmail = "";
+    let currentCandidateId = "";
+    let currentInterviewView = 'table';
 
-    // Global fetch interceptor to guarantee any Power Automate / Logic App webhook is safely bypassed
-    const originalFetch = window.fetch.bind(window);
-    window.fetch = async function(resource, config) {
-      const urlStr = typeof resource === 'string' ? resource : (resource?.url || '');
-      if (
-        urlStr.includes('powerplatform.com') ||
-        urlStr.includes('powerautomate') ||
-        urlStr.includes('logic.azure.com') ||
-        urlStr.includes('flow.microsoft.com')
-      ) {
-        console.info('[Power Automate Bypassed] Webhook call intercepted and bypassed:', urlStr);
-        return new Response(
-          JSON.stringify({ success: true, bypassed: true, message: 'Power Automate is disabled and bypassed.' }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
-        );
-      }
-      return originalFetch(resource, config);
-    };
+    function getElement(id) {
+      return document.getElementById(id);
+    }
 
-    // ==================== REQUIREMENT #1: SECURITY UTILITIES ====================
     function escapeHtml(unsafe) {
       if (unsafe === null || unsafe === undefined) return "";
       return String(unsafe)
@@ -987,33 +783,29 @@
         .replace(/'/g, "&#039;");
     }
 
-    // Prevent CSV Formula Injection when exporting to Excel/Sheets
     function sanitizeCsvCell(val) {
       let str = String(val ?? "").replace(/"/g, '""').trim();
-      if (/^[=+\-@\t\r]/.test(str)) {
-        str = "'" + str;
-      }
+      if (/^[=+\-@\t\r]/.test(str)) str = "'" + str;
       return `"${str}"`;
     }
 
-    // Validate external meeting URLs so only safe https:// links are rendered
     function getSafeHttpsUrl(rawUrl) {
       const trimmed = String(rawUrl || "").trim();
-      if (/^https:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/\S*)?$/.test(trimmed)) {
-        return trimmed;
-      }
-      return "";
+      return /^https:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/\S*)?$/.test(trimmed) ? trimmed : "";
+    }
+
+    function extractMobileDigits(c) {
+      if (!c) return "";
+      return String(c.Mobile || c.mobile || c.Phone || c.phone || "").replace(/\D/g, "").slice(-10);
     }
 
     function toggleTheme() {
-      const html = document.documentElement;
-      const isDark = html.classList.toggle('dark');
+      const isDark = document.documentElement.classList.toggle('dark');
       sessionStorage.setItem('tccTheme', isDark ? 'dark' : 'light');
     }
 
-    // XSS-Safe Non-blocking Toast Notification Helper
     function showToast(message, type = 'info') {
-      const container = document.getElementById('toastContainer');
+      const container = getElement('toastContainer');
       if (!container) return;
       const toast = document.createElement('div');
       const colors = {
@@ -1030,13 +822,11 @@
 
       const iconEl = document.createElement('i');
       iconEl.className = `fas ${icons[type] || icons.info} shrink-0`;
-
       const spanEl = document.createElement('span');
       spanEl.className = 'flex-1';
       spanEl.textContent = String(message || '');
 
-      toast.appendChild(iconEl);
-      toast.appendChild(spanEl);
+      toast.append(iconEl, spanEl);
       container.appendChild(toast);
 
       setTimeout(() => {
@@ -1046,16 +836,14 @@
       }, 3600);
     }
 
-    // ==================== REQUIREMENT #4: INPUT CONDITION CHECKS ====================
-    // 1. Search Input Condition Check
     function validateSearchFilterInput(inputEl) {
       if (!inputEl) return;
       const cleaned = inputEl.value.replace(/[<>"{}`\\]/g, '').slice(0, 60);
       if (inputEl.value !== cleaned) inputEl.value = cleaned;
 
-      const counter = document.getElementById('searchCharCounter');
-      const clearBtn = document.getElementById('clearSearchBtn');
-      const condBadge = document.getElementById('filterCondBadge');
+      const counter = getElement('searchCharCounter');
+      const clearBtn = getElement('clearSearchBtn');
+      const condBadge = getElement('filterCondBadge');
 
       if (counter) counter.textContent = `${cleaned.length}/60`;
       if (clearBtn) clearBtn.style.display = cleaned.length > 0 ? 'inline-flex' : 'none';
@@ -1063,7 +851,7 @@
     }
 
     function clearCandidateSearch() {
-      const el = document.getElementById('candidateSearchInput');
+      const el = getElement('candidateSearchInput');
       if (el) {
         el.value = '';
         validateSearchFilterInput(el);
@@ -1071,76 +859,51 @@
       }
     }
 
-    // 2. Status Update Modal Dropdowns & Comment Condition Check
+    function setSelectValidation(el, badgeEl) {
+      const isValid = Boolean(el?.value);
+      if (el) {
+        el.classList.toggle('input-valid', isValid);
+        el.classList.toggle('input-invalid', !isValid);
+      }
+      if (badgeEl) badgeEl.textContent = isValid ? '✓ Selected' : 'Required';
+      return isValid;
+    }
+
     function validateStatusModalInputs() {
-      const stEl = document.getElementById('statusDropdown');
-      const fnEl = document.getElementById('finalStatusDropdown');
-      const stBadge = document.getElementById('statusCondBadge');
-      const fnBadge = document.getElementById('finalStatusCondBadge');
-      const errMsg = document.getElementById('statusModalErrorMsg');
-
-      let valid = true;
-      if (!stEl?.value) {
-        stEl?.classList.remove('input-valid');
-        stEl?.classList.add('input-invalid');
-        if (stBadge) stBadge.textContent = 'Required';
-        valid = false;
-      } else {
-        stEl?.classList.remove('input-invalid');
-        stEl?.classList.add('input-valid');
-        if (stBadge) stBadge.textContent = '✓ Selected';
-      }
-
-      if (!fnEl?.value) {
-        fnEl?.classList.remove('input-valid');
-        fnEl?.classList.add('input-invalid');
-        if (fnBadge) fnBadge.textContent = 'Required';
-        valid = false;
-      } else {
-        fnEl?.classList.remove('input-invalid');
-        fnEl?.classList.add('input-valid');
-        if (fnBadge) fnBadge.textContent = '✓ Selected';
-      }
-
-      if (errMsg && valid) errMsg.classList.add('hidden');
-      return valid;
+      const stValid = setSelectValidation(getElement('statusDropdown'), getElement('statusCondBadge'));
+      const fnValid = setSelectValidation(getElement('finalStatusDropdown'), getElement('finalStatusCondBadge'));
+      if (stValid && fnValid) getElement('statusModalErrorMsg')?.classList.add('hidden');
+      return stValid && fnValid;
     }
 
     function validateCommentInput(textareaEl) {
       if (!textareaEl) return true;
       const cleaned = textareaEl.value.replace(/[<>]/g, '').slice(0, 300);
       if (textareaEl.value !== cleaned) textareaEl.value = cleaned;
-      const counter = document.getElementById('commentCharCounter');
+      const counter = getElement('commentCharCounter');
       if (counter && textareaEl.id === 'commentBox') counter.textContent = `${cleaned.length}/300`;
       return true;
     }
 
-    // View Mode Toggle (Table vs Timeline Cards)
-    let currentInterviewView = 'table';
     function switchInterviewView(mode) {
       currentInterviewView = mode;
-      const tableWrapper = document.getElementById('tableViewWrapper');
-      const cardsWrapper = document.getElementById('cardsViewWrapper');
-      const btnTable = document.getElementById('viewTableBtn');
-      const btnCards = document.getElementById('viewCardsBtn');
+      const isCards = mode === 'cards';
+      const tableWrapper = getElement('tableViewWrapper');
+      const cardsWrapper = getElement('cardsViewWrapper');
+      const btnTable = getElement('viewTableBtn');
+      const btnCards = getElement('viewCardsBtn');
+      const activeCls = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
+      const inactiveCls = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
 
-      if (mode === 'cards') {
-        tableWrapper.classList.add('hidden');
-        cardsWrapper.classList.remove('hidden');
-        cardsWrapper.classList.add('grid');
-        if (btnCards) btnCards.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
-        if (btnTable) btnTable.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
-      } else {
-        tableWrapper.classList.remove('hidden');
-        cardsWrapper.classList.add('hidden');
-        cardsWrapper.classList.remove('grid');
-        if (btnTable) btnTable.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white shadow-sm transition-all';
-        if (btnCards) btnCards.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
-      }
+      tableWrapper?.classList.toggle('hidden', isCards);
+      cardsWrapper?.classList.toggle('hidden', !isCards);
+      cardsWrapper?.classList.toggle('grid', isCards);
+      if (btnCards) btnCards.className = isCards ? activeCls : inactiveCls;
+      if (btnTable) btnTable.className = isCards ? inactiveCls : activeCls;
     }
 
     function quickFilterStatus(statusValue) {
-      const statusFilter = document.getElementById('statusFilter');
+      const statusFilter = getElement('statusFilter');
       if (statusFilter) {
         statusFilter.value = statusValue;
         applyFilters();
@@ -1148,15 +911,11 @@
     }
 
     function resetInterviewFilters() {
-      const companyFilter = document.getElementById('companyFilter');
-      const recruiterFilter = document.getElementById('recruiterFilter');
-      const statusFilter = document.getElementById('statusFilter');
-      const modeFilter = document.getElementById('modeFilter');
-      const searchInput = document.getElementById('candidateSearchInput');
-      if (companyFilter) companyFilter.value = '';
-      if (recruiterFilter) recruiterFilter.value = '';
-      if (statusFilter) statusFilter.value = '';
-      if (modeFilter) modeFilter.value = '';
+      ['companyFilter', 'recruiterFilter', 'statusFilter', 'modeFilter'].forEach(id => {
+        const el = getElement(id);
+        if (el) el.value = '';
+      });
+      const searchInput = getElement('candidateSearchInput');
       if (searchInput) {
         searchInput.value = '';
         validateSearchFilterInput(searchInput);
@@ -1166,28 +925,26 @@
     }
 
     function triggerRefreshInterviews() {
-      const icon = document.getElementById('syncIcon');
-      if (icon) icon.classList.add('fa-spin');
+      const icon = getElement('syncIcon');
+      icon?.classList.add('fa-spin');
       loadScheduledInterviews().finally(() => {
-        if (icon) icon.classList.remove('fa-spin');
+        icon?.classList.remove('fa-spin');
         showToast('Interview schedule synced with Supabase', 'success');
       });
     }
 
     function exportInterviewsToCSV() {
-      if (!filteredInterviews || filteredInterviews.length === 0) {
-        showToast('No scheduled interviews to export', 'error');
-        return;
+      if (!filteredInterviews || !filteredInterviews.length) {
+        return showToast('No scheduled interviews to export', 'error');
       }
       const headers = ['Interview Date', 'Candidate Name', 'Email', 'Mobile', 'Position', 'Company', 'Current CTC', 'Expected CTC', 'Experience', 'Notice Period', 'Recruiter', 'Mode', 'Final Status', 'Timeline Status', 'Comment'];
       const rows = filteredInterviews.map(item => {
         const st = getInterviewStatus(item.interview_date);
-        const mobileDigits = String(item.Mobile || item.mobile || item.Phone || item.phone || '').replace(/\D/g, '');
         return [
           sanitizeCsvCell(formatInterviewDateTime(item.interview_date)),
           sanitizeCsvCell(item.name || ''),
           sanitizeCsvCell(item.email || ''),
-          sanitizeCsvCell(mobileDigits),
+          sanitizeCsvCell(extractMobileDigits(item)),
           sanitizeCsvCell(item.position || ''),
           sanitizeCsvCell(item.company || ''),
           sanitizeCsvCell(item.current_ctc || ''),
@@ -1208,20 +965,16 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast(`Exported ${filteredInterviews.length} interviews to safe CSV`, 'success');
+      showToast(`Exported ${filteredInterviews.length} interviews to CSV`, 'success');
     }
 
     function sendWhatsAppInterviewReminder(candidateOverride = null) {
       const target = candidateOverride || currentCandidateForPopup;
-      if (!target) {
-        showToast('No candidate selected', 'error');
-        return;
-      }
-      const mobileRaw = target.Mobile || target.mobile || target.Phone || target.phone || '';
-      const digitsOnly = mobileRaw.toString().replace(/\D/g, '').slice(-10);
+      if (!target) return showToast('No candidate selected', 'error');
+
+      const digitsOnly = extractMobileDigits(target);
       if (digitsOnly.length !== 10) {
-        showToast('Valid 10-digit mobile number not available for this candidate', 'error');
-        return;
+        return showToast('Valid 10-digit mobile number not available for this candidate', 'error');
       }
       const recruiterName = sessionStorage.getItem('userName') || 'Recruiter';
       const formattedDT = formatInterviewDateTime(target.interview_date);
@@ -1231,14 +984,11 @@
       closeCandidateOptionsPopup();
     }
 
-    // NEW: Send WhatsApp Reschedule Confirmation Message
     function sendWhatsAppRescheduleConfirmation(candidate, newDateTimeISO, newMode, newInviteLink) {
       if (!candidate) return;
-      const mobileRaw = candidate.Mobile || candidate.mobile || candidate.Phone || candidate.phone || '';
-      const digitsOnly = mobileRaw.toString().replace(/\D/g, '').slice(-10);
+      const digitsOnly = extractMobileDigits(candidate);
       if (digitsOnly.length !== 10) {
-        showToast('Interview rescheduled, but candidate does not have a valid 10-digit mobile number for WhatsApp.', 'info');
-        return;
+        return showToast('Interview rescheduled, but candidate does not have a valid 10-digit mobile number for WhatsApp.', 'info');
       }
 
       const recruiterName = sessionStorage.getItem('userName') || 'Recruiter';
@@ -1247,171 +997,89 @@
       const safeLink = getSafeHttpsUrl(newInviteLink);
 
       const msg = `*Hi ${candidate.name || 'Candidate'}*,\n\nYour interview for the position of *${candidate.position || 'Open Role'}* at *${candidate.company || 'our client'}* has been *rescheduled*.\n\n📅 *New Date & Time:* ${formattedNewDT}\n💼 *Interview Mode:* ${modeStr}${safeLink ? `\n🔗 *Meeting Link:* ${safeLink}` : ''}\n\n*_Kindly acknowledge this message and confirm your availability for the rescheduled slot._*\n\n*Best regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
-
       window.open(`https://wa.me/91${digitsOnly}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
     }
 
-    // ==================== PRESERVED AUTHENTICATION & CORE LOGIC ====================
     window.addEventListener('load', function() {
-      // Ensure Light Mode is the default unless dark was chosen in session
-      const savedTheme = sessionStorage.getItem('tccTheme');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+      document.documentElement.classList.toggle('dark', sessionStorage.getItem('tccTheme') === 'dark');
+      if (window.innerWidth < 640) switchInterviewView('cards');
 
-      // Auto-switch to Timeline Cards view on phone screens for optimal mobile UX
-      if (window.innerWidth < 640) {
-        switchInterviewView('cards');
-      }
-
-      // Get all user data from sessionStorage
       const isLoggedIn = sessionStorage.getItem('isLoggedIn');
-      const userEmail = sessionStorage.getItem('userEmail');
-      const userName = sessionStorage.getItem('userName');
-      const userContact = sessionStorage.getItem('userContact');
-      const userDesignation = sessionStorage.getItem('userDesignation');
-      const userType = sessionStorage.getItem('userType');
-      const loginTime = sessionStorage.getItem('loginTime');
-
-      // Check if user is authenticated
       if (isLoggedIn !== 'true') {
         showToast("Session expired or not logged in. Redirecting to login page.", "error");
-        setTimeout(() => {
-          window.location.href = 'index.html';
-        }, 1000);
+        setTimeout(() => { window.location.href = 'index.html'; }, 1000);
         return;
       }
 
-      // Set loggedInEmail to the authenticated user's email
-      loggedInEmail = userEmail;
-
-      // Store user data globally for easy access
+      loggedInEmail = sessionStorage.getItem('userEmail');
       window.USER_DATA = {
-        isLoggedIn: isLoggedIn === 'true',
-        email: userEmail,
-        name: userName,
-        contact: userContact,
-        designation: userDesignation,
-        userType: userType,
-        loginTime: loginTime,
-        powerAutomateBypassed: true
+        isLoggedIn: true,
+        email: loggedInEmail,
+        name: sessionStorage.getItem('userName'),
+        contact: sessionStorage.getItem('userContact'),
+        designation: sessionStorage.getItem('userDesignation'),
+        userType: sessionStorage.getItem('userType'),
+        loginTime: sessionStorage.getItem('loginTime')
       };
 
-      // Display user type badge
       displayUserTypeBadge();
-
-      // Load scheduled interviews from Supabase
       loadScheduledInterviews();
     });
 
-    // Display user type badge
     function displayUserTypeBadge() {
-      const badge = document.getElementById('userTypeBadge');
+      const badge = getElement('userTypeBadge');
       const userType = sessionStorage.getItem('userType');
-
       if (badge && userType) {
-        const type = userType.toLowerCase();
+        const isAdmin = userType.toLowerCase() === 'admin';
         badge.textContent = userType.toUpperCase();
-
-        if (type === 'admin') {
-          badge.className = 'user-type-badge user-type-admin';
-        } else {
-          badge.className = 'user-type-badge user-type-user';
-        }
+        badge.className = `user-type-badge ${isAdmin ? 'user-type-admin' : 'user-type-user'}`;
       }
     }
 
-    // Role-based candidate filtering function
     function filterCandidatesByUserType(data) {
-      const userData = {
-        userType: sessionStorage.getItem('userType'),
-        email: sessionStorage.getItem('userEmail')
-      };
-
-      if (userData.userType && userData.userType.toLowerCase() === 'admin') {
-        return data;
-      } else {
-        return data.filter(c => {
-          const recEmail = (c.recruiter || c.recruiter_email || "").toLowerCase();
-          return recEmail === (userData.email || "").toLowerCase();
-        });
-      }
+      const userType = sessionStorage.getItem('userType') || '';
+      const email = (sessionStorage.getItem('userEmail') || '').toLowerCase();
+      if (userType.toLowerCase() === 'admin') return data;
+      return data.filter(c => (c.recruiter || c.recruiter_email || "").toLowerCase() === email);
     }
 
-    // Global variables
-    let loggedInEmail = "";
-    let allScheduledInterviews = [];
-    let filteredInterviews = [];
-    let currentCandidateForPopup = null;
-    let currentCandidateForStatusPopup = null;
-    let currentCandidateForReschedule = null;
-    let currentEmail = "";
-    let currentCandidateId = "";
-
-    // Helper functions
     function goHome() {
       window.location.href = 'index.html';
     }
 
-    function getElement(id) {
-      const element = document.getElementById(id);
-      if (!element) {
-        console.error(`Element with id '${id}' not found`);
-      }
-      return element;
-    }
-
     function formatInterviewDateTime(dt) {
       if (!dt) return "N/A";
-      try {
-        const d = new Date(dt);
-        if (isNaN(d.getTime())) return dt;
-
-        const options = {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: true
-        };
-
-        return d.toLocaleDateString('en-IN', options);
-      } catch (error) {
-        return dt;
-      }
+      const d = new Date(dt);
+      if (isNaN(d.getTime())) return dt;
+      return d.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
     }
 
     function getInterviewStatus(interviewDate) {
       if (!interviewDate) return { class: '', text: 'Not Scheduled' };
+      const now = new Date();
+      const interview = new Date(interviewDate);
+      if (isNaN(interview.getTime())) return { class: '', text: 'Invalid Date' };
 
-      try {
-        const now = new Date();
-        const interview = new Date(interviewDate);
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const interviewDay = new Date(interview.getFullYear(), interview.getMonth(), interview.getDate());
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const interviewDay = new Date(interview.getFullYear(), interview.getMonth(), interview.getDate());
 
-        if (interview < now) {
-          return { class: 'interview-overdue', text: 'Overdue' };
-        } else if (interviewDay.getTime() === today.getTime()) {
-          return { class: 'interview-today', text: 'Today' };
-        } else {
-          return { class: 'interview-upcoming', text: 'Upcoming' };
-        }
-      } catch (error) {
-        return { class: '', text: 'Invalid Date' };
-      }
+      if (interview < now) return { class: 'interview-overdue', text: 'Overdue' };
+      if (interviewDay.getTime() === today.getTime()) return { class: 'interview-today', text: 'Today' };
+      return { class: 'interview-upcoming', text: 'Upcoming' };
     }
 
-    // Popup functions
     function openCandidateOptionsPopup(candidate) {
       const popup = getElement('candidateOptionsPopup');
       const nameDisplay = getElement('popupCandidateNameDisplay');
-      const metaDisplay = document.getElementById('popupCandidateMetaDisplay');
-      const statsBox = document.getElementById('popupCandidateQuickStats');
-
+      const metaDisplay = getElement('popupCandidateMetaDisplay');
+      const statsBox = getElement('popupCandidateQuickStats');
       if (!popup || !nameDisplay) return;
 
       currentCandidateForPopup = candidate;
@@ -1420,15 +1088,14 @@
         metaDisplay.textContent = `${candidate.position || ''} • ${candidate.company || ''} (${formatInterviewDateTime(candidate.interview_date)})`;
       }
       if (statsBox) {
-        const mobileDigits = String(candidate.Mobile || candidate.mobile || candidate.Phone || candidate.phone || '').replace(/\D/g, '').slice(-10);
+        const mobileDigits = extractMobileDigits(candidate);
         statsBox.innerHTML = '';
-        const items = [
+        [
           ['Cur CTC', candidate.current_ctc || '-'],
           ['Exp CTC', candidate.expected_ctc || '-'],
           ['Exp / NP', `${candidate.experience || '-'} / ${candidate.notice_period || '-'}`],
           ['Mobile', mobileDigits ? `+91 ${mobileDigits}` : '-']
-        ];
-        items.forEach(([label, val]) => {
+        ].forEach(([label, val]) => {
           const div = document.createElement('div');
           const sp1 = document.createElement('span');
           sp1.className = 'text-slate-400 mr-1';
@@ -1436,8 +1103,7 @@
           const st1 = document.createElement('strong');
           st1.className = 'text-slate-800 dark:text-slate-200';
           st1.textContent = val;
-          div.appendChild(sp1);
-          div.appendChild(st1);
+          div.append(sp1, st1);
           statsBox.appendChild(div);
         });
       }
@@ -1450,49 +1116,35 @@
       currentCandidateForPopup = null;
     }
 
-    // Status update functions
     function openPopup(candidate) {
       currentCandidateForStatusPopup = candidate;
       currentEmail = candidate.email;
       currentCandidateId = candidate.id || "";
 
-      const elements = {
-        candidateName: getElement("popupCandidateName"),
-        company: getElement("popupCompany"),
-        position: getElement("popupPosition"),
-        compDetails: document.getElementById("popupCompDetails"),
-        powerAppsId: getElement("popup__powerappsid__"),
-        statusDropdown: getElement("statusDropdown"),
-        finalStatusDropdown: getElement("finalStatusDropdown"),
-        commentBox: getElement("commentBox"),
-        popup: getElement("popup")
-      };
+      getElement("popupCandidateName").textContent = candidate.name || "";
+      getElement("popupCompany").textContent = candidate.company || "";
+      getElement("popupPosition").textContent = candidate.position || "";
+      getElement("popupCompDetails").textContent = `${candidate.current_ctc || '-'} → ${candidate.expected_ctc || '-'} | NP: ${candidate.notice_period || '-'}`;
+      getElement("popup__powerappsid__").textContent = candidate.id || candidate.__powerappsid__ || "Not Available";
 
-      if (elements.candidateName) elements.candidateName.textContent = candidate.name || "";
-      if (elements.company) elements.company.textContent = candidate.company || "";
-      if (elements.position) elements.position.textContent = candidate.position || "";
-      if (elements.compDetails) {
-        elements.compDetails.textContent = `${candidate.current_ctc || '-'} → ${candidate.expected_ctc || '-'} | NP: ${candidate.notice_period || '-'}`;
-      }
+      const statusDropdown = getElement("statusDropdown");
+      const finalStatusDropdown = getElement("finalStatusDropdown");
+      const commentBox = getElement("commentBox");
 
-      if (elements.powerAppsId) {
-        elements.powerAppsId.textContent = candidate.id || candidate.__powerappsid__ || "Not Available";
+      if (statusDropdown) {
+        statusDropdown.value = "";
+        statusDropdown.classList.remove('input-valid', 'input-invalid');
       }
-
-      if (elements.statusDropdown) {
-        elements.statusDropdown.value = "";
-        elements.statusDropdown.classList.remove('input-valid', 'input-invalid');
+      if (finalStatusDropdown) {
+        finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
+        finalStatusDropdown.classList.remove('input-valid', 'input-invalid');
       }
-      if (elements.finalStatusDropdown) {
-        elements.finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
-        elements.finalStatusDropdown.classList.remove('input-valid', 'input-invalid');
+      if (commentBox) {
+        commentBox.value = candidate.comment || "";
+        validateCommentInput(commentBox);
       }
-      if (elements.commentBox) {
-        elements.commentBox.value = candidate.comment || "";
-        validateCommentInput(elements.commentBox);
-      }
-      document.getElementById('statusModalErrorMsg')?.classList.add('hidden');
-      if (elements.popup) elements.popup.style.display = "flex";
+      getElement('statusModalErrorMsg')?.classList.add('hidden');
+      getElement("popup").style.display = "flex";
     }
 
     function closePopup() {
@@ -1504,93 +1156,54 @@
     function switchFromStatusToReschedule() {
       const cand = currentCandidateForStatusPopup;
       closePopup();
-      if (cand) {
-        openReschedulePopup(cand);
-      }
+      if (cand) openReschedulePopup(cand);
     }
 
-    // ==================== NEW: RESCHEDULE INTERVIEW POPUP FUNCTIONS ====================
     function toLocalDatetimeInputString(dateVal) {
       if (!dateVal) return "";
-      try {
-        const d = new Date(dateVal);
-        if (isNaN(d.getTime())) return "";
-        const pad = (n) => String(n).padStart(2, '0');
-        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-      } catch (e) {
-        return "";
-      }
+      const d = new Date(dateVal);
+      if (isNaN(d.getTime())) return "";
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
     }
 
     function openReschedulePopup(candidate) {
-      if (!candidate) {
-        showToast("No candidate selected for rescheduling", "error");
-        return;
-      }
+      if (!candidate) return showToast("No candidate selected for rescheduling", "error");
       currentCandidateForReschedule = candidate;
 
-      const nameEl = document.getElementById("rescheduleCandidateName");
-      const roleCompEl = document.getElementById("rescheduleRoleCompany");
-      const prevSlotEl = document.getElementById("reschedulePreviousSlot");
-      const dtInput = document.getElementById("rescheduleDateTimeInput");
-      const modeSelect = document.getElementById("rescheduleModeDropdown");
-      const linkInput = document.getElementById("rescheduleLinkInput");
-      const commentInput = document.getElementById("rescheduleCommentBox");
-      const errMsg = document.getElementById("rescheduleErrorMsg");
-      const popup = document.getElementById("reschedulePopup");
-
-      if (nameEl) nameEl.textContent = candidate.name || "Candidate";
-      if (roleCompEl) roleCompEl.textContent = `${candidate.position || '-'} • ${candidate.company || '-'}`;
-      if (prevSlotEl) prevSlotEl.textContent = formatInterviewDateTime(candidate.interview_date);
-
-      if (dtInput) {
-        dtInput.value = toLocalDatetimeInputString(candidate.interview_date);
-      }
-      if (modeSelect) {
-        const existingMode = (candidate.interview_mode || 'Online').toLowerCase();
-        modeSelect.value = existingMode === 'physical' ? 'Physical' : 'Online';
-      }
-      if (linkInput) {
-        linkInput.value = candidate.invite_link || "";
-      }
-      if (commentInput) {
-        commentInput.value = candidate.comment || "";
-      }
-      if (errMsg) errMsg.classList.add('hidden');
-      if (popup) popup.style.display = "flex";
+      getElement("rescheduleCandidateName").textContent = candidate.name || "Candidate";
+      getElement("rescheduleRoleCompany").textContent = `${candidate.position || '-'} • ${candidate.company || '-'}`;
+      getElement("reschedulePreviousSlot").textContent = formatInterviewDateTime(candidate.interview_date);
+      getElement("rescheduleDateTimeInput").value = toLocalDatetimeInputString(candidate.interview_date);
+      getElement("rescheduleModeDropdown").value = (candidate.interview_mode || 'Online').toLowerCase() === 'physical' ? 'Physical' : 'Online';
+      getElement("rescheduleLinkInput").value = candidate.invite_link || "";
+      getElement("rescheduleCommentBox").value = candidate.comment || "";
+      getElement("rescheduleErrorMsg")?.classList.add('hidden');
+      getElement("reschedulePopup").style.display = "flex";
     }
 
     function closeReschedulePopup() {
-      const popup = document.getElementById("reschedulePopup");
+      const popup = getElement("reschedulePopup");
       if (popup) popup.style.display = "none";
       currentCandidateForReschedule = null;
     }
 
     async function submitRescheduleInterview() {
-      if (!currentCandidateForReschedule) {
-        showToast("No candidate selected.", "error");
-        return;
-      }
+      if (!currentCandidateForReschedule) return showToast("No candidate selected.", "error");
 
-      const dtInput = document.getElementById("rescheduleDateTimeInput");
-      const modeSelect = document.getElementById("rescheduleModeDropdown");
-      const linkInput = document.getElementById("rescheduleLinkInput");
-      const commentInput = document.getElementById("rescheduleCommentBox");
-      const errMsg = document.getElementById("rescheduleErrorMsg");
-      const submitBtn = document.getElementById("rescheduleSubmitButton");
-
-      const rawDt = dtInput ? dtInput.value.trim() : "";
-      const newMode = modeSelect ? modeSelect.value : "Online";
-      const newLink = linkInput ? linkInput.value.trim() : "";
-      const newComment = commentInput ? commentInput.value.trim() : "";
+      const rawDt = getElement("rescheduleDateTimeInput")?.value.trim() || "";
+      const newMode = getElement("rescheduleModeDropdown")?.value || "Online";
+      const newLink = getElement("rescheduleLinkInput")?.value.trim() || "";
+      const newComment = getElement("rescheduleCommentBox")?.value.trim() || "";
+      const errMsg = getElement("rescheduleErrorMsg");
+      const submitBtn = getElement("rescheduleSubmitButton");
 
       if (!rawDt || isNaN(new Date(rawDt).getTime())) {
         if (errMsg) {
           errMsg.textContent = "Please choose a valid new interview date and time.";
           errMsg.classList.remove("hidden");
         }
-        showToast("Please select a valid new interview date and time.", "error");
-        return;
+        return showToast("Please select a valid new interview date and time.", "error");
       }
 
       const newDateISO = new Date(rawDt).toISOString();
@@ -1607,29 +1220,17 @@
           interview_mode: newMode,
           comment: newComment
         };
-        if (newLink) {
-          updatePayload.invite_link = newLink;
-        }
+        if (newLink) updatePayload.invite_link = newLink;
 
-        let query = supabaseClient
-          .from('candidates')
-          .update(updatePayload);
-
-        if (targetCandidate.id) {
-          query = query.eq('id', targetCandidate.id);
-        } else {
-          query = query.eq('email', targetCandidate.email);
-        }
+        let query = supabaseClient.from('candidates').update(updatePayload);
+        query = targetCandidate.id ? query.eq('id', targetCandidate.id) : query.eq('email', targetCandidate.email);
 
         const { error } = await query;
         if (error) throw error;
 
         showToast("Interview rescheduled in Supabase! Opening WhatsApp confirmation...", "success");
         closeReschedulePopup();
-
-        // Automatically open WhatsApp with the Reschedule Confirmation message
         sendWhatsAppRescheduleConfirmation(targetCandidate, newDateISO, newMode, newLink || targetCandidate.invite_link);
-
         await loadScheduledInterviews();
       } catch (err) {
         console.error("Reschedule failed:", err);
@@ -1642,47 +1243,48 @@
       }
     }
 
+    function populateDropdown(selectEl, defaultLabel, items, formatLabel = v => v) {
+      if (!selectEl) return;
+      const currentVal = selectEl.value;
+      selectEl.innerHTML = `<option value="">${defaultLabel}</option>`;
+      items.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item;
+        opt.textContent = formatLabel(item);
+        selectEl.appendChild(opt);
+      });
+      if (items.includes(currentVal)) selectEl.value = currentVal;
+    }
+
     function updateFinalStatusOptions() {
       const statusDropdown = getElement("statusDropdown");
       const finalStatusDropdown = getElement("finalStatusDropdown");
       if (!statusDropdown || !finalStatusDropdown) return;
-
-      const status = statusDropdown.value;
-      finalStatusDropdown.innerHTML = '<option value="">Select Final Status</option>';
 
       const statusOptions = {
         "Selected": ["Shortlisted", "L1 Selected", "L2 Selected", "L3 Selected", "Final Select", "Joined"],
         "Rejected": ["Not Shortlisted", "L1 Reject", "L2 Reject", "L3 Reject", "Not Joined"],
         "On Hold": ["Position On Hold", "Candidate On Hold"]
       };
-
-      (statusOptions[status] || []).forEach(s => {
-        const opt = document.createElement("option");
-        opt.value = s;
-        opt.textContent = s;
-        finalStatusDropdown.appendChild(opt);
-      });
+      populateDropdown(finalStatusDropdown, 'Select Final Status', statusOptions[statusDropdown.value] || []);
     }
 
-    // ==================== SUPABASE STATUS UPDATE ====================
     async function submitFinalStatusUpdate() {
       const statusDropdown = getElement("statusDropdown");
       const finalStatusDropdown = getElement("finalStatusDropdown");
       const commentBox = getElement("commentBox");
 
       if (!statusDropdown || !finalStatusDropdown || !commentBox) {
-        showToast("Form elements not found", "error");
-        return;
+        return showToast("Form elements not found", "error");
       }
 
       if (!validateStatusModalInputs()) {
-        const errMsg = document.getElementById('statusModalErrorMsg');
+        const errMsg = getElement('statusModalErrorMsg');
         if (errMsg) {
           errMsg.textContent = "Please select both Stage Category and Final Status.";
           errMsg.classList.remove('hidden');
         }
-        showToast("Please select both status and final status.", "error");
-        return;
+        return showToast("Please select both status and final status.", "error");
       }
 
       validateCommentInput(commentBox);
@@ -1690,10 +1292,7 @@
       const finalStatus = finalStatusDropdown.value;
       const comment = commentBox.value.trim();
 
-      if (!currentEmail && !currentCandidateId) {
-        showToast("No candidate selected.", "error");
-        return;
-      }
+      if (!currentEmail && !currentCandidateId) return showToast("No candidate selected.", "error");
 
       const submitButton = getElement('statusSubmitButton');
       if (submitButton) {
@@ -1702,33 +1301,19 @@
       }
 
       try {
-        let query = supabaseClient
-          .from('candidates')
-          .update({
-            status: status,
-            final_status: finalStatus,
-            comment: comment
-          });
-
-        if (currentCandidateId) {
-          query = query.eq('id', currentCandidateId);
-        } else {
-          query = query.eq('email', currentEmail);
-        }
+        let query = supabaseClient.from('candidates').update({ status, final_status: finalStatus, comment });
+        query = currentCandidateId ? query.eq('id', currentCandidateId) : query.eq('email', currentEmail);
 
         const { error } = await query;
         if (error) throw error;
 
         showToast("Status updated in Supabase!", "success");
         closePopup();
-        if (submitButton) {
-          submitButton.disabled = false;
-          submitButton.innerHTML = '<i class="fas fa-save"></i> <span class="btn-text">Update</span>';
-        }
         await loadScheduledInterviews();
       } catch (error) {
         console.error("Supabase status update failed:", error);
         showToast("Update failed: " + error.message, "error");
+      } finally {
         if (submitButton) {
           submitButton.disabled = false;
           submitButton.innerHTML = '<i class="fas fa-save"></i> <span class="btn-text">Update</span>';
@@ -1736,63 +1321,25 @@
       }
     }
 
-    // Load filter options
     function loadFilterOptions() {
-      const companyFilter = getElement('companyFilter');
-      const recruiterFilter = getElement('recruiterFilter');
-
-      if (!companyFilter || !recruiterFilter) return;
-
-      const currentCompanyVal = companyFilter.value;
-      const currentRecVal = recruiterFilter.value;
-
-      const companies = [...new Set(allScheduledInterviews.map(interview => interview.company).filter(Boolean))];
-      companyFilter.innerHTML = '<option value="">All Companies</option>';
-      companies.forEach(company => {
-        const opt = document.createElement('option');
-        opt.value = company;
-        opt.textContent = company;
-        companyFilter.appendChild(opt);
-      });
-      if (companies.includes(currentCompanyVal)) companyFilter.value = currentCompanyVal;
-
-      const recruiters = [...new Set(allScheduledInterviews.map(interview => interview.recruiter).filter(Boolean))];
-      recruiterFilter.innerHTML = '<option value="">All Recruiters</option>';
-      recruiters.forEach(recruiter => {
-        const opt = document.createElement('option');
-        opt.value = recruiter;
-        opt.textContent = recruiter.split('@')[0];
-        recruiterFilter.appendChild(opt);
-      });
-      if (recruiters.includes(currentRecVal)) recruiterFilter.value = currentRecVal;
+      const companies = [...new Set(allScheduledInterviews.map(i => i.company).filter(Boolean))];
+      const recruiters = [...new Set(allScheduledInterviews.map(i => i.recruiter).filter(Boolean))];
+      populateDropdown(getElement('companyFilter'), 'All Companies', companies);
+      populateDropdown(getElement('recruiterFilter'), 'All Recruiters', recruiters, r => r.split('@')[0]);
     }
 
-    // Apply filters
     function applyFilters() {
-      const companyFilter = getElement('companyFilter');
-      const recruiterFilter = getElement('recruiterFilter');
-      const statusFilter = getElement('statusFilter');
-      const modeFilter = document.getElementById('modeFilter');
-      const searchInput = document.getElementById('candidateSearchInput');
-
-      const selectedCompany = companyFilter ? companyFilter.value : '';
-      const selectedRecruiter = recruiterFilter ? recruiterFilter.value : '';
-      const selectedStatus = statusFilter ? statusFilter.value : '';
-      const selectedMode = modeFilter ? modeFilter.value.toLowerCase() : '';
-      const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : '';
+      const selectedCompany = getElement('companyFilter')?.value || '';
+      const selectedRecruiter = getElement('recruiterFilter')?.value || '';
+      const selectedStatus = getElement('statusFilter')?.value || '';
+      const selectedMode = (getElement('modeFilter')?.value || '').toLowerCase();
+      const searchQuery = (getElement('candidateSearchInput')?.value || '').toLowerCase().trim();
 
       filteredInterviews = allScheduledInterviews.filter(interview => {
         const matchCompany = !selectedCompany || interview.company === selectedCompany;
         const matchRecruiter = !selectedRecruiter || interview.recruiter === selectedRecruiter;
-
-        let matchStatus = true;
-        if (selectedStatus) {
-          const interviewStatus = getInterviewStatus(interview.interview_date);
-          matchStatus = interviewStatus.text.toLowerCase() === selectedStatus;
-        }
-
+        const matchStatus = !selectedStatus || getInterviewStatus(interview.interview_date).text.toLowerCase() === selectedStatus;
         const matchMode = !selectedMode || (interview.interview_mode || '').toLowerCase() === selectedMode;
-
         const matchSearch = !searchQuery ||
           (interview.name || '').toLowerCase().includes(searchQuery) ||
           (interview.email || '').toLowerCase().includes(searchQuery) ||
@@ -1811,60 +1358,40 @@
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
       let totalInterviews = filteredInterviews.length;
-      let todayCount = 0;
-      let upcomingCount = 0;
-      let overdueCount = 0;
-      let onlineCount = 0;
-      let physicalCount = 0;
+      let todayCount = 0, upcomingCount = 0, overdueCount = 0, onlineCount = 0, physicalCount = 0;
 
       filteredInterviews.forEach(interview => {
         const mode = (interview.interview_mode || '').toLowerCase();
         if (mode === 'online') onlineCount++;
         if (mode === 'physical') physicalCount++;
-
         if (!interview.interview_date) return;
 
-        try {
-          const interviewDate = new Date(interview.interview_date);
-          const interviewDay = new Date(interviewDate.getFullYear(), interviewDate.getMonth(), interviewDate.getDate());
+        const interviewDate = new Date(interview.interview_date);
+        if (isNaN(interviewDate.getTime())) return;
+        const interviewDay = new Date(interviewDate.getFullYear(), interviewDate.getMonth(), interviewDate.getDate());
 
-          if (interviewDate < now) {
-            overdueCount++;
-          } else if (interviewDay.getTime() === today.getTime()) {
-            todayCount++;
-          } else {
-            upcomingCount++;
-          }
-        } catch (error) {
-          // Ignore malformed date
-        }
+        if (interviewDate < now) overdueCount++;
+        else if (interviewDay.getTime() === today.getTime()) todayCount++;
+        else upcomingCount++;
       });
 
-      const totalEl = getElement('totalInterviews');
-      const todayEl = getElement('todayInterviews');
-      const upcomingEl = getElement('upcomingInterviews');
-      const overdueEl = getElement('overdueInterviews');
-      const modeSplitEl = document.getElementById('kpiModeSplitText');
-      const showingBadge = document.getElementById('showingInterviewsBadge');
-
-      if (totalEl) totalEl.textContent = totalInterviews;
-      if (todayEl) todayEl.textContent = todayCount;
-      if (upcomingEl) upcomingEl.textContent = upcomingCount;
-      if (overdueEl) overdueEl.textContent = overdueCount;
-      if (modeSplitEl) modeSplitEl.textContent = `${onlineCount} Onl • ${physicalCount} Phy`;
-      if (showingBadge) showingBadge.textContent = `${totalInterviews} Selected`;
+      getElement('totalInterviews').textContent = totalInterviews;
+      getElement('todayInterviews').textContent = todayCount;
+      getElement('upcomingInterviews').textContent = upcomingCount;
+      getElement('overdueInterviews').textContent = overdueCount;
+      getElement('kpiModeSplitText').textContent = `${onlineCount} Onl • ${physicalCount} Phy`;
+      getElement('showingInterviewsBadge').textContent = `${totalInterviews} Selected`;
     }
 
-    // ==================== ONE-VIEW HIGH-DENSITY TABLE & TIMELINE CARD RENDERER ====================
     function renderInterviewTable() {
       const tableBody = document.querySelector("#interviewTable tbody");
-      const cardsContainer = document.getElementById('cardsViewWrapper');
+      const cardsContainer = getElement('cardsViewWrapper');
       if (!tableBody) return;
 
       tableBody.innerHTML = "";
       if (cardsContainer) cardsContainer.innerHTML = "";
 
-      if (filteredInterviews.length === 0) {
+      if (!filteredInterviews.length) {
         tableBody.innerHTML = '<tr><td colspan="9" class="py-12 text-center text-slate-400"><i class="fas fa-calendar-times text-lg mb-2"></i><br>No scheduled interviews found for Selected candidates</td></tr>';
         if (cardsContainer) {
           cardsContainer.innerHTML = '<div class="col-span-full glass-card rounded-3xl p-10 text-center text-slate-400">No scheduled interviews found matching current filters</div>';
@@ -1877,7 +1404,7 @@
         const row = document.createElement("tr");
         const safeName = escapeHtml(interview.name || "Candidate");
         const safeEmail = escapeHtml(interview.email || "-");
-        const rawMobile = String(interview.Mobile || interview.mobile || interview.Phone || interview.phone || "").replace(/\D/g, '').slice(-10);
+        const rawMobile = extractMobileDigits(interview);
         const safeMobile = escapeHtml(rawMobile);
         const safePos = escapeHtml(interview.position || "-");
         const safeComp = escapeHtml(interview.company || "-");
@@ -1890,20 +1417,18 @@
         const interviewStatus = getInterviewStatus(interview.interview_date);
         const recDisplay = escapeHtml((interview.recruiter || interview.recruiter_email || '').split("@")[0] || "-");
         const safeMeetingUrl = getSafeHttpsUrl(interview.invite_link);
+        const formattedDT = escapeHtml(formatInterviewDateTime(interview.interview_date));
 
-        let modeBadge = '<span class="mode-badge">Unknown</span>';
-        if (interview.interview_mode) {
-          const mode = interview.interview_mode.toLowerCase();
-          if (mode === 'physical') {
-            modeBadge = '<span class="mode-badge mode-physical"><i class="fas fa-building"></i> Physical</span>';
-          } else if (mode === 'online') {
-            modeBadge = '<span class="mode-badge mode-online"><i class="fas fa-video"></i> Online</span>';
-          }
-        }
+        const modeLower = (interview.interview_mode || '').toLowerCase();
+        const modeBadge = modeLower === 'physical'
+          ? '<span class="mode-badge mode-physical"><i class="fas fa-building"></i> Physical</span>'
+          : modeLower === 'online'
+            ? '<span class="mode-badge mode-online"><i class="fas fa-video"></i> Online</span>'
+            : '<span class="mode-badge">Unknown</span>';
 
         row.innerHTML = `
-          <td class="whitespace-nowrap font-semibold text-slate-800 dark:text-slate-200" title="${escapeHtml(formatInterviewDateTime(interview.interview_date))}">
-            <i class="far fa-clock text-amber-500 mr-1.5"></i>${escapeHtml(formatInterviewDateTime(interview.interview_date))}
+          <td class="whitespace-nowrap font-semibold text-slate-800 dark:text-slate-200" title="${formattedDT}">
+            <i class="far fa-clock text-amber-500 mr-1.5"></i>${formattedDT}
           </td>
           <td>
             <div title="${safeName}" class="candidate-name-clickable" data-index="${index}">
@@ -1947,7 +1472,6 @@
 
         tableBody.appendChild(row);
 
-        // Also populate Responsive Mobile-First Timeline Card View
         if (cardsContainer) {
           const card = document.createElement('div');
           card.className = 'glass-card rounded-2xl p-4 flex flex-col justify-between gap-3 border hover:border-blue-500/40 transition-all cursor-pointer';
@@ -1959,14 +1483,13 @@
             <div>
               <div class="flex items-center justify-between gap-2 mb-2">
                 <span class="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                  <i class="fas fa-calendar-day"></i> ${escapeHtml(formatInterviewDateTime(interview.interview_date))}
+                  <i class="fas fa-calendar-day"></i> ${formattedDT}
                 </span>
                 <span class="interview-badge ${interviewStatus.class}">${escapeHtml(interviewStatus.text)}</span>
               </div>
               <h4 class="font-display font-bold text-base text-blue-600 dark:text-blue-400 hover:underline">${safeName}</h4>
               <p class="text-xs font-bold text-slate-700 dark:text-slate-300 mt-0.5">${safePos} • ${safeComp}</p>
 
-              <!-- One-View Mini Metrics Grid inside Card -->
               <div class="grid grid-cols-2 gap-1.5 my-2.5 p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70 text-[11px]">
                 <div><span class="text-slate-400">CTC:</span> <strong class="text-slate-800 dark:text-slate-200">${safeCurCtc} → ${safeExpCtc}</strong></div>
                 <div><span class="text-slate-400">NP / Exp:</span> <strong class="text-amber-600 dark:text-amber-400">${safeNotice} (${safeExp})</strong></div>
@@ -2001,34 +1524,27 @@
         }
       });
 
-      // Add click handlers to candidate names
       tableBody.querySelectorAll('.candidate-name-clickable').forEach(nameCell => {
         nameCell.addEventListener('click', (event) => {
           event.stopPropagation();
-          const index = parseInt(event.currentTarget.getAttribute('data-index'));
+          const index = parseInt(event.currentTarget.getAttribute('data-index'), 10);
           const candidate = filteredInterviews[index];
-          if (candidate) {
-            openCandidateOptionsPopup(candidate);
-          }
+          if (candidate) openCandidateOptionsPopup(candidate);
         });
       });
 
       updateStats();
     }
 
-    // ==================== SUPABASE LOAD SCHEDULED INTERVIEWS (ONLY STATUS = "Selected") ====================
     async function loadScheduledInterviews() {
       try {
-        // Fetch candidates that have an interview_date and Status = 'Selected'
         const { data, error } = await supabaseClient
           .from('candidates')
           .select('*')
           .not('interview_date', 'is', null)
           .ilike('status', 'Selected');
 
-        if (error) {
-          throw error;
-        }
+        if (error) throw error;
 
         const normalizedData = (data || []).map(row => ({
           ...row,
@@ -2038,25 +1554,14 @@
 
         const roleFilteredCandidates = filterCandidatesByUserType(normalizedData);
 
-        // Strictly keep only candidates with a valid interview_date AND status === "Selected" (excludes "Rejected" & "On Hold")
         const userCandidates = roleFilteredCandidates.filter(c => {
           const rawDate = c.interview_date ? c.interview_date.toString().trim() : "";
           const hasValidDate = rawDate !== "" && !isNaN(new Date(rawDate).getTime());
-          const statusNormalized = (c.status || "").toString().trim().toLowerCase();
-          const isSelectedOnly = statusNormalized === "selected";
+          const isSelectedOnly = (c.status || "").toString().trim().toLowerCase() === "selected";
           return hasValidDate && isSelectedOnly;
         });
 
-        allScheduledInterviews = userCandidates.sort((a, b) => {
-          try {
-            const dateA = new Date(a.interview_date);
-            const dateB = new Date(b.interview_date);
-            return dateA - dateB;
-          } catch (error) {
-            return 0;
-          }
-        });
-
+        allScheduledInterviews = userCandidates.sort((a, b) => new Date(a.interview_date) - new Date(b.interview_date));
         filteredInterviews = [...allScheduledInterviews];
         loadFilterOptions();
         applyFilters();
@@ -2070,63 +1575,30 @@
       }
     }
 
-    // Initialize popup event handlers after DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
-      const btnUpdateStatus = getElement('btnUpdateStatus');
-      if (btnUpdateStatus) {
-        btnUpdateStatus.addEventListener('click', () => {
-          if (!currentCandidateForPopup) {
-            showToast('No candidate selected', 'error');
-            return;
-          }
-          openPopup(currentCandidateForPopup);
-          closeCandidateOptionsPopup();
-        });
-      }
+      getElement('btnUpdateStatus')?.addEventListener('click', () => {
+        if (!currentCandidateForPopup) return showToast('No candidate selected', 'error');
+        const cand = currentCandidateForPopup;
+        closeCandidateOptionsPopup();
+        openPopup(cand);
+      });
 
-      // NEW: Event listener for Reschedule button inside Candidate Quick Actions Popup
-      const btnRescheduleInterview = document.getElementById('btnRescheduleInterview');
-      if (btnRescheduleInterview) {
-        btnRescheduleInterview.addEventListener('click', () => {
-          if (!currentCandidateForPopup) {
-            showToast('No candidate selected', 'error');
-            return;
-          }
-          const cand = currentCandidateForPopup;
-          closeCandidateOptionsPopup();
-          openReschedulePopup(cand);
-        });
-      }
+      getElement('btnRescheduleInterview')?.addEventListener('click', () => {
+        if (!currentCandidateForPopup) return showToast('No candidate selected', 'error');
+        const cand = currentCandidateForPopup;
+        closeCandidateOptionsPopup();
+        openReschedulePopup(cand);
+      });
 
-      const btnConnectWhatsapp = getElement('btnConnectWhatsapp');
-      if (btnConnectWhatsapp) {
-        btnConnectWhatsapp.addEventListener('click', () => {
-          if (!currentCandidateForPopup) {
-            showToast('No candidate selected', 'error');
-            return;
-          }
-
-          const mobileRaw = currentCandidateForPopup.Mobile ||
-                            currentCandidateForPopup.mobile ||
-                            currentCandidateForPopup.Phone ||
-                            currentCandidateForPopup.phone || '';
-
-          if (!mobileRaw) {
-            showToast('Mobile number not available for this candidate', 'error');
-            return;
-          }
-
-          const digitsOnly = mobileRaw.toString().replace(/\D/g, '').slice(-10);
-          if (digitsOnly.length !== 10) {
-            showToast('Invalid 10-digit mobile number', 'error');
-            return;
-          }
-
-          const waUrl = `https://wa.me/91${digitsOnly}`;
-          window.open(waUrl, '_blank', 'noopener,noreferrer');
-          closeCandidateOptionsPopup();
-        });
-      }
+      getElement('btnConnectWhatsapp')?.addEventListener('click', () => {
+        if (!currentCandidateForPopup) return showToast('No candidate selected', 'error');
+        const digitsOnly = extractMobileDigits(currentCandidateForPopup);
+        if (digitsOnly.length !== 10) {
+          return showToast('Valid 10-digit mobile number not available for this candidate', 'error');
+        }
+        window.open(`https://wa.me/91${digitsOnly}`, '_blank', 'noopener,noreferrer');
+        closeCandidateOptionsPopup();
+      });
     });
   </script>
 </body>
