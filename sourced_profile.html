@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<!-- Default theme is explicitly LIGHT (removed "dark" class from html root) -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <title>TCC Sourced Profiles - Today's Sourcing</title>
+  <title>TCC WhatsApp Bulk Messenger</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS Client SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -28,25 +25,17 @@
   <style>
     :root {
       --bg-gradient:
-        radial-gradient(circle at 12% 15%, rgba(168, 85, 247, 0.14) 0%, transparent 45%),
-        radial-gradient(circle at 88% 85%, rgba(59, 130, 246, 0.14) 0%, transparent 45%),
-        radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.07) 0%, transparent 60%);
+        radial-gradient(circle at 12% 15%, rgba(16, 185, 129, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(20, 184, 166, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 50% 40%, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
     }
-
     .dark {
       --bg-gradient:
-        radial-gradient(circle at 12% 15%, rgba(168, 85, 247, 0.22) 0%, transparent 45%),
-        radial-gradient(circle at 88% 85%, rgba(59, 130, 246, 0.20) 0%, transparent 45%),
-        radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.10) 0%, transparent 60%);
+        radial-gradient(circle at 12% 15%, rgba(16, 185, 129, 0.22) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(20, 184, 166, 0.20) 0%, transparent 45%),
+        radial-gradient(circle at 50% 40%, rgba(59, 130, 246, 0.12) 0%, transparent 60%);
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
@@ -54,8 +43,6 @@
       overflow-x: hidden;
       transition: background-color 0.3s ease, color 0.3s ease;
     }
-
-    /* Ambient Floating Orbs */
     .orb {
       position: fixed;
       border-radius: 50%;
@@ -65,34 +52,15 @@
       opacity: 0.32;
       animation: floatOrb 18s ease-in-out infinite alternate;
     }
-
-    .dark .orb {
-      opacity: 0.42;
-    }
-
-    .orb-1 {
-      width: 300px;
-      height: 300px;
-      background: linear-gradient(135deg, #a855f7, #3b82f6);
-      top: -80px;
-      left: -80px;
-    }
-
-    .orb-2 {
-      width: 260px;
-      height: 260px;
-      background: linear-gradient(135deg, #10b981, #6366f1);
-      bottom: -60px;
-      right: -60px;
-      animation-delay: -7s;
-    }
+    .dark .orb { opacity: 0.42; }
+    .orb-1 { width: 300px; height: 300px; background: linear-gradient(135deg, #10b981, #14b8a6); top: -80px; left: -80px; }
+    .orb-2 { width: 260px; height: 260px; background: linear-gradient(135deg, #3b82f6, #10b981); bottom: -60px; right: -60px; animation-delay: -7s; }
 
     @keyframes floatOrb {
       0% { transform: translate(0, 0) scale(1); }
       50% { transform: translate(24px, -28px) scale(1.06); }
       100% { transform: translate(-18px, 20px) scale(0.95); }
     }
-
     .glass-card {
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(22px) saturate(180%);
@@ -100,104 +68,39 @@
       border: 1px solid rgba(226, 232, 240, 0.9);
       box-shadow: 0 14px 34px -10px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
     }
-
     .dark .glass-card {
       background: rgba(15, 23, 42, 0.84);
       border: 1px solid rgba(255, 255, 255, 0.09);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
     }
-
     @keyframes fadeSlideUp {
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
     }
+    .animate-in { animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
 
-    .animate-in {
-      animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-    }
-
-    .form-control-input {
+    .form-input {
       width: 100%;
-      padding: 9.5px 13px;
+      padding: 10px 13px;
       border-radius: 12px;
       border: 1.5px solid rgba(148, 163, 184, 0.35);
       background: #ffffff;
       color: #0f172a;
-      font-size: 12.5px;
+      font-size: 13px;
       transition: all 0.2s ease;
     }
+    .dark .form-input { background: rgba(30, 41, 59, 0.8); border-color: rgba(255, 255, 255, 0.12); color: #f8fafc; }
+    .form-input:focus { outline: none; border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.16); }
+    .input-valid { border-color: #10b981 !important; }
+    .input-invalid { border-color: #f43f5e !important; }
 
-    .dark .form-control-input {
-      background: rgba(30, 41, 59, 0.8);
-      border-color: rgba(255, 255, 255, 0.12);
-      color: #f8fafc;
-    }
-
-    .form-control-input:focus {
-      outline: none;
-      border-color: #8b5cf6;
-      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.16);
-    }
-
-    .input-valid {
-      border-color: #10b981 !important;
-    }
-
-    .input-invalid {
-      border-color: #f43f5e !important;
-    }
-
-    /* Preserved Loading & Error States */
-    .loading {
-      display: none;
-      text-align: center;
-      padding: 48px 20px;
-      color: #8b5cf6;
-      font-size: 14px;
-      font-weight: 600;
-    }
-
-    .loading.show {
-      display: block;
-    }
-
-    .error {
-      display: none;
-      text-align: center;
+    .campaign-header {
+      background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+      color: white;
       padding: 16px 20px;
-      color: #ef4444;
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.25);
-      border-radius: 16px;
-      margin-bottom: 16px;
-      font-size: 13px;
+      border-radius: 20px 20px 0 0;
     }
-
-    .error.show {
-      display: block;
-    }
-
-    /* Table Container & Preserved Column Semantic Classes */
-    .table-container {
-      overflow-x: auto;
-      max-height: 68vh;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      font-size: 12px;
-    }
-
-    thead {
-      position: sticky;
-      top: 0;
-      z-index: 15;
-    }
-
+    table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12.5px; }
     th {
       background: rgba(241, 245, 249, 0.96);
       color: #475569;
@@ -205,252 +108,114 @@
       font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      padding: 12px 11px;
+      padding: 12px 14px;
       text-align: left;
       border-bottom: 1px solid rgba(226, 232, 240, 0.95);
-      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
+    .dark th { background: rgba(15, 23, 42, 0.96); color: #94a3b8; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    td { padding: 11px 14px; border-bottom: 1px solid rgba(226, 232, 240, 0.65); vertical-align: middle; }
+    .dark td { border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    tbody tr { transition: all 0.15s ease; }
+    tbody tr:hover { background: rgba(16, 185, 129, 0.06); }
+    .dark tbody tr:hover { background: rgba(16, 185, 129, 0.12); }
 
-    .dark th {
-      background: rgba(15, 23, 42, 0.96);
-      color: #94a3b8;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    td {
-      padding: 10px 11px;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.65);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 190px;
-      vertical-align: middle;
-    }
-
-    .dark td {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    tbody tr {
-      transition: background-color 0.15s ease;
-    }
-
-    tbody tr:hover {
-      background-color: rgba(139, 92, 246, 0.06);
-    }
-
-    .dark tbody tr:hover {
-      background-color: rgba(139, 92, 246, 0.12);
-    }
-
-    .timestamp {
-      font-size: 11px;
-      color: #64748b;
-    }
-
-    .dark .timestamp {
-      color: #94a3b8;
-    }
-
-    .company {
-      font-weight: 700;
-      color: #1e293b;
-    }
-
-    .dark .company {
-      color: #f1f5f9;
-    }
-
-    .position {
-      color: #2563eb;
-      font-weight: 600;
-    }
-
-    .dark .position {
-      color: #60a5fa;
-    }
-
-    .candidate-name {
-      font-weight: 700;
-      color: #059669;
-    }
-
-    .dark .candidate-name {
-      color: #34d399;
-    }
-
-    .mobile {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-weight: 600;
-    }
-
-    .email {
-      color: #7c3aed;
-    }
-
-    .dark .email {
-      color: #a78bfa;
-    }
-
-    .ctc {
-      color: #d97706;
-      font-weight: 600;
-    }
-
-    .dark .ctc {
-      color: #fbbf24;
-    }
-
-    .experience {
-      color: #0d9488;
-      font-weight: 600;
-    }
-
-    .dark .experience {
-      color: #2dd4bf;
-    }
-
-    .notice-period {
-      color: #e11d48;
-      font-weight: 600;
-    }
-
-    .dark .notice-period {
-      color: #fb7185;
-    }
-
-    .recruiter {
-      color: #64748b;
-      font-style: italic;
-    }
-
-    .no-data {
-      text-align: center;
-      padding: 48px 20px;
-      color: #94a3b8;
-      font-size: 14px;
-    }
-
-    /* Preserved Toast Notification (#toast) */
-    .toast {
-      position: fixed;
-      bottom: 72px;
-      right: 20px;
-      background: linear-gradient(135deg, #10b981, #059669);
+    .btn-send {
+      padding: 7px 15px;
+      background: linear-gradient(135deg, #25D366, #128C7E);
       color: white;
-      padding: 13px 20px;
-      border-radius: 16px;
-      font-size: 12.5px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
       font-weight: 700;
-      box-shadow: 0 15px 35px -5px rgba(16, 185, 129, 0.45);
-      transform: translateY(140px);
-      opacity: 0;
-      transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-      z-index: 2500;
+      font-size: 12px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
     }
+    .btn-send:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(37, 211, 102, 0.35); }
+    .no-data { text-align: center; padding: 36px 20px; color: #94a3b8; font-size: 13px; }
 
-    @media (min-width: 640px) {
-      .toast {
-        bottom: 24px;
-      }
+    .template-pill {
+      padding: 5px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(255, 255, 255, 0.7);
+      color: #334155;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
     }
-
-    .toast.show {
-      transform: translateY(0);
-      opacity: 1;
+    .dark .template-pill { background: rgba(30, 41, 59, 0.7); color: #cbd5e1; border-color: rgba(255, 255, 255, 0.1); }
+    .template-pill:hover, .template-pill.active {
+      background: #10b981;
+      color: #ffffff;
+      border-color: #059669;
+      transform: translateY(-1px);
     }
   </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-20 sm:pb-12 selection:bg-purple-500 selection:text-white relative">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-20 sm:pb-14 selection:bg-emerald-500 selection:text-white relative">
 
-  <!-- Ambient Floating Orbs -->
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
+  <div id="toastContainer" class="fixed bottom-16 sm:bottom-5 right-4 sm:right-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-3 pointer-events-none"></div>
+
+  <!-- Sticky Top Navigation Bar -->
   <header class="sticky top-0 z-40 glass-card border-b border-slate-200/80 dark:border-slate-800/80 px-3 sm:px-6 py-2.5 sm:py-3">
     <div class="max-w-[1600px] mx-auto flex items-center justify-between gap-2 sm:gap-3">
       <div class="flex items-center gap-2.5 sm:gap-3">
         <button
           onclick="goHome()"
-          class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-purple-500/10 hover:bg-purple-600 text-purple-600 dark:text-purple-400 hover:text-white border border-purple-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0"
+          class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-emerald-500/10 hover:bg-emerald-600 text-emerald-600 dark:text-emerald-400 hover:text-white border border-emerald-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0"
           title="Back to Dashboard"
           aria-label="Back to Dashboard"
         >
           <i class="fas fa-house text-sm sm:text-base"></i>
         </button>
-
-        <div class="header">
+        <div>
           <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
             <h1 class="font-display font-extrabold text-sm sm:text-lg text-slate-900 dark:text-white leading-tight flex items-center gap-2">
-              <i class="fas fa-chart-line text-purple-500"></i>
-              <span>Today's Sourcing & Master Pool</span>
+              <i class="fab fa-whatsapp text-emerald-500 text-lg"></i>
+              <span>WhatsApp Bulk Messenger</span>
             </h1>
-            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
-              Live Supabase DB
-            </span>
-            <span class="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25" title="Power Automate flow is disabled and bypassed">
-              <i class="fas fa-bolt-slash text-[9px]"></i> PA Bypassed
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+              14+ Templates Studio
             </span>
           </div>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-            One-View Master Pool, Email-Ready Table Copy & Direct WhatsApp Broadcast Export (Synced with Supabase)
+            Recruiter Templates, Smart Number Validation &amp; Direct WhatsApp Queue
           </p>
         </div>
       </div>
 
-      <!-- Right Action Buttons -->
       <div class="flex items-center gap-1.5 sm:gap-2">
         <button
           type="button"
-          onclick="refreshData()"
+          onclick="syncCloudCompanies()"
           class="px-2.5 sm:px-3 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
-          title="Refresh Supabase Data"
+          title="Load Companies & Roles from Supabase"
         >
-          <i class="fas fa-arrows-rotate" id="syncSpinnerIcon"></i>
-          <span class="hidden md:inline">Refresh</span>
+          <i class="fas fa-database" id="cloudSyncIcon"></i>
+          <span class="hidden md:inline">Sync Supabase Roles</span>
         </button>
 
         <button
           type="button"
-          onclick="copyTableData()"
-          class="px-2.5 sm:px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all cursor-pointer"
-          title="Copy Email-Ready Table to Clipboard"
-        >
-          <i class="fas fa-copy"></i>
-          <span class="hidden sm:inline">Copy Table</span>
-        </button>
-
-        <button
-          type="button"
-          onclick="exportSourcedToCSV()"
-          class="px-2.5 sm:px-3 py-2 rounded-xl bg-purple-500/10 hover:bg-purple-600 text-purple-600 dark:text-purple-400 hover:text-white border border-purple-500/20 text-xs font-bold hidden sm:flex items-center gap-1.5 transition-all cursor-pointer"
-          title="Download Safe CSV"
+          onclick="exportQueueToCSV()"
+          class="px-2.5 sm:px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-bold hidden sm:flex items-center gap-1.5 transition-all cursor-pointer"
+          title="Export Queue & Sent History to CSV"
         >
           <i class="fas fa-file-csv"></i>
           <span class="hidden lg:inline">Export CSV</span>
         </button>
-
-        <!-- View Mode Switcher (Table vs Cards) -->
-        <div class="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-          <button
-            type="button"
-            id="viewTableBtn"
-            onclick="switchSourcedView('table')"
-            class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-600 text-white shadow-sm transition-all"
-            title="High-Density Table View"
-          >
-            <i class="fas fa-table"></i>
-          </button>
-          <button
-            type="button"
-            id="viewCardsBtn"
-            onclick="switchSourcedView('cards')"
-            class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all"
-            title="Cards View"
-          >
-            <i class="fas fa-grip"></i>
-          </button>
-        </div>
 
         <button
           type="button"
@@ -465,277 +230,382 @@
     </div>
   </header>
 
-  <div class="container max-w-[1600px] mx-auto px-3 sm:px-6 pt-4 sm:pt-5 relative z-10">
+  <main class="max-w-[1600px] mx-auto px-3 sm:px-6 pt-4 sm:pt-5 relative z-10">
 
-    <!-- 6-Card One-View KPI Summary Strip (Preserves #totalCount, #filteredCount, #todaySourcedCount, #lastUpdated) -->
-    <div class="stats grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 mb-4 animate-in">
-      <!-- KPI 1: Total Candidates -->
-      <button type="button" onclick="quickSetDateFilter('')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-purple-500/40 transition-all cursor-pointer">
+    <!-- KPI Summary Strip -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3 mb-4 animate-in">
+      <div class="glass-card rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Pool</span>
-          <span class="w-7 h-7 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs">
-            <i class="fas fa-database"></i>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Detected Numbers</span>
+          <span class="w-7 h-7 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center text-xs">
+            <i class="fas fa-hashtag"></i>
           </span>
         </div>
-        <strong id="totalCount" class="font-display text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white block">0</strong>
-        <span class="text-[10px] text-slate-400 truncate block">Click to view all</span>
-      </button>
-
-      <!-- KPI 2: Filtered Results -->
-      <div class="glass-card rounded-2xl p-3 sm:p-3.5 text-left">
-        <div class="flex items-center justify-between mb-1">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Filtered View</span>
-          <span class="w-7 h-7 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs">
-            <i class="fas fa-filter"></i>
-          </span>
-        </div>
-        <strong id="filteredCount" class="font-display text-xl sm:text-2xl font-extrabold text-blue-600 dark:text-blue-400 block">0</strong>
-        <span class="text-[10px] text-slate-400 truncate block">Matching criteria</span>
+        <p class="font-display text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white" id="statDetectedCount">0</p>
+        <span class="text-[10px] text-slate-400 truncate block" id="kpiValidBreakdownText">0 valid 10-digit</span>
       </div>
 
-      <!-- KPI 3: Today's Submissions -->
-      <button type="button" onclick="quickSetDateFilter('today')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-emerald-500/40 transition-all cursor-pointer">
+      <div class="glass-card rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Today's Sourcing</span>
-          <span class="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xs">
-            <i class="fas fa-bolt"></i>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Remaining Queue</span>
+          <span class="w-7 h-7 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-xs">
+            <i class="fas fa-hourglass-half"></i>
           </span>
         </div>
-        <strong id="todaySourcedCount" class="font-display text-xl sm:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 block">0</strong>
-        <span class="text-[10px] text-slate-400 truncate block">Click for Today</span>
-      </button>
-
-      <!-- KPI 4: Immediate / Short Notice Joiners -->
-      <button type="button" onclick="quickSetNoticeFilter('immediate')" class="glass-card rounded-2xl p-3 sm:p-3.5 text-left hover:border-rose-500/40 transition-all cursor-pointer">
-        <div class="flex items-center justify-between mb-1">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">Immediate / ≤15d</span>
-          <span class="w-7 h-7 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center text-xs">
-            <i class="fas fa-rocket"></i>
-          </span>
-        </div>
-        <strong id="immediateJoinersCount" class="font-display text-xl sm:text-2xl font-extrabold text-rose-600 dark:text-rose-400 block">0</strong>
-        <span class="text-[10px] text-slate-400 truncate block">Fast joiners</span>
-      </button>
-
-      <!-- KPI 5: Active Clients & Recruiters Count -->
-      <div class="glass-card rounded-2xl p-3 sm:p-3.5 text-left">
-        <div class="flex items-center justify-between mb-1">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Clients & Team</span>
-          <span class="w-7 h-7 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs">
-            <i class="fas fa-building-user"></i>
-          </span>
-        </div>
-        <strong id="clientsAndRecruitersMetric" class="font-display text-sm sm:text-base font-extrabold text-slate-900 dark:text-white block mt-1 truncate">0 Clients • 0 Rec</strong>
-        <span class="text-[10px] text-slate-400 truncate block">In current view</span>
+        <p class="font-display text-xl sm:text-2xl font-extrabold text-amber-600 dark:text-amber-400" id="statRemainingCount">0</p>
+        <span class="text-[10px] text-slate-400 truncate block">Ready to send</span>
       </div>
 
-      <!-- KPI 6: Last Updated & PA Bypass -->
-      <div class="glass-card rounded-2xl p-3 sm:p-3.5 text-left border-amber-500/30 bg-amber-500/5">
+      <div class="glass-card rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between">
         <div class="flex items-center justify-between mb-1">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">Sync & PA Bypass</span>
-          <span class="w-7 h-7 rounded-xl bg-amber-500 text-white flex items-center justify-center text-xs">
-            <i class="fas fa-forward-fast"></i>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Sent in Session</span>
+          <span class="w-7 h-7 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-xs">
+            <i class="fas fa-check-double"></i>
           </span>
         </div>
-        <strong id="lastUpdated" class="font-display text-xs font-bold text-slate-800 dark:text-slate-200 block mt-1 truncate">Loading...</strong>
-        <span class="text-[10px] text-amber-700 dark:text-amber-400 font-semibold truncate block">Supabase Live • PA Bypassed</span>
+        <p class="font-display text-xl sm:text-2xl font-extrabold text-emerald-600 dark:text-emerald-400" id="statSentCount">0</p>
+        <span class="text-[10px] text-slate-400 truncate block">Completed chats</span>
+      </div>
+
+      <div class="glass-card rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Queue Progress</span>
+          <span class="w-7 h-7 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-xs">
+            <i class="fas fa-chart-pie"></i>
+          </span>
+        </div>
+        <p class="font-display text-xl sm:text-2xl font-extrabold text-indigo-600 dark:text-indigo-400" id="kpiProgressPercent">0%</p>
+        <div class="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden mt-1">
+          <div id="kpiProgressBar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <div class="glass-card rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between col-span-2 sm:col-span-1">
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">Active Template</span>
+          <span class="w-7 h-7 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center text-xs">
+            <i class="fas fa-wand-magic-sparkles"></i>
+          </span>
+        </div>
+        <p class="font-display text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white truncate mt-1" id="kpiActiveTemplateName">Standard Outreach</p>
+        <span class="text-[10px] text-slate-400 truncate block">14 presets available</span>
       </div>
     </div>
 
-    <!-- Filters & Action Controls Card -->
-    <div class="controls glass-card rounded-3xl p-4 sm:p-5 mb-4 animate-in" id="filterTopAnchor">
-      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-        <div class="flex items-center gap-2">
-          <h3 class="font-display font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-2">
-            <i class="fas fa-sliders text-purple-500"></i>
-            <span>Filter & Export Sourced Profiles</span>
-          </h3>
-          <span id="filterConditionBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
-            All Records
-          </span>
-        </div>
+    <!-- 12-COLUMN WORKSPACE -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
-        <div class="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onclick="sendFilteredToWhatsAppSender()"
-            class="px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer"
-          >
-            <i class="fab fa-whatsapp"></i>
-            <span>Send Filtered Numbers to Bulk WhatsApp</span>
-          </button>
-          <button
-            type="button"
-            onclick="clearFilters()"
-            class="text-xs font-semibold text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1 ml-1"
-          >
-            <i class="fas fa-rotate-left text-[10px]"></i> Clear Filters
-          </button>
-        </div>
-      </div>
+      <!-- LEFT COLUMN (7 Cols): CAMPAIGN BUILDER & TEMPLATE STUDIO -->
+      <div id="campaignBuilderAnchor" class="lg:col-span-7 container glass-card rounded-3xl p-4 sm:p-6 relative overflow-hidden animate-in">
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500"></div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 items-end">
-        <!-- Instant Search Input with Condition Check -->
-        <div class="filter-group lg:col-span-3">
-          <div class="flex items-center justify-between mb-1">
-            <label for="searchCandidateInput" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
-              Search Candidate / Role
-            </label>
-            <span id="searchCharCounter" class="text-[10px] text-slate-400">0/60</span>
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-3.5 mb-4 border-b border-slate-200/80 dark:border-slate-800">
+          <div class="flex items-center gap-2">
+            <h2 class="font-display font-extrabold text-sm sm:text-lg text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fas fa-bullhorn text-emerald-500"></i>
+              <span>1. Configure Broadcast Campaign</span>
+            </h2>
+            <span id="formReadinessBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
+              0/4 Validated
+            </span>
           </div>
-          <div class="relative">
-            <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <button type="button" onclick="resetCampaignForm()" class="text-xs font-semibold text-slate-500 hover:text-rose-500 flex items-center gap-1 transition-colors cursor-pointer">
+            <i class="fas fa-trash-can text-[10px]"></i> Clear All
+          </button>
+        </div>
+
+        <div class="form-group mb-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+            <div class="flex items-center gap-2">
+              <label for="mobileNumbers" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <i class="fas fa-mobile-screen-button text-emerald-500 mr-1"></i> Mobile Numbers <span class="text-rose-500">*</span>
+              </label>
+              <span id="mobileCondBadge" class="text-[10px] font-semibold text-slate-400">10-digit Indian numbers</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button
+                type="button"
+                onclick="pullNumbersFromSupabaseCandidates()"
+                class="px-2.5 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 text-[11px] font-bold transition-all cursor-pointer"
+                title="Import candidate numbers from Supabase"
+              >
+                <i class="fas fa-cloud-arrow-down mr-1"></i> Import from Supabase
+              </button>
+              <button
+                type="button"
+                onclick="cleanAndDeduplicateNumbers()"
+                class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-[11px] font-bold transition-all cursor-pointer"
+              >
+                <i class="fas fa-wand-magic-sparkles mr-1"></i> Clean &amp; Deduplicate
+              </button>
+            </div>
+          </div>
+
+          <textarea
+            id="mobileNumbers"
+            rows="3"
+            maxlength="5000"
+            oninput="validateMobileNumbersField(this); updateLivePreviewAndCounts()"
+            onblur="validateMobileNumbersField(this)"
+            placeholder="9876543210, 9123456789, 9988776655 (Paste comma, space, or newline separated numbers)"
+            class="form-input font-mono text-xs sm:text-sm"
+          ></textarea>
+          <div class="helper-text text-[11px] text-slate-500 mt-1 flex flex-wrap items-center justify-between gap-2">
+            <span id="mobileValidationErrorMsg" class="text-rose-600 dark:text-rose-400 font-medium hidden"></span>
+            <span class="text-slate-400">Separated by commas, spaces, or new lines</span>
+            <span id="liveValidNumbersBadge" class="font-bold text-emerald-600 dark:text-emerald-400">0 numbers</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+          <div class="form-group">
+            <div class="flex items-center justify-between mb-1">
+              <label for="company" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <i class="fas fa-building text-blue-500 mr-1"></i> Company <span class="text-rose-500">*</span>
+              </label>
+              <button type="button" onclick="promptCustomOption('company', 'Enter Custom Company Name:')" class="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline">
+                + Custom
+              </button>
+            </div>
+            <select id="company" onchange="handleCompanySelectionChange(); validateCampaignSelects()" class="form-input">
+              <option value="">Select Company</option>
+              <option value="Angel Portal">Angel Portal</option>
+              <option value="Savisa Homes">Savisa Homes</option>
+              <option value="Holy Family">Holy Family</option>
+            </select>
+            <p id="companyErrorMsg" class="text-[10px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
+          </div>
+
+          <div class="form-group">
+            <div class="flex items-center justify-between mb-1">
+              <label for="position" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <i class="fas fa-briefcase text-indigo-500 mr-1"></i> Position <span class="text-rose-500">*</span>
+              </label>
+              <button type="button" onclick="promptCustomOption('position', 'Enter Custom Position Title:')" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+                + Custom
+              </button>
+            </div>
+            <select id="position" onchange="validateCampaignSelects(); updateLivePreviewAndCounts()" class="form-input">
+              <option value="">Select Position</option>
+              <option value="Java Lead">Java Lead</option>
+              <option value="Technical Developer">Technical Developer</option>
+              <option value="Sales">Sales</option>
+            </select>
+            <p id="positionErrorMsg" class="text-[10px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
+          </div>
+
+          <div class="form-group">
+            <div class="flex items-center justify-between mb-1">
+              <label for="jobLocation" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                <i class="fas fa-location-dot text-rose-500 mr-1"></i> Location <span class="text-rose-500">*</span>
+              </label>
+              <span id="locationCharCounter" class="text-[10px] text-slate-400">0/80</span>
+            </div>
             <input
               type="text"
-              id="searchCandidateInput"
-              maxlength="60"
-              oninput="validateSearchInput(this); applyFilters()"
-              placeholder="Name, position, mobile, email..."
-              class="form-control-input pl-9 pr-8"
+              id="jobLocation"
+              maxlength="80"
+              oninput="validateJobLocationField(this); updateLivePreviewAndCounts()"
+              onblur="validateJobLocationField(this)"
+              placeholder="e.g., Mumbai, Bangalore, Remote"
+              class="form-input"
             >
-            <button
-              type="button"
-              id="clearSearchBtn"
-              onclick="clearSearchInputField()"
-              class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 items-center justify-center text-[10px]"
-              title="Clear search"
-            >
-              <i class="fas fa-times"></i>
-            </button>
+            <p id="locationErrorMsg" class="text-[10px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
           </div>
         </div>
 
-        <!-- Date Filter (#dateFilter) -->
-        <div class="filter-group lg:col-span-2">
-          <label for="dateFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
-            Date Filter
-          </label>
-          <select id="dateFilter" class="form-control-input">
-            <option value="">All Dates</option>
-            <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
-            <option value="dayBeforeYesterday">Day Before Yesterday</option>
+        <!-- 14-TEMPLATE STUDIO -->
+        <div id="templateStudioAnchor" class="form-group mb-4 p-3.5 sm:p-4 rounded-2xl bg-slate-100/90 dark:bg-slate-900/70 border border-slate-200/90 dark:border-slate-800">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+            <label for="templatePreset" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+              <i class="fas fa-comment-dots text-emerald-500"></i>
+              <span>2. Recruiter Message Templates (14 Presets)</span>
+            </label>
+            <span id="templateCharCounter" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">0/1000 chars</span>
+          </div>
+
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-2 mb-2.5">
+            <button type="button" onclick="selectTemplateFromPill('default')" data-pill="default" class="template-pill active">1. Standard</button>
+            <button type="button" onclick="selectTemplateFromPill('detailed')" data-pill="detailed" class="template-pill">2. Detailed Pitch</button>
+            <button type="button" onclick="selectTemplateFromPill('urgent')" data-pill="urgent" class="template-pill">3. Urgent / Imm</button>
+            <button type="button" onclick="selectTemplateFromPill('walkin')" data-pill="walkin" class="template-pill">4. Walk-In Drive</button>
+            <button type="button" onclick="selectTemplateFromPill('screening')" data-pill="screening" class="template-pill">5. Quick Screen</button>
+            <button type="button" onclick="selectTemplateFromPill('cv_request')" data-pill="cv_request" class="template-pill">6. Request CV &amp; CTC</button>
+            <button type="button" onclick="selectTemplateFromPill('shortlisted')" data-pill="shortlisted" class="template-pill">7. Shortlisted Alert</button>
+            <button type="button" onclick="selectTemplateFromPill('interview_confirm')" data-pill="interview_confirm" class="template-pill">8. Interview Slot</button>
+            <button type="button" onclick="selectTemplateFromPill('interview_reminder')" data-pill="interview_reminder" class="template-pill">9. Today Reminder</button>
+            <button type="button" onclick="selectTemplateFromPill('followup')" data-pill="followup" class="template-pill">10. Missed Call Follow-up</button>
+            <button type="button" onclick="selectTemplateFromPill('offer_discussion')" data-pill="offer_discussion" class="template-pill">11. Offer / Salary</button>
+            <button type="button" onclick="selectTemplateFromPill('work_from_home')" data-pill="work_from_home" class="template-pill">12. Remote / Hybrid</button>
+            <button type="button" onclick="selectTemplateFromPill('executive')" data-pill="executive" class="template-pill">13. Leadership / CXO</button>
+          </div>
+
+          <select id="templatePreset" onchange="applyTemplatePreset()" class="form-input mb-2.5 text-xs font-semibold">
+            <option value="default">1. Standard Outreach (Default Original)</option>
+            <option value="detailed">2. Detailed Recruiter Pitch (Bold Formatted)</option>
+            <option value="urgent">3. Urgent Requirement / Immediate Joiners</option>
+            <option value="walkin">4. Walk-In Interview Drive Invitation</option>
+            <option value="screening">5. Quick Telephonic Screening Request</option>
+            <option value="cv_request">6. Resume / CV &amp; CTC Details Request</option>
+            <option value="shortlisted">7. Profile Shortlisted for Interview</option>
+            <option value="interview_confirm">8. Interview Slot Confirmation Check</option>
+            <option value="interview_reminder">9. Gentle Reminder for Today's Interview</option>
+            <option value="followup">10. Unreachable / Missed Call Follow-Up</option>
+            <option value="offer_discussion">11. Offer &amp; Salary Discussion</option>
+            <option value="work_from_home">12. Work From Home / Hybrid Role Pitch</option>
+            <option value="executive">13. Senior / Leadership Confidential Outreach</option>
+            <option value="custom">14. Custom Editable Template</option>
           </select>
+
+          <div class="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+            <div class="flex flex-wrap items-center gap-1">
+              <span class="text-[10px] font-bold text-slate-400 mr-1">Insert Tag:</span>
+              <button type="button" onclick="insertTemplateToken('{position}')" class="px-2 py-0.5 rounded bg-emerald-500/10 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-300 hover:text-white text-[10px] font-bold transition-colors">+{position}</button>
+              <button type="button" onclick="insertTemplateToken('{company}')" class="px-2 py-0.5 rounded bg-blue-500/10 hover:bg-blue-500 text-blue-700 dark:text-blue-300 hover:text-white text-[10px] font-bold transition-colors">+{company}</button>
+              <button type="button" onclick="insertTemplateToken('{location}')" class="px-2 py-0.5 rounded bg-purple-500/10 hover:bg-purple-500 text-purple-700 dark:text-purple-300 hover:text-white text-[10px] font-bold transition-colors">+{location}</button>
+              <button type="button" onclick="insertTemplateToken('{recruiter}')" class="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500 text-amber-700 dark:text-amber-300 hover:text-white text-[10px] font-bold transition-colors">+{recruiter}</button>
+            </div>
+            <button type="button" onclick="copyPreviewMessageText()" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
+              <i class="fas fa-copy mr-0.5"></i>Copy Message
+            </button>
+          </div>
+
+          <textarea
+            id="customMessageTemplate"
+            rows="4"
+            maxlength="1000"
+            oninput="validateMessageTemplateField(this); updateLivePreviewAndCounts()"
+            class="form-input text-xs font-sans leading-relaxed"
+          >Hi, I am messaging you regarding {position} position for {company} at {location}.</textarea>
+          <p id="templateErrorMsg" class="text-[10px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
         </div>
 
-        <!-- Company Filter (#companyFilter) -->
-        <div class="filter-group lg:col-span-2">
-          <label for="companyFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
-            Company Filter
-          </label>
-          <select id="companyFilter" class="form-control-input">
-            <option value="">All Companies</option>
-          </select>
-        </div>
-
-        <!-- Recruiter Filter (#recruiterFilter) -->
-        <div class="filter-group lg:col-span-2">
-          <label for="recruiterFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
-            Recruiter
-          </label>
-          <select id="recruiterFilter" onchange="applyFilters()" class="form-control-input">
-            <option value="">All Recruiters</option>
-          </select>
-        </div>
-
-        <!-- Notice Period Quick Filter (#noticeFilter) -->
-        <div class="filter-group lg:col-span-1">
-          <label for="noticeFilter" class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
-            Notice
-          </label>
-          <select id="noticeFilter" onchange="applyFilters()" class="form-control-input">
-            <option value="">All</option>
-            <option value="immediate">≤15d / Imm</option>
-            <option value="30days">≤30 Days</option>
-          </select>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="lg:col-span-2 flex items-center gap-2">
-          <button
-            type="button"
-            class="btn btn-primary flex-1 py-2.5 px-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-purple-600/20 cursor-pointer"
-            onclick="applyFilters()"
-          >
-            <i class="fas fa-filter mr-1"></i> Apply
-          </button>
-          <button
-            type="button"
-            class="btn btn-success py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-600/20 cursor-pointer"
-            onclick="copyTableData()"
-            title="Copy Formatted Table for Email"
-          >
-            <i class="fas fa-copy"></i>
-          </button>
-        </div>
+        <button
+          type="button"
+          class="btn-generate w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm sm:text-base shadow-lg shadow-emerald-600/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
+          onclick="generateTable()"
+        >
+          <i class="fas fa-list-check"></i>
+          <span>Generate Contact List</span>
+        </button>
       </div>
-    </div>
 
-    <!-- Loading Indicator (#loading) -->
-    <div id="loading" class="loading glass-card rounded-3xl mb-5">
-      <i class="fas fa-circle-notch fa-spin text-2xl text-purple-500 mb-2 block"></i>
-      <div>Loading Sourced Candidate Database from Supabase...</div>
-    </div>
+      <!-- RIGHT COLUMN (5 Cols): LIVE PREVIEW, QUEUE LAUNCHER & QUEUE TABLE -->
+      <div class="lg:col-span-5 space-y-4 animate-in">
 
-    <!-- Error Box (#error & #errorMessage) -->
-    <div id="error" class="error">
-      <strong><i class="fas fa-triangle-exclamation mr-1"></i> Error:</strong> <span id="errorMessage"></span>
-    </div>
+        <div class="glass-card rounded-3xl p-4 sm:p-5">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200/80 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                <i class="fab fa-whatsapp text-lg"></i>
+              </span>
+              <div>
+                <h3 class="font-display font-bold text-xs sm:text-sm text-slate-900 dark:text-white">Live Message Preview</h3>
+                <p class="text-[10px] text-slate-500">Exact message sent to each contact</p>
+              </div>
+            </div>
+            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Live</span>
+          </div>
 
-    <!-- Table Container (.table-container & #candidateTable & #candidateTableBody) -->
-    <div id="tableViewWrapper" class="glass-card rounded-3xl overflow-hidden animate-in">
-      <div class="table-container">
-        <table id="candidateTable">
-          <thead>
-            <tr>
-              <th><i class="far fa-clock mr-1"></i> Timestamp</th>
-              <th><i class="fas fa-building mr-1"></i> Company</th>
-              <th><i class="fas fa-briefcase mr-1"></i> Position</th>
-              <th><i class="fas fa-user mr-1"></i> Candidate Name</th>
-              <th><i class="fas fa-phone mr-1"></i> Mobile Number</th>
-              <th><i class="fas fa-envelope mr-1"></i> Email ID</th>
-              <th><i class="fas fa-indian-rupee-sign mr-1"></i> Current CTC</th>
-              <th><i class="fas fa-chart-line mr-1"></i> Expected CTC</th>
-              <th><i class="fas fa-award mr-1"></i> Experience</th>
-              <th><i class="fas fa-calendar-day mr-1"></i> Notice Period</th>
-              <th><i class="fas fa-user-tie mr-1"></i> Recruiter</th>
-              <th><i class="fas fa-bolt mr-1"></i> Quick Actions</th>
-            </tr>
-          </thead>
-          <tbody id="candidateTableBody">
-            <tr><td colspan="12" class="no-data">Loading candidate data from Supabase...</td></tr>
-          </tbody>
-        </table>
+          <div id="liveMessagePreview" class="p-3.5 rounded-2xl bg-[#e7ffdb] dark:bg-emerald-950/50 border border-emerald-500/20 text-slate-800 dark:text-slate-200 text-xs leading-relaxed whitespace-pre-line shadow-inner max-h-52 overflow-y-auto">
+            Hi, I am messaging you regarding [Position] position for [Company] at [Location].
+          </div>
+
+          <div class="mt-3.5 pt-3.5 border-t border-slate-200/80 dark:border-slate-800 flex flex-col gap-2">
+            <button
+              type="button"
+              onclick="sendNextInQueue()"
+              id="btnSendNext"
+              class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:pointer-events-none text-white font-bold text-xs sm:text-sm shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+              disabled
+            >
+              <i class="fas fa-bolt"></i>
+              <span>Send Next in Queue (1-Click Rapid Launch)</span>
+            </button>
+            <div class="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onclick="exportQueueToCSV()"
+                class="py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              >
+                <i class="fas fa-file-csv text-emerald-500"></i> Export List
+              </button>
+              <button
+                type="button"
+                onclick="restoreSentContacts()"
+                class="py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+              >
+                <i class="fas fa-rotate-left text-blue-500"></i> Restore Sent (<span id="restoreSentBadge">0</span>)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Prompt Modal -->
+        <div id="customOptionModal" class="glass-card rounded-2xl p-4 hidden border-2 border-blue-500/40">
+          <div class="flex items-center justify-between mb-1.5">
+            <p id="customOptionPromptTitle" class="text-xs font-bold text-slate-700 dark:text-slate-200">Add New Item</p>
+            <span class="text-[10px] text-slate-400">2-60 chars</span>
+          </div>
+          <div class="flex gap-2">
+            <input
+              type="text"
+              id="customOptionInput"
+              maxlength="60"
+              oninput="sanitizeCustomOptionInput(this)"
+              class="form-input py-2 text-xs"
+              placeholder="Type name..."
+            >
+            <button type="button" onclick="confirmCustomOption()" class="px-3.5 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold shrink-0 cursor-pointer">Add</button>
+            <button type="button" onclick="closeCustomOptionModal()" class="px-3 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-xs font-semibold shrink-0 cursor-pointer">Cancel</button>
+          </div>
+        </div>
+
+        <!-- GENERATED CONTACT QUEUE TABLE (#tableContainer) -->
+        <div class="table-container glass-card rounded-3xl overflow-hidden" id="tableContainer">
+          <div class="no-data">
+            <i class="fab fa-whatsapp text-3xl text-emerald-500/50 mb-2 block"></i>
+            Fill the campaign details and click <strong>"Generate Contact List"</strong>
+          </div>
+        </div>
+
+        <!-- Sent History Log -->
+        <div id="sentHistoryCard" class="glass-card rounded-3xl p-4 hidden">
+          <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200/80 dark:border-slate-800">
+            <h4 class="font-display font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+              <i class="fas fa-check-double text-emerald-500"></i>
+              <span>Sent in This Session</span>
+            </h4>
+            <button type="button" onclick="restoreSentContacts()" class="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline">
+              Re-queue All
+            </button>
+          </div>
+          <div id="sentHistoryList" class="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto"></div>
+        </div>
+
       </div>
+
     </div>
 
-    <!-- Mobile / Responsive Cards Grid Container -->
-    <div id="cardsViewWrapper" class="hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 mt-2"></div>
+  </main>
 
-  </div>
-
-  <!-- Preserved Toast Notification (#toast & #toastMessage) -->
-  <div id="toast" class="toast">
-    <span id="toastMessage">Table data copied to clipboard!</span>
-  </div>
-
-  <!-- Mobile-First Bottom Quick Navigation Bar (Thumb-friendly on phones) -->
+  <!-- Mobile Bottom Quick Navigation Bar -->
   <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 glass-card border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
-    <button type="button" onclick="goHome()" class="flex flex-col items-center gap-0.5 text-purple-600 dark:text-purple-400 text-[10px] font-bold">
+    <button type="button" onclick="goHome()" class="flex flex-col items-center gap-0.5 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
       <i class="fas fa-house text-sm"></i>
       <span>Home</span>
     </button>
-    <button type="button" onclick="document.getElementById('filterTopAnchor').scrollIntoView({behavior:'smooth'})" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
-      <i class="fas fa-sliders text-sm"></i>
-      <span>Filters</span>
+    <button type="button" onclick="document.getElementById('campaignBuilderAnchor').scrollIntoView({behavior:'smooth'})" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
+      <i class="fas fa-bullhorn text-sm"></i>
+      <span>Campaign</span>
     </button>
-    <button type="button" onclick="copyTableData()" class="flex flex-col items-center gap-0.5 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
-      <i class="fas fa-copy text-sm"></i>
-      <span>Copy Table</span>
+    <button type="button" onclick="document.getElementById('templateStudioAnchor').scrollIntoView({behavior:'smooth'})" class="flex flex-col items-center gap-0.5 text-purple-600 dark:text-purple-400 text-[10px] font-bold">
+      <i class="fas fa-comment-dots text-sm"></i>
+      <span>Templates</span>
     </button>
-    <button type="button" onclick="switchSourcedView(currentSourcedView === 'table' ? 'cards' : 'table')" class="flex flex-col items-center gap-0.5 text-blue-600 dark:text-blue-400 text-[10px] font-bold">
-      <i class="fas fa-grip text-sm"></i>
-      <span>View Mode</span>
+    <button type="button" onclick="document.getElementById('tableContainer').scrollIntoView({behavior:'smooth'})" class="flex flex-col items-center gap-0.5 text-blue-600 dark:text-blue-400 text-[10px] font-bold">
+      <i class="fas fa-list-check text-sm"></i>
+      <span>Queue</span>
     </button>
     <button type="button" onclick="toggleTheme()" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
       <i class="fas fa-circle-half-stroke text-sm"></i>
@@ -744,817 +614,680 @@
   </nav>
 
   <script>
-    // ==================== SUPABASE CONFIGURATION ====================
     const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0';
-
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Global variables
-    let candidateData = [];
-    let filteredData = [];
-    let currentSourcedView = 'table';
+    let contactData = [];
+    let campaignInfo = {};
+    let sentHistory = [];
+    let cloudCompanyMap = {};
+    let pendingTargetSelectId = null;
 
-    // ==================== REQUIREMENT #5: POWER AUTOMATE BYPASS ====================
-    window.POWER_AUTOMATE_ENABLED = false;
-    window.BYPASS_POWER_AUTOMATE = true;
-    sessionStorage.setItem('powerAutomateEnabled', 'false');
-    sessionStorage.setItem('bypassPowerAutomate', 'true');
-
-    const originalFetch = window.fetch.bind(window);
-    window.fetch = async function(resource, config) {
-      const urlStr = typeof resource === 'string' ? resource : (resource?.url || '');
-      if (
-        urlStr.includes('powerplatform.com') ||
-        urlStr.includes('powerautomate') ||
-        urlStr.includes('logic.azure.com') ||
-        urlStr.includes('flow.microsoft.com')
-      ) {
-        console.info('[Power Automate Bypassed] Webhook call intercepted and bypassed:', urlStr);
-        return new Response(
-          JSON.stringify({ success: true, bypassed: true, message: 'Power Automate is disabled and bypassed.' }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
-        );
-      }
-      return originalFetch(resource, config);
-    };
-
-    // ==================== REQUIREMENT #1: SECURITY UTILITIES ====================
     function escapeHtml(unsafe) {
       if (unsafe === null || unsafe === undefined) return '';
       return String(unsafe)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
-    // Prevent CSV Formula Injection when exporting to Excel/Sheets
     function sanitizeCsvCell(val) {
       let str = String(val ?? '').replace(/"/g, '""').trim();
-      if (/^[=+\-@\t\r]/.test(str)) {
-        str = "'" + str;
-      }
+      if (/^[=+\-@\t\r]/.test(str)) str = "'" + str;
       return `"${str}"`;
     }
 
     function toggleTheme() {
-      const html = document.documentElement;
-      const isDark = html.classList.toggle('dark');
+      const isDark = document.documentElement.classList.toggle('dark');
       sessionStorage.setItem('tccTheme', isDark ? 'dark' : 'light');
     }
 
-    // Accurately parses ISO 8601 (Supabase), DD/MM/YYYY, DD-MM-YYYY (Indian format), and Date objects
-    function parseFlexibleDate(input) {
-      if (!input) return null;
-      if (input instanceof Date) {
-        return isNaN(input.getTime()) ? null : input;
-      }
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const colors = {
+        info: 'bg-slate-900 dark:bg-slate-800 text-white border-emerald-500/40',
+        success: 'bg-emerald-600 text-white border-emerald-400',
+        error: 'bg-rose-600 text-white border-rose-400'
+      };
+      const icons = {
+        info: 'fa-circle-info text-emerald-400',
+        success: 'fa-circle-check text-white',
+        error: 'fa-triangle-exclamation text-white'
+      };
+      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl border shadow-xl text-xs sm:text-sm font-semibold transition-all duration-300 ${colors[type] || colors.info}`;
 
-      const str = String(input).trim();
-      if (!str) return null;
+      const iconEl = document.createElement('i');
+      iconEl.className = `fas ${icons[type] || icons.info} shrink-0`;
+      const spanEl = document.createElement('span');
+      spanEl.className = 'flex-1';
+      spanEl.textContent = String(message || '');
 
-      // 1. Handle Indian DD/MM/YYYY or DD-MM-YYYY format (with optional time & AM/PM)
-      // Example: "15/10/2026, 05:30:12 pm" or "05/10/2026 14:20"
-      const dmyMatch = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})(?:[,\sT]+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(am|pm)?)?/i);
-      if (dmyMatch) {
-        const first = parseInt(dmyMatch[1], 10);
-        const second = parseInt(dmyMatch[2], 10);
-        const year = parseInt(dmyMatch[3], 10);
-        let hours = dmyMatch[4] ? parseInt(dmyMatch[4], 10) : 0;
-        const minutes = dmyMatch[5] ? parseInt(dmyMatch[5], 10) : 0;
-        const seconds = dmyMatch[6] ? parseInt(dmyMatch[6], 10) : 0;
-        const ampm = dmyMatch[7] ? dmyMatch[7].toLowerCase() : null;
+      toast.append(iconEl, spanEl);
+      container.appendChild(toast);
 
-        if (ampm === 'pm' && hours < 12) hours += 12;
-        if (ampm === 'am' && hours === 12) hours = 0;
-
-        // Default to DD/MM/YYYY; only treat as MM/DD/YYYY if second > 12 and first <= 12
-        let day = first;
-        let month = second - 1;
-        if (second > 12 && first <= 12) {
-          month = first - 1;
-          day = second;
-        }
-
-        const parsedDmy = new Date(year, month, day, hours, minutes, seconds);
-        if (!isNaN(parsedDmy.getTime())) {
-          return parsedDmy;
-        }
-      }
-
-      // 2. Standard ISO 8601 / RFC date string
-      const parsedIso = new Date(str);
-      if (!isNaN(parsedIso.getTime())) {
-        return parsedIso;
-      }
-
-      return null;
-    }
-
-    // ==================== REQUIREMENT #4: INPUT CONDITION CHECKS ====================
-    function validateSearchInput(inputEl) {
-      if (!inputEl) return;
-      const cleaned = inputEl.value.replace(/[<>"{}`\\]/g, '').slice(0, 60);
-      if (inputEl.value !== cleaned) inputEl.value = cleaned;
-
-      const counter = document.getElementById('searchCharCounter');
-      const clearBtn = document.getElementById('clearSearchBtn');
-      if (counter) counter.textContent = `${cleaned.length}/60`;
-      if (clearBtn) clearBtn.style.display = cleaned.length > 0 ? 'inline-flex' : 'none';
-
-      if (cleaned.length > 0) {
-        inputEl.classList.add('input-valid');
-      } else {
-        inputEl.classList.remove('input-valid', 'input-invalid');
-      }
-    }
-
-    function clearSearchInputField() {
-      const el = document.getElementById('searchCandidateInput');
-      if (el) {
-        el.value = '';
-        validateSearchInput(el);
-        applyFilters();
-      }
-    }
-
-    function updateFilterConditionBadge() {
-      const badge = document.getElementById('filterConditionBadge');
-      if (!badge) return;
-      const d = document.getElementById('dateFilter')?.value;
-      const c = document.getElementById('companyFilter')?.value;
-      const r = document.getElementById('recruiterFilter')?.value;
-      const n = document.getElementById('noticeFilter')?.value;
-      const s = document.getElementById('searchCandidateInput')?.value.trim();
-
-      const activeCount = [d, c, r, n, s].filter(Boolean).length;
-      if (activeCount > 0) {
-        badge.textContent = `${activeCount} Filter${activeCount > 1 ? 's' : ''} Active`;
-        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30';
-      } else {
-        badge.textContent = 'All Records';
-        badge.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500';
-      }
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3400);
     }
 
     function goHome() {
       window.location.href = 'index.html';
     }
 
-    function switchSourcedView(mode) {
-      currentSourcedView = mode;
-      const tableWrapper = document.getElementById('tableViewWrapper');
-      const cardsWrapper = document.getElementById('cardsViewWrapper');
-      const btnTable = document.getElementById('viewTableBtn');
-      const btnCards = document.getElementById('viewCardsBtn');
+    // Unified validation UI helper
+    function setFieldValidation(el, isValid, errEl = null, errMsg = '') {
+      if (el) {
+        el.classList.toggle('input-valid', isValid);
+        el.classList.toggle('input-invalid', !isValid);
+      }
+      if (errEl) {
+        if (errMsg) errEl.textContent = errMsg;
+        errEl.classList.toggle('hidden', isValid || !errMsg);
+      }
+      return isValid;
+    }
 
-      if (mode === 'cards') {
-        tableWrapper.classList.add('hidden');
-        cardsWrapper.classList.remove('hidden');
-        cardsWrapper.classList.add('grid');
-        if (btnCards) btnCards.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-600 text-white shadow-sm transition-all';
-        if (btnTable) btnTable.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
-      } else {
-        tableWrapper.classList.remove('hidden');
-        cardsWrapper.classList.add('hidden');
-        cardsWrapper.classList.remove('grid');
-        if (btnTable) btnTable.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-600 text-white shadow-sm transition-all';
-        if (btnCards) btnCards.className = 'px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white transition-all';
+    function normalizeTenDigitMobile(rawToken) {
+      let digits = String(rawToken || '').replace(/\D/g, '');
+      if (digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2);
+      else if (digits.length === 11 && digits.startsWith('0')) digits = digits.slice(1);
+      return digits;
+    }
+
+    function validateMobileNumbersField(textareaEl) {
+      const el = textareaEl || document.getElementById('mobileNumbers');
+      if (!el) return false;
+      const cleanedText = el.value.replace(/[<>"{}`\\]/g, '');
+      if (el.value !== cleanedText) el.value = cleanedText;
+
+      const tokens = parseRawNumbers(cleanedText);
+      const errEl = document.getElementById('mobileValidationErrorMsg');
+      const condBadge = document.getElementById('mobileCondBadge');
+      const kpiBreakdown = document.getElementById('kpiValidBreakdownText');
+
+      if (!tokens.length) {
+        if (condBadge) condBadge.textContent = 'Required';
+        if (kpiBreakdown) kpiBreakdown.textContent = '0 valid 10-digit';
+        return setFieldValidation(el, false, errEl, 'Enter at least one 10-digit mobile number.');
+      }
+
+      let validCount = 0, invalidCount = 0;
+      tokens.forEach(t => (/^[6-9]\d{9}$/.test(normalizeTenDigitMobile(t)) ? validCount++ : invalidCount++));
+
+      if (kpiBreakdown) {
+        kpiBreakdown.textContent = invalidCount > 0 ? `${validCount} valid • ${invalidCount} invalid` : `${validCount} valid 10-digit`;
+      }
+
+      if (validCount === 0) {
+        if (condBadge) condBadge.textContent = 'Invalid numbers';
+        return setFieldValidation(el, false, errEl, 'No valid 10-digit Indian mobile numbers detected (must start with 6-9).');
+      }
+
+      setFieldValidation(el, true, errEl, '');
+      if (invalidCount > 0) {
+        if (errEl) {
+          errEl.textContent = `${invalidCount} malformed number(s) detected. Click "Clean & Deduplicate" to auto-fix.`;
+          errEl.classList.remove('hidden');
+        }
+        if (condBadge) condBadge.textContent = `${validCount} valid (${invalidCount} raw)`;
+      } else if (condBadge) {
+        condBadge.textContent = `✓ ${validCount} Valid`;
+      }
+      return true;
+    }
+
+    function validateCampaignSelects() {
+      const compEl = document.getElementById('company');
+      const posEl = document.getElementById('position');
+      const v1 = setFieldValidation(compEl, Boolean(compEl?.value), document.getElementById('companyErrorMsg'), 'Select a company.');
+      const v2 = setFieldValidation(posEl, Boolean(posEl?.value), document.getElementById('positionErrorMsg'), 'Select a position.');
+      return v1 && v2;
+    }
+
+    function validateJobLocationField(inputEl) {
+      const el = inputEl || document.getElementById('jobLocation');
+      if (!el) return false;
+      const cleaned = el.value.replace(/[<>"{}`\\]/g, '').slice(0, 80);
+      if (el.value !== cleaned) el.value = cleaned;
+
+      const counter = document.getElementById('locationCharCounter');
+      if (counter) counter.textContent = `${cleaned.length}/80`;
+      return setFieldValidation(el, el.value.trim().length >= 2, document.getElementById('locationErrorMsg'), 'Enter job location (min 2 chars).');
+    }
+
+    function validateMessageTemplateField(textareaEl) {
+      const el = textareaEl || document.getElementById('customMessageTemplate');
+      if (!el) return false;
+      const cleaned = el.value.replace(/<\/?script[^>]*>/gi, '').slice(0, 1000);
+      if (el.value !== cleaned) el.value = cleaned;
+
+      const counter = document.getElementById('templateCharCounter');
+      if (counter) counter.textContent = `${cleaned.length}/1000 chars`;
+      return setFieldValidation(el, cleaned.trim().length >= 5, document.getElementById('templateErrorMsg'), 'Message template must be at least 5 characters.');
+    }
+
+    function sanitizeCustomOptionInput(inputEl) {
+      if (!inputEl) return;
+      const cleaned = inputEl.value.replace(/[<>"{}`\\]/g, '').slice(0, 60);
+      if (inputEl.value !== cleaned) inputEl.value = cleaned;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.documentElement.classList.toggle('dark', sessionStorage.getItem('tccTheme') === 'dark');
+
+      const importedNumbers = sessionStorage.getItem('tcc_bulk_wa_numbers');
+      const importedCompany = sessionStorage.getItem('tcc_bulk_wa_company');
+      if (importedNumbers) {
+        const mobileInput = document.getElementById('mobileNumbers');
+        if (mobileInput) {
+          mobileInput.value = importedNumbers;
+          validateMobileNumbersField(mobileInput);
+          sessionStorage.removeItem('tcc_bulk_wa_numbers');
+        }
+        if (importedCompany) {
+          const compSelect = document.getElementById('company');
+          if (compSelect) {
+            addOptionIfNotExists(compSelect, importedCompany);
+            compSelect.value = importedCompany;
+          }
+          sessionStorage.removeItem('tcc_bulk_wa_company');
+        }
+        showToast('Imported candidate numbers from Sourced Profiles!', 'success');
+      }
+
+      syncCloudCompanies(true);
+      updateLivePreviewAndCounts();
+    });
+
+    function addOptionIfNotExists(selectEl, value) {
+      if (!selectEl || !value) return;
+      if (!Array.from(selectEl.options).some(opt => opt.value === value)) {
+        const opt = document.createElement('option');
+        opt.value = value;
+        opt.textContent = value;
+        selectEl.appendChild(opt);
       }
     }
 
-    function quickSetDateFilter(val) {
-      const df = document.getElementById('dateFilter');
-      if (df) {
-        df.value = val;
-        applyFilters();
+    async function syncCloudCompanies(silent = false) {
+      const icon = document.getElementById('cloudSyncIcon');
+      icon?.classList.add('fa-spin');
+      try {
+        const { data: rows, error } = await supabaseClient
+          .from('companies')
+          .select('company_name, positions')
+          .order('company_name', { ascending: true });
+
+        if (error) throw error;
+
+        cloudCompanyMap = {};
+        const compSelect = document.getElementById('company');
+        const posSelect = document.getElementById('position');
+
+        (rows || []).forEach(row => {
+          if (row.company_name) {
+            const posList = Array.isArray(row.positions) ? row.positions : [];
+            cloudCompanyMap[row.company_name] = posList;
+            addOptionIfNotExists(compSelect, row.company_name);
+            posList.forEach(p => addOptionIfNotExists(posSelect, p));
+          }
+        });
+
+        if (!silent) showToast(`Synced ${Object.keys(cloudCompanyMap).length} companies from Supabase`, 'success');
+      } catch (err) {
+        console.error('Error syncing Supabase companies:', err);
+        if (!silent) showToast('Could not sync companies from Supabase: ' + err.message, 'error');
+      } finally {
+        icon?.classList.remove('fa-spin');
       }
     }
 
-    function quickSetNoticeFilter(val) {
-      const nf = document.getElementById('noticeFilter');
-      if (nf) {
-        nf.value = nf.value === val ? '' : val;
-        applyFilters();
+    async function pullNumbersFromSupabaseCandidates() {
+      const selectedCompany = document.getElementById('company')?.value || '';
+      try {
+        let query = supabaseClient.from('candidates').select('mobile, company');
+        if (selectedCompany) query = query.eq('company', selectedCompany);
+        const { data, error } = await query;
+        if (error) throw error;
+
+        const uniqueNumbers = [...new Set(
+          (data || []).map(r => normalizeTenDigitMobile(r.mobile || '')).filter(n => /^[6-9]\d{9}$/.test(n))
+        )];
+
+        if (!uniqueNumbers.length) {
+          return showToast(selectedCompany ? `No mobile numbers found for ${selectedCompany}` : 'No mobile numbers found in Supabase', 'error');
+        }
+
+        const input = document.getElementById('mobileNumbers');
+        input.value = [...new Set([...parseRawNumbers(input.value), ...uniqueNumbers])].join(', ');
+        validateMobileNumbersField(input);
+        updateLivePreviewAndCounts();
+        showToast(`Imported ${uniqueNumbers.length} number(s) from Supabase${selectedCompany ? ' (' + selectedCompany + ')' : ''}`, 'success');
+      } catch (err) {
+        console.error('Error importing numbers from Supabase:', err);
+        showToast('Failed to import numbers: ' + err.message, 'error');
       }
     }
 
-    function isShortOrImmediateNotice(npStr) {
-      const s = String(npStr || '').toLowerCase();
-      if (!s) return false;
-      if (s.includes('imm') || s.includes('join')) return true;
-      const num = parseFloat(s);
-      if (!isNaN(num) && s.includes('day') && num <= 15) return true;
-      return false;
+    function handleCompanySelectionChange() {
+      const comp = document.getElementById('company').value;
+      const posSelect = document.getElementById('position');
+      if (comp && Array.isArray(cloudCompanyMap[comp])) {
+        cloudCompanyMap[comp].forEach(pos => addOptionIfNotExists(posSelect, pos));
+      }
+      updateLivePreviewAndCounts();
     }
 
-    function isThirtyDaysOrLessNotice(npStr) {
-      if (isShortOrImmediateNotice(npStr)) return true;
-      const s = String(npStr || '').toLowerCase();
-      const num = parseFloat(s);
-      if (!isNaN(num) && s.includes('day') && num <= 30) return true;
-      if (!isNaN(num) && s.includes('month') && num <= 1) return true;
-      return false;
+    function promptCustomOption(selectId, title) {
+      pendingTargetSelectId = selectId;
+      document.getElementById('customOptionPromptTitle').textContent = title;
+      const input = document.getElementById('customOptionInput');
+      input.value = '';
+      document.getElementById('customOptionModal').classList.remove('hidden');
+      input.focus();
     }
 
-    function copySingleCandidateRow(index) {
-      const c = filteredData[index];
-      if (!c) return;
-      const summary = `${c.candidateName || 'Candidate'} | ${c.position || '-'} @ ${c.company || '-'} | Mob: ${c.mobile || '-'} | Email: ${c.email || '-'} | CTC: ${c.currentCTC || '-'} -> ${c.expectedCTC || '-'} | Exp: ${c.experience || '-'} | NP: ${c.noticePeriod || '-'}`;
-      navigator.clipboard?.writeText(summary).then(() => {
-        showToast(`✅ Copied ${c.candidateName || 'Candidate'} summary!`);
+    function closeCustomOptionModal() {
+      document.getElementById('customOptionModal').classList.add('hidden');
+      pendingTargetSelectId = null;
+    }
+
+    function confirmCustomOption() {
+      const inputEl = document.getElementById('customOptionInput');
+      sanitizeCustomOptionInput(inputEl);
+      const val = inputEl.value.trim();
+      if (val.length < 2) return showToast('Please enter at least 2 characters.', 'error');
+
+      if (pendingTargetSelectId) {
+        const selectEl = document.getElementById(pendingTargetSelectId);
+        addOptionIfNotExists(selectEl, val);
+        selectEl.value = val;
+        validateCampaignSelects();
+        updateLivePreviewAndCounts();
+        showToast(`Added "${val}"`, 'success');
+      }
+      closeCustomOptionModal();
+    }
+
+    function parseRawNumbers(rawText) {
+      if (!rawText) return [];
+      return rawText.split(/[\n,;|\s]+/).map(item => item.trim()).filter(Boolean);
+    }
+
+    function cleanAndDeduplicateNumbers() {
+      const input = document.getElementById('mobileNumbers');
+      if (!input || !input.value.trim()) return showToast('Please enter or paste mobile numbers first', 'error');
+
+      const uniqueList = [...new Set(
+        parseRawNumbers(input.value).map(normalizeTenDigitMobile).filter(norm => /^[6-9]\d{9}$/.test(norm))
+      )];
+
+      input.value = uniqueList.join(', ');
+      validateMobileNumbersField(input);
+      updateLivePreviewAndCounts();
+      showToast(`Cleaned & deduplicated: ${uniqueList.length} valid 10-digit number(s) ready`, 'success');
+    }
+
+    function getTemplateDictionary(recruiterName) {
+      return {
+        default: {
+          name: 'Standard Outreach',
+          text: `Hi, I am messaging you regarding {position} position for {company} at {location}.`
+        },
+        detailed: {
+          name: 'Detailed Recruiter Pitch',
+          text: `*Hi Candidate*,\n\nGreetings from *Talent Connect Consultancy*! We have an exciting job opening for the *{position}* role with our client *{company}* based at *{location}*.\n\nPlease share your updated resume and current CTC details if interested.\n\n*Regards,*\n*${recruiterName}*`
+        },
+        urgent: {
+          name: 'Urgent / Immediate Joiners',
+          text: `*Urgent Hiring Alert!* 🚀\n\nWe are actively shortlisting candidates for *{position}* at *{company}* (*{location}*). Immediate or short notice joiners (15-30 days) are highly preferred.\n\nReply *YES* or share your updated CV here to schedule your interview today!\n\n*Regards,*\n*${recruiterName}*`
+        },
+        walkin: {
+          name: 'Walk-In Drive Invite',
+          text: `*Walk-In Interview Drive!* 🏢\n\nGreetings from *Talent Connect Consultancy*! Our client *{company}* is conducting an exclusive interview drive for the *{position}* role at *{location}*.\n\nPlease reply with your updated resume so we can share the entry pass and venue timings.\n\n*Regards,*\n*${recruiterName}*`
+        },
+        screening: {
+          name: 'Quick Telephonic Screen',
+          text: `Hi! I came across your profile for the *{position}* opening with *{company}* at *{location}*.\n\nAre you available for a quick 5-minute telephonic screening call today? Please share a convenient time.\n\n*Regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`
+        },
+        cv_request: {
+          name: 'Request CV & CTC Details',
+          text: `*Hi*,\n\nAs discussed regarding the *{position}* role at *{company}* (*{location}*), kindly reply with the following details to proceed with client shortlisting:\n\n1️⃣ *Updated Resume (PDF/Word)*\n2️⃣ *Current CTC:*\n3️⃣ *Expected CTC:*\n4️⃣ *Notice Period:*\n\n*Thanks & Regards,*\n*${recruiterName}*`
+        },
+        shortlisted: {
+          name: 'Profile Shortlisted Alert',
+          text: `*Congratulations!* 🎉\n\nYour profile has been shortlisted for the *{position}* position at *{company}* (*{location}*).\n\nPlease confirm your availability for the L1 interview round over the next 2 days.\n\n*Best Regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`
+        },
+        interview_confirm: {
+          name: 'Interview Slot Check',
+          text: `*Hi*,\n\nWe are scheduling interviews for the *{position}* role at *{company}* (*{location}*).\n\nCould you please confirm which time slot works best for you tomorrow (Morning 11 AM - 1 PM or Afternoon 3 PM - 5 PM)?\n\n*Regards,*\n*${recruiterName}*`
+        },
+        interview_reminder: {
+          name: 'Today Interview Reminder',
+          text: `*Gentle Reminder* ⏰\n\nThis is a reminder regarding your scheduled interview today for the *{position}* role with *{company}* (*{location}*).\n\nKindly be ready 10 minutes prior and reply *CONFIRMED* once you see this message. All the best!\n\n*Regards,*\n*${recruiterName}*`
+        },
+        followup: {
+          name: 'Missed Call Follow-Up',
+          text: `Hi, I tried calling you regarding an urgent job opportunity for *{position}* with *{company}* at *{location}*, but could not connect.\n\nPlease message back or share your updated CV if you are open to exploring new opportunities.\n\n*Regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`
+        },
+        offer_discussion: {
+          name: 'Offer & Salary Discussion',
+          text: `*Hi*,\n\nPositive update regarding your interview for the *{position}* position at *{company}* (*{location}*)! The client panel is keen to take your candidature forward.\n\nPlease call me back at your earliest convenience for compensation & offer discussion.\n\n*Regards,*\n*${recruiterName}*`
+        },
+        work_from_home: {
+          name: 'Remote / Hybrid Pitch',
+          text: `*Flexible / Hybrid Opportunity!* 💻\n\nWe are hiring for *{position}* with *{company}* (*{location}*).\n\nIf you are looking for a high-growth role with great work culture, share your updated resume and current CTC details here!\n\n*Regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`
+        },
+        executive: {
+          name: 'Leadership / Senior Role',
+          text: `*Confidential Mandate* 🤝\n\nGreetings from *Talent Connect Consultancy*. We are currently partnering with *{company}* to hire a seasoned professional for a key *{position}* mandate based in *{location}*.\n\nWould love to connect for a brief confidential conversation at your convenience.\n\n*Warm Regards,*\n*${recruiterName}*`
+        }
+      };
+    }
+
+    function selectTemplateFromPill(presetKey) {
+      const selectEl = document.getElementById('templatePreset');
+      if (selectEl) {
+        selectEl.value = presetKey;
+        applyTemplatePreset();
+      }
+    }
+
+    function applyTemplatePreset() {
+      const preset = document.getElementById('templatePreset').value;
+      const templateBox = document.getElementById('customMessageTemplate');
+      const recruiterName = sessionStorage.getItem('userName') || 'Talent Connect Consultancy';
+      const dict = getTemplateDictionary(recruiterName);
+
+      document.querySelectorAll('.template-pill').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-pill') === preset);
+      });
+
+      const kpiName = document.getElementById('kpiActiveTemplateName');
+      if (dict[preset]) {
+        templateBox.value = dict[preset].text;
+        if (kpiName) kpiName.textContent = dict[preset].name;
+      } else if (kpiName) {
+        kpiName.textContent = 'Custom Template';
+      }
+
+      validateMessageTemplateField(templateBox);
+      updateLivePreviewAndCounts();
+    }
+
+    function insertTemplateToken(token) {
+      const box = document.getElementById('customMessageTemplate');
+      if (!box) return;
+      const start = box.selectionStart ?? box.value.length;
+      const end = box.selectionEnd ?? box.value.length;
+      box.value = box.value.slice(0, start) + token + box.value.slice(end);
+      box.focus();
+      validateMessageTemplateField(box);
+      updateLivePreviewAndCounts();
+    }
+
+    function copyPreviewMessageText() {
+      const text = document.getElementById('liveMessagePreview')?.textContent || '';
+      navigator.clipboard?.writeText(text).then(() => {
+        showToast('Copied preview message to clipboard!', 'success');
       });
     }
 
-    function sendFilteredToWhatsAppSender() {
-      if (!filteredData || filteredData.length === 0) {
-        showToast('❌ No filtered candidates to send');
-        return;
-      }
-      const numbers = filteredData
-        .map(c => (c.mobile || '').toString().replace(/\D/g, '').slice(-10))
-        .filter(n => n.length === 10);
-      const uniqueNumbers = [...new Set(numbers)];
-      if (uniqueNumbers.length === 0) {
-        showToast('❌ No valid 10-digit mobile numbers found');
-        return;
-      }
-      sessionStorage.setItem('tcc_bulk_wa_numbers', uniqueNumbers.join(', '));
-      const selectedCompany = document.getElementById('companyFilter')?.value || '';
-      if (selectedCompany) {
-        sessionStorage.setItem('tcc_bulk_wa_company', selectedCompany);
-      }
-      window.location.href = 'Whatsapp_Sender.html';
+    function buildFormattedMessage(pos, comp, loc) {
+      const recruiterName = sessionStorage.getItem('userName') || 'Talent Connect Consultancy';
+      const rawTemplate = document.getElementById('customMessageTemplate')?.value ||
+        `Hi, I am messaging you regarding {position} position for {company} at {location}.`;
+      return rawTemplate
+        .replace(/\{position\}/gi, pos || '[Position]')
+        .replace(/\{company\}/gi, comp || '[Company]')
+        .replace(/\{location\}/gi, loc || '[Location]')
+        .replace(/\{recruiter\}/gi, recruiterName);
     }
 
-    function exportSourcedToCSV() {
-      if (!filteredData || filteredData.length === 0) {
-        showToast('❌ No data to export');
+    function updateLivePreviewAndCounts() {
+      const rawMobile = document.getElementById('mobileNumbers')?.value.trim() || '';
+      const company = document.getElementById('company')?.value || '';
+      const position = document.getElementById('position')?.value || '';
+      const jobLocation = document.getElementById('jobLocation')?.value.trim() || '';
+      const msgTemplate = document.getElementById('customMessageTemplate')?.value.trim() || '';
+
+      const detectedList = parseRawNumbers(rawMobile);
+      document.getElementById('liveValidNumbersBadge').textContent = `${detectedList.length} number${detectedList.length === 1 ? '' : 's'}`;
+      document.getElementById('statDetectedCount').textContent = detectedList.length;
+      document.getElementById('statRemainingCount').textContent = contactData.length;
+      document.getElementById('statSentCount').textContent = sentHistory.length;
+      document.getElementById('restoreSentBadge').textContent = sentHistory.length;
+      document.getElementById('btnSendNext').disabled = contactData.length === 0;
+
+      const totalQueueAndSent = contactData.length + sentHistory.length;
+      const pct = totalQueueAndSent > 0 ? Math.round((sentHistory.length / totalQueueAndSent) * 100) : 0;
+      document.getElementById('kpiProgressPercent').textContent = `${pct}%`;
+      document.getElementById('kpiProgressBar').style.width = `${pct}%`;
+
+      const readyChecks = [
+        detectedList.length > 0,
+        Boolean(company),
+        Boolean(position),
+        jobLocation.length >= 2 && msgTemplate.length >= 5
+      ].filter(Boolean).length;
+
+      const readyBadge = document.getElementById('formReadinessBadge');
+      if (readyBadge) {
+        readyBadge.textContent = `${readyChecks}/4 Validated`;
+        readyBadge.className = readyChecks === 4
+          ? 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
+          : 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500';
+      }
+
+      document.getElementById('liveMessagePreview').textContent = buildFormattedMessage(position, company, jobLocation);
+      document.getElementById('templateCharCounter').textContent = `${msgTemplate.length}/1000 chars`;
+
+      renderSentHistoryPills();
+    }
+
+    function renderSentHistoryPills() {
+      const card = document.getElementById('sentHistoryCard');
+      const list = document.getElementById('sentHistoryList');
+      if (!card || !list) return;
+
+      if (!sentHistory.length) {
+        card.classList.add('hidden');
+        list.innerHTML = '';
         return;
       }
-      const headers = ['Timestamp', 'Company', 'Position', 'Candidate Name', 'Mobile Number', 'Email ID', 'Current CTC', 'Expected CTC', 'Experience', 'Notice Period', 'Recruiter'];
-      const rows = filteredData.map(c => [
-        sanitizeCsvCell(formatTimestamp(c.timestamp)),
-        sanitizeCsvCell(c.company || ''),
-        sanitizeCsvCell(c.position || ''),
-        sanitizeCsvCell(c.candidateName || ''),
-        sanitizeCsvCell(c.mobile || ''),
-        sanitizeCsvCell(c.email || ''),
-        sanitizeCsvCell(c.currentCTC || ''),
-        sanitizeCsvCell(c.expectedCTC || ''),
-        sanitizeCsvCell(c.experience || ''),
-        sanitizeCsvCell(c.noticePeriod || ''),
-        sanitizeCsvCell(c.recruiter || '')
-      ]);
-      const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+
+      card.classList.remove('hidden');
+      list.innerHTML = '';
+      sentHistory.forEach(item => {
+        const span = document.createElement('span');
+        span.className = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20';
+        span.innerHTML = '<i class="fas fa-check text-[9px]"></i> ';
+        span.appendChild(document.createTextNode(item.mobile));
+        list.appendChild(span);
+      });
+    }
+
+    function resetCampaignForm() {
+      ['mobileNumbers', 'company', 'position', 'jobLocation'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      ['mobileNumbers', 'company', 'position', 'jobLocation', 'customMessageTemplate'].forEach(id => {
+        document.getElementById(id)?.classList.remove('input-valid', 'input-invalid');
+      });
+      ['mobileValidationErrorMsg', 'companyErrorMsg', 'positionErrorMsg', 'locationErrorMsg', 'templateErrorMsg'].forEach(id => {
+        document.getElementById(id)?.classList.add('hidden');
+      });
+      contactData = [];
+      sentHistory = [];
+      renderTable();
+      updateLivePreviewAndCounts();
+      showToast('Campaign form cleared', 'info');
+    }
+
+    function sendNextInQueue() {
+      if (!contactData.length) return showToast('No contacts remaining in queue', 'error');
+      const nextContact = contactData[0];
+      sendWhatsApp(nextContact.id, nextContact.mobile);
+    }
+
+    function restoreSentContacts() {
+      if (!sentHistory.length) return showToast('No sent contacts to restore', 'info');
+      contactData = [...sentHistory, ...contactData];
+      sentHistory = [];
+      renderTable();
+      updateLivePreviewAndCounts();
+      showToast('Restored all sent contacts back to queue', 'success');
+    }
+
+    function exportQueueToCSV() {
+      const allContacts = [...contactData, ...sentHistory];
+      if (!allContacts.length) return showToast('Generate a contact list first to export', 'error');
+
+      const headers = ['S.No', 'Mobile Number', 'Company', 'Position', 'Location', 'Status'];
+      const formatRow = (c, idx, status) => [
+        idx + 1,
+        sanitizeCsvCell(c.mobile),
+        sanitizeCsvCell(campaignInfo.company || ''),
+        sanitizeCsvCell(campaignInfo.position || ''),
+        sanitizeCsvCell(campaignInfo.jobLocation || ''),
+        sanitizeCsvCell(status)
+      ];
+
+      const rows = [
+        ...contactData.map((c, i) => formatRow(c, i, 'Pending')),
+        ...sentHistory.map((c, i) => formatRow(c, contactData.length + i, 'Sent'))
+      ];
+
+      const csv = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
       const link = document.createElement('a');
-      link.setAttribute('href', encodeURI(csvContent));
-      link.setAttribute('download', `TCC_Sourced_Profiles_${new Date().toISOString().slice(0, 10)}.csv`);
+      link.setAttribute('href', encodeURI(csv));
+      link.setAttribute('download', `TCC_WhatsApp_Campaign_${new Date().toISOString().slice(0, 10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast(`✅ Exported ${filteredData.length} candidates to safe CSV`);
+      showToast('Campaign list exported to CSV', 'success');
     }
 
-    // ==================== SUPABASE DATA LOADING ====================
-    function init() {
-      const savedTheme = sessionStorage.getItem('tccTheme');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
+    function generateTable() {
+      if (![validateMobileNumbersField(), validateCampaignSelects(), validateJobLocationField(), validateMessageTemplateField()].every(Boolean)) {
+        return showToast('Please fix the highlighted campaign fields before generating the list.', 'error');
       }
 
-      if (window.innerWidth < 640) {
-        switchSourcedView('cards');
-      }
+      const mobileNumbers = parseRawNumbers(document.getElementById('mobileNumbers').value.trim());
+      if (!mobileNumbers.length) return showToast('No valid mobile numbers found', 'error');
 
-      loadDataFromSupabase();
+      campaignInfo = {
+        company: document.getElementById('company').value,
+        position: document.getElementById('position').value,
+        jobLocation: document.getElementById('jobLocation').value.trim()
+      };
+
+      contactData = mobileNumbers.map((mobile, index) => ({
+        id: Date.now() + index,
+        mobile
+      }));
+
+      sentHistory = [];
+      renderTable();
+      updateLivePreviewAndCounts();
+      showToast(`Generated queue with ${contactData.length} contact(s)`, 'success');
     }
 
-    async function loadDataFromSupabase() {
-      showLoading(true);
-      hideError();
-      const spinIcon = document.getElementById('syncSpinnerIcon');
-      if (spinIcon) spinIcon.classList.add('fa-spin');
+    function renderTable() {
+      const container = document.getElementById('tableContainer');
+      if (!container) return;
 
-      try {
-        // Fetch all candidates from Supabase ordered by newest first (id descending)
-        const { data: rows, error } = await supabaseClient
-          .from('candidates')
-          .select('*')
-          .order('id', { ascending: false });
-
-        if (error) {
-          throw error;
-        }
-
-        const todayIsoFallback = new Date().toISOString();
-
-        // Normalize Supabase row schema to match the table's expected fields
-        candidateData = (rows || []).map(row => {
-          const rawTimestamp =
-            row.created_at ||
-            row.timestamp ||
-            row.Timestamp ||
-            row.date ||
-            row.submitted_at ||
-            row.updated_at ||
-            '';
-
-          // If a row was newly inserted in Supabase via Candidate Registration without a timestamp column default,
-          // fallback to today's timestamp so profiles registered today are never hidden
-          const effectiveTimestamp = rawTimestamp ? String(rawTimestamp).trim() : todayIsoFallback;
-
-          const recNameOrEmail =
-            row.recruiter_name ||
-            row.recruiter ||
-            row.recruiter_email ||
-            row.Recruiter ||
-            '';
-
-          return {
-            id: row.id,
-            timestamp: effectiveTimestamp,
-            hasExplicitTimestamp: Boolean(rawTimestamp),
-            company: row.company || row.Company || '',
-            position: row.position || row.Position || '',
-            candidateName: row.name || row.candidateName || row.Candidate_Name || '',
-            mobile: row.mobile || row.Mobile || row.contact || row.Phone || '',
-            email: row.email || row.Email || '',
-            currentCTC: row.current_ctc || row.currentCTC || row.Current_CTC || '',
-            expectedCTC: row.expected_ctc || row.expectedCTC || row.Expected_CTC || '',
-            experience: row.experience || row.experience_years || row.Experience || '',
-            noticePeriod: row.notice_period || row.noticePeriod || row.Notice_Period || '',
-            recruiter: recNameOrEmail.includes('@') ? recNameOrEmail.split('@')[0] : recNameOrEmail
-          };
-        });
-
-        populateCompanyFilter();
-        populateRecruiterFilter();
-        applyFilters();
-        updateLastUpdated();
-
-        if (candidateData.length === 0) {
-          showToast('⚠️ No candidate data found in Supabase');
-        } else {
-          showToast(`✅ Loaded ${candidateData.length} candidates from Supabase`);
-        }
-
-      } catch (error) {
-        console.error('Error loading data from Supabase:', error);
-        showError(`Failed to load data from Supabase: ${error.message}`);
-
-        const tbody = document.getElementById('candidateTableBody');
-        tbody.innerHTML = '<tr><td colspan="12" class="no-data">Failed to load data from Supabase. Please click Refresh to try again.</td></tr>';
-      } finally {
-        showLoading(false);
-        if (spinIcon) spinIcon.classList.remove('fa-spin');
-      }
-    }
-
-    function refreshData() {
-      loadDataFromSupabase();
-    }
-
-    function showLoading(show) {
-      const loading = document.getElementById('loading');
-      const tableContainer = document.querySelector('.table-container');
-
-      if (show) {
-        loading.classList.add('show');
-        if (tableContainer) tableContainer.style.display = 'none';
-      } else {
-        loading.classList.remove('show');
-        if (tableContainer) tableContainer.style.display = 'block';
-      }
-    }
-
-    function showError(message) {
-      const error = document.getElementById('error');
-      const errorMessage = document.getElementById('errorMessage');
-      errorMessage.textContent = message;
-      error.classList.add('show');
-    }
-
-    function hideError() {
-      const error = document.getElementById('error');
-      error.classList.remove('show');
-    }
-
-    function updateLastUpdated() {
-      const now = new Date();
-      const timeString = now.toLocaleString('en-IN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
-      document.getElementById('lastUpdated').textContent = timeString;
-    }
-
-    function populateCompanyFilter() {
-      const companyFilter = document.getElementById('companyFilter');
-      const currentVal = companyFilter.value;
-      const companies = [...new Set(candidateData.map(item => item.company))].filter(Boolean);
-
-      companyFilter.innerHTML = '<option value="">All Companies</option>';
-
-      companies.forEach(company => {
-        const option = document.createElement('option');
-        option.value = company;
-        option.textContent = company;
-        companyFilter.appendChild(option);
-      });
-      if (companies.includes(currentVal)) companyFilter.value = currentVal;
-    }
-
-    function populateRecruiterFilter() {
-      const recruiterFilter = document.getElementById('recruiterFilter');
-      if (!recruiterFilter) return;
-      const currentVal = recruiterFilter.value;
-      const recruiters = [...new Set(candidateData.map(item => item.recruiter))].filter(Boolean);
-      recruiterFilter.innerHTML = '<option value="">All Recruiters</option>';
-      recruiters.forEach(rec => {
-        const option = document.createElement('option');
-        option.value = rec;
-        option.textContent = rec;
-        recruiterFilter.appendChild(option);
-      });
-      if (recruiters.includes(currentVal)) recruiterFilter.value = currentVal;
-    }
-
-    // ==================== XSS-SAFE HIGH-DENSITY TABLE & CARD RENDERER ====================
-    function displayTable(data) {
-      const tbody = document.getElementById('candidateTableBody');
-      const cardsContainer = document.getElementById('cardsViewWrapper');
-
-      if (data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="12" class="no-data">No candidates found matching the selected criteria</td></tr>';
-        if (cardsContainer) {
-          cardsContainer.innerHTML = '<div class="col-span-full glass-card rounded-3xl p-10 text-center text-slate-400">No candidates found matching the selected criteria</div>';
-        }
+      if (!contactData.length) {
+        container.innerHTML = `
+          <div class="no-data">
+            <i class="fas fa-check-circle text-3xl text-emerald-500 mb-2 block"></i>
+            ${sentHistory.length > 0 ? `All ${escapeHtml(sentHistory.length)} contacts in this campaign have been messaged!` : 'No contacts in queue yet. Generate a list on the left.'}
+          </div>`;
+        updateLivePreviewAndCounts();
         return;
       }
 
-      tbody.innerHTML = data.map((candidate, idx) => {
-        const safeTs = escapeHtml(formatTimestamp(candidate.timestamp));
-        const safeComp = escapeHtml(candidate.company || '');
-        const safePos = escapeHtml(candidate.position || '');
-        const safeName = escapeHtml(candidate.candidateName || '');
-        const cleanMob = String(candidate.mobile || '').replace(/\D/g, '').slice(-10);
-        const safeMob = escapeHtml(candidate.mobile || '');
-        const safeEmail = escapeHtml(candidate.email || '');
-        const safeCurCtc = escapeHtml(candidate.currentCTC || '');
-        const safeExpCtc = escapeHtml(candidate.expectedCTC || '');
-        const safeExp = escapeHtml(candidate.experience || '');
-        const safeNotice = escapeHtml(candidate.noticePeriod || '');
-        const safeRec = escapeHtml(candidate.recruiter || '');
-
+      const rowsHtml = contactData.map((contact, index) => {
+        const safeId = escapeHtml(contact.id);
         return `
-          <tr>
-            <td class="timestamp" title="${safeTs}">${safeTs}</td>
-            <td class="company" title="${safeComp}">${safeComp}</td>
-            <td class="position" title="${safePos}">${safePos}</td>
-            <td class="candidate-name" title="${safeName}">${safeName}</td>
-            <td class="mobile">
-              ${cleanMob ? `
-                <a href="https://wa.me/91${cleanMob}" target="_blank" rel="noopener noreferrer" class="hover:underline inline-flex items-center gap-1" title="Chat on WhatsApp">
-                  <i class="fab fa-whatsapp text-emerald-500"></i> ${safeMob}
-                </a>
-              ` : safeMob}
+          <tr id="row-${safeId}">
+            <td class="font-bold text-slate-400">#${index + 1}</td>
+            <td class="font-mono font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
+              <i class="fas fa-phone text-emerald-500 mr-2 text-xs"></i>${escapeHtml(contact.mobile)}
             </td>
-            <td class="email" title="${safeEmail}">${safeEmail}</td>
-            <td class="ctc">${safeCurCtc}</td>
-            <td class="ctc">${safeExpCtc}</td>
-            <td class="experience">${safeExp}</td>
-            <td class="notice-period">${safeNotice}</td>
-            <td class="recruiter">${safeRec}</td>
-            <td>
-              <div class="flex items-center gap-1.5">
-                ${cleanMob ? `
-                  <a href="https://wa.me/91${cleanMob}" target="_blank" rel="noopener noreferrer" class="px-2 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white text-[11px] font-bold transition-colors" title="Direct WhatsApp">
-                    <i class="fab fa-whatsapp"></i>
-                  </a>
-                  <a href="tel:+91${cleanMob}" class="px-2 py-1 rounded-lg bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white text-[11px] font-bold transition-colors" title="Call Candidate">
-                    <i class="fas fa-phone"></i>
-                  </a>
-                ` : ''}
-                <button type="button" onclick="copySingleCandidateRow(${idx})" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-purple-600 text-slate-600 dark:text-slate-300 hover:text-white text-[11px] font-bold transition-colors" title="Copy Row Summary">
-                  <i class="fas fa-copy"></i>
-                </button>
-              </div>
+            <td class="text-right">
+              <button type="button" class="btn-send" data-send-id="${safeId}">
+                <i class="fab fa-whatsapp text-sm"></i>
+                <span>Send</span>
+              </button>
             </td>
           </tr>
         `;
       }).join('');
 
-      if (cardsContainer) {
-        cardsContainer.innerHTML = data.map((candidate, idx) => {
-          const safeTs = escapeHtml(formatTimestamp(candidate.timestamp));
-          const safeComp = escapeHtml(candidate.company || '');
-          const safePos = escapeHtml(candidate.position || '');
-          const safeName = escapeHtml(candidate.candidateName || 'N/A');
-          const cleanMob = String(candidate.mobile || '').replace(/\D/g, '').slice(-10);
-          const safeMob = escapeHtml(candidate.mobile || '');
-          const safeEmail = escapeHtml(candidate.email || '-');
-          const safeCurCtc = escapeHtml(candidate.currentCTC || '-');
-          const safeExpCtc = escapeHtml(candidate.expectedCTC || '-');
-          const safeExp = escapeHtml(candidate.experience || '-');
-          const safeNotice = escapeHtml(candidate.noticePeriod || '-');
-          const safeRec = escapeHtml(candidate.recruiter || '-');
-
-          return `
-            <div class="glass-card rounded-2xl p-4 flex flex-col justify-between gap-3 border hover:border-purple-500/40 transition-all">
-              <div>
-                <div class="flex items-start justify-between gap-2 mb-2">
-                  <div>
-                    <h4 class="font-display font-bold text-base text-emerald-600 dark:text-emerald-400">${safeName}</h4>
-                    <p class="text-xs font-semibold text-blue-600 dark:text-blue-400">${safePos} • <span class="text-slate-700 dark:text-slate-200">${safeComp}</span></p>
-                  </div>
-                  <span class="text-[10px] font-semibold text-slate-400">${safeTs}</span>
-                </div>
-                <div class="grid grid-cols-2 gap-2 my-3 p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70 text-[11px]">
-                  <div><span class="text-slate-400 block">Current / Expected</span><strong class="text-amber-600 dark:text-amber-400">${safeCurCtc} → ${safeExpCtc}</strong></div>
-                  <div><span class="text-slate-400 block">Exp / Notice</span><strong class="text-teal-600 dark:text-teal-400">${safeExp} • ${safeNotice}</strong></div>
-                </div>
-                <div class="space-y-1 text-xs text-slate-500 dark:text-slate-400">
-                  <p class="truncate"><i class="fas fa-envelope w-4 text-purple-500"></i> ${safeEmail}</p>
-                  <p><i class="fas fa-user-tie w-4 text-slate-400"></i> Recruiter: ${safeRec}</p>
-                </div>
-              </div>
-              <div class="pt-3 border-t border-slate-200/70 dark:border-slate-800 flex items-center justify-between">
-                <span class="font-mono text-xs font-bold text-slate-700 dark:text-slate-300">${safeMob}</span>
-                <div class="flex items-center gap-1.5">
-                  <button type="button" onclick="copySingleCandidateRow(${idx})" class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold" title="Copy Summary">
-                    <i class="fas fa-copy"></i>
-                  </button>
-                  ${cleanMob ? `<a href="tel:+91${cleanMob}" class="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs font-bold"><i class="fas fa-phone"></i></a>` : ''}
-                  ${cleanMob ? `<a href="https://wa.me/91${cleanMob}" target="_blank" rel="noopener noreferrer" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 text-xs font-bold flex items-center gap-1"><i class="fab fa-whatsapp"></i> Chat</a>` : ''}
-                </div>
-              </div>
+      container.innerHTML = `
+        <div class="campaign-header flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="font-display font-extrabold text-sm sm:text-base flex items-center gap-2">
+              <i class="fab fa-whatsapp"></i> Active Campaign Queue
+            </h2>
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-xs">
+              <p><strong>Role:</strong> ${escapeHtml(campaignInfo.position)}</p>
+              <p><strong>Client:</strong> ${escapeHtml(campaignInfo.company)}</p>
+              <p><strong>Loc:</strong> ${escapeHtml(campaignInfo.jobLocation)}</p>
             </div>
-          `;
-        }).join('');
-      }
-    }
+          </div>
+          <div class="bg-white/15 backdrop-blur-md px-3.5 py-2 rounded-2xl text-right shrink-0 border border-white/20">
+            <p class="text-[10px] uppercase tracking-wider font-bold opacity-85">Remaining</p>
+            <p class="font-display text-xl font-extrabold leading-none mt-0.5">${escapeHtml(contactData.length)}</p>
+          </div>
+        </div>
+        <div class="overflow-x-auto max-h-96 overflow-y-auto">
+          <table>
+            <thead>
+              <tr>
+                <th class="w-16">S.No</th>
+                <th>Mobile Number</th>
+                <th class="text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+        </div>
+      `;
 
-    function formatTimestamp(timestamp) {
-      if (!timestamp) return '';
-      const date = parseFlexibleDate(timestamp);
-      if (!date) return String(timestamp);
-
-      return date.toLocaleString('en-IN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
-    }
-
-    // Fixed date filter using parseFlexibleDate() so Indian DD/MM/YYYY & ISO timestamps match Today accurately
-    function matchesDateFilter(timestamp, filter) {
-      if (!filter) return true;
-      if (!timestamp) return false;
-
-      const candidateDate = parseFlexibleDate(timestamp);
-      if (!candidateDate) return false;
-
-      const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      const dayBeforeYesterday = new Date(today);
-      dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 2);
-
-      const candDay = new Date(candidateDate.getFullYear(), candidateDate.getMonth(), candidateDate.getDate()).getTime();
-      const todayDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
-      const yesterdayDay = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate()).getTime();
-      const dbyDay = new Date(dayBeforeYesterday.getFullYear(), dayBeforeYesterday.getMonth(), dayBeforeYesterday.getDate()).getTime();
-
-      switch (filter) {
-        case 'today':
-          return candDay === todayDay;
-        case 'yesterday':
-          return candDay === yesterdayDay;
-        case 'dayBeforeYesterday':
-          return candDay === dbyDay;
-        default:
-          return true;
-      }
-    }
-
-    function applyFilters() {
-      const dateFilter = document.getElementById('dateFilter').value;
-      const companyFilter = document.getElementById('companyFilter').value;
-      const recruiterFilter = document.getElementById('recruiterFilter')?.value || '';
-      const noticeFilter = document.getElementById('noticeFilter')?.value || '';
-      const searchQuery = (document.getElementById('searchCandidateInput')?.value || '').toLowerCase().trim();
-
-      filteredData = candidateData.filter(candidate => {
-        const matchesDate = matchesDateFilter(candidate.timestamp, dateFilter);
-        const matchesCompany = !companyFilter || candidate.company === companyFilter;
-        const matchesRecruiter = !recruiterFilter || candidate.recruiter === recruiterFilter;
-
-        let matchesNotice = true;
-        if (noticeFilter === 'immediate') {
-          matchesNotice = isShortOrImmediateNotice(candidate.noticePeriod);
-        } else if (noticeFilter === '30days') {
-          matchesNotice = isThirtyDaysOrLessNotice(candidate.noticePeriod);
-        }
-
-        const matchesSearch = !searchQuery ||
-          (candidate.candidateName || '').toLowerCase().includes(searchQuery) ||
-          (candidate.position || '').toLowerCase().includes(searchQuery) ||
-          (candidate.company || '').toLowerCase().includes(searchQuery) ||
-          (candidate.email || '').toLowerCase().includes(searchQuery) ||
-          (candidate.mobile || '').toString().toLowerCase().includes(searchQuery);
-
-        return matchesDate && matchesCompany && matchesRecruiter && matchesNotice && matchesSearch;
+      container.querySelectorAll('button[data-send-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = Number(btn.getAttribute('data-send-id'));
+          const item = contactData.find(c => c.id === id);
+          if (item) sendWhatsApp(item.id, item.mobile);
+        });
       });
 
-      updateFilterConditionBadge();
-      displayTable(filteredData);
-      updateStats();
+      updateLivePreviewAndCounts();
     }
 
-    function clearFilters() {
-      document.getElementById('dateFilter').value = '';
-      document.getElementById('companyFilter').value = '';
-      if (document.getElementById('recruiterFilter')) document.getElementById('recruiterFilter').value = '';
-      if (document.getElementById('noticeFilter')) document.getElementById('noticeFilter').value = '';
-      const searchEl = document.getElementById('searchCandidateInput');
-      if (searchEl) {
-        searchEl.value = '';
-        validateSearchInput(searchEl);
-      }
-      filteredData = [...candidateData];
-      updateFilterConditionBadge();
-      displayTable(filteredData);
-      updateStats();
-    }
+    function sendWhatsApp(id, mobile) {
+      const message = buildFormattedMessage(campaignInfo.position, campaignInfo.company, campaignInfo.jobLocation);
+      const cleanMobile = String(mobile || '').replace(/\D/g, '');
+      const fullMobile = cleanMobile.startsWith('91') && cleanMobile.length > 10 ? cleanMobile : '91' + cleanMobile.slice(-10);
 
-    function updateStats() {
-      document.getElementById('totalCount').textContent = candidateData.length;
-      document.getElementById('filteredCount').textContent = filteredData.length;
-
-      const todayEl = document.getElementById('todaySourcedCount');
-      if (todayEl) {
-        const todayCount = candidateData.filter(c => matchesDateFilter(c.timestamp, 'today')).length;
-        todayEl.textContent = todayCount;
-      }
-
-      const immEl = document.getElementById('immediateJoinersCount');
-      if (immEl) {
-        const immCount = filteredData.filter(c => isShortOrImmediateNotice(c.noticePeriod)).length;
-        immEl.textContent = immCount;
-      }
-
-      const metricEl = document.getElementById('clientsAndRecruitersMetric');
-      if (metricEl) {
-        const uniqueClients = new Set(filteredData.map(c => c.company).filter(Boolean)).size;
-        const uniqueRecs = new Set(filteredData.map(c => c.recruiter).filter(Boolean)).size;
-        metricEl.textContent = `${uniqueClients} Clients • ${uniqueRecs} Rec`;
-      }
-    }
-
-    // Copy table data to clipboard - PRESERVED EXACT COLUMNS & EMAIL TABLE FORMATTING (XSS-Hardened)
-    function copyTableData() {
-      if (filteredData.length === 0) {
-        showToast('❌ No data to copy. Please load data first.');
-        return;
-      }
-
-      let htmlTable = `
-<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; font-family: Arial, sans-serif; font-size: 12px;">
-    <thead>
-        <tr style="background-color: #4a5568; color: white;">
-            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Position</th>
-            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Candidate Name</th>
-            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Mobile Number</th>
-            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Email ID</th>
-            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Current CTC</th>
-            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Expected CTC</th>
-            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Experience</th>
-            <th style="border: 1px solid #000; padding: 8px; text-align: left; font-weight: bold;">Notice Period</th>
-        </tr>
-    </thead>
-    <tbody>`;
-
-      filteredData.forEach((candidate, index) => {
-        const rowStyle = index % 2 === 0 ? 'background-color: #f9f9f9;' : 'background-color: white;';
-        htmlTable += `
-        <tr style="${rowStyle}">
-            <td style="border: 1px solid #000; padding: 8px; color: #007bff;">${escapeHtml(candidate.position || '')}</td>
-            <td style="border: 1px solid #000; padding: 8px; color: #28a745; font-weight: bold;">${escapeHtml(candidate.candidateName || '')}</td>
-            <td style="border: 1px solid #000; padding: 8px; font-family: monospace;">${escapeHtml(candidate.mobile || '')}</td>
-            <td style="border: 1px solid #000; padding: 8px; color: #6f42c1;">${escapeHtml(candidate.email || '')}</td>
-            <td style="border: 1px solid #000; padding: 8px; color: #fd7e14; font-weight: bold;">${escapeHtml(candidate.currentCTC || '')}</td>
-            <td style="border: 1px solid #000; padding: 8px; color: #fd7e14; font-weight: bold;">${escapeHtml(candidate.expectedCTC || '')}</td>
-            <td style="border: 1px solid #000; padding: 8px; color: #20c997; font-weight: bold;">${escapeHtml(candidate.experience || '')}</td>
-            <td style="border: 1px solid #000; padding: 8px; color: #dc3545; font-weight: bold;">${escapeHtml(candidate.noticePeriod || '')}</td>
-        </tr>`;
-      });
-
-      htmlTable += `
-    </tbody>
-</table>`;
-
-      let tabSeparatedText = "Position\tCandidate Name\tMobile Number\tEmail ID\tCurrent CTC\tExpected CTC\tExperience\tNotice Period\n";
-
-      filteredData.forEach(candidate => {
-        const row = [
-          candidate.position || '',
-          candidate.candidateName || '',
-          candidate.mobile || '',
-          candidate.email || '',
-          candidate.currentCTC || '',
-          candidate.expectedCTC || '',
-          candidate.experience || '',
-          candidate.noticePeriod || ''
-        ].join('\t');
-
-        tabSeparatedText += row + "\n";
-      });
-
-      try {
-        if (navigator.clipboard && navigator.clipboard.write) {
-          const clipboardItems = [
-            new ClipboardItem({
-              'text/html': new Blob([htmlTable], { type: 'text/html' }),
-              'text/plain': new Blob([tabSeparatedText], { type: 'text/plain' })
-            })
-          ];
-
-          navigator.clipboard.write(clipboardItems).then(() => {
-            showToast(`✅ ${filteredData.length} candidates copied! Ready to paste in emails.`);
-          });
-        } else {
-          copyToClipboardFallback(htmlTable, tabSeparatedText);
-        }
-      } catch (err) {
-        copyToClipboardFallback(htmlTable, tabSeparatedText);
-      }
-    }
-
-    function copyToClipboardFallback(htmlContent, textContent) {
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = htmlContent;
-      tempDiv.style.position = 'absolute';
-      tempDiv.style.left = '-9999px';
-      document.body.appendChild(tempDiv);
-
-      try {
-        const range = document.createRange();
-        range.selectNodeContents(tempDiv);
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-
-        document.execCommand('copy');
-        showToast(`✅ ${filteredData.length} candidates copied! Ready to paste in emails.`);
-
-        selection.removeAllRanges();
-      } catch (err) {
-        const textArea = document.createElement('textarea');
-        textArea.value = textContent;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        showToast('Candidates copied as text.');
-      }
-
-      document.body.removeChild(tempDiv);
-    }
-
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      const toastMessage = document.getElementById('toastMessage');
-
-      toastMessage.textContent = message;
-      toast.classList.add('show');
+      window.open(`https://wa.me/${fullMobile}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
 
       setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
+        const sentItem = contactData.find(contact => contact.id === id);
+        if (sentItem) sentHistory.push(sentItem);
+        contactData = contactData.filter(contact => contact.id !== id);
+        renderTable();
+      }, 450);
     }
-
-    document.getElementById('dateFilter').addEventListener('change', applyFilters);
-    document.getElementById('companyFilter').addEventListener('change', applyFilters);
-
-    document.addEventListener('DOMContentLoaded', init);
-
-    setInterval(() => {
-      if (candidateData.length > 0) {
-        loadDataFromSupabase();
-      }
-    }, 10 * 60 * 1000);
   </script>
 </body>
 </html>
