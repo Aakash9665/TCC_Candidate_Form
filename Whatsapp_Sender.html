@@ -1,16 +1,13 @@
 <!DOCTYPE html>
-<!-- Default theme is explicitly LIGHT (removed "dark" class from html root) -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <title>TCC WhatsApp Bulk Messenger</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Supabase JS Client SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -32,21 +29,13 @@
         radial-gradient(circle at 88% 85%, rgba(20, 184, 166, 0.14) 0%, transparent 45%),
         radial-gradient(circle at 50% 40%, rgba(59, 130, 246, 0.08) 0%, transparent 60%);
     }
-
     .dark {
       --bg-gradient:
         radial-gradient(circle at 12% 15%, rgba(16, 185, 129, 0.22) 0%, transparent 45%),
         radial-gradient(circle at 88% 85%, rgba(20, 184, 166, 0.20) 0%, transparent 45%),
         radial-gradient(circle at 50% 40%, rgba(59, 130, 246, 0.12) 0%, transparent 60%);
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
@@ -54,8 +43,6 @@
       overflow-x: hidden;
       transition: background-color 0.3s ease, color 0.3s ease;
     }
-
-    /* Ambient Floating Orbs */
     .orb {
       position: fixed;
       border-radius: 50%;
@@ -65,34 +52,15 @@
       opacity: 0.32;
       animation: floatOrb 18s ease-in-out infinite alternate;
     }
-
-    .dark .orb {
-      opacity: 0.42;
-    }
-
-    .orb-1 {
-      width: 300px;
-      height: 300px;
-      background: linear-gradient(135deg, #10b981, #14b8a6);
-      top: -80px;
-      left: -80px;
-    }
-
-    .orb-2 {
-      width: 260px;
-      height: 260px;
-      background: linear-gradient(135deg, #3b82f6, #10b981);
-      bottom: -60px;
-      right: -60px;
-      animation-delay: -7s;
-    }
+    .dark .orb { opacity: 0.42; }
+    .orb-1 { width: 300px; height: 300px; background: linear-gradient(135deg, #10b981, #14b8a6); top: -80px; left: -80px; }
+    .orb-2 { width: 260px; height: 260px; background: linear-gradient(135deg, #3b82f6, #10b981); bottom: -60px; right: -60px; animation-delay: -7s; }
 
     @keyframes floatOrb {
       0% { transform: translate(0, 0) scale(1); }
       50% { transform: translate(24px, -28px) scale(1.06); }
       100% { transform: translate(-18px, 20px) scale(0.95); }
     }
-
     .glass-card {
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(22px) saturate(180%);
@@ -100,21 +68,16 @@
       border: 1px solid rgba(226, 232, 240, 0.9);
       box-shadow: 0 14px 34px -10px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
     }
-
     .dark .glass-card {
       background: rgba(15, 23, 42, 0.84);
       border: 1px solid rgba(255, 255, 255, 0.09);
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
     }
-
     @keyframes fadeSlideUp {
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
-    .animate-in {
-      animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-    }
+    .animate-in { animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
 
     .form-input {
       width: 100%;
@@ -126,42 +89,18 @@
       font-size: 13px;
       transition: all 0.2s ease;
     }
+    .dark .form-input { background: rgba(30, 41, 59, 0.8); border-color: rgba(255, 255, 255, 0.12); color: #f8fafc; }
+    .form-input:focus { outline: none; border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.16); }
+    .input-valid { border-color: #10b981 !important; }
+    .input-invalid { border-color: #f43f5e !important; }
 
-    .dark .form-input {
-      background: rgba(30, 41, 59, 0.8);
-      border-color: rgba(255, 255, 255, 0.12);
-      color: #f8fafc;
-    }
-
-    .form-input:focus {
-      outline: none;
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.16);
-    }
-
-    .input-valid {
-      border-color: #10b981 !important;
-    }
-
-    .input-invalid {
-      border-color: #f43f5e !important;
-    }
-
-    /* Preserved Campaign Header & Table Styles */
     .campaign-header {
       background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
       color: white;
       padding: 16px 20px;
       border-radius: 20px 20px 0 0;
     }
-
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      font-size: 12.5px;
-    }
-
+    table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12.5px; }
     th {
       background: rgba(241, 245, 249, 0.96);
       color: #475569;
@@ -176,34 +115,12 @@
       top: 0;
       z-index: 10;
     }
-
-    .dark th {
-      background: rgba(15, 23, 42, 0.96);
-      color: #94a3b8;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    td {
-      padding: 11px 14px;
-      border-bottom: 1px solid rgba(226, 232, 240, 0.65);
-      vertical-align: middle;
-    }
-
-    .dark td {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    tbody tr {
-      transition: all 0.15s ease;
-    }
-
-    tbody tr:hover {
-      background: rgba(16, 185, 129, 0.06);
-    }
-
-    .dark tbody tr:hover {
-      background: rgba(16, 185, 129, 0.12);
-    }
+    .dark th { background: rgba(15, 23, 42, 0.96); color: #94a3b8; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    td { padding: 11px 14px; border-bottom: 1px solid rgba(226, 232, 240, 0.65); vertical-align: middle; }
+    .dark td { border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+    tbody tr { transition: all 0.15s ease; }
+    tbody tr:hover { background: rgba(16, 185, 129, 0.06); }
+    .dark tbody tr:hover { background: rgba(16, 185, 129, 0.12); }
 
     .btn-send {
       padding: 7px 15px;
@@ -220,18 +137,8 @@
       gap: 6px;
       box-shadow: 0 4px 12px rgba(37, 211, 102, 0.25);
     }
-
-    .btn-send:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(37, 211, 102, 0.35);
-    }
-
-    .no-data {
-      text-align: center;
-      padding: 36px 20px;
-      color: #94a3b8;
-      font-size: 13px;
-    }
+    .btn-send:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(37, 211, 102, 0.35); }
+    .no-data { text-align: center; padding: 36px 20px; color: #94a3b8; font-size: 13px; }
 
     .template-pill {
       padding: 5px 10px;
@@ -245,13 +152,7 @@
       transition: all 0.18s ease;
       white-space: nowrap;
     }
-
-    .dark .template-pill {
-      background: rgba(30, 41, 59, 0.7);
-      color: #cbd5e1;
-      border-color: rgba(255, 255, 255, 0.1);
-    }
-
+    .dark .template-pill { background: rgba(30, 41, 59, 0.7); color: #cbd5e1; border-color: rgba(255, 255, 255, 0.1); }
     .template-pill:hover, .template-pill.active {
       background: #10b981;
       color: #ffffff;
@@ -262,11 +163,9 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-20 sm:pb-14 selection:bg-emerald-500 selection:text-white relative">
 
-  <!-- Ambient Floating Orbs -->
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
 
-  <!-- Non-Blocking Toast Notification Container -->
   <div id="toastContainer" class="fixed bottom-16 sm:bottom-5 right-4 sm:right-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-3 pointer-events-none"></div>
 
   <!-- Sticky Top Navigation Bar -->
@@ -290,17 +189,13 @@
             <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
               14+ Templates Studio
             </span>
-            <span class="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/25" title="Power Automate flow is disabled and bypassed">
-              <i class="fas fa-bolt-slash text-[9px]"></i> PA Bypassed
-            </span>
           </div>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-            One-View Broadcast Studio: 14 Recruiter Templates, Smart Number Validation & Direct WhatsApp Queue (PA Bypassed)
+            Recruiter Templates, Smart Number Validation &amp; Direct WhatsApp Queue
           </p>
         </div>
       </div>
 
-      <!-- Right Action Controls -->
       <div class="flex items-center gap-1.5 sm:gap-2">
         <button
           type="button"
@@ -316,7 +211,7 @@
           type="button"
           onclick="exportQueueToCSV()"
           class="px-2.5 sm:px-3 py-2 rounded-xl bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-xs font-bold hidden sm:flex items-center gap-1.5 transition-all cursor-pointer"
-          title="Export Queue & Sent History to Safe CSV"
+          title="Export Queue & Sent History to CSV"
         >
           <i class="fas fa-file-csv"></i>
           <span class="hidden lg:inline">Export CSV</span>
@@ -337,9 +232,8 @@
 
   <main class="max-w-[1600px] mx-auto px-3 sm:px-6 pt-4 sm:pt-5 relative z-10">
 
-    <!-- 6-Card One-View KPI Summary Strip (Preserves #statDetectedCount, #statRemainingCount, #statSentCount) -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3 mb-4 animate-in">
-      <!-- KPI 1: Detected Numbers -->
+    <!-- KPI Summary Strip -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 sm:gap-3 mb-4 animate-in">
       <div class="glass-card rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between">
         <div class="flex items-center justify-between mb-1">
           <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Detected Numbers</span>
@@ -351,7 +245,6 @@
         <span class="text-[10px] text-slate-400 truncate block" id="kpiValidBreakdownText">0 valid 10-digit</span>
       </div>
 
-      <!-- KPI 2: Remaining Queue -->
       <div class="glass-card rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between">
         <div class="flex items-center justify-between mb-1">
           <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">Remaining Queue</span>
@@ -363,7 +256,6 @@
         <span class="text-[10px] text-slate-400 truncate block">Ready to send</span>
       </div>
 
-      <!-- KPI 3: Sent in Session -->
       <div class="glass-card rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between">
         <div class="flex items-center justify-between mb-1">
           <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Sent in Session</span>
@@ -375,7 +267,6 @@
         <span class="text-[10px] text-slate-400 truncate block">Completed chats</span>
       </div>
 
-      <!-- KPI 4: Campaign Progress % -->
       <div class="glass-card rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between">
         <div class="flex items-center justify-between mb-1">
           <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Queue Progress</span>
@@ -389,8 +280,7 @@
         </div>
       </div>
 
-      <!-- KPI 5: Active Template Style -->
-      <div class="glass-card rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between">
+      <div class="glass-card rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between col-span-2 sm:col-span-1">
         <div class="flex items-center justify-between mb-1">
           <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">Active Template</span>
           <span class="w-7 h-7 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center text-xs">
@@ -400,24 +290,12 @@
         <p class="font-display text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white truncate mt-1" id="kpiActiveTemplateName">Standard Outreach</p>
         <span class="text-[10px] text-slate-400 truncate block">14 presets available</span>
       </div>
-
-      <!-- KPI 6: Power Automate Status -->
-      <div class="glass-card rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between border-amber-500/30 bg-amber-500/5">
-        <div class="flex items-center justify-between mb-1">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">Power Automate</span>
-          <span class="w-7 h-7 rounded-xl bg-amber-500 text-white flex items-center justify-center text-xs">
-            <i class="fas fa-forward-fast"></i>
-          </span>
-        </div>
-        <p class="font-display text-sm sm:text-base font-extrabold text-amber-700 dark:text-amber-400 mt-1">BYPASSED</p>
-        <span class="text-[10px] text-slate-400 truncate block">Direct WhatsApp Mode</span>
-      </div>
     </div>
 
-    <!-- ==================== ONE-VIEW 12-COLUMN WORKSPACE ==================== -->
+    <!-- 12-COLUMN WORKSPACE -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
-      <!-- LEFT COLUMN (7 Cols): CAMPAIGN BUILDER & EXPANDED TEMPLATE STUDIO (.container) -->
+      <!-- LEFT COLUMN (7 Cols): CAMPAIGN BUILDER & TEMPLATE STUDIO -->
       <div id="campaignBuilderAnchor" class="lg:col-span-7 container glass-card rounded-3xl p-4 sm:p-6 relative overflow-hidden animate-in">
         <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500"></div>
 
@@ -436,7 +314,6 @@
           </button>
         </div>
 
-        <!-- Mobile Numbers Input (#mobileNumbers) with Condition Check, Smart Cleaner & Supabase Import -->
         <div class="form-group mb-4">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-1.5">
             <div class="flex items-center gap-2">
@@ -459,7 +336,7 @@
                 onclick="cleanAndDeduplicateNumbers()"
                 class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white border border-emerald-500/20 text-[11px] font-bold transition-all cursor-pointer"
               >
-                <i class="fas fa-wand-magic-sparkles mr-1"></i> Clean & Deduplicate
+                <i class="fas fa-wand-magic-sparkles mr-1"></i> Clean &amp; Deduplicate
               </button>
             </div>
           </div>
@@ -480,9 +357,7 @@
           </div>
         </div>
 
-        <!-- Company, Position & Job Location Grid (With Condition Checks) -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-          <!-- Company (#company) -->
           <div class="form-group">
             <div class="flex items-center justify-between mb-1">
               <label for="company" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -501,7 +376,6 @@
             <p id="companyErrorMsg" class="text-[10px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
           </div>
 
-          <!-- Position (#position) -->
           <div class="form-group">
             <div class="flex items-center justify-between mb-1">
               <label for="position" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -520,7 +394,6 @@
             <p id="positionErrorMsg" class="text-[10px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
           </div>
 
-          <!-- Job Location (#jobLocation) -->
           <div class="form-group">
             <div class="flex items-center justify-between mb-1">
               <label for="jobLocation" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -541,7 +414,7 @@
           </div>
         </div>
 
-        <!-- ==================== EXPANDED 14-TEMPLATE STUDIO (#templatePreset & Quick Pill Bar) ==================== -->
+        <!-- 14-TEMPLATE STUDIO -->
         <div id="templateStudioAnchor" class="form-group mb-4 p-3.5 sm:p-4 rounded-2xl bg-slate-100/90 dark:bg-slate-900/70 border border-slate-200/90 dark:border-slate-800">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
             <label for="templatePreset" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
@@ -551,83 +424,46 @@
             <span id="templateCharCounter" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">0/1000 chars</span>
           </div>
 
-          <!-- 1-Click Quick Template Category Pills -->
           <div class="flex items-center gap-1.5 overflow-x-auto pb-2 mb-2.5">
-            <button type="button" onclick="selectTemplateFromPill('default')" data-pill="default" class="template-pill active">
-              1. Standard
-            </button>
-            <button type="button" onclick="selectTemplateFromPill('detailed')" data-pill="detailed" class="template-pill">
-              2. Detailed Pitch
-            </button>
-            <button type="button" onclick="selectTemplateFromPill('urgent')" data-pill="urgent" class="template-pill">
-              3. Urgent / Imm
-            </button>
-            <button type="button" onclick="selectTemplateFromPill('walkin')" data-pill="walkin" class="template-pill">
-              4. Walk-In Drive
-            </button>
-            <button type="button" onclick="selectTemplateFromPill('screening')" data-pill="screening" class="template-pill">
-              5. Quick Screen
-            </button>
-            <button type="button" onclick="selectTemplateFromPill('cv_request')" data-pill="cv_request" class="template-pill">
-              6. Request CV & CTC
-            </button>
-            <button type="button" onclick="selectTemplateFromPill('shortlisted')" data-pill="shortlisted" class="template-pill">
-              7. Shortlisted Alert
-            </button>
-            <button type="button" onclick="selectTemplateFromPill('interview_confirm')" data-pill="interview_confirm" class="template-pill">
-              8. Interview Slot
-            </button>
-            <button type="button" onclick="selectTemplateFromPill('interview_reminder')" data-pill="interview_reminder" class="template-pill">
-              9. Today Reminder
-            </button>
-            <button type="button" onclick="selectTemplateFromPill('followup')" data-pill="followup" class="template-pill">
-              10. Missed Call Follow-up
-            </button>
-            <button type="button" onclick="selectTemplateFromPill('offer_discussion')" data-pill="offer_discussion" class="template-pill">
-              11. Offer / Salary
-            </button>
-            <button type="button" onclick="selectTemplateFromPill('work_from_home')" data-pill="work_from_home" class="template-pill">
-              12. Remote / Hybrid
-            </button>
-            <button type="button" onclick="selectTemplateFromPill('executive')" data-pill="executive" class="template-pill">
-              13. Leadership / CXO
-            </button>
+            <button type="button" onclick="selectTemplateFromPill('default')" data-pill="default" class="template-pill active">1. Standard</button>
+            <button type="button" onclick="selectTemplateFromPill('detailed')" data-pill="detailed" class="template-pill">2. Detailed Pitch</button>
+            <button type="button" onclick="selectTemplateFromPill('urgent')" data-pill="urgent" class="template-pill">3. Urgent / Imm</button>
+            <button type="button" onclick="selectTemplateFromPill('walkin')" data-pill="walkin" class="template-pill">4. Walk-In Drive</button>
+            <button type="button" onclick="selectTemplateFromPill('screening')" data-pill="screening" class="template-pill">5. Quick Screen</button>
+            <button type="button" onclick="selectTemplateFromPill('cv_request')" data-pill="cv_request" class="template-pill">6. Request CV &amp; CTC</button>
+            <button type="button" onclick="selectTemplateFromPill('shortlisted')" data-pill="shortlisted" class="template-pill">7. Shortlisted Alert</button>
+            <button type="button" onclick="selectTemplateFromPill('interview_confirm')" data-pill="interview_confirm" class="template-pill">8. Interview Slot</button>
+            <button type="button" onclick="selectTemplateFromPill('interview_reminder')" data-pill="interview_reminder" class="template-pill">9. Today Reminder</button>
+            <button type="button" onclick="selectTemplateFromPill('followup')" data-pill="followup" class="template-pill">10. Missed Call Follow-up</button>
+            <button type="button" onclick="selectTemplateFromPill('offer_discussion')" data-pill="offer_discussion" class="template-pill">11. Offer / Salary</button>
+            <button type="button" onclick="selectTemplateFromPill('work_from_home')" data-pill="work_from_home" class="template-pill">12. Remote / Hybrid</button>
+            <button type="button" onclick="selectTemplateFromPill('executive')" data-pill="executive" class="template-pill">13. Leadership / CXO</button>
           </div>
 
-          <!-- Full Dropdown Selector (#templatePreset) -->
           <select id="templatePreset" onchange="applyTemplatePreset()" class="form-input mb-2.5 text-xs font-semibold">
             <option value="default">1. Standard Outreach (Default Original)</option>
             <option value="detailed">2. Detailed Recruiter Pitch (Bold Formatted)</option>
             <option value="urgent">3. Urgent Requirement / Immediate Joiners</option>
             <option value="walkin">4. Walk-In Interview Drive Invitation</option>
             <option value="screening">5. Quick Telephonic Screening Request</option>
-            <option value="cv_request">6. Resume / CV & CTC Details Request</option>
+            <option value="cv_request">6. Resume / CV &amp; CTC Details Request</option>
             <option value="shortlisted">7. Profile Shortlisted for Interview</option>
             <option value="interview_confirm">8. Interview Slot Confirmation Check</option>
             <option value="interview_reminder">9. Gentle Reminder for Today's Interview</option>
             <option value="followup">10. Unreachable / Missed Call Follow-Up</option>
-            <option value="offer_discussion">11. Offer & Salary Discussion</option>
+            <option value="offer_discussion">11. Offer &amp; Salary Discussion</option>
             <option value="work_from_home">12. Work From Home / Hybrid Role Pitch</option>
             <option value="executive">13. Senior / Leadership Confidential Outreach</option>
             <option value="custom">14. Custom Editable Template</option>
           </select>
 
-          <!-- Dynamic Variable Insertion Chips -->
           <div class="flex flex-wrap items-center justify-between gap-1.5 mb-2">
             <div class="flex flex-wrap items-center gap-1">
               <span class="text-[10px] font-bold text-slate-400 mr-1">Insert Tag:</span>
-              <button type="button" onclick="insertTemplateToken('{position}')" class="px-2 py-0.5 rounded bg-emerald-500/10 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-300 hover:text-white text-[10px] font-bold transition-colors">
-                +{position}
-              </button>
-              <button type="button" onclick="insertTemplateToken('{company}')" class="px-2 py-0.5 rounded bg-blue-500/10 hover:bg-blue-500 text-blue-700 dark:text-blue-300 hover:text-white text-[10px] font-bold transition-colors">
-                +{company}
-              </button>
-              <button type="button" onclick="insertTemplateToken('{location}')" class="px-2 py-0.5 rounded bg-purple-500/10 hover:bg-purple-500 text-purple-700 dark:text-purple-300 hover:text-white text-[10px] font-bold transition-colors">
-                +{location}
-              </button>
-              <button type="button" onclick="insertTemplateToken('{recruiter}')" class="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500 text-amber-700 dark:text-amber-300 hover:text-white text-[10px] font-bold transition-colors">
-                +{recruiter}
-              </button>
+              <button type="button" onclick="insertTemplateToken('{position}')" class="px-2 py-0.5 rounded bg-emerald-500/10 hover:bg-emerald-500 text-emerald-700 dark:text-emerald-300 hover:text-white text-[10px] font-bold transition-colors">+{position}</button>
+              <button type="button" onclick="insertTemplateToken('{company}')" class="px-2 py-0.5 rounded bg-blue-500/10 hover:bg-blue-500 text-blue-700 dark:text-blue-300 hover:text-white text-[10px] font-bold transition-colors">+{company}</button>
+              <button type="button" onclick="insertTemplateToken('{location}')" class="px-2 py-0.5 rounded bg-purple-500/10 hover:bg-purple-500 text-purple-700 dark:text-purple-300 hover:text-white text-[10px] font-bold transition-colors">+{location}</button>
+              <button type="button" onclick="insertTemplateToken('{recruiter}')" class="px-2 py-0.5 rounded bg-amber-500/10 hover:bg-amber-500 text-amber-700 dark:text-amber-300 hover:text-white text-[10px] font-bold transition-colors">+{recruiter}</button>
             </div>
             <button type="button" onclick="copyPreviewMessageText()" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
               <i class="fas fa-copy mr-0.5"></i>Copy Message
@@ -644,7 +480,6 @@
           <p id="templateErrorMsg" class="text-[10px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
         </div>
 
-        <!-- Generate Button (.btn-generate) -->
         <button
           type="button"
           class="btn-generate w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-sm sm:text-base shadow-lg shadow-emerald-600/25 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
@@ -655,10 +490,9 @@
         </button>
       </div>
 
-      <!-- ==================== RIGHT COLUMN (5 Cols): LIVE PREVIEW, QUEUE LAUNCHER & ONE-VIEW QUEUE TABLE ==================== -->
+      <!-- RIGHT COLUMN (5 Cols): LIVE PREVIEW, QUEUE LAUNCHER & QUEUE TABLE -->
       <div class="lg:col-span-5 space-y-4 animate-in">
 
-        <!-- Live WhatsApp Preview & Rapid Launcher Card -->
         <div class="glass-card rounded-3xl p-4 sm:p-5">
           <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200/80 dark:border-slate-800">
             <div class="flex items-center gap-2">
@@ -677,7 +511,6 @@
             Hi, I am messaging you regarding [Position] position for [Company] at [Location].
           </div>
 
-          <!-- Rapid Queue Launcher Controls -->
           <div class="mt-3.5 pt-3.5 border-t border-slate-200/80 dark:border-slate-800 flex flex-col gap-2">
             <button
               type="button"
@@ -708,7 +541,7 @@
           </div>
         </div>
 
-        <!-- Custom Prompt Modal (Replaces native prompt() with Condition Check) -->
+        <!-- Custom Prompt Modal -->
         <div id="customOptionModal" class="glass-card rounded-2xl p-4 hidden border-2 border-blue-500/40">
           <div class="flex items-center justify-between mb-1.5">
             <p id="customOptionPromptTitle" class="text-xs font-bold text-slate-700 dark:text-slate-200">Add New Item</p>
@@ -728,7 +561,7 @@
           </div>
         </div>
 
-        <!-- GENERATED CONTACT QUEUE TABLE IN ONE VIEW (#tableContainer) -->
+        <!-- GENERATED CONTACT QUEUE TABLE (#tableContainer) -->
         <div class="table-container glass-card rounded-3xl overflow-hidden" id="tableContainer">
           <div class="no-data">
             <i class="fab fa-whatsapp text-3xl text-emerald-500/50 mb-2 block"></i>
@@ -736,7 +569,7 @@
           </div>
         </div>
 
-        <!-- Sent History Log in One View -->
+        <!-- Sent History Log -->
         <div id="sentHistoryCard" class="glass-card rounded-3xl p-4 hidden">
           <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-200/80 dark:border-slate-800">
             <h4 class="font-display font-bold text-xs text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
@@ -756,7 +589,7 @@
 
   </main>
 
-  <!-- Mobile-First Bottom Quick Navigation Bar (Thumb-friendly on phones) -->
+  <!-- Mobile Bottom Quick Navigation Bar -->
   <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 glass-card border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
     <button type="button" onclick="goHome()" class="flex flex-col items-center gap-0.5 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
       <i class="fas fa-house text-sm"></i>
@@ -781,38 +614,16 @@
   </nav>
 
   <script>
-    // ==================== SUPABASE CONFIGURATION ====================
     const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0';
-
-    // Initialize Supabase Client
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // ==================== REQUIREMENT #5: POWER AUTOMATE BYPASS ====================
-    window.POWER_AUTOMATE_ENABLED = false;
-    window.BYPASS_POWER_AUTOMATE = true;
-    sessionStorage.setItem('powerAutomateEnabled', 'false');
-    sessionStorage.setItem('bypassPowerAutomate', 'true');
+    let contactData = [];
+    let campaignInfo = {};
+    let sentHistory = [];
+    let cloudCompanyMap = {};
+    let pendingTargetSelectId = null;
 
-    const originalFetch = window.fetch.bind(window);
-    window.fetch = async function(resource, config) {
-      const urlStr = typeof resource === 'string' ? resource : (resource?.url || '');
-      if (
-        urlStr.includes('powerplatform.com') ||
-        urlStr.includes('powerautomate') ||
-        urlStr.includes('logic.azure.com') ||
-        urlStr.includes('flow.microsoft.com')
-      ) {
-        console.info('[Power Automate Bypassed] Webhook call intercepted and bypassed:', urlStr);
-        return new Response(
-          JSON.stringify({ success: true, bypassed: true, message: 'Power Automate is disabled and bypassed.' }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
-        );
-      }
-      return originalFetch(resource, config);
-    };
-
-    // ==================== REQUIREMENT #1: SECURITY UTILITIES ====================
     function escapeHtml(unsafe) {
       if (unsafe === null || unsafe === undefined) return '';
       return String(unsafe)
@@ -823,29 +634,17 @@
         .replace(/'/g, "&#039;");
     }
 
-    // Prevent CSV Formula Injection when exporting to Excel/Sheets
     function sanitizeCsvCell(val) {
       let str = String(val ?? '').replace(/"/g, '""').trim();
-      if (/^[=+\-@\t\r]/.test(str)) {
-        str = "'" + str;
-      }
+      if (/^[=+\-@\t\r]/.test(str)) str = "'" + str;
       return `"${str}"`;
     }
 
     function toggleTheme() {
-      const html = document.documentElement;
-      const isDark = html.classList.toggle('dark');
+      const isDark = document.documentElement.classList.toggle('dark');
       sessionStorage.setItem('tccTheme', isDark ? 'dark' : 'light');
     }
 
-    // Preserved Global Variables
-    let contactData = [];
-    let campaignInfo = {};
-    let sentHistory = [];
-    let cloudCompanyMap = {};
-    let pendingTargetSelectId = null;
-
-    // XSS-Safe Non-blocking Toast Helper
     function showToast(message, type = 'info') {
       const container = document.getElementById('toastContainer');
       if (!container) return;
@@ -864,13 +663,11 @@
 
       const iconEl = document.createElement('i');
       iconEl.className = `fas ${icons[type] || icons.info} shrink-0`;
-
       const spanEl = document.createElement('span');
       spanEl.className = 'flex-1';
       spanEl.textContent = String(message || '');
 
-      toast.appendChild(iconEl);
-      toast.appendChild(spanEl);
+      toast.append(iconEl, spanEl);
       container.appendChild(toast);
 
       setTimeout(() => {
@@ -884,14 +681,23 @@
       window.location.href = 'index.html';
     }
 
-    // ==================== REQUIREMENT #4: INPUT CONDITION CHECKS ====================
+    // Unified validation UI helper
+    function setFieldValidation(el, isValid, errEl = null, errMsg = '') {
+      if (el) {
+        el.classList.toggle('input-valid', isValid);
+        el.classList.toggle('input-invalid', !isValid);
+      }
+      if (errEl) {
+        if (errMsg) errEl.textContent = errMsg;
+        errEl.classList.toggle('hidden', isValid || !errMsg);
+      }
+      return isValid;
+    }
+
     function normalizeTenDigitMobile(rawToken) {
       let digits = String(rawToken || '').replace(/\D/g, '');
-      if (digits.length === 12 && digits.startsWith('91')) {
-        digits = digits.slice(2);
-      } else if (digits.length === 11 && digits.startsWith('0')) {
-        digits = digits.slice(1);
-      }
+      if (digits.length === 12 && digits.startsWith('91')) digits = digits.slice(2);
+      else if (digits.length === 11 && digits.startsWith('0')) digits = digits.slice(1);
       return digits;
     }
 
@@ -906,57 +712,33 @@
       const condBadge = document.getElementById('mobileCondBadge');
       const kpiBreakdown = document.getElementById('kpiValidBreakdownText');
 
-      if (tokens.length === 0) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = 'Enter at least one 10-digit mobile number.';
-          errEl.classList.remove('hidden');
-        }
+      if (!tokens.length) {
         if (condBadge) condBadge.textContent = 'Required';
         if (kpiBreakdown) kpiBreakdown.textContent = '0 valid 10-digit';
-        return false;
+        return setFieldValidation(el, false, errEl, 'Enter at least one 10-digit mobile number.');
       }
 
-      let validCount = 0;
-      let invalidCount = 0;
-      tokens.forEach(t => {
-        const norm = normalizeTenDigitMobile(t);
-        if (/^[6-9]\d{9}$/.test(norm)) {
-          validCount++;
-        } else {
-          invalidCount++;
-        }
-      });
+      let validCount = 0, invalidCount = 0;
+      tokens.forEach(t => (/^[6-9]\d{9}$/.test(normalizeTenDigitMobile(t)) ? validCount++ : invalidCount++));
 
       if (kpiBreakdown) {
-        kpiBreakdown.textContent = invalidCount > 0
-          ? `${validCount} valid • ${invalidCount} invalid`
-          : `${validCount} valid 10-digit`;
+        kpiBreakdown.textContent = invalidCount > 0 ? `${validCount} valid • ${invalidCount} invalid` : `${validCount} valid 10-digit`;
       }
 
       if (validCount === 0) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = 'No valid 10-digit Indian mobile numbers detected (must start with 6-9).';
-          errEl.classList.remove('hidden');
-        }
         if (condBadge) condBadge.textContent = 'Invalid numbers';
-        return false;
+        return setFieldValidation(el, false, errEl, 'No valid 10-digit Indian mobile numbers detected (must start with 6-9).');
       }
 
-      el.classList.remove('input-invalid');
-      el.classList.add('input-valid');
+      setFieldValidation(el, true, errEl, '');
       if (invalidCount > 0) {
         if (errEl) {
           errEl.textContent = `${invalidCount} malformed number(s) detected. Click "Clean & Deduplicate" to auto-fix.`;
           errEl.classList.remove('hidden');
         }
         if (condBadge) condBadge.textContent = `${validCount} valid (${invalidCount} raw)`;
-      } else {
-        if (errEl) errEl.classList.add('hidden');
-        if (condBadge) condBadge.textContent = `✓ ${validCount} Valid`;
+      } else if (condBadge) {
+        condBadge.textContent = `✓ ${validCount} Valid`;
       }
       return true;
     }
@@ -964,38 +746,9 @@
     function validateCampaignSelects() {
       const compEl = document.getElementById('company');
       const posEl = document.getElementById('position');
-      const compErr = document.getElementById('companyErrorMsg');
-      const posErr = document.getElementById('positionErrorMsg');
-
-      let valid = true;
-      if (!compEl?.value) {
-        compEl?.classList.remove('input-valid');
-        compEl?.classList.add('input-invalid');
-        if (compErr) {
-          compErr.textContent = 'Select a company.';
-          compErr.classList.remove('hidden');
-        }
-        valid = false;
-      } else {
-        compEl?.classList.remove('input-invalid');
-        compEl?.classList.add('input-valid');
-        if (compErr) compErr.classList.add('hidden');
-      }
-
-      if (!posEl?.value) {
-        posEl?.classList.remove('input-valid');
-        posEl?.classList.add('input-invalid');
-        if (posErr) {
-          posErr.textContent = 'Select a position.';
-          posErr.classList.remove('hidden');
-        }
-        valid = false;
-      } else {
-        posEl?.classList.remove('input-invalid');
-        posEl?.classList.add('input-valid');
-        if (posErr) posErr.classList.add('hidden');
-      }
-      return valid;
+      const v1 = setFieldValidation(compEl, Boolean(compEl?.value), document.getElementById('companyErrorMsg'), 'Select a company.');
+      const v2 = setFieldValidation(posEl, Boolean(posEl?.value), document.getElementById('positionErrorMsg'), 'Select a position.');
+      return v1 && v2;
     }
 
     function validateJobLocationField(inputEl) {
@@ -1004,25 +757,9 @@
       const cleaned = el.value.replace(/[<>"{}`\\]/g, '').slice(0, 80);
       if (el.value !== cleaned) el.value = cleaned;
 
-      const val = el.value.trim();
       const counter = document.getElementById('locationCharCounter');
-      const errEl = document.getElementById('locationErrorMsg');
       if (counter) counter.textContent = `${cleaned.length}/80`;
-
-      if (val.length < 2) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = 'Enter job location (min 2 chars).';
-          errEl.classList.remove('hidden');
-        }
-        return false;
-      }
-
-      el.classList.remove('input-invalid');
-      el.classList.add('input-valid');
-      if (errEl) errEl.classList.add('hidden');
-      return true;
+      return setFieldValidation(el, el.value.trim().length >= 2, document.getElementById('locationErrorMsg'), 'Enter job location (min 2 chars).');
     }
 
     function validateMessageTemplateField(textareaEl) {
@@ -1032,23 +769,8 @@
       if (el.value !== cleaned) el.value = cleaned;
 
       const counter = document.getElementById('templateCharCounter');
-      const errEl = document.getElementById('templateErrorMsg');
       if (counter) counter.textContent = `${cleaned.length}/1000 chars`;
-
-      if (cleaned.trim().length < 5) {
-        el.classList.remove('input-valid');
-        el.classList.add('input-invalid');
-        if (errEl) {
-          errEl.textContent = 'Message template must be at least 5 characters.';
-          errEl.classList.remove('hidden');
-        }
-        return false;
-      }
-
-      el.classList.remove('input-invalid');
-      el.classList.add('input-valid');
-      if (errEl) errEl.classList.add('hidden');
-      return true;
+      return setFieldValidation(el, cleaned.trim().length >= 5, document.getElementById('templateErrorMsg'), 'Message template must be at least 5 characters.');
     }
 
     function sanitizeCustomOptionInput(inputEl) {
@@ -1057,15 +779,8 @@
       if (inputEl.value !== cleaned) inputEl.value = cleaned;
     }
 
-    // Auto-load Supabase companies & check if numbers were transferred from Sourced Profiles page
     window.addEventListener('DOMContentLoaded', () => {
-      // Ensure Light Mode is default unless dark was chosen in session
-      const savedTheme = sessionStorage.getItem('tccTheme');
-      if (savedTheme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+      document.documentElement.classList.toggle('dark', sessionStorage.getItem('tccTheme') === 'dark');
 
       const importedNumbers = sessionStorage.getItem('tcc_bulk_wa_numbers');
       const importedCompany = sessionStorage.getItem('tcc_bulk_wa_company');
@@ -1087,15 +802,13 @@
         showToast('Imported candidate numbers from Sourced Profiles!', 'success');
       }
 
-      // Automatically sync companies & positions from Supabase on load
       syncCloudCompanies(true);
       updateLivePreviewAndCounts();
     });
 
     function addOptionIfNotExists(selectEl, value) {
       if (!selectEl || !value) return;
-      const exists = Array.from(selectEl.options).some(opt => opt.value === value);
-      if (!exists) {
+      if (!Array.from(selectEl.options).some(opt => opt.value === value)) {
         const opt = document.createElement('option');
         opt.value = value;
         opt.textContent = value;
@@ -1103,10 +816,9 @@
       }
     }
 
-    // Sync Companies & Roles directly from Supabase 'companies' table
     async function syncCloudCompanies(silent = false) {
       const icon = document.getElementById('cloudSyncIcon');
-      if (icon) icon.classList.add('fa-spin');
+      icon?.classList.add('fa-spin');
       try {
         const { data: rows, error } = await supabaseClient
           .from('companies')
@@ -1119,55 +831,42 @@
         const compSelect = document.getElementById('company');
         const posSelect = document.getElementById('position');
 
-        if (Array.isArray(rows)) {
-          rows.forEach(row => {
-            if (row.company_name) {
-              const posList = Array.isArray(row.positions) ? row.positions : [];
-              cloudCompanyMap[row.company_name] = posList;
-              addOptionIfNotExists(compSelect, row.company_name);
-              posList.forEach(p => addOptionIfNotExists(posSelect, p));
-            }
-          });
-        }
+        (rows || []).forEach(row => {
+          if (row.company_name) {
+            const posList = Array.isArray(row.positions) ? row.positions : [];
+            cloudCompanyMap[row.company_name] = posList;
+            addOptionIfNotExists(compSelect, row.company_name);
+            posList.forEach(p => addOptionIfNotExists(posSelect, p));
+          }
+        });
 
-        if (!silent) {
-          showToast(`Synced ${Object.keys(cloudCompanyMap).length} companies from Supabase`, 'success');
-        }
+        if (!silent) showToast(`Synced ${Object.keys(cloudCompanyMap).length} companies from Supabase`, 'success');
       } catch (err) {
         console.error('Error syncing Supabase companies:', err);
-        if (!silent) {
-          showToast('Could not sync companies from Supabase: ' + err.message, 'error');
-        }
+        if (!silent) showToast('Could not sync companies from Supabase: ' + err.message, 'error');
       } finally {
-        if (icon) icon.classList.remove('fa-spin');
+        icon?.classList.remove('fa-spin');
       }
     }
 
-    // Pull candidate mobile numbers directly from Supabase 'candidates' table
     async function pullNumbersFromSupabaseCandidates() {
       const selectedCompany = document.getElementById('company')?.value || '';
       try {
         let query = supabaseClient.from('candidates').select('mobile, company');
-        if (selectedCompany) {
-          query = query.eq('company', selectedCompany);
-        }
+        if (selectedCompany) query = query.eq('company', selectedCompany);
         const { data, error } = await query;
         if (error) throw error;
 
-        const numbers = (data || [])
-          .map(r => normalizeTenDigitMobile(r.mobile || ''))
-          .filter(n => /^[6-9]\d{9}$/.test(n));
+        const uniqueNumbers = [...new Set(
+          (data || []).map(r => normalizeTenDigitMobile(r.mobile || '')).filter(n => /^[6-9]\d{9}$/.test(n))
+        )];
 
-        const uniqueNumbers = [...new Set(numbers)];
-        if (uniqueNumbers.length === 0) {
-          showToast(selectedCompany ? `No mobile numbers found for ${selectedCompany}` : 'No mobile numbers found in Supabase', 'error');
-          return;
+        if (!uniqueNumbers.length) {
+          return showToast(selectedCompany ? `No mobile numbers found for ${selectedCompany}` : 'No mobile numbers found in Supabase', 'error');
         }
 
         const input = document.getElementById('mobileNumbers');
-        const existing = parseRawNumbers(input.value);
-        const merged = [...new Set([...existing, ...uniqueNumbers])];
-        input.value = merged.join(', ');
+        input.value = [...new Set([...parseRawNumbers(input.value), ...uniqueNumbers])].join(', ');
         validateMobileNumbersField(input);
         updateLivePreviewAndCounts();
         showToast(`Imported ${uniqueNumbers.length} number(s) from Supabase${selectedCompany ? ' (' + selectedCompany + ')' : ''}`, 'success');
@@ -1180,13 +879,12 @@
     function handleCompanySelectionChange() {
       const comp = document.getElementById('company').value;
       const posSelect = document.getElementById('position');
-      if (comp && cloudCompanyMap[comp] && Array.isArray(cloudCompanyMap[comp])) {
+      if (comp && Array.isArray(cloudCompanyMap[comp])) {
         cloudCompanyMap[comp].forEach(pos => addOptionIfNotExists(posSelect, pos));
       }
       updateLivePreviewAndCounts();
     }
 
-    // Custom Option Modal Helpers
     function promptCustomOption(selectId, title) {
       pendingTargetSelectId = selectId;
       document.getElementById('customOptionPromptTitle').textContent = title;
@@ -1205,10 +903,8 @@
       const inputEl = document.getElementById('customOptionInput');
       sanitizeCustomOptionInput(inputEl);
       const val = inputEl.value.trim();
-      if (val.length < 2) {
-        showToast('Please enter at least 2 characters.', 'error');
-        return;
-      }
+      if (val.length < 2) return showToast('Please enter at least 2 characters.', 'error');
+
       if (pendingTargetSelectId) {
         const selectEl = document.getElementById(pendingTargetSelectId);
         addOptionIfNotExists(selectEl, val);
@@ -1220,39 +916,25 @@
       closeCustomOptionModal();
     }
 
-    // Smart Number Cleaner & Deduplicator
     function parseRawNumbers(rawText) {
       if (!rawText) return [];
-      return rawText
-        .split(/[\n,;|\s]+/)
-        .map(item => item.trim())
-        .filter(Boolean);
+      return rawText.split(/[\n,;|\s]+/).map(item => item.trim()).filter(Boolean);
     }
 
     function cleanAndDeduplicateNumbers() {
       const input = document.getElementById('mobileNumbers');
-      if (!input || !input.value.trim()) {
-        showToast('Please enter or paste mobile numbers first', 'error');
-        return;
-      }
-      const rawTokens = parseRawNumbers(input.value);
-      const cleanedSet = new Set();
+      if (!input || !input.value.trim()) return showToast('Please enter or paste mobile numbers first', 'error');
 
-      rawTokens.forEach(token => {
-        const norm = normalizeTenDigitMobile(token);
-        if (/^[6-9]\d{9}$/.test(norm)) {
-          cleanedSet.add(norm);
-        }
-      });
+      const uniqueList = [...new Set(
+        parseRawNumbers(input.value).map(normalizeTenDigitMobile).filter(norm => /^[6-9]\d{9}$/.test(norm))
+      )];
 
-      const uniqueList = Array.from(cleanedSet);
       input.value = uniqueList.join(', ');
       validateMobileNumbersField(input);
       updateLivePreviewAndCounts();
       showToast(`Cleaned & deduplicated: ${uniqueList.length} valid 10-digit number(s) ready`, 'success');
     }
 
-    // ==================== EXPANDED 14-TEMPLATE LIBRARY ====================
     function getTemplateDictionary(recruiterName) {
       return {
         default: {
@@ -1324,7 +1006,6 @@
       const recruiterName = sessionStorage.getItem('userName') || 'Talent Connect Consultancy';
       const dict = getTemplateDictionary(recruiterName);
 
-      // Highlight matching pill
       document.querySelectorAll('.template-pill').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('data-pill') === preset);
       });
@@ -1378,34 +1059,25 @@
       const msgTemplate = document.getElementById('customMessageTemplate')?.value.trim() || '';
 
       const detectedList = parseRawNumbers(rawMobile);
-      const countBadge = document.getElementById('liveValidNumbersBadge');
-      const statDetected = document.getElementById('statDetectedCount');
-      const statRemaining = document.getElementById('statRemainingCount');
-      const statSent = document.getElementById('statSentCount');
-      const restoreBadge = document.getElementById('restoreSentBadge');
-      const btnSendNext = document.getElementById('btnSendNext');
+      document.getElementById('liveValidNumbersBadge').textContent = `${detectedList.length} number${detectedList.length === 1 ? '' : 's'}`;
+      document.getElementById('statDetectedCount').textContent = detectedList.length;
+      document.getElementById('statRemainingCount').textContent = contactData.length;
+      document.getElementById('statSentCount').textContent = sentHistory.length;
+      document.getElementById('restoreSentBadge').textContent = sentHistory.length;
+      document.getElementById('btnSendNext').disabled = contactData.length === 0;
 
-      if (countBadge) countBadge.textContent = `${detectedList.length} number${detectedList.length === 1 ? '' : 's'}`;
-      if (statDetected) statDetected.textContent = detectedList.length;
-      if (statRemaining) statRemaining.textContent = contactData.length;
-      if (statSent) statSent.textContent = sentHistory.length;
-      if (restoreBadge) restoreBadge.textContent = sentHistory.length;
-      if (btnSendNext) btnSendNext.disabled = contactData.length === 0;
-
-      // Update Progress KPI
       const totalQueueAndSent = contactData.length + sentHistory.length;
       const pct = totalQueueAndSent > 0 ? Math.round((sentHistory.length / totalQueueAndSent) * 100) : 0;
-      const pctEl = document.getElementById('kpiProgressPercent');
-      const barEl = document.getElementById('kpiProgressBar');
-      if (pctEl) pctEl.textContent = `${pct}%`;
-      if (barEl) barEl.style.width = `${pct}%`;
+      document.getElementById('kpiProgressPercent').textContent = `${pct}%`;
+      document.getElementById('kpiProgressBar').style.width = `${pct}%`;
 
-      // Update Readiness Pill
-      let readyChecks = 0;
-      if (detectedList.length > 0) readyChecks++;
-      if (company) readyChecks++;
-      if (position) readyChecks++;
-      if (jobLocation.length >= 2 && msgTemplate.length >= 5) readyChecks++;
+      const readyChecks = [
+        detectedList.length > 0,
+        Boolean(company),
+        Boolean(position),
+        jobLocation.length >= 2 && msgTemplate.length >= 5
+      ].filter(Boolean).length;
+
       const readyBadge = document.getElementById('formReadinessBadge');
       if (readyBadge) {
         readyBadge.textContent = `${readyChecks}/4 Validated`;
@@ -1414,13 +1086,8 @@
           : 'px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500';
       }
 
-      const previewBox = document.getElementById('liveMessagePreview');
-      if (previewBox) {
-        previewBox.textContent = buildFormattedMessage(position, company, jobLocation);
-      }
-
-      const tCounter = document.getElementById('templateCharCounter');
-      if (tCounter) tCounter.textContent = `${msgTemplate.length}/1000 chars`;
+      document.getElementById('liveMessagePreview').textContent = buildFormattedMessage(position, company, jobLocation);
+      document.getElementById('templateCharCounter').textContent = `${msgTemplate.length}/1000 chars`;
 
       renderSentHistoryPills();
     }
@@ -1430,7 +1097,7 @@
       const list = document.getElementById('sentHistoryList');
       if (!card || !list) return;
 
-      if (sentHistory.length === 0) {
+      if (!sentHistory.length) {
         card.classList.add('hidden');
         list.innerHTML = '';
         return;
@@ -1448,10 +1115,9 @@
     }
 
     function resetCampaignForm() {
-      document.getElementById('mobileNumbers').value = '';
-      document.getElementById('company').value = '';
-      document.getElementById('position').value = '';
-      document.getElementById('jobLocation').value = '';
+      ['mobileNumbers', 'company', 'position', 'jobLocation'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
       ['mobileNumbers', 'company', 'position', 'jobLocation', 'customMessageTemplate'].forEach(id => {
         document.getElementById(id)?.classList.remove('input-valid', 'input-invalid');
       });
@@ -1466,19 +1132,13 @@
     }
 
     function sendNextInQueue() {
-      if (contactData.length === 0) {
-        showToast('No contacts remaining in queue', 'error');
-        return;
-      }
+      if (!contactData.length) return showToast('No contacts remaining in queue', 'error');
       const nextContact = contactData[0];
       sendWhatsApp(nextContact.id, nextContact.mobile);
     }
 
     function restoreSentContacts() {
-      if (sentHistory.length === 0) {
-        showToast('No sent contacts to restore', 'info');
-        return;
-      }
+      if (!sentHistory.length) return showToast('No sent contacts to restore', 'info');
       contactData = [...sentHistory, ...contactData];
       sentHistory = [];
       renderTable();
@@ -1488,29 +1148,23 @@
 
     function exportQueueToCSV() {
       const allContacts = [...contactData, ...sentHistory];
-      if (allContacts.length === 0) {
-        showToast('Generate a contact list first to export', 'error');
-        return;
-      }
+      if (!allContacts.length) return showToast('Generate a contact list first to export', 'error');
+
       const headers = ['S.No', 'Mobile Number', 'Company', 'Position', 'Location', 'Status'];
-      const rows = [
-        ...contactData.map((c, i) => [
-          i + 1,
-          sanitizeCsvCell(c.mobile),
-          sanitizeCsvCell(campaignInfo.company || ''),
-          sanitizeCsvCell(campaignInfo.position || ''),
-          sanitizeCsvCell(campaignInfo.jobLocation || ''),
-          sanitizeCsvCell('Pending')
-        ]),
-        ...sentHistory.map((c, i) => [
-          contactData.length + i + 1,
-          sanitizeCsvCell(c.mobile),
-          sanitizeCsvCell(campaignInfo.company || ''),
-          sanitizeCsvCell(campaignInfo.position || ''),
-          sanitizeCsvCell(campaignInfo.jobLocation || ''),
-          sanitizeCsvCell('Sent')
-        ])
+      const formatRow = (c, idx, status) => [
+        idx + 1,
+        sanitizeCsvCell(c.mobile),
+        sanitizeCsvCell(campaignInfo.company || ''),
+        sanitizeCsvCell(campaignInfo.position || ''),
+        sanitizeCsvCell(campaignInfo.jobLocation || ''),
+        sanitizeCsvCell(status)
       ];
+
+      const rows = [
+        ...contactData.map((c, i) => formatRow(c, i, 'Pending')),
+        ...sentHistory.map((c, i) => formatRow(c, contactData.length + i, 'Sent'))
+      ];
+
       const csv = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
       const link = document.createElement('a');
       link.setAttribute('href', encodeURI(csv));
@@ -1518,45 +1172,26 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast('Campaign list exported to safe CSV', 'success');
+      showToast('Campaign list exported to CSV', 'success');
     }
 
-    // ==================== PRESERVED CORE FUNCTIONS (WITH XSS HARDENING & INPUT CHECKS) ====================
     function generateTable() {
-      const v1 = validateMobileNumbersField();
-      const v2 = validateCampaignSelects();
-      const v3 = validateJobLocationField();
-      const v4 = validateMessageTemplateField();
-
-      if (!v1 || !v2 || !v3 || !v4) {
-        showToast('Please fix the highlighted campaign fields before generating the list.', 'error');
-        return;
+      if (![validateMobileNumbersField(), validateCampaignSelects(), validateJobLocationField(), validateMessageTemplateField()].every(Boolean)) {
+        return showToast('Please fix the highlighted campaign fields before generating the list.', 'error');
       }
 
-      const mobileInput = document.getElementById('mobileNumbers').value.trim();
-      const company = document.getElementById('company').value;
-      const position = document.getElementById('position').value;
-      const jobLocation = document.getElementById('jobLocation').value.trim();
+      const mobileNumbers = parseRawNumbers(document.getElementById('mobileNumbers').value.trim());
+      if (!mobileNumbers.length) return showToast('No valid mobile numbers found', 'error');
 
-      // Parse mobile numbers (supports commas, newlines, spaces)
-      const mobileNumbers = parseRawNumbers(mobileInput);
-
-      if (mobileNumbers.length === 0) {
-        showToast('No valid mobile numbers found', 'error');
-        return;
-      }
-
-      // Store campaign info
       campaignInfo = {
-        company: company,
-        position: position,
-        jobLocation: jobLocation
+        company: document.getElementById('company').value,
+        position: document.getElementById('position').value,
+        jobLocation: document.getElementById('jobLocation').value.trim()
       };
 
-      // Create contact data
       contactData = mobileNumbers.map((mobile, index) => ({
         id: Date.now() + index,
-        mobile: mobile
+        mobile
       }));
 
       sentHistory = [];
@@ -1569,7 +1204,7 @@
       const container = document.getElementById('tableContainer');
       if (!container) return;
 
-      if (contactData.length === 0) {
+      if (!contactData.length) {
         container.innerHTML = `
           <div class="no-data">
             <i class="fas fa-check-circle text-3xl text-emerald-500 mb-2 block"></i>
@@ -1579,7 +1214,25 @@
         return;
       }
 
-      let tableHTML = `
+      const rowsHtml = contactData.map((contact, index) => {
+        const safeId = escapeHtml(contact.id);
+        return `
+          <tr id="row-${safeId}">
+            <td class="font-bold text-slate-400">#${index + 1}</td>
+            <td class="font-mono font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
+              <i class="fas fa-phone text-emerald-500 mr-2 text-xs"></i>${escapeHtml(contact.mobile)}
+            </td>
+            <td class="text-right">
+              <button type="button" class="btn-send" data-send-id="${safeId}">
+                <i class="fab fa-whatsapp text-sm"></i>
+                <span>Send</span>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      container.innerHTML = `
         <div class="campaign-header flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h2 class="font-display font-extrabold text-sm sm:text-base flex items-center gap-2">
@@ -1605,44 +1258,16 @@
                 <th class="text-right">Action</th>
               </tr>
             </thead>
-            <tbody>
-      `;
-
-      contactData.forEach((contact, index) => {
-        const safeId = escapeHtml(contact.id);
-        const safeMob = escapeHtml(contact.mobile);
-        tableHTML += `
-          <tr id="row-${safeId}">
-            <td class="font-bold text-slate-400">#${index + 1}</td>
-            <td class="font-mono font-bold text-slate-900 dark:text-white text-xs sm:text-sm">
-              <i class="fas fa-phone text-emerald-500 mr-2 text-xs"></i>${safeMob}
-            </td>
-            <td class="text-right">
-              <button type="button" class="btn-send" data-send-id="${safeId}">
-                <i class="fab fa-whatsapp text-sm"></i>
-                <span>Send</span>
-              </button>
-            </td>
-          </tr>
-        `;
-      });
-
-      tableHTML += `
-            </tbody>
+            <tbody>${rowsHtml}</tbody>
           </table>
         </div>
       `;
 
-      container.innerHTML = tableHTML;
-
-      // Safe event listener binding prevents inline attribute injection
       container.querySelectorAll('button[data-send-id]').forEach(btn => {
         btn.addEventListener('click', () => {
           const id = Number(btn.getAttribute('data-send-id'));
           const item = contactData.find(c => c.id === id);
-          if (item) {
-            sendWhatsApp(item.id, item.mobile);
-          }
+          if (item) sendWhatsApp(item.id, item.mobile);
         });
       });
 
@@ -1650,31 +1275,15 @@
     }
 
     function sendWhatsApp(id, mobile) {
-      // Create message template with location
-      const message = buildFormattedMessage(
-        campaignInfo.position,
-        campaignInfo.company,
-        campaignInfo.jobLocation
-      );
-
-      // Clean mobile number (remove spaces, dashes, non-digits)
+      const message = buildFormattedMessage(campaignInfo.position, campaignInfo.company, campaignInfo.jobLocation);
       const cleanMobile = String(mobile || '').replace(/\D/g, '');
-
-      // Add country code if not present
       const fullMobile = cleanMobile.startsWith('91') && cleanMobile.length > 10 ? cleanMobile : '91' + cleanMobile.slice(-10);
 
-      // Create WhatsApp URL
-      const whatsappURL = `https://wa.me/${fullMobile}?text=${encodeURIComponent(message)}`;
+      window.open(`https://wa.me/${fullMobile}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
 
-      // Open WhatsApp with reverse-tabnabbing protection
-      window.open(whatsappURL, '_blank', 'noopener,noreferrer');
-
-      // Remove row after sending & log to sentHistory
       setTimeout(() => {
         const sentItem = contactData.find(contact => contact.id === id);
-        if (sentItem) {
-          sentHistory.push(sentItem);
-        }
+        if (sentItem) sentHistory.push(sentItem);
         contactData = contactData.filter(contact => contact.id !== id);
         renderTable();
       }, 450);
