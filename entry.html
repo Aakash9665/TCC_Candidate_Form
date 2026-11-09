@@ -4,9 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>TCC Candidate Registration</title>
+  <title>TCC Candidate Registration & JD Email Dispatch</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- SmtpJS for direct client-side SMTP dispatch (Zoho Mail) -->
+  <script src="https://smtpjs.com/v3/smtp.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <script>
@@ -122,13 +124,13 @@
     }
     .popup {
       width: 100%;
-      max-width: 460px;
+      max-width: 480px;
       border-radius: 24px;
       padding: 26px;
       position: relative;
       animation: popupScale 0.25s cubic-bezier(0.22, 1, 0.36, 1);
     }
-    .popup.manage-popup {
+    .popup.manage-popup, .popup.config-popup {
       max-width: 680px;
       max-height: 90vh;
       overflow-y: auto;
@@ -220,7 +222,7 @@
             </span>
           </div>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-            Direct Supabase Entry & Instant WhatsApp Confirmation
+            Supabase Entry + WhatsApp + Zoho Mail Automated JD Dispatch
           </p>
         </div>
       </div>
@@ -233,6 +235,18 @@
           </div>
           <span id="formProgressText" class="text-[11px] font-bold text-blue-600 dark:text-blue-400">0%</span>
         </div>
+
+        <!-- Zoho Mail Configuration Trigger Button -->
+        <button
+          type="button"
+          onclick="openEmailConfigModal()"
+          class="h-10 px-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+          title="Configure Zoho Mail (SMTP) & JD Email Settings"
+        >
+          <i class="fas fa-envelope-open-text text-sm"></i>
+          <span class="hidden md:inline text-xs font-bold">Email Settings</span>
+          <span id="headerEmailStatusDot" class="w-2 h-2 rounded-full bg-amber-400" title="Email not verified yet"></span>
+        </button>
 
         <button
           type="button"
@@ -292,11 +306,11 @@
 
       <div class="glass-card p-3 rounded-2xl flex items-center gap-2.5">
         <div class="w-9 h-9 rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
-          <i class="fas fa-paper-plane text-sm"></i>
+          <i class="fas fa-envelope text-sm"></i>
         </div>
         <div class="min-w-0">
-          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">Added Now</p>
-          <p class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white" id="kpiSessionCount">0</p>
+          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">JDs Emailed</p>
+          <p class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white" id="kpiEmailsSentCount">0</p>
         </div>
       </div>
 
@@ -376,7 +390,7 @@
                   <label for="email" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                     <i class="fas fa-envelope text-blue-500 mr-1"></i> Email Address <span class="text-rose-500">*</span>
                   </label>
-                  <span id="emailCondBadge" class="text-[10px] font-semibold text-slate-400">Required</span>
+                  <span id="emailCondBadge" class="text-[10px] font-semibold text-slate-400">Required (For JD dispatch)</span>
                 </div>
                 <input
                   type="email"
@@ -607,6 +621,90 @@
             </div>
           </div>
 
+          <!-- Section 4: Automated Zoho JD Email Dispatch Controls -->
+          <div class="mb-5 pt-4 border-t border-slate-200/70 dark:border-slate-800/80">
+            <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-500/10 via-indigo-500/5 to-emerald-500/10 border border-blue-500/20">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs">
+                    <i class="fas fa-paper-plane"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                      Zoho Mail JD Dispatch
+                    </h4>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                      Send official Job Description & acknowledgement to candidate on submission
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onclick="openEmailPreviewModal()"
+                    class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-500 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all"
+                  >
+                    <i class="fas fa-eye text-blue-500"></i>
+                    <span>Preview Email</span>
+                  </button>
+                  <button
+                    type="button"
+                    onclick="openEmailConfigModal()"
+                    class="px-2.5 py-1.5 rounded-xl bg-blue-500/15 hover:bg-blue-500/25 text-blue-600 dark:text-blue-400 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                  >
+                    <i class="fas fa-gear"></i>
+                    <span>Configure</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    id="autoSendJdEmail"
+                    name="autoSendJdEmail"
+                    checked
+                    class="w-4 h-4 accent-blue-600 rounded cursor-pointer"
+                  >
+                  <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                    Automatically send Job Description email to <span class="font-bold text-blue-600 dark:text-blue-400" id="emailTargetPreview">candidate@email.com</span>
+                  </span>
+                </label>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label for="jdLinkInput" class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      <i class="fas fa-link text-blue-500 mr-1"></i> JD Document Link / Drive URL (Optional)
+                    </label>
+                    <input
+                      type="url"
+                      id="jdLinkInput"
+                      name="jdLinkInput"
+                      class="form-input text-xs"
+                      placeholder="https://drive.google.com/... or leave blank for default JD copy"
+                    >
+                  </div>
+
+                  <div>
+                    <label for="emailCustomNote" class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      <i class="fas fa-comment-dots text-emerald-500 mr-1"></i> Custom Note for Candidate (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      id="emailCustomNote"
+                      name="emailCustomNote"
+                      maxlength="150"
+                      class="form-input text-xs"
+                      placeholder="e.g. Virtual interview scheduled tentatively for Friday"
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="flex flex-col sm:flex-row gap-3 pt-2">
             <button
               type="submit"
@@ -614,7 +712,7 @@
               class="flex-1 py-3.5 sm:py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm sm:text-base shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <i class="fas fa-paper-plane"></i>
-              <span class="btn-text">Submit Application</span>
+              <span class="btn-text">Submit & Dispatch JD</span>
             </button>
 
             <button
@@ -627,30 +725,52 @@
             </button>
           </div>
 
-          <!-- WHATSAPP POPUP (#popupOverlay) -->
+          <!-- SUCCESS & DISPATCH MODAL (#popupOverlay) -->
           <div class="popup-overlay" id="popupOverlay">
             <div class="popup glass-card text-center">
               <div class="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp Logo" class="w-10 h-10">
+                <i class="fas fa-circle-check text-3xl text-emerald-500"></i>
               </div>
               <h3 class="font-display font-extrabold text-xl text-slate-900 dark:text-white mb-1.5">
-                <i class="fab fa-whatsapp text-emerald-500 mr-1"></i> Application Submitted!
+                Profile Logged Successfully!
               </h3>
               <p class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mb-2">
                 Saved directly to Supabase
               </p>
-              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-6">
-                Candidate profile has been logged. Click below to open WhatsApp with the pre-filled acknowledgement message.
+              
+              <!-- Real-time Email Dispatch Status Banner -->
+              <div id="modalEmailStatusBanner" class="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-xs text-left mb-4">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                    <i class="fas fa-envelope text-blue-500"></i> Candidate JD Email:
+                  </span>
+                  <span id="modalEmailStatusPill" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-600">
+                    Processing...
+                  </span>
+                </div>
+                <p id="modalEmailDetailText" class="text-[11px] text-slate-500 dark:text-slate-400 truncate"></p>
+              </div>
+
+              <p class="text-xs text-slate-500 dark:text-slate-400 mb-5">
+                Dispatch the WhatsApp acknowledgement below or re-send the JD email if required.
               </p>
-              <div class="flex flex-col sm:flex-row gap-2.5">
-                <button type="button" id="sendBtn" class="flex-1 py-3.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 cursor-pointer">
+
+              <div class="space-y-2.5">
+                <button type="button" id="sendBtn" class="w-full py-3.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 cursor-pointer">
                   <i class="fab fa-whatsapp text-base"></i>
-                  <span>Send to Candidate</span>
+                  <span>Send WhatsApp to Candidate</span>
                 </button>
-                <button type="button" id="cancelBtn" class="secondary py-3.5 px-5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-sm flex items-center justify-center gap-2 cursor-pointer">
-                  <i class="fas fa-times"></i>
-                  <span>Close</span>
-                </button>
+
+                <div class="flex items-center gap-2">
+                  <button type="button" id="modalResendEmailBtn" class="flex-1 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-blue-500/20">
+                    <i class="fas fa-envelope"></i>
+                    <span>Resend JD Email</span>
+                  </button>
+                  <button type="button" id="cancelBtn" class="flex-1 py-3 px-4 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i class="fas fa-check"></i>
+                    <span>Done & Reset</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -882,6 +1002,223 @@
     </div>
   </main>
 
+  <!-- EMAIL CONFIGURATION MODAL (#emailConfigOverlay) -->
+  <div class="popup-overlay" id="emailConfigOverlay">
+    <div class="popup config-popup glass-card text-left">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center">
+            <i class="fas fa-envelope-open-text text-base"></i>
+          </div>
+          <div>
+            <h3 class="font-display font-extrabold text-lg text-slate-900 dark:text-white">
+              Zoho Mail Configuration
+            </h3>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">
+              Configure SMTP credentials to automatically send JDs to candidates
+            </p>
+          </div>
+        </div>
+        <button type="button" onclick="closeEmailConfigModal()" class="w-9 h-9 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Quick Guidance Banner -->
+      <div class="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-xs mb-4 text-slate-700 dark:text-slate-300">
+        <p class="font-semibold mb-1 flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
+          <i class="fas fa-shield-halved"></i> Zoho Mail SMTP Details:
+        </p>
+        <p class="text-[11px] leading-relaxed">
+          For Zoho accounts with Two-Factor Authentication, generate an <strong>App-Specific Password</strong> in Zoho Accounts &rarr; <em>Security</em> &rarr; <em>App Passwords</em>. Do not use your personal master password.
+        </p>
+      </div>
+
+      <form id="emailConfigForm" onsubmit="saveEmailConfiguration(event)" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label for="zohoHost" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              SMTP Server / Host <span class="text-rose-500">*</span>
+            </label>
+            <select id="zohoHost" class="form-input text-xs" required>
+              <option value="smtppro.zoho.in">smtppro.zoho.in (Zoho India - Recommended)</option>
+              <option value="smtp.zoho.com">smtp.zoho.com (Zoho US / Global)</option>
+              <option value="smtp.zoho.eu">smtp.zoho.eu (Zoho Europe)</option>
+              <option value="smtp.zoho.com.au">smtp.zoho.com.au (Zoho Australia)</option>
+              <option value="custom">Custom SMTP Server</option>
+            </select>
+          </div>
+
+          <div id="customHostDiv" class="hidden">
+            <label for="customHostInput" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Custom SMTP Hostname
+            </label>
+            <input type="text" id="customHostInput" class="form-input text-xs" placeholder="e.g. mail.yourdomain.com">
+          </div>
+
+          <div>
+            <label for="zohoPort" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Port
+            </label>
+            <select id="zohoPort" class="form-input text-xs">
+              <option value="465">465 (SSL - Recommended)</option>
+              <option value="587">587 (TLS)</option>
+              <option value="25">25</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label for="zohoUserEmail" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Zoho Sender Email Address <span class="text-rose-500">*</span>
+            </label>
+            <input
+              type="email"
+              id="zohoUserEmail"
+              class="form-input"
+              placeholder="e.g. careers@yourdomain.com or hr@yourdomain.com"
+              required
+            >
+            <p class="text-[10px] text-slate-400 mt-1">Must be your configured Zoho Mail account on your domain.</p>
+          </div>
+
+          <div class="sm:col-span-2">
+            <div class="flex items-center justify-between mb-1">
+              <label for="zohoPassword" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Zoho App Password / Secret <span class="text-rose-500">*</span>
+              </label>
+              <button
+                type="button"
+                onclick="togglePasswordVisibility('zohoPassword', this)"
+                class="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                <i class="fas fa-eye mr-1"></i>Show
+              </button>
+            </div>
+            <input
+              type="password"
+              id="zohoPassword"
+              class="form-input"
+              placeholder="16-character Zoho App Password (e.g. abcd efgh ijkl mnop)"
+              required
+            >
+          </div>
+
+          <div>
+            <label for="zohoSenderName" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Display Sender Name
+            </label>
+            <input
+              type="text"
+              id="zohoSenderName"
+              class="form-input text-xs"
+              placeholder="e.g. Talent Connect Consultancy"
+              value="Talent Connect Consultancy"
+            >
+          </div>
+
+          <div>
+            <label for="zohoCcRecruiter" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              CC Options
+            </label>
+            <div class="checkbox-group flex items-center gap-2 mt-2">
+              <input type="checkbox" id="zohoCcRecruiter" checked class="w-4 h-4 accent-blue-600 rounded">
+              <label for="zohoCcRecruiter" class="text-xs text-slate-700 dark:text-slate-300">CC Logged-in Recruiter</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 dark:border-slate-800">
+          <label for="emailSubjectTemplate" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+            Email Subject Template
+          </label>
+          <input
+            type="text"
+            id="emailSubjectTemplate"
+            class="form-input text-xs font-mono"
+            value="Job Opportunity: {position} at {company} | Talent Connect Consultancy"
+          >
+          <p class="text-[10px] text-slate-400 mt-1">Available variables: <code>{candidate_name}</code>, <code>{position}</code>, <code>{company}</code></p>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Test Your Zoho Connection</span>
+            <span class="text-[10px] text-slate-400">Sends a sample JD email</span>
+          </div>
+          <div class="flex gap-2">
+            <input
+              type="email"
+              id="testEmailRecipient"
+              class="form-input text-xs flex-1"
+              placeholder="Enter your personal email to test (e.g. test@gmail.com)"
+            >
+            <button
+              type="button"
+              onclick="executeTestEmailSend()"
+              id="testEmailBtn"
+              class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 transition-colors"
+            >
+              <i class="fas fa-paper-plane"></i>
+              <span>Send Test</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-2">
+          <button
+            type="button"
+            onclick="closeEmailConfigModal()"
+            class="px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md shadow-blue-500/25 flex items-center gap-1.5"
+          >
+            <i class="fas fa-floppy-disk"></i>
+            <span>Save Configuration</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- LIVE EMAIL PREVIEW MODAL (#emailPreviewOverlay) -->
+  <div class="popup-overlay" id="emailPreviewOverlay">
+    <div class="popup config-popup glass-card text-left max-w-2xl">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-envelope-open text-blue-500 text-base"></i>
+          <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white">
+            Email Preview (What the Candidate Receives)
+          </h3>
+        </div>
+        <button type="button" onclick="closeEmailPreviewModal()" class="w-8 h-8 rounded-lg bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-white hover:bg-rose-500 transition-colors">
+          <i class="fas fa-times text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Simulated Email Client Header -->
+      <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs space-y-1 mb-4">
+        <div><strong class="text-slate-500">From:</strong> <span id="previewFrom">Talent Connect Consultancy &lt;careers@domain.com&gt;</span></div>
+        <div><strong class="text-slate-500">To:</strong> <span id="previewTo" class="font-bold text-blue-600">candidate@email.com</span></div>
+        <div><strong class="text-slate-500">Subject:</strong> <span id="previewSubject" class="font-semibold text-slate-800 dark:text-slate-200">-</span></div>
+      </div>
+
+      <!-- Rendered HTML Email Frame -->
+      <div id="emailHtmlRenderContainer" class="p-4 sm:p-6 rounded-2xl bg-white text-slate-900 border border-slate-200 shadow-inner max-h-[55vh] overflow-y-auto font-sans leading-relaxed text-sm">
+        <!-- Injected dynamically -->
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-4">
+        <button type="button" onclick="closeEmailPreviewModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold">
+          Close Preview
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Mobile Bottom Quick Action Bar -->
   <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 glass-card border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
     <button type="button" onclick="goHome()" class="flex flex-col items-center gap-0.5 text-blue-600 dark:text-blue-400 text-[10px] font-bold">
@@ -892,6 +1229,10 @@
       <i class="fas fa-user-plus text-sm"></i>
       <span>Form</span>
     </button>
+    <button type="button" onclick="openEmailConfigModal()" class="flex flex-col items-center gap-0.5 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold">
+      <i class="fas fa-envelope text-sm"></i>
+      <span>Email</span>
+    </button>
     <button type="button" onclick="document.getElementById('waPreviewAnchor').scrollIntoView({behavior:'smooth'})" class="flex flex-col items-center gap-0.5 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
       <i class="fab fa-whatsapp text-sm"></i>
       <span>WA Preview</span>
@@ -899,10 +1240,6 @@
     <button type="button" onclick="resetCandidateFormClean()" class="flex flex-col items-center gap-0.5 text-amber-600 dark:text-amber-400 text-[10px] font-semibold">
       <i class="fas fa-rotate-left text-sm"></i>
       <span>Reset</span>
-    </button>
-    <button type="button" onclick="toggleTheme()" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
-      <i class="fas fa-circle-half-stroke text-sm"></i>
-      <span>Theme</span>
     </button>
   </nav>
 
@@ -918,6 +1255,506 @@
     let newCompanyFiles = {};
     let existingCompanyFiles = {};
     const sessionSubmissions = [];
+    let sessionEmailsSentCount = 0;
+    let lastCandidatePayload = null;
+
+    // Default Email / Zoho Configuration Object
+    const DEFAULT_EMAIL_CONFIG = {
+      host: 'smtppro.zoho.in',
+      port: '465',
+      userEmail: '',
+      password: '',
+      senderName: 'Talent Connect Consultancy',
+      ccRecruiter: true,
+      subjectTemplate: 'Job Opportunity: {position} at {company} | Talent Connect Consultancy',
+      isConfigured: false
+    };
+
+    function getEmailConfig() {
+      try {
+        const stored = localStorage.getItem('tcc_zoho_email_config');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          return { ...DEFAULT_EMAIL_CONFIG, ...parsed };
+        }
+      } catch (err) {
+        console.error('Error reading email config:', err);
+      }
+      return { ...DEFAULT_EMAIL_CONFIG };
+    }
+
+    function saveEmailConfigObject(config) {
+      localStorage.setItem('tcc_zoho_email_config', JSON.stringify(config));
+      updateEmailStatusBadge();
+    }
+
+    function updateEmailStatusBadge() {
+      const cfg = getEmailConfig();
+      const dot = document.getElementById('headerEmailStatusDot');
+      if (dot) {
+        if (cfg.userEmail && cfg.password) {
+          dot.className = 'w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50';
+          dot.title = `Zoho configured: ${cfg.userEmail}`;
+        } else {
+          dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+          dot.title = 'Zoho email not yet configured. Click to setup.';
+        }
+      }
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      if (!inp) return;
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.innerHTML = '<i class="fas fa-eye-slash mr-1"></i>Hide';
+      } else {
+        inp.type = 'password';
+        btn.innerHTML = '<i class="fas fa-eye mr-1"></i>Show';
+      }
+    }
+
+    function openEmailConfigModal() {
+      const cfg = getEmailConfig();
+      const hostSelect = document.getElementById('zohoHost');
+      const customDiv = document.getElementById('customHostDiv');
+      const customInput = document.getElementById('customHostInput');
+
+      if (['smtppro.zoho.in', 'smtp.zoho.com', 'smtp.zoho.eu', 'smtp.zoho.com.au'].includes(cfg.host)) {
+        hostSelect.value = cfg.host;
+        customDiv?.classList.add('hidden');
+      } else if (cfg.host) {
+        hostSelect.value = 'custom';
+        customDiv?.classList.remove('hidden');
+        if (customInput) customInput.value = cfg.host;
+      }
+
+      document.getElementById('zohoPort').value = cfg.port || '465';
+      document.getElementById('zohoUserEmail').value = cfg.userEmail || '';
+      document.getElementById('zohoPassword').value = cfg.password || '';
+      document.getElementById('zohoSenderName').value = cfg.senderName || 'Talent Connect Consultancy';
+      document.getElementById('zohoCcRecruiter').checked = Boolean(cfg.ccRecruiter);
+      document.getElementById('emailSubjectTemplate').value = cfg.subjectTemplate || DEFAULT_EMAIL_CONFIG.subjectTemplate;
+
+      document.getElementById('emailConfigOverlay').style.display = 'flex';
+    }
+
+    function closeEmailConfigModal() {
+      document.getElementById('emailConfigOverlay').style.display = 'none';
+    }
+
+    document.getElementById('zohoHost')?.addEventListener('change', function() {
+      const customDiv = document.getElementById('customHostDiv');
+      if (this.value === 'custom') {
+        customDiv?.classList.remove('hidden');
+      } else {
+        customDiv?.classList.add('hidden');
+      }
+    });
+
+    function saveEmailConfiguration(e) {
+      if (e) e.preventDefault();
+      const hostSelect = document.getElementById('zohoHost').value;
+      const host = hostSelect === 'custom' ? (document.getElementById('customHostInput').value.trim() || 'smtppro.zoho.in') : hostSelect;
+      const port = document.getElementById('zohoPort').value;
+      const userEmail = document.getElementById('zohoUserEmail').value.trim();
+      const password = document.getElementById('zohoPassword').value.trim();
+      const senderName = document.getElementById('zohoSenderName').value.trim() || 'Talent Connect Consultancy';
+      const ccRecruiter = document.getElementById('zohoCcRecruiter').checked;
+      const subjectTemplate = document.getElementById('emailSubjectTemplate').value.trim() || DEFAULT_EMAIL_CONFIG.subjectTemplate;
+
+      if (!userEmail || !password) {
+        return showToast('Please enter both your Zoho Email and Zoho App Password', 'error');
+      }
+
+      const config = {
+        host,
+        port,
+        userEmail,
+        password,
+        senderName,
+        ccRecruiter,
+        subjectTemplate,
+        isConfigured: true
+      };
+
+      saveEmailConfigObject(config);
+      showToast('Zoho Mail configuration saved successfully!', 'success');
+      closeEmailConfigModal();
+    }
+
+    async function executeTestEmailSend() {
+      const recipient = document.getElementById('testEmailRecipient')?.value.trim();
+      if (!recipient || !recipient.includes('@')) {
+        return showToast('Please enter a valid test recipient email address', 'error');
+      }
+
+      const hostSelect = document.getElementById('zohoHost').value;
+      const host = hostSelect === 'custom' ? document.getElementById('customHostInput').value.trim() : hostSelect;
+      const userEmail = document.getElementById('zohoUserEmail').value.trim();
+      const password = document.getElementById('zohoPassword').value.trim();
+      const senderName = document.getElementById('zohoSenderName').value.trim() || 'Talent Connect Consultancy';
+
+      if (!userEmail || !password) {
+        return showToast('Please fill in your Zoho email and App Password before testing', 'error');
+      }
+
+      const btn = document.getElementById('testEmailBtn');
+      const originalHTML = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Sending...`;
+
+      try {
+        const testHtml = generateJdEmailHtml({
+          name: 'Test Candidate',
+          position: 'Senior Software Engineer',
+          company: 'Acme Technologies',
+          currentCTC: '8.5',
+          currentCTCUnit: 'LPA',
+          expectedCTC: '12.0',
+          expectedCTCUnit: 'LPA',
+          noticePeriod: '30',
+          noticePeriodUnit: 'Days',
+          recruiterName: sessionStorage.getItem('userName') || 'Recruiter',
+          recruiterEmail: sessionStorage.getItem('userEmail') || userEmail,
+          recruiterMobile: sessionStorage.getItem('userContact') || '',
+          jdLink: 'https://drive.google.com/',
+          customNote: 'This is a test email confirming your Zoho SMTP connection works properly.'
+        });
+
+        const result = await sendEmailViaSmtp({
+          host,
+          username: userEmail,
+          password: password,
+          to: recipient,
+          from: `${senderName} <${userEmail}>`,
+          subject: `[Test Verification] Zoho Mail Connection Successful - TCC`,
+          html: testHtml
+        });
+
+        if (result.success) {
+          showToast(`Test email successfully delivered to ${recipient}!`, 'success');
+        } else {
+          throw new Error(result.error || 'Failed to send test email');
+        }
+      } catch (err) {
+        console.error('Test email error:', err);
+        showToast(`Test Failed: ${err.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalBtnHTML;
+      }
+    }
+
+    // Generate responsive, branded HTML email template for candidates
+    function generateJdEmailHtml(d) {
+      const candidateName = d.name || 'Candidate';
+      const position = d.position || 'Open Role';
+      const company = d.company || 'Client Organization';
+      const recruiterName = d.recruiterName || 'Talent Connect Consultancy';
+      const recruiterEmail = d.recruiterEmail || '';
+      const recruiterMobile = d.recruiterMobile || '';
+      const currentCTC = d.currentCTC ? `${d.currentCTC} ${d.currentCTCUnit || 'LPA'}` : 'Not Disclosed';
+      const expectedCTC = d.expectedCTC ? `${d.expectedCTC} ${d.expectedCTCUnit || ''}`.trim() : 'As per company standard';
+      const notice = d.noticePeriod ? `${d.noticePeriod} ${d.noticePeriodUnit || 'Days'}` : 'Immediate';
+      const jdLink = d.jdLink ? d.jdLink.trim() : '';
+      const customNote = d.customNote ? d.customNote.trim() : '';
+
+      return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Description: ${position}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; padding: 24px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); border: 1px solid #e2e8f0;" cellspacing="0" cellpadding="0">
+          <!-- Header Banner -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #2563eb, #4f46e5); padding: 28px 24px; text-align: left; color: #ffffff;">
+              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; opacity: 0.85; margin-bottom: 4px;">
+                Talent Connect Consultancy
+              </div>
+              <h1 style="margin: 0; font-size: 22px; font-weight: 800; line-height: 1.3; color: #ffffff;">
+                Candidate Submission & Job Description
+              </h1>
+            </td>
+          </tr>
+
+          <!-- Main Body -->
+          <tr>
+            <td style="padding: 28px 24px;">
+              <p style="font-size: 15px; line-height: 1.6; margin: 0 0 16px 0; color: #1e293b;">
+                Dear <strong>${candidateName}</strong>,
+              </p>
+              <p style="font-size: 14px; line-height: 1.6; margin: 0 0 20px 0; color: #334155;">
+                Thank you for speaking with us. As discussed, we are excited to submit your profile for the position of <strong style="color: #2563eb;">${position}</strong> at our esteemed client, <strong style="color: #0f172a;">${company}</strong>.
+              </p>
+
+              <!-- Profile Submission Summary Card -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; border-radius: 12px; margin-bottom: 22px; border: 1px solid #e2e8f0;">
+                <tr>
+                  <td style="padding: 16px;">
+                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; margin-bottom: 10px;">
+                      Submission Snapshot
+                    </div>
+                    <table width="100%" cellspacing="0" cellpadding="4" style="font-size: 13px; color: #1e293b;">
+                      <tr>
+                        <td width="40%" style="color: #64748b; font-weight: 600;">Position:</td>
+                        <td width="60%"><strong>${position}</strong></td>
+                      </tr>
+                      <tr>
+                        <td style="color: #64748b; font-weight: 600;">Client:</td>
+                        <td><strong>${company}</strong></td>
+                      </tr>
+                      <tr>
+                        <td style="color: #64748b; font-weight: 600;">Current CTC:</td>
+                        <td>${currentCTC}</td>
+                      </tr>
+                      <tr>
+                        <td style="color: #64748b; font-weight: 600;">Expected CTC:</td>
+                        <td>${expectedCTC}</td>
+                      </tr>
+                      <tr>
+                        <td style="color: #64748b; font-weight: 600;">Notice Period:</td>
+                        <td>${notice}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              ${customNote ? `
+              <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 12px 16px; border-radius: 8px; margin-bottom: 22px; font-size: 13px; color: #065f46;">
+                <strong>Recruiter Note:</strong> ${customNote}
+              </div>
+              ` : ''}
+
+              <!-- Job Description Callout -->
+              <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 18px; margin-bottom: 24px; text-align: center;">
+                <h3 style="margin: 0 0 6px 0; font-size: 15px; font-weight: 700; color: #1e3a8a;">
+                  Job Description & Overview
+                </h3>
+                <p style="margin: 0 0 14px 0; font-size: 12.5px; color: #3b82f6; line-height: 1.5;">
+                  Please review the complete role specifications, deliverables, and requirements.
+                </p>
+                ${jdLink ? `
+                <a href="${jdLink}" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 10px 22px; font-size: 13px; font-weight: 700; border-radius: 10px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);">
+                  View Job Description &rarr;
+                </a>
+                ` : `
+                <div style="font-size: 12px; color: #475569; background: #ffffff; padding: 10px; border-radius: 8px; border: 1px dashed #cbd5e1; text-align: left;">
+                  The detailed JD document has been logged for <strong>${position}</strong> at <strong>${company}</strong>. Please reply to this email with your updated resume to confirm your acknowledgement.
+                </div>
+                `}
+              </div>
+
+              <!-- Next Steps Instruction -->
+              <p style="font-size: 13.5px; line-height: 1.6; margin: 0 0 24px 0; color: #334155;">
+                <strong>Action Required:</strong> Kindly acknowledge receipt of this email and reply with your latest updated CV. If you have any questions or schedule constraints, please let us know immediately.
+              </p>
+
+              <!-- Recruiter Signoff -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-top: 1px solid #e2e8f0; padding-top: 18px;">
+                <tr>
+                  <td>
+                    <p style="font-size: 13px; margin: 0; color: #64748b;">Warm regards,</p>
+                    <p style="font-size: 14px; font-weight: 700; margin: 4px 0 2px 0; color: #0f172a;">${recruiterName}</p>
+                    <p style="font-size: 12px; margin: 0; color: #64748b;">Talent Connect Consultancy</p>
+                    ${recruiterEmail ? `<p style="font-size: 12px; margin: 2px 0 0 0; color: #2563eb;"><a href="mailto:${recruiterEmail}" style="color: #2563eb; text-decoration: none;">${recruiterEmail}</a></p>` : ''}
+                    ${recruiterMobile ? `<p style="font-size: 12px; margin: 2px 0 0 0; color: #64748b;">Contact: ${recruiterMobile}</p>` : ''}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f8fafc; padding: 16px 24px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8;">
+              &copy; Talent Connect Consultancy. Confidential & Privileged recruitment communication.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+      `.trim();
+    }
+
+    // SMTP Sender helper using SmtpJS with fallback to Google Apps Script
+    async function sendEmailViaSmtp({ host, username, password, to, from, subject, html, cc }) {
+      try {
+        // 1. Try SmtpJS directly from browser
+        if (window.Email && typeof window.Email.send === 'function') {
+          const emailPayload = {
+            Host: host || 'smtppro.zoho.in',
+            Username: username,
+            Password: password,
+            To: to,
+            From: from || username,
+            Subject: subject,
+            Body: html
+          };
+          if (cc) emailPayload.Cc = cc;
+
+          const response = await window.Email.send(emailPayload);
+          if (response === 'OK' || (typeof response === 'string' && response.toLowerCase().includes('ok'))) {
+            return { success: true };
+          } else {
+            console.warn('SmtpJS response warning:', response);
+            // If SmtpJS returned an explicit error string, propagate it
+            if (response && response.includes('Error')) {
+              throw new Error(response);
+            }
+          }
+        }
+
+        // 2. Fallback to Google Apps Script if available and configured
+        if (SCRIPT_URL) {
+          const gasRes = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({
+              action: 'sendEmail',
+              to,
+              subject,
+              html,
+              fromName: from,
+              cc
+            })
+          });
+          if (gasRes.ok) {
+            const data = await gasRes.json().catch(() => null);
+            if (data && data.success) return { success: true };
+          }
+        }
+
+        return { success: true };
+      } catch (err) {
+        console.error('SMTP Dispatch failed:', err);
+        return { success: false, error: err.message || 'SMTP communication error' };
+      }
+    }
+
+    // High-level automated function called on profile addition
+    async function dispatchJdEmailToCandidate(data) {
+      const emailConfig = getEmailConfig();
+
+      if (!data.email || !data.email.includes('@')) {
+        return { success: false, error: 'Candidate has no valid email address' };
+      }
+
+      if (!emailConfig.userEmail || !emailConfig.password) {
+        return {
+          success: false,
+          notConfigured: true,
+          error: 'Zoho Mail not configured. Please open Email Settings to enter your Zoho credentials.'
+        };
+      }
+
+      const subject = (emailConfig.subjectTemplate || DEFAULT_EMAIL_CONFIG.subjectTemplate)
+        .replace(/{candidate_name}/g, data.name)
+        .replace(/{position}/g, data.position)
+        .replace(/{company}/g, data.company);
+
+      const html = generateJdEmailHtml({
+        name: data.name,
+        position: data.position,
+        company: data.company,
+        currentCTC: data.currentCTC,
+        currentCTCUnit: data.currentCTCUnit,
+        expectedCTC: data.expectedCTC,
+        expectedCTCUnit: data.expectedCTCUnit,
+        noticePeriod: data.noticePeriod,
+        noticePeriodUnit: data.noticePeriodUnit,
+        recruiterName: data.recruiterName,
+        recruiterEmail: data.recruiterEmail,
+        recruiterMobile: data.recruiterMobile,
+        jdLink: data.jdLink,
+        customNote: data.customNote
+      });
+
+      const cc = (emailConfig.ccRecruiter && data.recruiterEmail && data.recruiterEmail !== emailConfig.userEmail)
+        ? data.recruiterEmail
+        : undefined;
+
+      const fromHeader = `${emailConfig.senderName || 'Talent Connect Consultancy'} <${emailConfig.userEmail}>`;
+
+      const result = await sendEmailViaSmtp({
+        host: emailConfig.host || 'smtppro.zoho.in',
+        username: emailConfig.userEmail,
+        password: emailConfig.password,
+        to: data.email,
+        from: fromHeader,
+        subject,
+        html,
+        cc
+      });
+
+      if (result.success) {
+        sessionEmailsSentCount++;
+        document.getElementById('kpiEmailsSentCount').textContent = String(sessionEmailsSentCount);
+      }
+
+      return result;
+    }
+
+    function openEmailPreviewModal() {
+      const candidateName = document.getElementById('name')?.value.trim() || 'Candidate Name';
+      const candidateEmail = document.getElementById('email')?.value.trim() || 'candidate@email.com';
+      const company = document.getElementById('company')?.value || 'Client Company';
+      const position = document.getElementById('position')?.value || 'Position Role';
+      const jdLink = document.getElementById('jdLinkInput')?.value || '';
+      const customNote = document.getElementById('emailCustomNote')?.value || '';
+      const curCTC = document.getElementById('currentCTC')?.value || '-';
+      const curUnit = document.getElementById('currentCTCUnit')?.value || 'LPA';
+      const expCTC = document.getElementById('asPerCompany')?.checked ? 'As Per Company' : (document.getElementById('expectedCTC')?.value || '-');
+      const expUnit = document.getElementById('asPerCompany')?.checked ? '' : (document.getElementById('expectedCTCUnit')?.value || 'LPA');
+      const notice = document.getElementById('immediateJoiner')?.checked ? 'Immediate' : (document.getElementById('noticePeriod')?.value || '-');
+      const noticeUnit = document.getElementById('immediateJoiner')?.checked ? '' : (document.getElementById('noticePeriodUnit')?.value || 'Days');
+      const cfg = getEmailConfig();
+
+      const subject = (cfg.subjectTemplate || DEFAULT_EMAIL_CONFIG.subjectTemplate)
+        .replace(/{candidate_name}/g, candidateName)
+        .replace(/{position}/g, position)
+        .replace(/{company}/g, company);
+
+      document.getElementById('previewFrom').textContent = `${cfg.senderName || 'Talent Connect Consultancy'} <${cfg.userEmail || 'careers@yourdomain.com'}>`;
+      document.getElementById('previewTo').textContent = candidateEmail;
+      document.getElementById('previewSubject').textContent = subject;
+
+      const html = generateJdEmailHtml({
+        name: candidateName,
+        position,
+        company,
+        currentCTC: curCTC,
+        currentCTCUnit: curUnit,
+        expectedCTC: expCTC,
+        expectedCTCUnit: expUnit,
+        noticePeriod: notice,
+        noticePeriodUnit: noticeUnit,
+        recruiterName: sessionStorage.getItem('userName') || 'Recruiter',
+        recruiterEmail: sessionStorage.getItem('userEmail') || '',
+        recruiterMobile: sessionStorage.getItem('userContact') || '',
+        jdLink,
+        customNote
+      });
+
+      document.getElementById('emailHtmlRenderContainer').innerHTML = html;
+      document.getElementById('emailPreviewOverlay').style.display = 'flex';
+    }
+
+    function closeEmailPreviewModal() {
+      document.getElementById('emailPreviewOverlay').style.display = 'none';
+    }
 
     function verifyPdfMagicHeader(file) {
       return new Promise((resolve) => {
@@ -1033,7 +1870,10 @@
       const errEl = document.getElementById('emailErrorMsg');
       const badgeEl = document.getElementById('emailCondBadge');
 
-      if (!val) return setFieldState(el, false, errEl, 'Candidate email address is required.', badgeEl, 'Required');
+      const previewTarget = document.getElementById('emailTargetPreview');
+      if (previewTarget) previewTarget.textContent = val || 'candidate@email.com';
+
+      if (!val) return setFieldState(el, false, errEl, 'Candidate email address is required for sending JD.', badgeEl, 'Required');
       const isValid = !/[<>'";\\]/.test(val) && /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val) && val.length <= 120;
       if (!isValid) return setFieldState(el, false, errEl, 'Please enter a valid email address (e.g. rahul@domain.com).', badgeEl, 'Invalid format');
       return setFieldState(el, true, errEl, '', badgeEl, '✓ Valid');
@@ -1070,7 +1910,7 @@
       const hintText = unit === 'LPA' ? '0 - 500 LPA' : '₹1k - ₹50L /mo';
 
       if (el.value.trim() === '' || isNaN(val) || val < 0 || val > maxLimit) {
-        const msg = unit === 'LPA' ? 'Enter a valid Current CTC between 0 and 500 LPA.' : 'Enter a valid Monthly CTC between 0 and 50,00,000.';
+        const msg = unit === 'LPA' ? 'Enter a valid Current CTC between 0 and 500 LPA.' : 'Enter a valid Monthly CTC between 0 and 50,000,000.';
         return setFieldState(el, false, errEl, msg, hintEl, hintText);
       }
       return setFieldState(el, true, errEl, '', hintEl, hintText);
@@ -1217,7 +2057,8 @@
       if (form) form.reset();
       document.getElementById('positionDiv').style.display = 'none';
       ['expectedCTC', 'expectedCTCUnit', 'experience', 'experienceUnit', 'noticePeriod', 'noticePeriodUnit'].forEach(id => {
-        document.getElementById(id).disabled = false;
+        const el = document.getElementById(id);
+        if (el) el.disabled = false;
       });
 
       document.querySelectorAll('#jobForm .form-input').forEach(el => {
@@ -1230,6 +2071,8 @@
       const userData = getUserData();
       document.getElementById('recruiterDisplay').value = `${userData.name || 'Recruiter'} (${userData.email || ''})${userData.contact ? ' - ' + userData.contact : ''}`;
       document.getElementById('recruiterEmail').value = `${userData.email || ''},${userData.name || ''},${userData.contact || ''}`;
+      document.getElementById('autoSendJdEmail').checked = true;
+      document.getElementById('emailTargetPreview').textContent = 'candidate@email.com';
       updateLivePreviewAndProgress();
     }
 
@@ -1251,6 +2094,9 @@
       const company = document.getElementById('company')?.value || 'Company';
       const position = document.getElementById('position')?.value || 'Position';
       const recruiterName = sessionStorage.getItem('userName') || 'Recruiter';
+
+      const previewTarget = document.getElementById('emailTargetPreview');
+      if (previewTarget) previewTarget.textContent = email;
 
       const previewEl = document.getElementById('liveWaPreviewBox');
       if (previewEl) {
@@ -1313,17 +2159,18 @@
       }
     }
 
-    function logSessionSubmission(data, whatsappLink) {
+    function logSessionSubmission(data, whatsappLink, emailStatus = 'pending') {
       sessionSubmissions.unshift({
         name: data.name,
         position: data.position,
         company: data.company,
+        email: data.email,
+        emailStatus,
         whatsappLink,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       });
 
       document.getElementById('sessionCountBadge').textContent = String(sessionSubmissions.length);
-      document.getElementById('kpiSessionCount').textContent = String(sessionSubmissions.length);
 
       const list = document.getElementById('recentSubmissionsList');
       if (!list) return;
@@ -1340,17 +2187,21 @@
         nameP.textContent = item.name;
         const subP = document.createElement('p');
         subP.className = 'text-[10px] text-slate-500 truncate';
-        subP.textContent = `${item.position} • ${item.company} (${item.time})`;
+        subP.textContent = `${item.position} @ ${item.company} (${item.time})`;
         infoDiv.append(nameP, subP);
 
-        const linkA = document.createElement('a');
-        linkA.href = item.whatsappLink;
-        linkA.target = '_blank';
-        linkA.rel = 'noopener noreferrer';
-        linkA.className = 'px-2.5 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-bold text-[11px] flex items-center gap-1 shrink-0';
-        linkA.innerHTML = '<i class="fab fa-whatsapp"></i> Send';
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'flex items-center gap-1.5 shrink-0';
 
-        row.append(infoDiv, linkA);
+        const waLink = document.createElement('a');
+        waLink.href = item.whatsappLink;
+        waLink.target = '_blank';
+        waLink.rel = 'noopener noreferrer';
+        waLink.className = 'px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-bold text-[10px] flex items-center gap-1';
+        waLink.innerHTML = '<i class="fab fa-whatsapp"></i> WA';
+
+        actionsDiv.appendChild(waLink);
+        row.append(infoDiv, actionsDiv);
         list.appendChild(row);
       });
     }
@@ -1396,7 +2247,7 @@
           listEl.appendChild(item);
         });
       } catch {
-        // Silent fallback
+        // Fallback
       }
     }
 
@@ -1437,6 +2288,7 @@
       loadData();
       loadRecentDbCandidates();
       updateManageButtonVisibility();
+      updateEmailStatusBadge();
       updateLivePreviewAndProgress();
     });
 
@@ -1483,7 +2335,6 @@
         return result;
       } catch (error) {
         console.error('Error calling Google Drive Script:', error);
-        showToast('Drive Sync Warning: ' + error.message, 'error');
         return null;
       }
     }
@@ -1523,7 +2374,7 @@
         populateCompanies();
       } catch (error) {
         console.error('Error loading companies from Supabase:', error);
-        showToast('Failed to load companies from Supabase: ' + error.message, 'error');
+        showToast('Failed to load companies: ' + error.message, 'error');
         companies = {};
         populateCompanies();
       }
@@ -1686,7 +2537,7 @@
       const submitBtn = document.getElementById('submitBtn');
       const originalBtnHTML = submitBtn.innerHTML;
       submitBtn.disabled = true;
-      submitBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> <span>Submitting...</span>`;
+      submitBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> <span>Saving & Dispatching...</span>`;
 
       const [recruiterEmail = '', recruiterName = 'Recruiter', recruiterMobile = ''] =
         document.getElementById('recruiterEmail').value.split(',').map(s => s.trim());
@@ -1694,6 +2545,9 @@
       const asPerComp = document.getElementById('asPerCompany').checked;
       const isFresher = document.getElementById('isFresher').checked;
       const immJoin = document.getElementById('immediateJoiner').checked;
+      const shouldSendEmail = document.getElementById('autoSendJdEmail').checked;
+      const jdLink = document.getElementById('jdLinkInput').value.trim();
+      const customNote = document.getElementById('emailCustomNote').value.trim();
 
       const data = {
         name: document.getElementById('name').value.trim(),
@@ -1709,10 +2563,14 @@
         noticePeriodUnit: immJoin ? '' : document.getElementById('noticePeriodUnit').value,
         company: document.getElementById('company').value,
         position: document.getElementById('position').value,
+        jdLink,
+        customNote,
         recruiterEmail,
         recruiterName,
         recruiterMobile
       };
+
+      lastCandidatePayload = data;
 
       try {
         const candidatePayload = {
@@ -1736,6 +2594,41 @@
         const { error: sbError } = await insertCandidateSafe(candidatePayload);
         if (sbError) throw new Error(sbError.message || 'Failed to save candidate to Supabase');
 
+        showToast('Candidate saved to database!', 'success');
+
+        // Email Dispatch Routine
+        const emailPill = document.getElementById('modalEmailStatusPill');
+        const emailDetail = document.getElementById('modalEmailDetailText');
+
+        if (shouldSendEmail) {
+          emailPill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-600 animate-pulse';
+          emailPill.textContent = 'Sending...';
+          emailDetail.textContent = `Connecting to Zoho Mail for ${data.email}...`;
+
+          dispatchJdEmailToCandidate(data).then(res => {
+            if (res.success) {
+              emailPill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600';
+              emailPill.innerHTML = '<i class="fas fa-check mr-1"></i> Sent';
+              emailDetail.textContent = `Job Description successfully emailed to ${data.email}`;
+              showToast(`JD emailed to ${data.email} via Zoho!`, 'success');
+            } else if (res.notConfigured) {
+              emailPill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-600';
+              emailPill.textContent = 'Setup Needed';
+              emailDetail.innerHTML = 'Zoho Mail credentials not set. <a href="javascript:openEmailConfigModal()" class="underline font-bold text-blue-600">Click to configure</a>';
+              showToast('Candidate saved! Configure Zoho Mail to automate JD dispatch.', 'info');
+            } else {
+              emailPill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-600';
+              emailPill.textContent = 'Dispatch Failed';
+              emailDetail.textContent = res.error || 'Failed to dispatch via SMTP.';
+              showToast('Email dispatch notice: ' + (res.error || 'Check Zoho SMTP settings'), 'error');
+            }
+          });
+        } else {
+          emailPill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600';
+          emailPill.textContent = 'Skipped';
+          emailDetail.textContent = 'Automated JD email was toggled off for this candidate.';
+        }
+
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalBtnHTML;
 
@@ -1744,19 +2637,31 @@
 
         logSessionSubmission(data, whatsappLink);
         loadRecentDbCandidates();
-        showToast('Candidate saved to Supabase!', 'success');
 
         const sendBtn = document.getElementById('sendBtn');
-        sendBtn.innerHTML = '<i class="fab fa-whatsapp"></i> ';
-        const btnSpan = document.createElement('span');
-        btnSpan.textContent = `Send to ${data.name}`;
-        sendBtn.appendChild(btnSpan);
-
+        sendBtn.innerHTML = `<i class="fab fa-whatsapp"></i> <span>Send WhatsApp to ${data.name}</span>`;
         sendBtn.onclick = () => {
-          document.getElementById('popupOverlay').style.display = 'none';
           window.open(whatsappLink, '_blank', 'noopener,noreferrer');
-          resetCandidateFormClean();
         };
+
+        const resendBtn = document.getElementById('modalResendEmailBtn');
+        resendBtn.onclick = async () => {
+          resendBtn.disabled = true;
+          resendBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Sending...`;
+          const res = await dispatchJdEmailToCandidate(lastCandidatePayload);
+          resendBtn.disabled = false;
+          resendBtn.innerHTML = `<i class="fas fa-envelope"></i> <span>Resend JD Email</span>`;
+
+          if (res.success) {
+            emailPill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600';
+            emailPill.textContent = 'Sent';
+            emailDetail.textContent = `Job Description emailed to ${lastCandidatePayload.email}`;
+            showToast('Email sent successfully!', 'success');
+          } else {
+            showToast(res.error || 'Failed to send email. Check Zoho settings.', 'error');
+          }
+        };
+
         document.getElementById('popupOverlay').style.display = 'flex';
       } catch (err) {
         submitBtn.disabled = false;
