@@ -1135,7 +1135,7 @@
             type="text"
             id="emailSubjectTemplate"
             class="form-input text-xs font-mono"
-            value="Job Opportunity: {position} at {company} | Talent Connect Consultancy"
+            value="JD for {position} role at {company} | Talent Connect Consultancy"
           >
           <p class="text-[10px] text-slate-400 mt-1">Available variables: <code>{candidate_name}</code>, <code>{position}</code>, <code>{company}</code></p>
         </div>
