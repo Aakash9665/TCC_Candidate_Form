@@ -1594,7 +1594,7 @@
     // and attachments ([{ name, mimeType, data(base64) }]).
     async function sendEmailViaSmtp({ host, port, username, password, to, from, subject, html, cc, jdLink, attachments }) {
       try {
-        const response = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/Send-email`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
