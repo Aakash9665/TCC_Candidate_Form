@@ -600,9 +600,13 @@
                   <label for="position" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                     <i class="fas fa-user-tie text-purple-500 mr-1"></i> Open Position <span class="text-rose-500">*</span>
                   </label>
-                  <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">Active Role</span>
+                  <div class="flex items-center gap-2">
+                    <!-- JD Availability Badge -->
+                    <span id="jdStatusBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-md hidden"></span>
+                    <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">Active Role</span>
+                  </div>
                 </div>
-                <select id="position" name="position" onchange="validateCompanyPositionFields()" class="form-input" required>
+                <select id="position" name="position" onchange="handlePositionSelection(this.value)" class="form-input" required>
                   <option value="">-- Choose Position --</option>
                 </select>
                 <p id="positionErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
@@ -1252,6 +1256,7 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxyo19lD_6WHXwCkpcIXrfV38pAobEjiO6sYhYBFh-nId-YWdGHNPJF_Rh9IQBchSd/exec';
 
     let companies = {};
+    let currentDriveFileId = "";
     let newCompanyFiles = {};
     let existingCompanyFiles = {};
     const sessionSubmissions = [];
@@ -1311,6 +1316,57 @@
       } else {
         inp.type = 'password';
         btn.innerHTML = '<i class="fas fa-eye mr-1"></i>Show';
+      }
+    }
+
+    function setJdBadgeStatus(status, text) {
+      const badge = document.getElementById('jdStatusBadge');
+      if (!badge) return;
+
+      if (!status) {
+        badge.className = 'hidden';
+        badge.textContent = '';
+        return;
+      }
+
+      badge.classList.remove('hidden');
+      if (status === 'loading') {
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400 animate-pulse';
+        badge.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Checking JD...';
+      } else if (status === 'found') {
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25';
+        badge.innerHTML = `<i class="fas fa-file-pdf mr-1"></i> ${text || 'JD Available'}`;
+      } else if (status === 'missing') {
+        badge.className = 'text-[10px] font-bold px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/25';
+        badge.innerHTML = '<i class="fas fa-triangle-exclamation mr-1"></i> No JD in Drive';
+      }
+    }
+
+    async function handlePositionSelection(position) {
+      validateCompanyPositionFields();
+      const company = document.getElementById('company').value;
+      const jdLinkInput = document.getElementById('jdLinkInput');
+
+      if (!company || !position) {
+        currentDriveFileId = "";
+        if (jdLinkInput) jdLinkInput.value = "";
+        setJdBadgeStatus(null);
+        return;
+      }
+
+      setJdBadgeStatus('loading');
+
+      // Call Google Apps Script to fetch file ID by path: JD/company/position
+      const res = await callGoogleScript('getJdFileId', { company, position });
+
+      if (res && res.success && res.found) {
+        currentDriveFileId = res.fileId;
+        if (jdLinkInput) jdLinkInput.value = res.viewUrl || `https://drive.google.com/file/d/${res.fileId}/view`;
+        setJdBadgeStatus('found', 'JD Available');
+      } else {
+        currentDriveFileId = "";
+        if (jdLinkInput) jdLinkInput.value = "";
+        setJdBadgeStatus('missing');
       }
     }
 
@@ -1688,8 +1744,7 @@
         subject,
         html,
         cc,
-        jdLink: data.jdLink,
-        attachments: data.attachments || []
+        jdLink: data.jdLink
       });
 
       if (result.success) {
@@ -2377,9 +2432,7 @@
       fillSelectOptions(document.getElementById('company'), '-- Choose Company --', Object.keys(companies));
     }
 
-    let currentAutoFetchedJd = null; // Holds the fetched JD attachment object
-
-    async function populatePositions() {
+    function populatePositions() {
       const company = document.getElementById('company').value;
       const positionSelect = document.getElementById('position');
       const positionDiv = document.getElementById('positionDiv');
@@ -2389,44 +2442,16 @@
       fillSelectOptions(positionSelect, '-- Choose Position --', list);
       positionDiv.style.display = company && companies[company] ? 'block' : 'none';
       if (roleBadge) roleBadge.textContent = company && companies[company] ? `${list.length} role(s)` : 'Required';
-      
-      currentAutoFetchedJd = null;
-      document.getElementById('jdLinkInput').value = '';
       validateCompanyPositionFields();
     }
 
-    // Add event listener when Position changes
-    document.getElementById('position').addEventListener('change', async function() {
-      const company = document.getElementById('company').value;
-      const position = this.value;
-      const jdLinkInput = document.getElementById('jdLinkInput');
-
-      if (!company || !position) {
-        currentAutoFetchedJd = null;
-        jdLinkInput.value = '';
-        return;
-      }
-
-      showToast(`Searching JD in Drive: JD/${company}/${position}...`, 'info');
-
-      // Call Google Apps Script by path
-      const res = await callGoogleScript('getJdFile', { company, position });
-
-      if (res && res.success) {
-        currentAutoFetchedJd = {
-          name: res.fileName,
-          mimeType: res.mimeType,
-          data: res.fileData // Pure Base64 from Google Drive
-        };
-        jdLinkInput.value = res.viewUrl; // Auto-fills Google Drive link for email body
-        showToast(`✓ JD Loaded: ${res.fileName}`, 'success');
-      } else {
-        currentAutoFetchedJd = null;
-        jdLinkInput.value = '';
-        console.warn('Drive JD search notice:', res?.error);
-        showToast(`No file in Drive folder: JD/${company}/ for ${position}`, 'info');
-      }
-    });
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
     }
 
     function generateFileInput(position, containerId, filesObject) {
@@ -2572,11 +2597,6 @@
       const jdLink = document.getElementById('jdLinkInput').value.trim();
       const customNote = document.getElementById('emailCustomNote').value.trim();
 
-      const attachmentsToSend = [];
-      if (currentAutoFetchedJd) {
-        attachmentsToSend.push(currentAutoFetchedJd);
-      }
-
       const data = {
         name: document.getElementById('name').value.trim(),
         email: document.getElementById('email').value.trim(),
@@ -2593,7 +2613,6 @@
         position: document.getElementById('position').value,
         jdLink,
         customNote,
-        attachments: attachmentsToSend
         recruiterEmail,
         recruiterName,
         recruiterMobile
@@ -2612,6 +2631,7 @@
           notice_period: `${data.noticePeriod} ${data.noticePeriodUnit}`.trim(),
           company: data.company,
           position: data.position,
+          drive_id: currentDriveFileId || null,
           recruiter: recruiterEmail,
           recruiter_email: recruiterEmail,
           recruiter_name: recruiterName,
