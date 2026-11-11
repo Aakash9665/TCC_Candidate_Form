@@ -1591,7 +1591,7 @@
     // ---- Zoho Flow email transport ----
     // wss://...  -> WebSocket (sends the email JSON, waits for an ack message)
     // https://... -> Zoho Flow webhook URL (HTTP POST)
-    const ZOHO_FLOW_URL = 'PASTE_YOUR_ZOHO_FLOW_URL_HERE';
+    const ZOHO_FLOW_URL = 'https://flow.zoho.in/60095631377/flow/webhook/incoming?zapikey=1001.b4750d55f4ef08cec719c064449ef2b4.ecbeca0f7af26506815ab91c8f9c3507&isdebug=false';
     const ZOHO_FLOW_TIMEOUT_MS = 20000;
 
     function sendViaZohoFlowSocket(url, payload) {
