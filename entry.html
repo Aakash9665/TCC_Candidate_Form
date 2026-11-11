@@ -1594,12 +1594,18 @@
     // and attachments ([{ name, mimeType, data(base64) }]).
     async function sendEmailViaSmtp({ host, port, username, password, to, from, subject, html, cc, jdLink, attachments }) {
       try {
-        const { data, error } = await supabaseClient.functions.invoke('send-email', {
-          body: {
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/send-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
             host: host || 'smtppro.zoho.in',
-            port: port || getEmailConfig().port || '465',
-            username,
-            password,
+            port: Number(port || getEmailConfig().port || 465),
+            username: username.trim(),
+            password: password.trim().replace(/\s+/g, ''),
             to,
             cc: cc || '',
             from: from || username,
@@ -1608,18 +1614,26 @@
             html,
             jdLink: jdLink || '',
             attachments: attachments || []
-          }
+          })
         });
-        if (error) throw new Error(error.message || 'Email service unreachable');
-        if (!data || !data.success) throw new Error((data && data.error) || 'Email service reported a failure');
-        if (data.warning) console.warn('Email sent with warning:', data.warning);
+
+        if (!response.ok) {
+          const text = await response.text();
+          throw new Error(`Edge Function returned ${response.status}: ${text || response.statusText}`);
+        }
+
+        const data = await response.json();
+        if (!data || !data.success) {
+          throw new Error(data?.error || 'Email dispatch failed on server');
+        }
+
+        if (data.warning) console.warn('Email warning:', data.warning);
         return { success: true };
       } catch (err) {
         console.error('Email dispatch failed:', err);
         return { success: false, error: err.message || 'Email communication error' };
       }
     }
-
     // High-level automated function called on profile addition
     async function dispatchJdEmailToCandidate(data) {
       const emailConfig = getEmailConfig();
