@@ -1640,7 +1640,7 @@
     // Email sender (same signature as before, so all callers keep working)
     async function sendEmailViaSmtp({ host, username, password, to, from, subject, html, cc }) {
       try {
-        if (!ZOHO_FLOW_URL || ZOHO_FLOW_URL.startsWith('PASTE_')) {
+        if (!ZOHO_FLOW_URL || ZOHO_FLOW_URL.startsWith('https://flow.zoho.in/60095631377/flow/webhook/incoming?zapikey=1001.b4750d55f4ef08cec719c064449ef2b4.ecbeca0f7af26506815ab91c8f9c3507&isdebug=false')) {
           return { success: false, error: 'Zoho Flow URL not set. Add it to ZOHO_FLOW_URL in the script.' };
         }
 
