@@ -1443,7 +1443,7 @@
         showToast(`Test Failed: ${err.message}`, 'error');
       } finally {
         btn.disabled = false;
-        btn.innerHTML = originalBtnHTML;
+        btn.innerHTML = originalHTML; // <--- Fixed here (was originalBtnHTML)
       }
     }
 
