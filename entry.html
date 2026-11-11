@@ -1424,6 +1424,7 @@
 
         const result = await sendEmailViaSmtp({
           host,
+          port: document.getElementById('zohoPort').value,
           username: userEmail,
           password: password,
           to: recipient,
@@ -1588,81 +1589,34 @@
       `.trim();
     }
 
-    // ---- Zoho Flow email transport ----
-    // wss://...  -> WebSocket (sends the email JSON, waits for an ack message)
-    // https://... -> Zoho Flow webhook URL (HTTP POST)
-    const ZOHO_FLOW_URL = 'https://flow.zoho.in/60095631377/flow/webhook/incoming?zapikey=1001.b4750d55f4ef08cec719c064449ef2b4.ecbeca0f7af26506815ab91c8f9c3507&isdebug=false';
-    const ZOHO_FLOW_TIMEOUT_MS = 20000;
-
-    function sendViaZohoFlowSocket(url, payload) {
-      return new Promise((resolve) => {
-        let settled = false;
-        let ws = null;
-        let timer = null;
-        const finish = (result) => {
-          if (settled) return;
-          settled = true;
-          clearTimeout(timer);
-          try { if (ws) ws.close(); } catch (_) {}
-          resolve(result);
-        };
-        timer = setTimeout(() => finish({ success: false, error: 'Zoho Flow did not respond in time' }), ZOHO_FLOW_TIMEOUT_MS);
-
-        try {
-          ws = new WebSocket(url);
-        } catch (err) {
-          return finish({ success: false, error: 'Invalid Zoho Flow WebSocket URL' });
-        }
-
-        ws.onopen = () => ws.send(JSON.stringify(payload));
-        ws.onmessage = (evt) => {
-          let msg = null;
-          try { msg = JSON.parse(evt.data); } catch (_) {}
-          if (msg && msg.id && msg.id !== payload.id) return; // ack for another request
-          if (msg && (msg.success === false || msg.error)) {
-            finish({ success: false, error: msg.error || 'Zoho Flow rejected the email' });
-          } else {
-            finish({ success: true });
-          }
-        };
-        ws.onerror = () => finish({ success: false, error: 'Could not connect to Zoho Flow WebSocket' });
-        ws.onclose = () => finish({ success: false, error: 'Zoho Flow connection closed before confirming delivery' });
-      });
-    }
-
-    async function sendViaZohoFlowWebhook(url, payload) {
-      // Form-encoded + no-cors avoids the CORS preflight that Zoho Flow webhooks reject.
-      // The response is opaque, so success means "Flow accepted the request".
-      await fetch(url, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(payload) });
-      return { success: true };
-    }
-
-    // Email sender (same signature as before, so all callers keep working)
-    async function sendEmailViaSmtp({ host, username, password, to, from, subject, html, cc }) {
+    // Email sender: Zoho SMTP via a Supabase Edge Function ("send-email"), supports attachments.
+    // Same signature as before; extra optional fields: port, jdLink (Drive file link -> attached)
+    // and attachments ([{ name, mimeType, data(base64) }]).
+    async function sendEmailViaSmtp({ host, port, username, password, to, from, subject, html, cc, jdLink, attachments }) {
       try {
-        if (!ZOHO_FLOW_URL || ZOHO_FLOW_URL.startsWith('https://flow.zoho.in/60095631377/flow/webhook/incoming?zapikey=1001.b4750d55f4ef08cec719c064449ef2b4.ecbeca0f7af26506815ab91c8f9c3507&isdebug=false')) {
-          return { success: false, error: 'Zoho Flow URL not set. Add it to ZOHO_FLOW_URL in the script.' };
-        }
-
-        // SMTP password/host are intentionally NOT sent; Zoho Flow handles the mail account.
-        const payload = {
-          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
-          action: 'sendEmail',
-          to,
-          cc: cc || '',
-          from: from || username,
-          fromEmail: username || '',
-          subject,
-          html
-        };
-
-        if (/^wss?:\/\//i.test(ZOHO_FLOW_URL)) {
-          return await sendViaZohoFlowSocket(ZOHO_FLOW_URL, payload);
-        }
-        return await sendViaZohoFlowWebhook(ZOHO_FLOW_URL, payload);
+        const { data, error } = await supabaseClient.functions.invoke('send-email', {
+          body: {
+            host: host || 'smtppro.zoho.in',
+            port: port || getEmailConfig().port || '465',
+            username,
+            password,
+            to,
+            cc: cc || '',
+            from: from || username,
+            replyTo: username || '',
+            subject,
+            html,
+            jdLink: jdLink || '',
+            attachments: attachments || []
+          }
+        });
+        if (error) throw new Error(error.message || 'Email service unreachable');
+        if (!data || !data.success) throw new Error((data && data.error) || 'Email service reported a failure');
+        if (data.warning) console.warn('Email sent with warning:', data.warning);
+        return { success: true };
       } catch (err) {
-        console.error('Zoho Flow dispatch failed:', err);
-        return { success: false, error: err.message || 'Zoho Flow communication error' };
+        console.error('Email dispatch failed:', err);
+        return { success: false, error: err.message || 'Email communication error' };
       }
     }
 
@@ -1712,13 +1666,15 @@
 
       const result = await sendEmailViaSmtp({
         host: emailConfig.host || 'smtppro.zoho.in',
+        port: emailConfig.port,
         username: emailConfig.userEmail,
         password: emailConfig.password,
         to: data.email,
         from: fromHeader,
         subject,
         html,
-        cc
+        cc,
+        jdLink: data.jdLink
       });
 
       if (result.success) {
