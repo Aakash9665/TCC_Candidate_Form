@@ -1,0 +1,2874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>TCC Candidate Registration & JD Email Dispatch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- SmtpJS for direct client-side SMTP dispatch (Zoho Mail) -->
+  <script src="https://smtpjs.com/v3/smtp.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --bg-gradient:
+        radial-gradient(circle at 10% 15%, rgba(59, 130, 246, 0.14) 0%, transparent 45%),
+        radial-gradient(circle at 90% 85%, rgba(16, 185, 129, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 50% 40%, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
+    }
+    .dark {
+      --bg-gradient:
+        radial-gradient(circle at 10% 15%, rgba(59, 130, 246, 0.22) 0%, transparent 45%),
+        radial-gradient(circle at 90% 85%, rgba(16, 185, 129, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 50% 40%, rgba(99, 102, 241, 0.12) 0%, transparent 60%);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      background-image: var(--bg-gradient);
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(85px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.32;
+      animation: floatOrb 18s ease-in-out infinite alternate;
+    }
+    .dark .orb { opacity: 0.42; }
+    .orb-1 { width: 300px; height: 300px; background: linear-gradient(135deg, #3b82f6, #6366f1); top: -80px; left: -80px; }
+    .orb-2 { width: 260px; height: 260px; background: linear-gradient(135deg, #10b981, #06b6d4); bottom: -60px; right: -60px; animation-delay: -7s; }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(24px, -28px) scale(1.06); }
+      100% { transform: translate(-18px, 20px) scale(0.95); }
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 14px 34px -10px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+    }
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.84);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+    }
+    .form-input {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 13px;
+      border: 1.5px solid rgba(148, 163, 184, 0.35);
+      background: #ffffff;
+      color: #0f172a;
+      font-size: 13.5px;
+      transition: all 0.2s ease;
+    }
+    .dark .form-input {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #f8fafc;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3.5px rgba(59, 130, 246, 0.15);
+    }
+    .form-input:disabled { opacity: 0.5; cursor: not-allowed; }
+    .input-valid { border-color: #10b981 !important; }
+    .input-invalid { border-color: #f43f5e !important; }
+
+    #positionDiv { display: none; animation: slideDown 0.25s ease-out; }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-in { animation: fadeSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+
+    .popup-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1200;
+      background: rgba(2, 6, 23, 0.65);
+      backdrop-filter: blur(12px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .popup {
+      width: 100%;
+      max-width: 480px;
+      border-radius: 24px;
+      padding: 26px;
+      position: relative;
+      animation: popupScale 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .popup.manage-popup, .popup.config-popup {
+      max-width: 680px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    @keyframes popupScale {
+      from { opacity: 0; transform: translateY(20px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .loading { opacity: 0.55; pointer-events: none; }
+
+    .file-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.06);
+      border: 1px dashed rgba(16, 185, 129, 0.35);
+      margin-bottom: 8px;
+    }
+    .file-input { display: none; }
+    .file-input-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: #059669;
+      transition: all 0.2s ease;
+    }
+    .dark .file-input-label { color: #10b981; }
+    .file-input-label:hover { background: rgba(16, 185, 129, 0.25); }
+    .file-status { font-size: 11px; color: #64748b; text-align: center; }
+    .file-status.success { color: #10b981; font-weight: 600; }
+    .file-status.error { color: #ef4444; font-weight: 600; }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-20 sm:pb-10 selection:bg-blue-500 selection:text-white relative">
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div id="toastContainer" class="fixed bottom-16 sm:bottom-5 right-4 sm:right-5 z-[2000] flex flex-col gap-2.5 max-w-sm w-full px-3 pointer-events-none"></div>
+
+  <!-- Confirmation Dialog Modal -->
+  <div id="confirmDialogModal" class="fixed inset-0 z-[2100] bg-slate-950/70 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-card rounded-3xl max-w-md w-full p-6 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-rose-500/15 text-rose-500 flex items-center justify-center mx-auto mb-4 text-xl">
+        <i class="fas fa-triangle-exclamation"></i>
+      </div>
+      <h4 class="font-display font-bold text-lg text-slate-900 dark:text-white mb-2">Confirm Action</h4>
+      <p id="confirmDialogText" class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-6"></p>
+      <div class="flex items-center gap-3">
+        <button type="button" id="confirmCancelBtn" class="flex-1 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm">
+          Cancel
+        </button>
+        <button type="button" id="confirmAcceptBtn" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-rose-600/25">
+          Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Navigation Header -->
+  <header class="sticky top-0 z-40 glass-card border-b border-slate-200/80 dark:border-slate-800/80 px-3 sm:px-6 py-2.5 sm:py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-2 sm:gap-3">
+      <div class="flex items-center gap-2.5 sm:gap-3">
+        <button
+          class="home-button w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 flex items-center justify-center transition-all cursor-pointer shrink-0"
+          onclick="goHome()"
+          title="Back to Dashboard"
+          aria-label="Back to Dashboard"
+        >
+          <i class="fas fa-house text-sm sm:text-base"></i>
+        </button>
+        <div>
+          <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <h1 class="font-display font-extrabold text-sm sm:text-lg text-slate-900 dark:text-white leading-tight">
+              Candidate Registration
+            </h1>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+              Entry Module
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
+            Supabase Entry + WhatsApp + Zoho Mail Automated JD Dispatch
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          <span class="text-[11px] font-semibold text-slate-500">Readiness</span>
+          <div class="w-16 sm:w-20 h-2 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+            <div id="formProgressBar" class="h-full bg-gradient-to-r from-blue-500 to-emerald-500 transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <span id="formProgressText" class="text-[11px] font-bold text-blue-600 dark:text-blue-400">0%</span>
+        </div>
+
+        <!-- Zoho Mail Configuration Trigger Button -->
+        <button
+          type="button"
+          onclick="openEmailConfigModal()"
+          class="h-10 px-3 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+          title="Configure Zoho Mail (SMTP) & JD Email Settings"
+        >
+          <i class="fas fa-envelope-open-text text-sm"></i>
+          <span class="hidden md:inline text-xs font-bold">Email Settings</span>
+          <span id="headerEmailStatusDot" class="w-2 h-2 rounded-full bg-amber-400" title="Email not verified yet"></span>
+        </button>
+
+        <button
+          type="button"
+          onclick="refreshAllWorkspaceData()"
+          class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors"
+          title="Sync Companies & Recent DB Feed"
+        >
+          <i class="fas fa-arrows-rotate text-xs" id="syncHeaderIcon"></i>
+        </button>
+
+        <button
+          type="button"
+          onclick="toggleTheme()"
+          class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-blue-600 transition-colors"
+          title="Toggle Light / Dark Theme"
+        >
+          <i class="fas fa-sun text-xs hidden dark:inline text-amber-400"></i>
+          <i class="fas fa-moon text-xs inline dark:hidden text-indigo-600"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 pt-4 sm:pt-5 relative z-10">
+
+    <!-- KPI & CONTEXT RIBBON -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 mb-5 animate-in">
+      <div class="glass-card p-3 rounded-2xl flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+          <i class="fas fa-building text-sm"></i>
+        </div>
+        <div class="min-w-0">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">Active Clients</p>
+          <p class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white" id="kpiClientCount">0</p>
+        </div>
+      </div>
+
+      <div class="glass-card p-3 rounded-2xl flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+          <i class="fas fa-briefcase text-sm"></i>
+        </div>
+        <div class="min-w-0">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">Open Roles</p>
+          <p class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white" id="kpiPositionsCount">0</p>
+        </div>
+      </div>
+
+      <div class="glass-card p-3 rounded-2xl flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+          <i class="fas fa-database text-sm"></i>
+        </div>
+        <div class="min-w-0">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">Total DB Profiles</p>
+          <p class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white" id="kpiTotalDbCount">--</p>
+        </div>
+      </div>
+
+      <div class="glass-card p-3 rounded-2xl flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+          <i class="fas fa-envelope text-sm"></i>
+        </div>
+        <div class="min-w-0">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">JDs Emailed</p>
+          <p class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white" id="kpiEmailsSentCount">0</p>
+        </div>
+      </div>
+
+      <div class="glass-card p-3 rounded-2xl flex items-center gap-2.5 col-span-2 sm:col-span-1">
+        <div class="w-9 h-9 rounded-xl bg-teal-500/15 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
+          <i class="fas fa-user-shield text-sm"></i>
+        </div>
+        <div class="min-w-0">
+          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 truncate">Recruiter</p>
+          <p class="text-xs font-extrabold text-slate-900 dark:text-white truncate" id="kpiRecruiterShort">-</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+      <!-- LEFT COLUMN: REGISTRATION FORM (#jobForm) -->
+      <div class="lg:col-span-7 xl:col-span-8 animate-in" id="formTopAnchor">
+        <form id="jobForm" class="glass-card rounded-3xl p-4 sm:p-7 relative overflow-hidden" novalidate>
+          <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-600 via-indigo-500 to-emerald-500"></div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-slate-200/80 dark:border-slate-800/80">
+            <div>
+              <h2 class="font-display text-base sm:text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2.5">
+                <span class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs sm:text-sm shadow-md shadow-blue-600/25">
+                  <i class="fas fa-user-plus"></i>
+                </span>
+                <span>Candidate Profile Details</span>
+              </h2>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span id="validationSummaryPill" class="px-2.5 py-1 rounded-xl text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                0/8 Validated
+              </span>
+              <button
+                type="button"
+                onclick="resetCandidateFormClean()"
+                class="px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+              >
+                <i class="fas fa-rotate-left"></i>
+                <span>Reset</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 1: Personal & Contact Info -->
+          <div class="mb-5">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-3 flex items-center gap-1.5">
+              <i class="fas fa-address-card"></i>
+              1. Personal & Contact Information
+            </p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div class="sm:col-span-2">
+                <div class="flex items-center justify-between mb-1">
+                  <label for="name" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    <i class="fas fa-user text-blue-500 mr-1"></i> Full Name <span class="text-rose-500">*</span>
+                  </label>
+                  <span id="nameCondBadge" class="text-[10px] font-semibold text-slate-400">Letters & spaces (2-80 chars)</span>
+                </div>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  maxlength="80"
+                  oninput="validateNameField(this)"
+                  onblur="validateNameField(this)"
+                  class="form-input"
+                  placeholder="Enter candidate's full name (e.g. Rahul Sharma)"
+                  required
+                >
+                <p id="nameErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label for="email" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    <i class="fas fa-envelope text-blue-500 mr-1"></i> Email Address <span class="text-rose-500">*</span>
+                  </label>
+                  <span id="emailCondBadge" class="text-[10px] font-semibold text-slate-400">Required (For JD dispatch)</span>
+                </div>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  maxlength="120"
+                  oninput="validateEmailField(this)"
+                  onblur="validateEmailField(this)"
+                  class="form-input"
+                  placeholder="candidate@email.com"
+                  required
+                >
+                <p id="emailErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label for="contact" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    <i class="fas fa-phone text-blue-500 mr-1"></i> Contact Number <span class="text-rose-500">*</span>
+                  </label>
+                  <div class="flex items-center gap-2">
+                    <span id="contactDigitCounter" class="text-[10px] font-bold text-slate-400">0/10 digits</span>
+                    <button type="button" onclick="cleanPhoneNumber()" class="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline">
+                      Clean +91
+                    </button>
+                  </div>
+                </div>
+                <input
+                  type="tel"
+                  id="contact"
+                  name="contact"
+                  maxlength="14"
+                  oninput="validateContactField(this)"
+                  onblur="validateContactField(this)"
+                  class="form-input"
+                  placeholder="10-digit mobile (starts with 6-9)"
+                  required
+                >
+                <p id="contactErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 2: Compensation & Experience -->
+          <div class="mb-5 pt-4 border-t border-slate-200/70 dark:border-slate-800/80">
+            <div class="flex items-center justify-between mb-3">
+              <p class="text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                <i class="fas fa-indian-rupee-sign"></i>
+                2. Compensation & Experience
+              </p>
+              <span id="liveHikeBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 hidden">
+                Hike: 0%
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label for="currentCTC" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    <i class="fas fa-rupee-sign text-emerald-500 mr-1"></i> Current CTC <span class="text-rose-500">*</span>
+                  </label>
+                  <span id="currentCtcHint" class="text-[10px] font-semibold text-slate-400">0 - 500 LPA</span>
+                </div>
+                <div class="inline-group grid grid-cols-3 gap-2">
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    id="currentCTC"
+                    name="currentCTC"
+                    oninput="validateCurrentCtcField()"
+                    class="form-input col-span-2"
+                    placeholder="e.g. 5.5 or 45000"
+                    required
+                  >
+                  <select id="currentCTCUnit" name="currentCTCUnit" onchange="validateCurrentCtcField()" class="form-input" required>
+                    <option value="LPA">LPA</option>
+                    <option value="Monthly">Monthly</option>
+                  </select>
+                </div>
+                <p id="currentCtcErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label for="expectedCTC" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    <i class="fas fa-chart-line text-emerald-500 mr-1"></i> Expected CTC <span class="text-rose-500">*</span>
+                  </label>
+                  <span id="expectedCtcHint" class="text-[10px] font-semibold text-slate-400">0 - 500 LPA</span>
+                </div>
+                <div class="inline-group grid grid-cols-3 gap-2">
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    id="expectedCTC"
+                    name="expectedCTC"
+                    oninput="validateExpectedCtcField()"
+                    class="form-input col-span-2"
+                    placeholder="e.g. 7.0 or 60000"
+                    required
+                  >
+                  <select id="expectedCTCUnit" name="expectedCTCUnit" onchange="validateExpectedCtcField()" class="form-input" required>
+                    <option value="LPA">LPA</option>
+                    <option value="Monthly">Monthly</option>
+                  </select>
+                </div>
+                <p id="expectedCtcErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
+                <div class="checkbox-group mt-2 flex items-center gap-2.5 px-3 py-2 rounded-xl bg-blue-500/5 border border-blue-500/15">
+                  <input type="checkbox" id="asPerCompany" name="asPerCompany" class="w-4 h-4 accent-blue-600 rounded cursor-pointer">
+                  <label for="asPerCompany" class="text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                    <i class="fas fa-handshake text-blue-500 mr-1"></i> Negotiate as per company budget
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label for="experience" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    <i class="fas fa-briefcase text-indigo-500 mr-1"></i> Total Experience <span class="text-rose-500">*</span>
+                  </label>
+                  <span id="expCondHint" class="text-[10px] font-semibold text-slate-400">0 - 50 Yrs</span>
+                </div>
+                <div class="inline-group grid grid-cols-3 gap-2">
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    id="experience"
+                    name="experience"
+                    oninput="validateExperienceField()"
+                    class="form-input col-span-2"
+                    placeholder="e.g. 3"
+                    required
+                  >
+                  <select id="experienceUnit" name="experienceUnit" onchange="validateExperienceField()" class="form-input">
+                    <option value="Years">Years</option>
+                    <option value="Months">Months</option>
+                  </select>
+                </div>
+                <p id="experienceErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
+                <div class="checkbox-group mt-2 flex items-center gap-2.5 px-3 py-2 rounded-xl bg-indigo-500/5 border border-indigo-500/15">
+                  <input type="checkbox" id="isFresher" name="isFresher" class="w-4 h-4 accent-indigo-600 rounded cursor-pointer">
+                  <label for="isFresher" class="text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                    <i class="fas fa-graduation-cap text-indigo-500 mr-1"></i> Fresh Graduate (No Experience)
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label for="noticePeriod" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    <i class="fas fa-calendar-alt text-amber-500 mr-1"></i> Notice Period <span class="text-rose-500">*</span>
+                  </label>
+                  <span id="noticeCondHint" class="text-[10px] font-semibold text-slate-400">0 - 365 Days</span>
+                </div>
+                <div class="inline-group grid grid-cols-3 gap-2">
+                  <input
+                    type="number"
+                    min="0"
+                    id="noticePeriod"
+                    name="noticePeriod"
+                    oninput="validateNoticeField()"
+                    class="form-input col-span-2"
+                    placeholder="e.g. 30"
+                    required
+                  >
+                  <select id="noticePeriodUnit" name="noticePeriodUnit" onchange="validateNoticeField()" class="form-input">
+                    <option value="Days">Days</option>
+                    <option value="Months">Months</option>
+                  </select>
+                </div>
+                <p id="noticeErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
+                <div class="checkbox-group mt-2 flex items-center gap-2.5 px-3 py-2 rounded-xl bg-amber-500/5 border border-amber-500/15">
+                  <input type="checkbox" id="immediateJoiner" name="immediateJoiner" class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                  <label for="immediateJoiner" class="text-xs font-medium text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                    <i class="fas fa-rocket text-amber-500 mr-1"></i> Available to join immediately
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 3: Client Company & Recruiter Attribution -->
+          <div class="mb-5 pt-4 border-t border-slate-200/70 dark:border-slate-800/80">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-3 flex items-center gap-1.5">
+              <i class="fas fa-building"></i>
+              3. Client Company & Role Selection
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label for="company" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    <i class="fas fa-building text-purple-500 mr-1"></i> Select Company <span class="text-rose-500">*</span>
+                  </label>
+                  <span id="companyRoleCountBadge" class="text-[10px] font-semibold text-purple-600 dark:text-purple-400">Required</span>
+                </div>
+                <select id="company" name="company" class="form-input" required>
+                  <option value="">-- Choose Company --</option>
+                </select>
+                <p id="companyErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
+              </div>
+
+              <div id="positionDiv">
+                <div class="flex items-center justify-between mb-1">
+                  <label for="position" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    <i class="fas fa-user-tie text-purple-500 mr-1"></i> Open Position <span class="text-rose-500">*</span>
+                  </label>
+                  <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">Active Role</span>
+                </div>
+                <select id="position" name="position" onchange="validateCompanyPositionFields()" class="form-input" required>
+                  <option value="">-- Choose Position --</option>
+                </select>
+                <p id="positionErrorMsg" class="text-[11px] text-rose-600 dark:text-rose-400 font-medium mt-1 hidden"></p>
+              </div>
+
+              <div class="sm:col-span-2">
+                <div class="flex items-center justify-between mb-1">
+                  <label for="recruiterDisplay" class="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    <i class="fas fa-user-check text-blue-500 mr-1"></i> Submitting Recruiter
+                  </label>
+                  <span class="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">Verified Session</span>
+                </div>
+                <input type="text" id="recruiterDisplay" name="recruiterDisplay" readonly class="form-input opacity-85 cursor-not-allowed bg-slate-100 dark:bg-slate-800/90">
+                <input type="hidden" id="recruiterEmail" name="recruiterEmail">
+              </div>
+            </div>
+          </div>
+
+          <!-- Section 4: Automated Zoho JD Email Dispatch Controls -->
+          <div class="mb-5 pt-4 border-t border-slate-200/70 dark:border-slate-800/80">
+            <div class="p-4 rounded-2xl bg-gradient-to-br from-blue-500/10 via-indigo-500/5 to-emerald-500/10 border border-blue-500/20">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xs">
+                    <i class="fas fa-paper-plane"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                      Zoho Mail JD Dispatch
+                    </h4>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                      Send official Job Description & acknowledgement to candidate on submission
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onclick="openEmailPreviewModal()"
+                    class="px-2.5 py-1.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-blue-500 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all"
+                  >
+                    <i class="fas fa-eye text-blue-500"></i>
+                    <span>Preview Email</span>
+                  </button>
+                  <button
+                    type="button"
+                    onclick="openEmailConfigModal()"
+                    class="px-2.5 py-1.5 rounded-xl bg-blue-500/15 hover:bg-blue-500/25 text-blue-600 dark:text-blue-400 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                  >
+                    <i class="fas fa-gear"></i>
+                    <span>Configure</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="space-y-3">
+                <label class="flex items-center gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    id="autoSendJdEmail"
+                    name="autoSendJdEmail"
+                    checked
+                    class="w-4 h-4 accent-blue-600 rounded cursor-pointer"
+                  >
+                  <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                    Automatically send Job Description email to <span class="font-bold text-blue-600 dark:text-blue-400" id="emailTargetPreview">candidate@email.com</span>
+                  </span>
+                </label>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label for="jdLinkInput" class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      <i class="fas fa-link text-blue-500 mr-1"></i> JD Document Link / Drive URL (Optional)
+                    </label>
+                    <input
+                      type="url"
+                      id="jdLinkInput"
+                      name="jdLinkInput"
+                      class="form-input text-xs"
+                      placeholder="https://drive.google.com/... or leave blank for default JD copy"
+                    >
+                  </div>
+
+                  <div>
+                    <label for="emailCustomNote" class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">
+                      <i class="fas fa-comment-dots text-emerald-500 mr-1"></i> Custom Note for Candidate (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      id="emailCustomNote"
+                      name="emailCustomNote"
+                      maxlength="150"
+                      class="form-input text-xs"
+                      placeholder="e.g. Virtual interview scheduled tentatively for Friday"
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-3 pt-2">
+            <button
+              type="submit"
+              id="submitBtn"
+              class="flex-1 py-3.5 sm:py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-sm sm:text-base shadow-lg shadow-blue-600/25 hover:shadow-blue-600/40 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <i class="fas fa-paper-plane"></i>
+              <span class="btn-text">Submit & Dispatch JD</span>
+            </button>
+
+            <button
+              type="button"
+              id="manageCompanyBtn"
+              class="secondary py-3.5 sm:py-4 px-5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-700 font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <i class="fas fa-cogs text-blue-500"></i>
+              <span>Manage Companies & JDs</span>
+            </button>
+          </div>
+
+          <!-- SUCCESS & DISPATCH MODAL (#popupOverlay) -->
+          <div class="popup-overlay" id="popupOverlay">
+            <div class="popup glass-card text-center">
+              <div class="w-16 h-16 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-circle-check text-3xl text-emerald-500"></i>
+              </div>
+              <h3 class="font-display font-extrabold text-xl text-slate-900 dark:text-white mb-1.5">
+                Profile Logged Successfully!
+              </h3>
+              <p class="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 mb-2">
+                Saved directly to Supabase
+              </p>
+              
+              <!-- Real-time Email Dispatch Status Banner -->
+              <div id="modalEmailStatusBanner" class="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-xs text-left mb-4">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-bold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+                    <i class="fas fa-envelope text-blue-500"></i> Candidate JD Email:
+                  </span>
+                  <span id="modalEmailStatusPill" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-600">
+                    Processing...
+                  </span>
+                </div>
+                <p id="modalEmailDetailText" class="text-[11px] text-slate-500 dark:text-slate-400 truncate"></p>
+              </div>
+
+              <p class="text-xs text-slate-500 dark:text-slate-400 mb-5">
+                Dispatch the WhatsApp acknowledgement below or re-send the JD email if required.
+              </p>
+
+              <div class="space-y-2.5">
+                <button type="button" id="sendBtn" class="w-full py-3.5 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 cursor-pointer">
+                  <i class="fab fa-whatsapp text-base"></i>
+                  <span>Send WhatsApp to Candidate</span>
+                </button>
+
+                <div class="flex items-center gap-2">
+                  <button type="button" id="modalResendEmailBtn" class="flex-1 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md shadow-blue-500/20">
+                    <i class="fas fa-envelope"></i>
+                    <span>Resend JD Email</span>
+                  </button>
+                  <button type="button" id="cancelBtn" class="flex-1 py-3 px-4 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer">
+                    <i class="fas fa-check"></i>
+                    <span>Done & Reset</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MANAGE COMPANIES POPUP (#manageOverlay) -->
+          <div class="popup-overlay" id="manageOverlay">
+            <div class="popup manage-popup glass-card text-left">
+              <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-200 dark:border-slate-800">
+                <h3 class="font-display font-extrabold text-lg sm:text-xl text-slate-900 dark:text-white flex items-center gap-2">
+                  <i class="fas fa-building text-blue-500"></i>
+                  Company & JD Management
+                </h3>
+                <button type="button" id="manageCloseBtn" class="secondary close-button w-9 h-9 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+
+              <!-- Section A: Add New Company -->
+              <div class="p-4 rounded-2xl bg-blue-500/5 border border-blue-500/15 mb-6 space-y-3">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
+                  <i class="fas fa-plus-circle"></i> Add New Client Company
+                </h4>
+
+                <div>
+                  <div class="flex justify-between mb-1">
+                    <label for="newCompanyName" class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Company Name</label>
+                    <span class="text-[10px] text-slate-400">2-80 chars</span>
+                  </div>
+                  <input
+                    type="text"
+                    id="newCompanyName"
+                    maxlength="80"
+                    oninput="sanitizeAdminTextInput(this)"
+                    class="form-input"
+                    placeholder="e.g. Acme Corporation"
+                  >
+                </div>
+
+                <div>
+                  <div class="flex justify-between mb-1">
+                    <label for="newCompanyPositions" class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Initial Positions (comma separated)</label>
+                    <span class="text-[10px] text-slate-400">Comma separated</span>
+                  </div>
+                  <input
+                    type="text"
+                    id="newCompanyPositions"
+                    maxlength="250"
+                    oninput="sanitizeAdminTextInput(this)"
+                    class="form-input"
+                    placeholder="e.g. Developer, Manager"
+                  >
+                </div>
+
+                <div class="file-upload-section pt-1">
+                  <p class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-2">
+                    <i class="fas fa-file-pdf mr-1"></i> Upload Job Descriptions (Optional, Validated PDF max 10MB)
+                  </p>
+                  <div id="newCompanyFileInputs"></div>
+                </div>
+
+                <button type="button" id="addCompanyBtn" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-600/20 flex items-center justify-center gap-2 cursor-pointer">
+                  <i class="fas fa-plus"></i>
+                  Add New Company
+                </button>
+              </div>
+
+              <!-- Section B: Manage Existing Company & Positions -->
+              <div class="p-4 rounded-2xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-3">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
+                  <i class="fas fa-sliders"></i> Modify Existing Company & Positions
+                </h4>
+
+                <div>
+                  <label for="existingCompanySelect" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Select Company</label>
+                  <select id="existingCompanySelect" class="form-input">
+                    <option value="">-- Select Company --</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="addPositionsInput" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Add New Positions (comma separated)</label>
+                  <input
+                    type="text"
+                    id="addPositionsInput"
+                    maxlength="250"
+                    oninput="sanitizeAdminTextInput(this)"
+                    class="form-input"
+                    placeholder="e.g. Product Manager, Data Analyst"
+                  >
+                </div>
+
+                <div class="file-upload-section pt-1">
+                  <p class="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-2">
+                    <i class="fas fa-file-pdf mr-1"></i> Upload Job Descriptions for New Positions
+                  </p>
+                  <div id="existingCompanyFileInputs"></div>
+                </div>
+
+                <button type="button" id="addPositionsBtn" class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-indigo-600/20 flex items-center justify-center gap-2 cursor-pointer">
+                  <i class="fas fa-plus"></i>
+                  Add Positions to Selected Company
+                </button>
+
+                <hr class="border-slate-200 dark:border-slate-800 my-3">
+
+                <div>
+                  <label for="existingPositionSelect" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Existing Positions</label>
+                  <select id="existingPositionSelect" class="form-input">
+                    <option value="">-- Select Position --</option>
+                  </select>
+                </div>
+
+                <div class="button-group grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2">
+                  <button type="button" id="deletePositionBtn" class="danger py-3 px-4 rounded-xl bg-rose-500/15 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white border border-rose-500/25 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer">
+                    <i class="fas fa-trash"></i>
+                    Delete Position & JD
+                  </button>
+                  <button type="button" id="deleteCompanyBtn" class="danger py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer">
+                    <i class="fas fa-trash-alt"></i>
+                    Delete Company & All JDs
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- RIGHT SIDEBAR: ANALYTICS, WHATSAPP PREVIEW & LIVE DB FEED -->
+      <div class="lg:col-span-5 xl:col-span-4 space-y-4 animate-in">
+
+        <!-- Card 1: Live Candidate Snapshot -->
+        <div class="glass-card rounded-3xl p-4 sm:p-5">
+          <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-200/80 dark:border-slate-800">
+            <h3 class="font-display font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fas fa-chart-simple text-indigo-500"></i>
+              Live Candidate Snapshot
+            </h3>
+            <span id="matrixStatusBadge" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+              Real-Time
+            </span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70">
+              <span class="block text-[10px] text-slate-400 font-medium">Annualized Current</span>
+              <span class="font-extrabold text-slate-800 dark:text-white" id="matrixCurAnnual">₹0 LPA</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70">
+              <span class="block text-[10px] text-slate-400 font-medium">Annualized Expected</span>
+              <span class="font-extrabold text-emerald-600 dark:text-emerald-400" id="matrixExpAnnual">₹0 LPA</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70">
+              <span class="block text-[10px] text-slate-400 font-medium">Est. Monthly Gross</span>
+              <span class="font-bold text-slate-800 dark:text-white" id="matrixExpMonthly">₹0 /mo</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70">
+              <span class="block text-[10px] text-slate-400 font-medium">Calculated Hike</span>
+              <span class="font-extrabold text-indigo-600 dark:text-indigo-400" id="matrixHikePct">0%</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70">
+              <span class="block text-[10px] text-slate-400 font-medium">Experience Level</span>
+              <span class="font-bold text-slate-800 dark:text-white truncate block" id="matrixExpSummary">-</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/70">
+              <span class="block text-[10px] text-slate-400 font-medium">Joining Availability</span>
+              <span class="font-bold text-amber-600 dark:text-amber-400 truncate block" id="matrixNoticeSummary">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Live WhatsApp Message Preview Card -->
+        <div class="glass-card rounded-3xl p-4 sm:p-5 relative overflow-hidden" id="waPreviewAnchor">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200/80 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+              <span class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                <i class="fab fa-whatsapp text-base"></i>
+              </span>
+              <div>
+                <h3 class="font-display font-bold text-xs sm:text-sm text-slate-900 dark:text-white">Live WhatsApp Preview</h3>
+                <p class="text-[10px] text-slate-500">Auto-updates as you type</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button
+                type="button"
+                onclick="copyWhatsAppPreview()"
+                class="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-500/15 text-slate-700 dark:text-slate-300 hover:text-emerald-600 text-[10px] font-bold transition-colors"
+                title="Copy WhatsApp Message"
+              >
+                <i class="fas fa-copy mr-1"></i>Copy
+              </button>
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">Ready</span>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-[#e7ffdb] dark:bg-emerald-950/50 border border-emerald-500/20 text-slate-800 dark:text-slate-200 text-xs leading-relaxed whitespace-pre-line font-sans shadow-inner max-h-60 overflow-y-auto" id="liveWaPreviewBox"></div>
+        </div>
+
+        <!-- Card 3: Session Submissions + Recent Database Feed -->
+        <div class="glass-card rounded-3xl p-4 sm:p-5">
+          <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-slate-200/80 dark:border-slate-800">
+            <h3 class="font-display font-bold text-xs sm:text-sm text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fas fa-clock-rotate-left text-blue-500"></i>
+              Recent & Session Submissions
+            </h3>
+            <span id="sessionCountBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-600 dark:text-blue-400">0</span>
+          </div>
+
+          <div id="recentSubmissionsList" class="space-y-2 text-xs text-slate-500 dark:text-slate-400 max-h-48 overflow-y-auto">
+            <p class="text-center py-2 italic text-[11px]">Candidates submitted in this session will appear here.</p>
+          </div>
+
+          <div class="mt-3 pt-3 border-t border-slate-200/70 dark:border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Latest in Supabase DB</span>
+              <button type="button" onclick="loadRecentDbCandidates()" class="text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:underline">
+                Refresh
+              </button>
+            </div>
+            <div id="liveDbRecentList" class="space-y-1.5 text-[11px] text-slate-600 dark:text-slate-400 max-h-44 overflow-y-auto">
+              <p class="text-center py-2 text-slate-400">Loading recent entries...</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- EMAIL CONFIGURATION MODAL (#emailConfigOverlay) -->
+  <div class="popup-overlay" id="emailConfigOverlay">
+    <div class="popup config-popup glass-card text-left">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center">
+            <i class="fas fa-envelope-open-text text-base"></i>
+          </div>
+          <div>
+            <h3 class="font-display font-extrabold text-lg text-slate-900 dark:text-white">
+              Zoho Mail Configuration
+            </h3>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">
+              Configure SMTP credentials to automatically send JDs to candidates
+            </p>
+          </div>
+        </div>
+        <button type="button" onclick="closeEmailConfigModal()" class="w-9 h-9 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Quick Guidance Banner -->
+      <div class="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-xs mb-4 text-slate-700 dark:text-slate-300">
+        <p class="font-semibold mb-1 flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
+          <i class="fas fa-shield-halved"></i> Zoho Mail SMTP Details:
+        </p>
+        <p class="text-[11px] leading-relaxed">
+          For Zoho accounts with Two-Factor Authentication, generate an <strong>App-Specific Password</strong> in Zoho Accounts &rarr; <em>Security</em> &rarr; <em>App Passwords</em>. Do not use your personal master password.
+        </p>
+      </div>
+
+      <form id="emailConfigForm" onsubmit="saveEmailConfiguration(event)" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label for="zohoHost" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              SMTP Server / Host <span class="text-rose-500">*</span>
+            </label>
+            <select id="zohoHost" class="form-input text-xs" required>
+              <option value="smtppro.zoho.in">smtppro.zoho.in (Zoho India - Recommended)</option>
+              <option value="smtp.zoho.com">smtp.zoho.com (Zoho US / Global)</option>
+              <option value="smtp.zoho.eu">smtp.zoho.eu (Zoho Europe)</option>
+              <option value="smtp.zoho.com.au">smtp.zoho.com.au (Zoho Australia)</option>
+              <option value="custom">Custom SMTP Server</option>
+            </select>
+          </div>
+
+          <div id="customHostDiv" class="hidden">
+            <label for="customHostInput" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Custom SMTP Hostname
+            </label>
+            <input type="text" id="customHostInput" class="form-input text-xs" placeholder="e.g. mail.yourdomain.com">
+          </div>
+
+          <div>
+            <label for="zohoPort" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Port
+            </label>
+            <select id="zohoPort" class="form-input text-xs">
+              <option value="465">465 (SSL - Recommended)</option>
+              <option value="587">587 (TLS)</option>
+              <option value="25">25</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-2">
+            <label for="zohoUserEmail" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Zoho Sender Email Address <span class="text-rose-500">*</span>
+            </label>
+            <input
+              type="email"
+              id="zohoUserEmail"
+              class="form-input"
+              placeholder="e.g. careers@yourdomain.com or hr@yourdomain.com"
+              required
+            >
+            <p class="text-[10px] text-slate-400 mt-1">Must be your configured Zoho Mail account on your domain.</p>
+          </div>
+
+          <div class="sm:col-span-2">
+            <div class="flex items-center justify-between mb-1">
+              <label for="zohoPassword" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                Zoho App Password / Secret <span class="text-rose-500">*</span>
+              </label>
+              <button
+                type="button"
+                onclick="togglePasswordVisibility('zohoPassword', this)"
+                class="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                <i class="fas fa-eye mr-1"></i>Show
+              </button>
+            </div>
+            <input
+              type="password"
+              id="zohoPassword"
+              class="form-input"
+              placeholder="16-character Zoho App Password (e.g. abcd efgh ijkl mnop)"
+              required
+            >
+          </div>
+
+          <div>
+            <label for="zohoSenderName" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              Display Sender Name
+            </label>
+            <input
+              type="text"
+              id="zohoSenderName"
+              class="form-input text-xs"
+              placeholder="e.g. Talent Connect Consultancy"
+              value="Talent Connect Consultancy"
+            >
+          </div>
+
+          <div>
+            <label for="zohoCcRecruiter" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+              CC Options
+            </label>
+            <div class="checkbox-group flex items-center gap-2 mt-2">
+              <input type="checkbox" id="zohoCcRecruiter" checked class="w-4 h-4 accent-blue-600 rounded">
+              <label for="zohoCcRecruiter" class="text-xs text-slate-700 dark:text-slate-300">CC Logged-in Recruiter</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 dark:border-slate-800">
+          <label for="emailSubjectTemplate" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+            Email Subject Template
+          </label>
+          <input
+            type="text"
+            id="emailSubjectTemplate"
+            class="form-input text-xs font-mono"
+            value="Job Opportunity: {position} at {company} | Talent Connect Consultancy"
+          >
+          <p class="text-[10px] text-slate-400 mt-1">Available variables: <code>{candidate_name}</code>, <code>{position}</code>, <code>{company}</code></p>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-700 dark:text-slate-300">Test Your Zoho Connection</span>
+            <span class="text-[10px] text-slate-400">Sends a sample JD email</span>
+          </div>
+          <div class="flex gap-2">
+            <input
+              type="email"
+              id="testEmailRecipient"
+              class="form-input text-xs flex-1"
+              placeholder="Enter your personal email to test (e.g. test@gmail.com)"
+            >
+            <button
+              type="button"
+              onclick="executeTestEmailSend()"
+              id="testEmailBtn"
+              class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 transition-colors"
+            >
+              <i class="fas fa-paper-plane"></i>
+              <span>Send Test</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-2">
+          <button
+            type="button"
+            onclick="closeEmailConfigModal()"
+            class="px-4 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold shadow-md shadow-blue-500/25 flex items-center gap-1.5"
+          >
+            <i class="fas fa-floppy-disk"></i>
+            <span>Save Configuration</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- LIVE EMAIL PREVIEW MODAL (#emailPreviewOverlay) -->
+  <div class="popup-overlay" id="emailPreviewOverlay">
+    <div class="popup config-popup glass-card text-left max-w-2xl">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-2">
+          <i class="fas fa-envelope-open text-blue-500 text-base"></i>
+          <h3 class="font-display font-bold text-sm sm:text-base text-slate-900 dark:text-white">
+            Email Preview (What the Candidate Receives)
+          </h3>
+        </div>
+        <button type="button" onclick="closeEmailPreviewModal()" class="w-8 h-8 rounded-lg bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-white hover:bg-rose-500 transition-colors">
+          <i class="fas fa-times text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Simulated Email Client Header -->
+      <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs space-y-1 mb-4">
+        <div><strong class="text-slate-500">From:</strong> <span id="previewFrom">Talent Connect Consultancy &lt;careers@domain.com&gt;</span></div>
+        <div><strong class="text-slate-500">To:</strong> <span id="previewTo" class="font-bold text-blue-600">candidate@email.com</span></div>
+        <div><strong class="text-slate-500">Subject:</strong> <span id="previewSubject" class="font-semibold text-slate-800 dark:text-slate-200">-</span></div>
+      </div>
+
+      <!-- Rendered HTML Email Frame -->
+      <div id="emailHtmlRenderContainer" class="p-4 sm:p-6 rounded-2xl bg-white text-slate-900 border border-slate-200 shadow-inner max-h-[55vh] overflow-y-auto font-sans leading-relaxed text-sm">
+        <!-- Injected dynamically -->
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-4">
+        <button type="button" onclick="closeEmailPreviewModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold">
+          Close Preview
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Quick Action Bar -->
+  <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 glass-card border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
+    <button type="button" onclick="goHome()" class="flex flex-col items-center gap-0.5 text-blue-600 dark:text-blue-400 text-[10px] font-bold">
+      <i class="fas fa-house text-sm"></i>
+      <span>Home</span>
+    </button>
+    <button type="button" onclick="document.getElementById('formTopAnchor').scrollIntoView({behavior:'smooth'})" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
+      <i class="fas fa-user-plus text-sm"></i>
+      <span>Form</span>
+    </button>
+    <button type="button" onclick="openEmailConfigModal()" class="flex flex-col items-center gap-0.5 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold">
+      <i class="fas fa-envelope text-sm"></i>
+      <span>Email</span>
+    </button>
+    <button type="button" onclick="document.getElementById('waPreviewAnchor').scrollIntoView({behavior:'smooth'})" class="flex flex-col items-center gap-0.5 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">
+      <i class="fab fa-whatsapp text-sm"></i>
+      <span>WA Preview</span>
+    </button>
+    <button type="button" onclick="resetCandidateFormClean()" class="flex flex-col items-center gap-0.5 text-amber-600 dark:text-amber-400 text-[10px] font-semibold">
+      <i class="fas fa-rotate-left text-sm"></i>
+      <span>Reset</span>
+    </button>
+  </nav>
+
+  <script>
+    const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Google Apps Script endpoint for Google Drive JD PDF file uploads/deletions
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzxyo19lD_6WHXwCkpcIXrfV38pAobEjiO6sYhYBFh-nId-YWdGHNPJF_Rh9IQBchSd/exec';
+
+    let companies = {};
+    let newCompanyFiles = {};
+    let existingCompanyFiles = {};
+    const sessionSubmissions = [];
+    let sessionEmailsSentCount = 0;
+    let lastCandidatePayload = null;
+
+    // Default Email / Zoho Configuration Object
+    const DEFAULT_EMAIL_CONFIG = {
+      host: 'smtppro.zoho.in',
+      port: '465',
+      userEmail: '',
+      password: '',
+      senderName: 'Talent Connect Consultancy',
+      ccRecruiter: true,
+      subjectTemplate: 'Job Opportunity: {position} at {company} | Talent Connect Consultancy',
+      isConfigured: false
+    };
+
+    function getEmailConfig() {
+      try {
+        const stored = localStorage.getItem('tcc_zoho_email_config');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          return { ...DEFAULT_EMAIL_CONFIG, ...parsed };
+        }
+      } catch (err) {
+        console.error('Error reading email config:', err);
+      }
+      return { ...DEFAULT_EMAIL_CONFIG };
+    }
+
+    function saveEmailConfigObject(config) {
+      localStorage.setItem('tcc_zoho_email_config', JSON.stringify(config));
+      updateEmailStatusBadge();
+    }
+
+    function updateEmailStatusBadge() {
+      const cfg = getEmailConfig();
+      const dot = document.getElementById('headerEmailStatusDot');
+      if (dot) {
+        if (cfg.userEmail && cfg.password) {
+          dot.className = 'w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50';
+          dot.title = `Zoho configured: ${cfg.userEmail}`;
+        } else {
+          dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+          dot.title = 'Zoho email not yet configured. Click to setup.';
+        }
+      }
+    }
+
+    function togglePasswordVisibility(inputId, btn) {
+      const inp = document.getElementById(inputId);
+      if (!inp) return;
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.innerHTML = '<i class="fas fa-eye-slash mr-1"></i>Hide';
+      } else {
+        inp.type = 'password';
+        btn.innerHTML = '<i class="fas fa-eye mr-1"></i>Show';
+      }
+    }
+
+    function openEmailConfigModal() {
+      const cfg = getEmailConfig();
+      const hostSelect = document.getElementById('zohoHost');
+      const customDiv = document.getElementById('customHostDiv');
+      const customInput = document.getElementById('customHostInput');
+
+      if (['smtppro.zoho.in', 'smtp.zoho.com', 'smtp.zoho.eu', 'smtp.zoho.com.au'].includes(cfg.host)) {
+        hostSelect.value = cfg.host;
+        customDiv?.classList.add('hidden');
+      } else if (cfg.host) {
+        hostSelect.value = 'custom';
+        customDiv?.classList.remove('hidden');
+        if (customInput) customInput.value = cfg.host;
+      }
+
+      document.getElementById('zohoPort').value = cfg.port || '465';
+      document.getElementById('zohoUserEmail').value = cfg.userEmail || '';
+      document.getElementById('zohoPassword').value = cfg.password || '';
+      document.getElementById('zohoSenderName').value = cfg.senderName || 'Talent Connect Consultancy';
+      document.getElementById('zohoCcRecruiter').checked = Boolean(cfg.ccRecruiter);
+      document.getElementById('emailSubjectTemplate').value = cfg.subjectTemplate || DEFAULT_EMAIL_CONFIG.subjectTemplate;
+
+      document.getElementById('emailConfigOverlay').style.display = 'flex';
+    }
+
+    function closeEmailConfigModal() {
+      document.getElementById('emailConfigOverlay').style.display = 'none';
+    }
+
+    document.getElementById('zohoHost')?.addEventListener('change', function() {
+      const customDiv = document.getElementById('customHostDiv');
+      if (this.value === 'custom') {
+        customDiv?.classList.remove('hidden');
+      } else {
+        customDiv?.classList.add('hidden');
+      }
+    });
+
+    function saveEmailConfiguration(e) {
+      if (e) e.preventDefault();
+      const hostSelect = document.getElementById('zohoHost').value;
+      const host = hostSelect === 'custom' ? (document.getElementById('customHostInput').value.trim() || 'smtppro.zoho.in') : hostSelect;
+      const port = document.getElementById('zohoPort').value;
+      const userEmail = document.getElementById('zohoUserEmail').value.trim();
+      const password = document.getElementById('zohoPassword').value.trim();
+      const senderName = document.getElementById('zohoSenderName').value.trim() || 'Talent Connect Consultancy';
+      const ccRecruiter = document.getElementById('zohoCcRecruiter').checked;
+      const subjectTemplate = document.getElementById('emailSubjectTemplate').value.trim() || DEFAULT_EMAIL_CONFIG.subjectTemplate;
+
+      if (!userEmail || !password) {
+        return showToast('Please enter both your Zoho Email and Zoho App Password', 'error');
+      }
+
+      const config = {
+        host,
+        port,
+        userEmail,
+        password,
+        senderName,
+        ccRecruiter,
+        subjectTemplate,
+        isConfigured: true
+      };
+
+      saveEmailConfigObject(config);
+      showToast('Zoho Mail configuration saved successfully!', 'success');
+      closeEmailConfigModal();
+    }
+
+    async function executeTestEmailSend() {
+      const recipient = document.getElementById('testEmailRecipient')?.value.trim();
+      if (!recipient || !recipient.includes('@')) {
+        return showToast('Please enter a valid test recipient email address', 'error');
+      }
+
+      const hostSelect = document.getElementById('zohoHost').value;
+      const host = hostSelect === 'custom' ? document.getElementById('customHostInput').value.trim() : hostSelect;
+      const userEmail = document.getElementById('zohoUserEmail').value.trim();
+      const password = document.getElementById('zohoPassword').value.trim();
+      const senderName = document.getElementById('zohoSenderName').value.trim() || 'Talent Connect Consultancy';
+
+      if (!userEmail || !password) {
+        return showToast('Please fill in your Zoho email and App Password before testing', 'error');
+      }
+
+      const btn = document.getElementById('testEmailBtn');
+      const originalHTML = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Sending...`;
+
+      try {
+        const testHtml = generateJdEmailHtml({
+          name: 'Test Candidate',
+          position: 'Senior Software Engineer',
+          company: 'Acme Technologies',
+          currentCTC: '8.5',
+          currentCTCUnit: 'LPA',
+          expectedCTC: '12.0',
+          expectedCTCUnit: 'LPA',
+          noticePeriod: '30',
+          noticePeriodUnit: 'Days',
+          recruiterName: sessionStorage.getItem('userName') || 'Recruiter',
+          recruiterEmail: sessionStorage.getItem('userEmail') || userEmail,
+          recruiterMobile: sessionStorage.getItem('userContact') || '',
+          jdLink: 'https://drive.google.com/',
+          customNote: 'This is a test email confirming your Zoho SMTP connection works properly.'
+        });
+
+        const result = await sendEmailViaSmtp({
+          host,
+          username: userEmail,
+          password: password,
+          to: recipient,
+          from: `${senderName} <${userEmail}>`,
+          subject: `[Test Verification] Zoho Mail Connection Successful - TCC`,
+          html: testHtml
+        });
+
+        if (result.success) {
+          showToast(`Test email successfully delivered to ${recipient}!`, 'success');
+        } else {
+          throw new Error(result.error || 'Failed to send test email');
+        }
+      } catch (err) {
+        console.error('Test email error:', err);
+        showToast(`Test Failed: ${err.message}`, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalBtnHTML;
+      }
+    }
+
+    // Generate responsive, branded HTML email template for candidates
+    function generateJdEmailHtml(d) {
+      const candidateName = d.name || 'Candidate';
+      const position = d.position || 'Open Role';
+      const company = d.company || 'Client Organization';
+      const recruiterName = d.recruiterName || 'Talent Connect Consultancy';
+      const recruiterEmail = d.recruiterEmail || '';
+      const recruiterMobile = d.recruiterMobile || '';
+      const currentCTC = d.currentCTC ? `${d.currentCTC} ${d.currentCTCUnit || 'LPA'}` : 'Not Disclosed';
+      const expectedCTC = d.expectedCTC ? `${d.expectedCTC} ${d.expectedCTCUnit || ''}`.trim() : 'As per company standard';
+      const notice = d.noticePeriod ? `${d.noticePeriod} ${d.noticePeriodUnit || 'Days'}` : 'Immediate';
+      const jdLink = d.jdLink ? d.jdLink.trim() : '';
+      const customNote = d.customNote ? d.customNote.trim() : '';
+
+      return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Description: ${position}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #1e293b;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; padding: 24px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06); border: 1px solid #e2e8f0;" cellspacing="0" cellpadding="0">
+          <!-- Header Banner -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #2563eb, #4f46e5); padding: 28px 24px; text-align: left; color: #ffffff;">
+              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; opacity: 0.85; margin-bottom: 4px;">
+                Talent Connect Consultancy
+              </div>
+              <h1 style="margin: 0; font-size: 22px; font-weight: 800; line-height: 1.3; color: #ffffff;">
+                Candidate Submission & Job Description
+              </h1>
+            </td>
+          </tr>
+
+          <!-- Main Body -->
+          <tr>
+            <td style="padding: 28px 24px;">
+              <p style="font-size: 15px; line-height: 1.6; margin: 0 0 16px 0; color: #1e293b;">
+                Dear <strong>${candidateName}</strong>,
+              </p>
+              <p style="font-size: 14px; line-height: 1.6; margin: 0 0 20px 0; color: #334155;">
+                Thank you for speaking with us. As discussed, we are excited to submit your profile for the position of <strong style="color: #2563eb;">${position}</strong> at our esteemed client, <strong style="color: #0f172a;">${company}</strong>.
+              </p>
+
+              <!-- Profile Submission Summary Card -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; border-radius: 12px; margin-bottom: 22px; border: 1px solid #e2e8f0;">
+                <tr>
+                  <td style="padding: 16px;">
+                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; margin-bottom: 10px;">
+                      Submission Snapshot
+                    </div>
+                    <table width="100%" cellspacing="0" cellpadding="4" style="font-size: 13px; color: #1e293b;">
+                      <tr>
+                        <td width="40%" style="color: #64748b; font-weight: 600;">Position:</td>
+                        <td width="60%"><strong>${position}</strong></td>
+                      </tr>
+                      <tr>
+                        <td style="color: #64748b; font-weight: 600;">Client:</td>
+                        <td><strong>${company}</strong></td>
+                      </tr>
+                      <tr>
+                        <td style="color: #64748b; font-weight: 600;">Current CTC:</td>
+                        <td>${currentCTC}</td>
+                      </tr>
+                      <tr>
+                        <td style="color: #64748b; font-weight: 600;">Expected CTC:</td>
+                        <td>${expectedCTC}</td>
+                      </tr>
+                      <tr>
+                        <td style="color: #64748b; font-weight: 600;">Notice Period:</td>
+                        <td>${notice}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              ${customNote ? `
+              <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 12px 16px; border-radius: 8px; margin-bottom: 22px; font-size: 13px; color: #065f46;">
+                <strong>Recruiter Note:</strong> ${customNote}
+              </div>
+              ` : ''}
+
+              <!-- Job Description Callout -->
+              <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 18px; margin-bottom: 24px; text-align: center;">
+                <h3 style="margin: 0 0 6px 0; font-size: 15px; font-weight: 700; color: #1e3a8a;">
+                  Job Description & Overview
+                </h3>
+                <p style="margin: 0 0 14px 0; font-size: 12.5px; color: #3b82f6; line-height: 1.5;">
+                  Please review the complete role specifications, deliverables, and requirements.
+                </p>
+                ${jdLink ? `
+                <a href="${jdLink}" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 10px 22px; font-size: 13px; font-weight: 700; border-radius: 10px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);">
+                  View Job Description &rarr;
+                </a>
+                ` : `
+                <div style="font-size: 12px; color: #475569; background: #ffffff; padding: 10px; border-radius: 8px; border: 1px dashed #cbd5e1; text-align: left;">
+                  The detailed JD document has been logged for <strong>${position}</strong> at <strong>${company}</strong>. Please reply to this email with your updated resume to confirm your acknowledgement.
+                </div>
+                `}
+              </div>
+
+              <!-- Next Steps Instruction -->
+              <p style="font-size: 13.5px; line-height: 1.6; margin: 0 0 24px 0; color: #334155;">
+                <strong>Action Required:</strong> Kindly acknowledge receipt of this email and reply with your latest updated CV. If you have any questions or schedule constraints, please let us know immediately.
+              </p>
+
+              <!-- Recruiter Signoff -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-top: 1px solid #e2e8f0; padding-top: 18px;">
+                <tr>
+                  <td>
+                    <p style="font-size: 13px; margin: 0; color: #64748b;">Warm regards,</p>
+                    <p style="font-size: 14px; font-weight: 700; margin: 4px 0 2px 0; color: #0f172a;">${recruiterName}</p>
+                    <p style="font-size: 12px; margin: 0; color: #64748b;">Talent Connect Consultancy</p>
+                    ${recruiterEmail ? `<p style="font-size: 12px; margin: 2px 0 0 0; color: #2563eb;"><a href="mailto:${recruiterEmail}" style="color: #2563eb; text-decoration: none;">${recruiterEmail}</a></p>` : ''}
+                    ${recruiterMobile ? `<p style="font-size: 12px; margin: 2px 0 0 0; color: #64748b;">Contact: ${recruiterMobile}</p>` : ''}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f8fafc; padding: 16px 24px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8;">
+              &copy; Talent Connect Consultancy. Confidential & Privileged recruitment communication.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+      `.trim();
+    }
+
+    // ---- Zoho Flow email transport ----
+    // wss://...  -> WebSocket (sends the email JSON, waits for an ack message)
+    // https://... -> Zoho Flow webhook URL (HTTP POST)
+    const ZOHO_FLOW_URL = 'PASTE_YOUR_ZOHO_FLOW_URL_HERE';
+    const ZOHO_FLOW_TIMEOUT_MS = 20000;
+
+    function sendViaZohoFlowSocket(url, payload) {
+      return new Promise((resolve) => {
+        let settled = false;
+        let ws = null;
+        let timer = null;
+        const finish = (result) => {
+          if (settled) return;
+          settled = true;
+          clearTimeout(timer);
+          try { if (ws) ws.close(); } catch (_) {}
+          resolve(result);
+        };
+        timer = setTimeout(() => finish({ success: false, error: 'Zoho Flow did not respond in time' }), ZOHO_FLOW_TIMEOUT_MS);
+
+        try {
+          ws = new WebSocket(url);
+        } catch (err) {
+          return finish({ success: false, error: 'Invalid Zoho Flow WebSocket URL' });
+        }
+
+        ws.onopen = () => ws.send(JSON.stringify(payload));
+        ws.onmessage = (evt) => {
+          let msg = null;
+          try { msg = JSON.parse(evt.data); } catch (_) {}
+          if (msg && msg.id && msg.id !== payload.id) return; // ack for another request
+          if (msg && (msg.success === false || msg.error)) {
+            finish({ success: false, error: msg.error || 'Zoho Flow rejected the email' });
+          } else {
+            finish({ success: true });
+          }
+        };
+        ws.onerror = () => finish({ success: false, error: 'Could not connect to Zoho Flow WebSocket' });
+        ws.onclose = () => finish({ success: false, error: 'Zoho Flow connection closed before confirming delivery' });
+      });
+    }
+
+    async function sendViaZohoFlowWebhook(url, payload) {
+      // Form-encoded + no-cors avoids the CORS preflight that Zoho Flow webhooks reject.
+      // The response is opaque, so success means "Flow accepted the request".
+      await fetch(url, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(payload) });
+      return { success: true };
+    }
+
+    // Email sender (same signature as before, so all callers keep working)
+    async function sendEmailViaSmtp({ host, username, password, to, from, subject, html, cc }) {
+      try {
+        if (!ZOHO_FLOW_URL || ZOHO_FLOW_URL.startsWith('PASTE_')) {
+          return { success: false, error: 'Zoho Flow URL not set. Add it to ZOHO_FLOW_URL in the script.' };
+        }
+
+        // SMTP password/host are intentionally NOT sent; Zoho Flow handles the mail account.
+        const payload = {
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+          action: 'sendEmail',
+          to,
+          cc: cc || '',
+          from: from || username,
+          fromEmail: username || '',
+          subject,
+          html
+        };
+
+        if (/^wss?:\/\//i.test(ZOHO_FLOW_URL)) {
+          return await sendViaZohoFlowSocket(ZOHO_FLOW_URL, payload);
+        }
+        return await sendViaZohoFlowWebhook(ZOHO_FLOW_URL, payload);
+      } catch (err) {
+        console.error('Zoho Flow dispatch failed:', err);
+        return { success: false, error: err.message || 'Zoho Flow communication error' };
+      }
+    }
+
+    // High-level automated function called on profile addition
+    async function dispatchJdEmailToCandidate(data) {
+      const emailConfig = getEmailConfig();
+
+      if (!data.email || !data.email.includes('@')) {
+        return { success: false, error: 'Candidate has no valid email address' };
+      }
+
+      if (!emailConfig.userEmail || !emailConfig.password) {
+        return {
+          success: false,
+          notConfigured: true,
+          error: 'Zoho Mail not configured. Please open Email Settings to enter your Zoho credentials.'
+        };
+      }
+
+      const subject = (emailConfig.subjectTemplate || DEFAULT_EMAIL_CONFIG.subjectTemplate)
+        .replace(/{candidate_name}/g, data.name)
+        .replace(/{position}/g, data.position)
+        .replace(/{company}/g, data.company);
+
+      const html = generateJdEmailHtml({
+        name: data.name,
+        position: data.position,
+        company: data.company,
+        currentCTC: data.currentCTC,
+        currentCTCUnit: data.currentCTCUnit,
+        expectedCTC: data.expectedCTC,
+        expectedCTCUnit: data.expectedCTCUnit,
+        noticePeriod: data.noticePeriod,
+        noticePeriodUnit: data.noticePeriodUnit,
+        recruiterName: data.recruiterName,
+        recruiterEmail: data.recruiterEmail,
+        recruiterMobile: data.recruiterMobile,
+        jdLink: data.jdLink,
+        customNote: data.customNote
+      });
+
+      const cc = (emailConfig.ccRecruiter && data.recruiterEmail && data.recruiterEmail !== emailConfig.userEmail)
+        ? data.recruiterEmail
+        : undefined;
+
+      const fromHeader = `${emailConfig.senderName || 'Talent Connect Consultancy'} <${emailConfig.userEmail}>`;
+
+      const result = await sendEmailViaSmtp({
+        host: emailConfig.host || 'smtppro.zoho.in',
+        username: emailConfig.userEmail,
+        password: emailConfig.password,
+        to: data.email,
+        from: fromHeader,
+        subject,
+        html,
+        cc
+      });
+
+      if (result.success) {
+        sessionEmailsSentCount++;
+        document.getElementById('kpiEmailsSentCount').textContent = String(sessionEmailsSentCount);
+      }
+
+      return result;
+    }
+
+    function openEmailPreviewModal() {
+      const candidateName = document.getElementById('name')?.value.trim() || 'Candidate Name';
+      const candidateEmail = document.getElementById('email')?.value.trim() || 'candidate@email.com';
+      const company = document.getElementById('company')?.value || 'Client Company';
+      const position = document.getElementById('position')?.value || 'Position Role';
+      const jdLink = document.getElementById('jdLinkInput')?.value || '';
+      const customNote = document.getElementById('emailCustomNote')?.value || '';
+      const curCTC = document.getElementById('currentCTC')?.value || '-';
+      const curUnit = document.getElementById('currentCTCUnit')?.value || 'LPA';
+      const expCTC = document.getElementById('asPerCompany')?.checked ? 'As Per Company' : (document.getElementById('expectedCTC')?.value || '-');
+      const expUnit = document.getElementById('asPerCompany')?.checked ? '' : (document.getElementById('expectedCTCUnit')?.value || 'LPA');
+      const notice = document.getElementById('immediateJoiner')?.checked ? 'Immediate' : (document.getElementById('noticePeriod')?.value || '-');
+      const noticeUnit = document.getElementById('immediateJoiner')?.checked ? '' : (document.getElementById('noticePeriodUnit')?.value || 'Days');
+      const cfg = getEmailConfig();
+
+      const subject = (cfg.subjectTemplate || DEFAULT_EMAIL_CONFIG.subjectTemplate)
+        .replace(/{candidate_name}/g, candidateName)
+        .replace(/{position}/g, position)
+        .replace(/{company}/g, company);
+
+      document.getElementById('previewFrom').textContent = `${cfg.senderName || 'Talent Connect Consultancy'} <${cfg.userEmail || 'careers@yourdomain.com'}>`;
+      document.getElementById('previewTo').textContent = candidateEmail;
+      document.getElementById('previewSubject').textContent = subject;
+
+      const html = generateJdEmailHtml({
+        name: candidateName,
+        position,
+        company,
+        currentCTC: curCTC,
+        currentCTCUnit: curUnit,
+        expectedCTC: expCTC,
+        expectedCTCUnit: expUnit,
+        noticePeriod: notice,
+        noticePeriodUnit: noticeUnit,
+        recruiterName: sessionStorage.getItem('userName') || 'Recruiter',
+        recruiterEmail: sessionStorage.getItem('userEmail') || '',
+        recruiterMobile: sessionStorage.getItem('userContact') || '',
+        jdLink,
+        customNote
+      });
+
+      document.getElementById('emailHtmlRenderContainer').innerHTML = html;
+      document.getElementById('emailPreviewOverlay').style.display = 'flex';
+    }
+
+    function closeEmailPreviewModal() {
+      document.getElementById('emailPreviewOverlay').style.display = 'none';
+    }
+
+    function verifyPdfMagicHeader(file) {
+      return new Promise((resolve) => {
+        try {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const header = String.fromCharCode(...new Uint8Array(e.target.result));
+            resolve(header === '%PDF-');
+          };
+          reader.onerror = () => resolve(false);
+          reader.readAsArrayBuffer(file.slice(0, 5));
+        } catch {
+          resolve(false);
+        }
+      });
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      sessionStorage.setItem('tccTheme', isDark ? 'dark' : 'light');
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const styles = {
+        info: 'bg-slate-900 dark:bg-slate-800 text-white border-blue-500/40',
+        success: 'bg-emerald-600 text-white border-emerald-400',
+        error: 'bg-rose-600 text-white border-rose-400'
+      };
+      const icons = {
+        info: 'fa-circle-info',
+        success: 'fa-circle-check',
+        error: 'fa-triangle-exclamation'
+      };
+      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3.5 rounded-2xl border shadow-xl text-xs sm:text-sm font-semibold transition-all duration-300 ${styles[type] || styles.info}`;
+
+      const iconEl = document.createElement('i');
+      iconEl.className = `fas ${icons[type] || icons.info} shrink-0`;
+      const spanEl = document.createElement('span');
+      spanEl.className = 'flex-1';
+      spanEl.textContent = String(message || '');
+
+      toast.append(iconEl, spanEl);
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3800);
+    }
+
+    function askConfirmation(message) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById('confirmDialogModal');
+        const textEl = document.getElementById('confirmDialogText');
+        const cancelBtn = document.getElementById('confirmCancelBtn');
+        const acceptBtn = document.getElementById('confirmAcceptBtn');
+
+        textEl.textContent = message;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+
+        const cleanup = (result) => {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          cancelBtn.onclick = acceptBtn.onclick = null;
+          resolve(result);
+        };
+
+        cancelBtn.onclick = () => cleanup(false);
+        acceptBtn.onclick = () => cleanup(true);
+      });
+    }
+
+    // Unified validation UI state helper
+    function setFieldState(el, isValid, errEl, errMsg = '', badgeEl = null, badgeText = '') {
+      if (el) {
+        el.classList.toggle('input-valid', isValid);
+        el.classList.toggle('input-invalid', !isValid);
+      }
+      if (errEl) {
+        errEl.textContent = errMsg;
+        errEl.classList.toggle('hidden', isValid || !errMsg);
+      }
+      if (badgeEl && badgeText) badgeEl.textContent = badgeText;
+      updateLivePreviewAndProgress();
+      return isValid;
+    }
+
+    function validateNameField(inputEl) {
+      const el = inputEl || document.getElementById('name');
+      if (!el) return false;
+      const cleaned = el.value.replace(/[<>"{}`]/g, '');
+      if (el.value !== cleaned) el.value = cleaned;
+
+      const val = el.value.trim();
+      const errEl = document.getElementById('nameErrorMsg');
+      const badgeEl = document.getElementById('nameCondBadge');
+
+      if (!val) return setFieldState(el, false, errEl, 'Candidate full name is required.', badgeEl, 'Required');
+      if (!/^[a-zA-Z\s.'-]{2,80}$/.test(val)) {
+        return setFieldState(el, false, errEl, 'Enter a valid name (2–80 characters, letters and spaces only).', badgeEl, 'Invalid name');
+      }
+      return setFieldState(el, true, errEl, '', badgeEl, '✓ Valid');
+    }
+
+    function validateEmailField(inputEl) {
+      const el = inputEl || document.getElementById('email');
+      if (!el) return false;
+      const val = el.value.trim();
+      const errEl = document.getElementById('emailErrorMsg');
+      const badgeEl = document.getElementById('emailCondBadge');
+
+      const previewTarget = document.getElementById('emailTargetPreview');
+      if (previewTarget) previewTarget.textContent = val || 'candidate@email.com';
+
+      if (!val) return setFieldState(el, false, errEl, 'Candidate email address is required for sending JD.', badgeEl, 'Required');
+      const isValid = !/[<>'";\\]/.test(val) && /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val) && val.length <= 120;
+      if (!isValid) return setFieldState(el, false, errEl, 'Please enter a valid email address (e.g. rahul@domain.com).', badgeEl, 'Invalid format');
+      return setFieldState(el, true, errEl, '', badgeEl, '✓ Valid');
+    }
+
+    function validateContactField(inputEl) {
+      const el = inputEl || document.getElementById('contact');
+      if (!el) return false;
+
+      let digits = el.value.replace(/\D/g, '');
+      if (digits.startsWith('91') && digits.length > 10) digits = digits.slice(2);
+      if (digits.startsWith('0') && digits.length > 10) digits = digits.slice(1);
+      digits = digits.slice(0, 10);
+      el.value = digits;
+
+      const counterEl = document.getElementById('contactDigitCounter');
+      const errEl = document.getElementById('contactErrorMsg');
+      if (counterEl) counterEl.textContent = `${digits.length}/10 digits`;
+
+      if (!digits) return setFieldState(el, false, errEl, '10-digit mobile number is required.');
+      if (!/^[6-9]\d{9}$/.test(digits)) return setFieldState(el, false, errEl, 'Mobile must be 10 digits starting with 6, 7, 8, or 9.');
+      return setFieldState(el, true, errEl);
+    }
+
+    function validateCurrentCtcField() {
+      const el = document.getElementById('currentCTC');
+      const unit = document.getElementById('currentCTCUnit')?.value || 'LPA';
+      const errEl = document.getElementById('currentCtcErrorMsg');
+      const hintEl = document.getElementById('currentCtcHint');
+      if (!el) return false;
+
+      const val = parseFloat(el.value);
+      const maxLimit = unit === 'LPA' ? 500 : 5000000;
+      const hintText = unit === 'LPA' ? '0 - 500 LPA' : '₹1k - ₹50L /mo';
+
+      if (el.value.trim() === '' || isNaN(val) || val < 0 || val > maxLimit) {
+        const msg = unit === 'LPA' ? 'Enter a valid Current CTC between 0 and 500 LPA.' : 'Enter a valid Monthly CTC between 0 and 50,000,000.';
+        return setFieldState(el, false, errEl, msg, hintEl, hintText);
+      }
+      return setFieldState(el, true, errEl, '', hintEl, hintText);
+    }
+
+    function validateExpectedCtcField() {
+      const el = document.getElementById('expectedCTC');
+      const unit = document.getElementById('expectedCTCUnit')?.value || 'LPA';
+      const asPerComp = document.getElementById('asPerCompany')?.checked;
+      const errEl = document.getElementById('expectedCtcErrorMsg');
+      const hintEl = document.getElementById('expectedCtcHint');
+      if (!el) return false;
+
+      if (asPerComp) {
+        el.classList.remove('input-invalid', 'input-valid');
+        if (errEl) errEl.classList.add('hidden');
+        if (hintEl) hintEl.textContent = 'As Per Company';
+        updateLivePreviewAndProgress();
+        return true;
+      }
+
+      const val = parseFloat(el.value);
+      const maxLimit = unit === 'LPA' ? 500 : 5000000;
+      const hintText = unit === 'LPA' ? '0 - 500 LPA' : '₹1k - ₹50L /mo';
+
+      if (el.value.trim() === '' || isNaN(val) || val <= 0 || val > maxLimit) {
+        const msg = unit === 'LPA'
+          ? 'Enter a valid Expected CTC (0.1 to 500 LPA) or check "As per company".'
+          : 'Enter a valid Monthly Expected CTC or check "As per company".';
+        return setFieldState(el, false, errEl, msg, hintEl, hintText);
+      }
+      return setFieldState(el, true, errEl, '', hintEl, hintText);
+    }
+
+    function validateExperienceField() {
+      const el = document.getElementById('experience');
+      const unit = document.getElementById('experienceUnit')?.value || 'Years';
+      const isFresher = document.getElementById('isFresher')?.checked;
+      const errEl = document.getElementById('experienceErrorMsg');
+      const hintEl = document.getElementById('expCondHint');
+      if (!el) return false;
+
+      if (isFresher) {
+        el.classList.remove('input-invalid', 'input-valid');
+        if (errEl) errEl.classList.add('hidden');
+        if (hintEl) hintEl.textContent = 'Fresher';
+        updateLivePreviewAndProgress();
+        return true;
+      }
+
+      const val = parseFloat(el.value);
+      const maxExp = unit === 'Years' ? 50 : 600;
+      const hintText = unit === 'Years' ? '0 - 50 Yrs' : '0 - 600 Mos';
+
+      if (el.value.trim() === '' || isNaN(val) || val < 0 || val > maxExp) {
+        return setFieldState(el, false, errEl, `Enter valid experience (0 to ${maxExp} ${unit}) or select Fresh Graduate.`, hintEl, hintText);
+      }
+      return setFieldState(el, true, errEl, '', hintEl, hintText);
+    }
+
+    function validateNoticeField() {
+      const el = document.getElementById('noticePeriod');
+      const unit = document.getElementById('noticePeriodUnit')?.value || 'Days';
+      const immJoin = document.getElementById('immediateJoiner')?.checked;
+      const errEl = document.getElementById('noticeErrorMsg');
+      const hintEl = document.getElementById('noticeCondHint');
+      if (!el) return false;
+
+      if (immJoin) {
+        el.classList.remove('input-invalid', 'input-valid');
+        if (errEl) errEl.classList.add('hidden');
+        if (hintEl) hintEl.textContent = 'Immediate';
+        updateLivePreviewAndProgress();
+        return true;
+      }
+
+      const val = parseFloat(el.value);
+      const maxNotice = unit === 'Days' ? 365 : 12;
+      const hintText = unit === 'Days' ? '0 - 365 Days' : '0 - 12 Mos';
+
+      if (el.value.trim() === '' || isNaN(val) || val < 0 || val > maxNotice) {
+        return setFieldState(el, false, errEl, `Enter a valid notice period (0 to ${maxNotice} ${unit}) or check Immediate.`, hintEl, hintText);
+      }
+      return setFieldState(el, true, errEl, '', hintEl, hintText);
+    }
+
+    function validateCompanyPositionFields() {
+      const compEl = document.getElementById('company');
+      const posEl = document.getElementById('position');
+      const compErr = document.getElementById('companyErrorMsg');
+      const posErr = document.getElementById('positionErrorMsg');
+
+      const hasComp = Boolean(compEl?.value);
+      const hasPos = Boolean(posEl?.value);
+
+      setFieldState(compEl, hasComp, compErr, hasComp ? '' : 'Please select a client company.');
+      if (hasComp) {
+        setFieldState(posEl, hasPos, posErr, hasPos ? '' : 'Please select an open position.');
+      }
+      return hasComp && hasPos;
+    }
+
+    function sanitizeAdminTextInput(inputEl) {
+      if (!inputEl) return;
+      const clean = inputEl.value.replace(/[<>"{}`\\]/g, '');
+      if (inputEl.value !== clean) inputEl.value = clean;
+    }
+
+    function validateAllCandidateFields() {
+      return [
+        validateNameField(),
+        validateEmailField(),
+        validateContactField(),
+        validateCurrentCtcField(),
+        validateExpectedCtcField(),
+        validateExperienceField(),
+        validateNoticeField(),
+        validateCompanyPositionFields()
+      ].every(Boolean);
+    }
+
+    function cleanPhoneNumber() {
+      const input = document.getElementById('contact');
+      if (!input) return;
+      validateContactField(input);
+      showToast('Phone number formatted to 10 digits', 'success');
+    }
+
+    function copyWhatsAppPreview() {
+      const text = document.getElementById('liveWaPreviewBox')?.textContent || '';
+      navigator.clipboard?.writeText(text).then(() => {
+        showToast('WhatsApp message copied to clipboard!', 'success');
+      }).catch(() => {
+        showToast('Ready to copy from preview box', 'info');
+      });
+    }
+
+    function buildWhatsAppMessage(d) {
+      return `*Hi ${d.name}*,\n\nAs per our recent discussion regarding the position of *${d.position}*, we have successfully submitted your profile for shortlisting to our client, *${d.company}*, with the following details:\n\n*Current CTC : ${d.currentCTC} ${d.currentCTCUnit}*\n*Expected CTC : ${d.expectedCTC}* ${d.expectedCTCUnit}\n*Notice Period : ${d.noticePeriod}* ${d.noticePeriodUnit}\n\nWe have also shared the *Job Description* with you via email at ${d.email}\n\n*_Kindly acknowledge this and share your updated resume for further processing._*\n\n*Best regards,*\n*${d.recruiterName}*\n*Talent Connect Consultancy*`;
+    }
+
+    function resetCandidateFormClean() {
+      const form = document.getElementById('jobForm');
+      if (form) form.reset();
+      document.getElementById('positionDiv').style.display = 'none';
+      ['expectedCTC', 'expectedCTCUnit', 'experience', 'experienceUnit', 'noticePeriod', 'noticePeriodUnit'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = false;
+      });
+
+      document.querySelectorAll('#jobForm .form-input').forEach(el => {
+        el.classList.remove('input-valid', 'input-invalid');
+      });
+      ['nameErrorMsg', 'emailErrorMsg', 'contactErrorMsg', 'currentCtcErrorMsg', 'expectedCtcErrorMsg', 'experienceErrorMsg', 'noticeErrorMsg', 'companyErrorMsg', 'positionErrorMsg'].forEach(id => {
+        document.getElementById(id)?.classList.add('hidden');
+      });
+
+      const userData = getUserData();
+      document.getElementById('recruiterDisplay').value = `${userData.name || 'Recruiter'} (${userData.email || ''})${userData.contact ? ' - ' + userData.contact : ''}`;
+      document.getElementById('recruiterEmail').value = `${userData.email || ''},${userData.name || ''},${userData.contact || ''}`;
+      document.getElementById('autoSendJdEmail').checked = true;
+      document.getElementById('emailTargetPreview').textContent = 'candidate@email.com';
+      updateLivePreviewAndProgress();
+    }
+
+    function updateLivePreviewAndProgress() {
+      const name = document.getElementById('name')?.value.trim() || 'Candidate';
+      const email = document.getElementById('email')?.value.trim() || 'candidate@email.com';
+      const contact = document.getElementById('contact')?.value.trim() || '';
+      const curCTC = document.getElementById('currentCTC')?.value || '-';
+      const curUnit = document.getElementById('currentCTCUnit')?.value || 'LPA';
+      const asPerComp = document.getElementById('asPerCompany')?.checked;
+      const expCTC = asPerComp ? 'As Per Company' : (document.getElementById('expectedCTC')?.value || '-');
+      const expUnit = asPerComp ? '' : (document.getElementById('expectedCTCUnit')?.value || 'LPA');
+      const isFresher = document.getElementById('isFresher')?.checked;
+      const expVal = isFresher ? 'Fresher' : (document.getElementById('experience')?.value || '-');
+      const expTimeUnit = isFresher ? '' : (document.getElementById('experienceUnit')?.value || 'Years');
+      const immJoin = document.getElementById('immediateJoiner')?.checked;
+      const notice = immJoin ? 'Immediate' : (document.getElementById('noticePeriod')?.value || '-');
+      const noticeUnit = immJoin ? '' : (document.getElementById('noticePeriodUnit')?.value || 'Days');
+      const company = document.getElementById('company')?.value || 'Company';
+      const position = document.getElementById('position')?.value || 'Position';
+      const recruiterName = sessionStorage.getItem('userName') || 'Recruiter';
+
+      const previewTarget = document.getElementById('emailTargetPreview');
+      if (previewTarget) previewTarget.textContent = email;
+
+      const previewEl = document.getElementById('liveWaPreviewBox');
+      if (previewEl) {
+        previewEl.textContent = buildWhatsAppMessage({
+          name, position, company,
+          currentCTC: curCTC, currentCTCUnit: curUnit,
+          expectedCTC: expCTC, expectedCTCUnit: expUnit,
+          noticePeriod: notice, noticePeriodUnit: noticeUnit,
+          email, recruiterName
+        });
+      }
+
+      const hikeBadge = document.getElementById('liveHikeBadge');
+      const cVal = parseFloat(curCTC);
+      const eVal = parseFloat(expCTC);
+      const cAnnual = !isNaN(cVal) && cVal > 0 ? (curUnit === 'Monthly' ? (cVal * 12) / 100000 : cVal) : 0;
+      const eAnnual = !asPerComp && !isNaN(eVal) && eVal > 0 ? (expUnit === 'Monthly' ? (eVal * 12) / 100000 : eVal) : 0;
+
+      const matHike = document.getElementById('matrixHikePct');
+      document.getElementById('matrixCurAnnual').textContent = cAnnual > 0 ? `₹${cAnnual.toFixed(2)} LPA` : '₹0 LPA';
+      document.getElementById('matrixExpAnnual').textContent = asPerComp ? 'As Per Company' : (eAnnual > 0 ? `₹${eAnnual.toFixed(2)} LPA` : '₹0 LPA');
+      document.getElementById('matrixExpMonthly').textContent = asPerComp ? 'Negotiable' : `₹${(eAnnual > 0 ? Math.round((eAnnual * 100000) / 12) : 0).toLocaleString('en-IN')} /mo`;
+      document.getElementById('matrixExpSummary').textContent = isFresher ? 'Fresh Graduate' : (expVal !== '-' ? `${expVal} ${expTimeUnit}` : '-');
+      document.getElementById('matrixNoticeSummary').textContent = immJoin ? 'Immediate Joiner' : (notice !== '-' ? `${notice} ${noticeUnit}` : '-');
+
+      if (hikeBadge && !asPerComp && cAnnual > 0 && eAnnual > 0) {
+        const hikePct = (((eAnnual - cAnnual) / cAnnual) * 100).toFixed(1);
+        const formattedHike = `${hikePct > 0 ? '+' : ''}${hikePct}%`;
+        hikeBadge.textContent = `Hike: ${formattedHike}`;
+        hikeBadge.classList.remove('hidden');
+        if (matHike) matHike.textContent = formattedHike;
+      } else {
+        hikeBadge?.classList.add('hidden');
+        if (matHike) matHike.textContent = asPerComp ? 'Budget Fit' : '0%';
+      }
+
+      const checks = [
+        /^[a-zA-Z\s.'-]{2,80}$/.test(document.getElementById('name')?.value.trim() || ''),
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(document.getElementById('email')?.value.trim() || ''),
+        /^[6-9]\d{9}$/.test(contact),
+        document.getElementById('currentCTC')?.value.trim() !== '' && cVal >= 0,
+        asPerComp || (document.getElementById('expectedCTC')?.value.trim() !== '' && eVal > 0),
+        isFresher || (document.getElementById('experience')?.value.trim() !== '' && parseFloat(expVal) >= 0),
+        immJoin || (document.getElementById('noticePeriod')?.value.trim() !== '' && parseFloat(notice) >= 0),
+        Boolean(document.getElementById('company')?.value && document.getElementById('position')?.value)
+      ];
+      const filled = checks.filter(Boolean).length;
+      const pct = Math.round((filled / checks.length) * 100);
+
+      const bar = document.getElementById('formProgressBar');
+      const txt = document.getElementById('formProgressText');
+      const summaryPill = document.getElementById('validationSummaryPill');
+      if (bar) bar.style.width = `${pct}%`;
+      if (txt) txt.textContent = `${pct}%`;
+      if (summaryPill) {
+        summaryPill.textContent = `${filled}/${checks.length} Validated`;
+        summaryPill.className = filled === checks.length
+          ? 'px-2.5 py-1 rounded-xl text-[11px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
+          : 'px-2.5 py-1 rounded-xl text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
+      }
+    }
+
+    function logSessionSubmission(data, whatsappLink, emailStatus = 'pending') {
+      sessionSubmissions.unshift({
+        name: data.name,
+        position: data.position,
+        company: data.company,
+        email: data.email,
+        emailStatus,
+        whatsappLink,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      });
+
+      document.getElementById('sessionCountBadge').textContent = String(sessionSubmissions.length);
+
+      const list = document.getElementById('recentSubmissionsList');
+      if (!list) return;
+      list.innerHTML = '';
+
+      sessionSubmissions.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2';
+
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'min-w-0';
+        const nameP = document.createElement('p');
+        nameP.className = 'font-bold text-slate-900 dark:text-white truncate';
+        nameP.textContent = item.name;
+        const subP = document.createElement('p');
+        subP.className = 'text-[10px] text-slate-500 truncate';
+        subP.textContent = `${item.position} @ ${item.company} (${item.time})`;
+        infoDiv.append(nameP, subP);
+
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'flex items-center gap-1.5 shrink-0';
+
+        const waLink = document.createElement('a');
+        waLink.href = item.whatsappLink;
+        waLink.target = '_blank';
+        waLink.rel = 'noopener noreferrer';
+        waLink.className = 'px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-bold text-[10px] flex items-center gap-1';
+        waLink.innerHTML = '<i class="fab fa-whatsapp"></i> WA';
+
+        actionsDiv.appendChild(waLink);
+        row.append(infoDiv, actionsDiv);
+        list.appendChild(row);
+      });
+    }
+
+    async function loadRecentDbCandidates() {
+      const listEl = document.getElementById('liveDbRecentList');
+      const kpiDbEl = document.getElementById('kpiTotalDbCount');
+      try {
+        const { data: rows, count, error } = await supabaseClient
+          .from('candidates')
+          .select('name, company, position, mobile, status', { count: 'exact' })
+          .order('id', { ascending: false })
+          .limit(5);
+
+        if (kpiDbEl && typeof count === 'number') kpiDbEl.textContent = String(count);
+        if (error || !listEl) return;
+
+        if (!rows || !rows.length) {
+          listEl.innerHTML = '<p class="text-center py-2 text-slate-400">No candidates in database yet.</p>';
+          return;
+        }
+
+        listEl.innerHTML = '';
+        rows.forEach(r => {
+          const item = document.createElement('div');
+          item.className = 'p-2 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/70 dark:border-slate-800 flex items-center justify-between gap-2';
+
+          const left = document.createElement('div');
+          left.className = 'min-w-0';
+          const title = document.createElement('p');
+          title.className = 'font-bold text-slate-800 dark:text-slate-200 truncate';
+          title.textContent = r.name || 'Candidate';
+          const meta = document.createElement('p');
+          meta.className = 'text-[10px] text-slate-400 truncate';
+          meta.textContent = `${r.position || '-'} @ ${r.company || '-'}`;
+          left.append(title, meta);
+
+          const statusSpan = document.createElement('span');
+          statusSpan.className = 'px-2 py-0.5 rounded text-[9px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 shrink-0';
+          statusSpan.textContent = r.status || 'Submitted';
+
+          item.append(left, statusSpan);
+          listEl.appendChild(item);
+        });
+      } catch {
+        // Fallback
+      }
+    }
+
+    async function refreshAllWorkspaceData() {
+      const icon = document.getElementById('syncHeaderIcon');
+      icon?.classList.add('fa-spin');
+      await Promise.all([loadData(), loadRecentDbCandidates()]);
+      setTimeout(() => icon?.classList.remove('fa-spin'), 400);
+    }
+
+    window.addEventListener('load', function() {
+      document.documentElement.classList.toggle('dark', sessionStorage.getItem('tccTheme') === 'dark');
+
+      document.querySelectorAll('#jobForm input, #jobForm select').forEach(el => {
+        el.addEventListener('input', updateLivePreviewAndProgress);
+        el.addEventListener('change', updateLivePreviewAndProgress);
+      });
+
+      const userData = getUserData();
+      if (!userData.isLoggedIn) {
+        showToast('Session expired or not logged in. Redirecting to login page.', 'error');
+        setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+        return;
+      }
+
+      const recruiterDisplay = document.getElementById('recruiterDisplay');
+      const recruiterEmail = document.getElementById('recruiterEmail');
+      const kpiRecruiter = document.getElementById('kpiRecruiterShort');
+
+      if (recruiterDisplay && recruiterEmail) {
+        recruiterDisplay.value = `${userData.name} (${userData.email})${userData.contact ? ' - ' + userData.contact : ''}`;
+        recruiterEmail.value = `${userData.email},${userData.name},${userData.contact || ''}`;
+      }
+      if (kpiRecruiter) kpiRecruiter.textContent = (userData.name || 'Recruiter').split(' ')[0];
+
+      window.USER_DATA = userData;
+
+      loadData();
+      loadRecentDbCandidates();
+      updateManageButtonVisibility();
+      updateEmailStatusBadge();
+      updateLivePreviewAndProgress();
+    });
+
+    function updateManageButtonVisibility() {
+      const userType = sessionStorage.getItem('userType') || sessionStorage.getItem('User_Type') || '';
+      const manageBtn = document.getElementById('manageCompanyBtn');
+      if (manageBtn) manageBtn.style.display = userType.toLowerCase() === 'admin' ? 'inline-flex' : 'none';
+    }
+
+    function logout() {
+      ['isLoggedIn', 'userEmail', 'userName', 'userContact', 'userDesignation', 'userType', 'loginTime', 'userRowIndex']
+        .forEach(k => sessionStorage.removeItem(k));
+      showToast('Logged out successfully', 'info');
+      window.location.href = 'index.html';
+    }
+
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+
+    function getUserData() {
+      return {
+        isLoggedIn: sessionStorage.getItem('isLoggedIn') === 'true',
+        email: sessionStorage.getItem('userEmail'),
+        name: sessionStorage.getItem('userName'),
+        contact: sessionStorage.getItem('userContact'),
+        designation: sessionStorage.getItem('userDesignation'),
+        userType: sessionStorage.getItem('userType'),
+        loginTime: sessionStorage.getItem('loginTime')
+      };
+    }
+
+    async function callGoogleScript(action, data = {}) {
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({ action, ...data })
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const result = JSON.parse(await response.text());
+        if (!result.success) throw new Error(result.error || 'Unknown error');
+        return result;
+      } catch (error) {
+        console.error('Error calling Google Drive Script:', error);
+        return null;
+      }
+    }
+
+    function fillSelectOptions(selectEl, placeholder, items = []) {
+      if (!selectEl) return;
+      selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+      items.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item;
+        option.textContent = item;
+        selectEl.appendChild(option);
+      });
+    }
+
+    async function loadData() {
+      try {
+        const { data: rows, error } = await supabaseClient
+          .from('companies')
+          .select('company_name, positions')
+          .order('company_name', { ascending: true });
+
+        if (error) throw error;
+
+        companies = {};
+        let totalPositionsCount = 0;
+        (rows || []).forEach(row => {
+          if (row.company_name) {
+            const posList = Array.isArray(row.positions) ? row.positions : [];
+            companies[row.company_name] = posList;
+            totalPositionsCount += posList.length;
+          }
+        });
+
+        document.getElementById('kpiClientCount').textContent = String(Object.keys(companies).length);
+        document.getElementById('kpiPositionsCount').textContent = String(totalPositionsCount);
+        populateCompanies();
+      } catch (error) {
+        console.error('Error loading companies from Supabase:', error);
+        showToast('Failed to load companies: ' + error.message, 'error');
+        companies = {};
+        populateCompanies();
+      }
+    }
+
+    function populateCompanies() {
+      fillSelectOptions(document.getElementById('company'), '-- Choose Company --', Object.keys(companies));
+    }
+
+    function populatePositions() {
+      const company = document.getElementById('company').value;
+      const positionSelect = document.getElementById('position');
+      const positionDiv = document.getElementById('positionDiv');
+      const roleBadge = document.getElementById('companyRoleCountBadge');
+      const list = (company && companies[company]) ? companies[company] : [];
+
+      fillSelectOptions(positionSelect, '-- Choose Position --', list);
+      positionDiv.style.display = company && companies[company] ? 'block' : 'none';
+      if (roleBadge) roleBadge.textContent = company && companies[company] ? `${list.length} role(s)` : 'Required';
+      validateCompanyPositionFields();
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    function generateFileInput(position, containerId, filesObject) {
+      const container = document.getElementById(containerId);
+      const safePosSlug = position.replace(/[^a-zA-Z0-9_-]/g, '-');
+      const fileInputGroup = document.createElement('div');
+      fileInputGroup.className = 'file-input-group';
+
+      const labelEl = document.createElement('label');
+      labelEl.className = 'file-input-label';
+      labelEl.setAttribute('for', `file-${safePosSlug}`);
+      labelEl.innerHTML = '<i class="fas fa-file-pdf"></i> ';
+      const spanText = document.createElement('span');
+      spanText.textContent = `JD for ${position}`;
+      labelEl.appendChild(spanText);
+
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.id = `file-${safePosSlug}`;
+      fileInput.className = 'file-input';
+      fileInput.accept = '.pdf,application/pdf';
+      fileInput.setAttribute('data-position', position);
+
+      const statusDiv = document.createElement('div');
+      statusDiv.className = 'file-status';
+      statusDiv.id = `status-${safePosSlug}`;
+      statusDiv.textContent = 'No file selected';
+
+      fileInputGroup.append(labelEl, fileInput, statusDiv);
+      container.appendChild(fileInputGroup);
+
+      fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) {
+          delete filesObject[position];
+          statusDiv.textContent = 'No file selected';
+          statusDiv.className = 'file-status';
+          return;
+        }
+        if (file.type !== 'application/pdf' || !file.name.toLowerCase().endsWith('.pdf')) {
+          statusDiv.textContent = 'Only valid .pdf files allowed';
+          statusDiv.className = 'file-status error';
+          return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+          statusDiv.textContent = 'File too large (max 10MB)';
+          statusDiv.className = 'file-status error';
+          return;
+        }
+        if (!(await verifyPdfMagicHeader(file))) {
+          statusDiv.textContent = 'Invalid or corrupted PDF header rejected';
+          statusDiv.className = 'file-status error';
+          return;
+        }
+        try {
+          statusDiv.textContent = 'Processing...';
+          statusDiv.className = 'file-status';
+          filesObject[position] = {
+            position,
+            data: await fileToBase64(file),
+            name: file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+          };
+          statusDiv.textContent = `✓ ${file.name} verified`;
+          statusDiv.className = 'file-status success';
+        } catch {
+          statusDiv.textContent = 'Error processing file';
+          statusDiv.className = 'file-status error';
+        }
+      });
+    }
+
+    function renderDynamicFileInputs(inputId, containerId, targetStore) {
+      const positions = document.getElementById(inputId).value.split(',').map(p => p.trim()).filter(Boolean);
+      document.getElementById(containerId).innerHTML = '';
+      Object.keys(targetStore).forEach(k => delete targetStore[k]);
+      positions.forEach(pos => generateFileInput(pos, containerId, targetStore));
+    }
+
+    function generateNewCompanyFileInputs() {
+      renderDynamicFileInputs('newCompanyPositions', 'newCompanyFileInputs', newCompanyFiles);
+    }
+
+    function generateExistingCompanyFileInputs() {
+      renderDynamicFileInputs('addPositionsInput', 'existingCompanyFileInputs', existingCompanyFiles);
+    }
+
+    document.getElementById('company').addEventListener('change', populatePositions);
+    document.getElementById('newCompanyPositions').addEventListener('input', generateNewCompanyFileInputs);
+    document.getElementById('addPositionsInput').addEventListener('input', generateExistingCompanyFileInputs);
+
+    [
+      ['immediateJoiner', 'noticePeriod', 'noticePeriodUnit', validateNoticeField],
+      ['isFresher', 'experience', 'experienceUnit', validateExperienceField],
+      ['asPerCompany', 'expectedCTC', 'expectedCTCUnit', validateExpectedCtcField]
+    ].forEach(([chkId, inpId, unitId, validator]) => {
+      document.getElementById(chkId).addEventListener('change', function () {
+        document.getElementById(inpId).disabled = this.checked;
+        document.getElementById(unitId).disabled = this.checked;
+        validator();
+      });
+    });
+
+    async function insertCandidateSafe(initialPayload) {
+      const payload = { ...initialPayload };
+      for (let attempt = 0; attempt < 8; attempt++) {
+        const { error } = await supabaseClient.from('candidates').insert([payload]);
+        if (!error) return { error: null };
+
+        const match = error.message && error.message.match(/Could not find the '([^']+)' column/i);
+        if (match && match[1] && Object.prototype.hasOwnProperty.call(payload, match[1])) {
+          delete payload[match[1]];
+          continue;
+        }
+        return { error };
+      }
+      return { error: new Error('Failed to insert candidate after schema adaptation.') };
+    }
+
+    let lastSubmitTimestamp = 0;
+    document.getElementById('jobForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      if (Date.now() - lastSubmitTimestamp < 2500) {
+        return showToast('Please wait a moment before submitting again.', 'info');
+      }
+      if (!validateAllCandidateFields()) {
+        return showToast('Please fix the highlighted input fields before submitting.', 'error');
+      }
+
+      lastSubmitTimestamp = Date.now();
+      const submitBtn = document.getElementById('submitBtn');
+      const originalBtnHTML = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> <span>Saving & Dispatching...</span>`;
+
+      const [recruiterEmail = '', recruiterName = 'Recruiter', recruiterMobile = ''] =
+        document.getElementById('recruiterEmail').value.split(',').map(s => s.trim());
+
+      const asPerComp = document.getElementById('asPerCompany').checked;
+      const isFresher = document.getElementById('isFresher').checked;
+      const immJoin = document.getElementById('immediateJoiner').checked;
+      const shouldSendEmail = document.getElementById('autoSendJdEmail').checked;
+      const jdLink = document.getElementById('jdLinkInput').value.trim();
+      const customNote = document.getElementById('emailCustomNote').value.trim();
+
+      const data = {
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        contact: document.getElementById('contact').value.trim(),
+        currentCTC: document.getElementById('currentCTC').value,
+        currentCTCUnit: document.getElementById('currentCTCUnit').value,
+        expectedCTC: asPerComp ? 'As Per Company' : document.getElementById('expectedCTC').value,
+        expectedCTCUnit: asPerComp ? '' : document.getElementById('expectedCTCUnit').value,
+        experience: isFresher ? 'Fresher' : document.getElementById('experience').value,
+        experienceUnit: isFresher ? '' : document.getElementById('experienceUnit').value,
+        noticePeriod: immJoin ? 'Immediate' : document.getElementById('noticePeriod').value,
+        noticePeriodUnit: immJoin ? '' : document.getElementById('noticePeriodUnit').value,
+        company: document.getElementById('company').value,
+        position: document.getElementById('position').value,
+        jdLink,
+        customNote,
+        recruiterEmail,
+        recruiterName,
+        recruiterMobile
+      };
+
+      lastCandidatePayload = data;
+
+      try {
+        const candidatePayload = {
+          name: data.name,
+          email: data.email,
+          mobile: data.contact,
+          current_ctc: `${data.currentCTC} ${data.currentCTCUnit}`.trim(),
+          expected_ctc: `${data.expectedCTC} ${data.expectedCTCUnit}`.trim(),
+          experience: `${data.experience} ${data.experienceUnit}`.trim(),
+          notice_period: `${data.noticePeriod} ${data.noticePeriodUnit}`.trim(),
+          company: data.company,
+          position: data.position,
+          recruiter: recruiterEmail,
+          recruiter_email: recruiterEmail,
+          recruiter_name: recruiterName,
+          recruiter_mobile: recruiterMobile,
+          status: 'Pending',
+          final_status: 'Submitted'
+        };
+
+        const { error: sbError } = await insertCandidateSafe(candidatePayload);
+        if (sbError) throw new Error(sbError.message || 'Failed to save candidate to Supabase');
+
+        showToast('Candidate saved to database!', 'success');
+
+        // Email Dispatch Routine
+        const emailPill = document.getElementById('modalEmailStatusPill');
+        const emailDetail = document.getElementById('modalEmailDetailText');
+
+        if (shouldSendEmail) {
+          emailPill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/15 text-blue-600 animate-pulse';
+          emailPill.textContent = 'Sending...';
+          emailDetail.textContent = `Connecting to Zoho Mail for ${data.email}...`;
+
+          dispatchJdEmailToCandidate(data).then(res => {
+            if (res.success) {
+              emailPill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600';
+              emailPill.innerHTML = '<i class="fas fa-check mr-1"></i> Sent';
+              emailDetail.textContent = `Job Description successfully emailed to ${data.email}`;
+              showToast(`JD emailed to ${data.email} via Zoho!`, 'success');
+            } else if (res.notConfigured) {
+              emailPill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-600';
+              emailPill.textContent = 'Setup Needed';
+              emailDetail.innerHTML = 'Zoho Mail credentials not set. <a href="javascript:openEmailConfigModal()" class="underline font-bold text-blue-600">Click to configure</a>';
+              showToast('Candidate saved! Configure Zoho Mail to automate JD dispatch.', 'info');
+            } else {
+              emailPill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-600';
+              emailPill.textContent = 'Dispatch Failed';
+              emailDetail.textContent = res.error || 'Failed to dispatch via SMTP.';
+              showToast('Email dispatch notice: ' + (res.error || 'Check Zoho SMTP settings'), 'error');
+            }
+          });
+        } else {
+          emailPill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-200 text-slate-600';
+          emailPill.textContent = 'Skipped';
+          emailDetail.textContent = 'Automated JD email was toggled off for this candidate.';
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHTML;
+
+        const msg = buildWhatsAppMessage(data);
+        const whatsappLink = `https://wa.me/91${data.contact}?text=${encodeURIComponent(msg)}`;
+
+        logSessionSubmission(data, whatsappLink);
+        loadRecentDbCandidates();
+
+        const sendBtn = document.getElementById('sendBtn');
+        sendBtn.innerHTML = `<i class="fab fa-whatsapp"></i> <span>Send WhatsApp to ${data.name}</span>`;
+        sendBtn.onclick = () => {
+          window.open(whatsappLink, '_blank', 'noopener,noreferrer');
+        };
+
+        const resendBtn = document.getElementById('modalResendEmailBtn');
+        resendBtn.onclick = async () => {
+          resendBtn.disabled = true;
+          resendBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Sending...`;
+          const res = await dispatchJdEmailToCandidate(lastCandidatePayload);
+          resendBtn.disabled = false;
+          resendBtn.innerHTML = `<i class="fas fa-envelope"></i> <span>Resend JD Email</span>`;
+
+          if (res.success) {
+            emailPill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-600';
+            emailPill.textContent = 'Sent';
+            emailDetail.textContent = `Job Description emailed to ${lastCandidatePayload.email}`;
+            showToast('Email sent successfully!', 'success');
+          } else {
+            showToast(res.error || 'Failed to send email. Check Zoho settings.', 'error');
+          }
+        };
+
+        document.getElementById('popupOverlay').style.display = 'flex';
+      } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnHTML;
+        showToast(err.message || 'Failed to submit candidate.', 'error');
+        console.error('Submission error:', err);
+      }
+    });
+
+    document.getElementById('cancelBtn').addEventListener('click', () => {
+      document.getElementById('popupOverlay').style.display = 'none';
+      resetCandidateFormClean();
+    });
+
+    function refreshManagementDropdowns() {
+      fillSelectOptions(document.getElementById('existingCompanySelect'), '-- Select Company --', Object.keys(companies));
+      refreshPositionDropdown();
+    }
+
+    function refreshPositionDropdown() {
+      const company = document.getElementById('existingCompanySelect').value;
+      fillSelectOptions(
+        document.getElementById('existingPositionSelect'),
+        '-- Select Position --',
+        (company && companies[company]) ? companies[company] : []
+      );
+    }
+
+    function setManageLoading(isLoading) {
+      document.querySelector('.manage-popup')?.classList.toggle('loading', Boolean(isLoading));
+    }
+
+    document.getElementById('manageCompanyBtn').addEventListener('click', () => {
+      refreshManagementDropdowns();
+      document.getElementById('manageOverlay').style.display = 'flex';
+    });
+
+    document.getElementById('manageCloseBtn').addEventListener('click', () => {
+      document.getElementById('manageOverlay').style.display = 'none';
+      document.getElementById('newCompanyFileInputs').innerHTML = '';
+      document.getElementById('existingCompanyFileInputs').innerHTML = '';
+      newCompanyFiles = {};
+      existingCompanyFiles = {};
+    });
+
+    document.getElementById('existingCompanySelect').addEventListener('change', refreshPositionDropdown);
+
+    document.getElementById('addCompanyBtn').addEventListener('click', async () => {
+      const nameInput = document.getElementById('newCompanyName');
+      sanitizeAdminTextInput(nameInput);
+      const name = nameInput.value.trim();
+
+      if (!name || name.length < 2) {
+        return showToast('Please enter a valid company name (min 2 characters)', 'error');
+      }
+      const positions = document.getElementById('newCompanyPositions').value.split(',').map(p => p.trim()).filter(Boolean);
+
+      setManageLoading(true);
+      try {
+        const { error: sbError } = await supabaseClient
+          .from('companies')
+          .upsert({ company_name: name, positions }, { onConflict: 'company_name' });
+        if (sbError) throw sbError;
+
+        const files = Object.values(newCompanyFiles);
+        if (files.length > 0) {
+          await callGoogleScript('addCompany', { company: name, positions, files });
+        }
+
+        showToast(`Company "${name}" saved to Supabase!`, 'success');
+        await loadData();
+        refreshManagementDropdowns();
+
+        document.getElementById('newCompanyName').value = '';
+        document.getElementById('newCompanyPositions').value = '';
+        document.getElementById('newCompanyFileInputs').innerHTML = '';
+        newCompanyFiles = {};
+      } catch (err) {
+        console.error('Error adding company:', err);
+        showToast('Error adding company: ' + err.message, 'error');
+      } finally {
+        setManageLoading(false);
+      }
+    });
+
+    document.getElementById('addPositionsBtn').addEventListener('click', async () => {
+      const company = document.getElementById('existingCompanySelect').value;
+      if (!company) return showToast('Please select a company first', 'error');
+
+      const posInput = document.getElementById('addPositionsInput');
+      sanitizeAdminTextInput(posInput);
+      const newPositions = posInput.value.split(',').map(p => p.trim()).filter(Boolean);
+
+      if (!newPositions.length) return showToast('Please enter at least one valid position', 'error');
+
+      setManageLoading(true);
+      try {
+        const updatedPositions = [...new Set([...(companies[company] || []), ...newPositions])];
+        const { error: sbError } = await supabaseClient
+          .from('companies')
+          .update({ positions: updatedPositions })
+          .eq('company_name', company);
+        if (sbError) throw sbError;
+
+        const files = Object.values(existingCompanyFiles);
+        if (files.length > 0) {
+          await callGoogleScript('addPositions', { company, positions: newPositions, files });
+        }
+
+        showToast(`Added ${newPositions.length} position(s) to ${company}!`, 'success');
+        await loadData();
+        document.getElementById('existingCompanySelect').value = company;
+        refreshPositionDropdown();
+        if (document.getElementById('company').value === company) populatePositions();
+
+        document.getElementById('addPositionsInput').value = '';
+        document.getElementById('existingCompanyFileInputs').innerHTML = '';
+        existingCompanyFiles = {};
+      } catch (err) {
+        console.error('Error adding positions:', err);
+        showToast('Error adding positions: ' + err.message, 'error');
+      } finally {
+        setManageLoading(false);
+      }
+    });
+
+    document.getElementById('deletePositionBtn').addEventListener('click', async () => {
+      const company = document.getElementById('existingCompanySelect').value;
+      const position = document.getElementById('existingPositionSelect').value;
+      if (!company || !position) return showToast('Please select both company and position', 'error');
+      if (!(await askConfirmation(`Delete position "${position}" from "${company}" and its JD file?`))) return;
+
+      setManageLoading(true);
+      try {
+        const updatedPositions = (companies[company] || []).filter(p => p !== position);
+        const { error: sbError } = await supabaseClient
+          .from('companies')
+          .update({ positions: updatedPositions })
+          .eq('company_name', company);
+        if (sbError) throw sbError;
+
+        await callGoogleScript('deletePosition', { company, position });
+        showToast(`Deleted position "${position}" from ${company}`, 'success');
+
+        await loadData();
+        document.getElementById('existingCompanySelect').value = company;
+        refreshPositionDropdown();
+        if (document.getElementById('company').value === company) populatePositions();
+      } catch (err) {
+        console.error('Error deleting position:', err);
+        showToast('Error deleting position: ' + err.message, 'error');
+      } finally {
+        setManageLoading(false);
+      }
+    });
+
+    document.getElementById('deleteCompanyBtn').addEventListener('click', async () => {
+      const company = document.getElementById('existingCompanySelect').value;
+      if (!company) return showToast('Please select a company', 'error');
+      if (!(await askConfirmation(`Delete company "${company}" and ALL its positions and JD files?`))) return;
+
+      setManageLoading(true);
+      try {
+        const { error: sbError } = await supabaseClient
+          .from('companies')
+          .delete()
+          .eq('company_name', company);
+        if (sbError) throw sbError;
+
+        await callGoogleScript('deleteCompany', { company });
+        showToast(`Deleted company "${company}"`, 'success');
+
+        await loadData();
+        refreshManagementDropdowns();
+        if (document.getElementById('company').value === company) {
+          document.getElementById('company').value = '';
+          populatePositions();
+        }
+      } catch (err) {
+        console.error('Error deleting company:', err);
+        showToast('Error deleting company: ' + err.message, 'error');
+      } finally {
+        setManageLoading(false);
+      }
+    });
+  </script>
+</body>
+</html>
