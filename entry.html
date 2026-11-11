@@ -1688,7 +1688,8 @@
         subject,
         html,
         cc,
-        jdLink: data.jdLink
+        jdLink: data.jdLink,
+        attachments: data.attachments || []
       });
 
       if (result.success) {
@@ -2376,7 +2377,9 @@
       fillSelectOptions(document.getElementById('company'), '-- Choose Company --', Object.keys(companies));
     }
 
-    function populatePositions() {
+    let currentAutoFetchedJd = null; // Holds the fetched JD attachment object
+
+    async function populatePositions() {
       const company = document.getElementById('company').value;
       const positionSelect = document.getElementById('position');
       const positionDiv = document.getElementById('positionDiv');
@@ -2386,16 +2389,44 @@
       fillSelectOptions(positionSelect, '-- Choose Position --', list);
       positionDiv.style.display = company && companies[company] ? 'block' : 'none';
       if (roleBadge) roleBadge.textContent = company && companies[company] ? `${list.length} role(s)` : 'Required';
+      
+      currentAutoFetchedJd = null;
+      document.getElementById('jdLinkInput').value = '';
       validateCompanyPositionFields();
     }
 
-    function fileToBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-      });
+    // Add event listener when Position changes
+    document.getElementById('position').addEventListener('change', async function() {
+      const company = document.getElementById('company').value;
+      const position = this.value;
+      const jdLinkInput = document.getElementById('jdLinkInput');
+
+      if (!company || !position) {
+        currentAutoFetchedJd = null;
+        jdLinkInput.value = '';
+        return;
+      }
+
+      showToast(`Searching JD in Drive: JD/${company}/${position}...`, 'info');
+
+      // Call Google Apps Script by path
+      const res = await callGoogleScript('getJdFile', { company, position });
+
+      if (res && res.success) {
+        currentAutoFetchedJd = {
+          name: res.fileName,
+          mimeType: res.mimeType,
+          data: res.fileData // Pure Base64 from Google Drive
+        };
+        jdLinkInput.value = res.viewUrl; // Auto-fills Google Drive link for email body
+        showToast(`✓ JD Loaded: ${res.fileName}`, 'success');
+      } else {
+        currentAutoFetchedJd = null;
+        jdLinkInput.value = '';
+        console.warn('Drive JD search notice:', res?.error);
+        showToast(`No file in Drive folder: JD/${company}/ for ${position}`, 'info');
+      }
+    });
     }
 
     function generateFileInput(position, containerId, filesObject) {
@@ -2541,6 +2572,11 @@
       const jdLink = document.getElementById('jdLinkInput').value.trim();
       const customNote = document.getElementById('emailCustomNote').value.trim();
 
+      const attachmentsToSend = [];
+      if (currentAutoFetchedJd) {
+        attachmentsToSend.push(currentAutoFetchedJd);
+      }
+
       const data = {
         name: document.getElementById('name').value.trim(),
         email: document.getElementById('email').value.trim(),
@@ -2557,6 +2593,7 @@
         position: document.getElementById('position').value,
         jdLink,
         customNote,
+        attachments: attachmentsToSend
         recruiterEmail,
         recruiterName,
         recruiterMobile
