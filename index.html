@@ -2,8 +2,65 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
   <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <script>
+    /* Session + theme bootstrap. Runs before first paint: no login-screen flash, no theme flash.
+       Persists ONLY the profile fields the app already kept in sessionStorage (never the password,
+       never a token - this app has none). Same 12h limit the app already enforces. */
+    (function () {
+      var KEYS = ['isLoggedIn', 'userEmail', 'userName', 'userContact', 'userDesignation', 'userType', 'loginTime', 'userRowIndex'];
+      var STORE = 'tccPersistedSession';
+      var MAX_AGE_MS = 12 * 60 * 60 * 1000;
+      var api = window.TCCSession = { KEYS: KEYS, MAX_AGE_MS: MAX_AGE_MS, expired: false };
+
+      function ls() { try { return window.localStorage; } catch (e) { return null; } }
+      function ss() { try { return window.sessionStorage; } catch (e) { return null; } }
+      function clearPersisted() { try { var l = ls(); if (l) l.removeItem(STORE); } catch (e) {} }
+
+      api.clear = function () {
+        try { var s = ss(); if (s) KEYS.concat(['recruiterScratchpad']).forEach(function (k) { s.removeItem(k); }); } catch (e) {}
+        clearPersisted();
+      };
+      api.save = function () {
+        var s = ss(), l = ls();
+        if (!s || !l || s.getItem('isLoggedIn') !== 'true') return;
+        var snap = {};
+        KEYS.forEach(function (k) { snap[k] = s.getItem(k); });
+        try { l.setItem(STORE, JSON.stringify(snap)); } catch (e) {}
+      };
+
+      function restore() {
+        var s = ss(), l = ls();
+        if (!s || !l) return false;
+        try {
+          if (s.getItem('isLoggedIn') === 'true') return true;          // same-tab navigation: already signed in
+          var raw = l.getItem(STORE);
+          if (!raw) return false;
+          // Empty sessionStorage + same-origin referrer = the user just logged out on another page of this app.
+          if (location.origin !== 'null' && document.referrer.indexOf(location.origin) === 0) { clearPersisted(); return false; }
+          var snap = JSON.parse(raw);
+          var age = snap ? Date.now() - Date.parse(snap.loginTime) : NaN;
+          if (!snap || snap.isLoggedIn !== 'true' || isNaN(age) || age < -60000 || age > MAX_AGE_MS) {
+            clearPersisted(); api.expired = true; return false;
+          }
+          KEYS.forEach(function (k) { if (snap[k] != null) s.setItem(k, String(snap[k])); });
+          return true;
+        } catch (e) { return false; }
+      }
+
+      var root = document.documentElement;
+      if (restore()) root.classList.add('has-session');
+      try {
+        var t = (ss() && ss().getItem('tccTheme')) || (ls() && ls().getItem('tccTheme'));
+        root.classList.toggle('dark', t === 'dark');
+      } catch (e) {}
+    })();
+  </script>
   <title>TCC Portal - Login & Workspace</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -35,10 +92,14 @@
                      radial-gradient(circle at 85% 80%, rgba(168, 85, 247, 0.25) 0%, transparent 45%),
                      radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.12) 0%, transparent 60%);
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    * { -webkit-tap-highlight-color: transparent; }
+    :root { color-scheme: light; --ease-out: cubic-bezier(0.22, 1, 0.36, 1); }
+    .dark { color-scheme: dark; }
     body {
-      font-family: 'Inter', sans-serif;
       min-height: 100vh;
+      min-height: 100dvh;
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
       overflow-x: hidden;
       background-image: var(--bg-gradient);
       transition: background-color 0.3s ease, color 0.3s ease;
@@ -46,16 +107,16 @@
     .orb {
       position: fixed;
       border-radius: 50%;
-      filter: blur(85px);
+      will-change: transform;
       pointer-events: none;
       z-index: 0;
       opacity: 0.35;
       animation: floatOrb 18s ease-in-out infinite alternate;
     }
     .dark .orb { opacity: 0.45; }
-    .orb-1 { width: 320px; height: 320px; background: linear-gradient(135deg, #6366f1, #8b5cf6); top: -80px; left: -80px; }
-    .orb-2 { width: 280px; height: 280px; background: linear-gradient(135deg, #ec4899, #8b5cf6); bottom: -60px; right: -60px; animation-delay: -6s; }
-    .orb-3 { width: 240px; height: 240px; background: linear-gradient(135deg, #06b6d4, #3b82f6); top: 40%; left: 55%; animation-delay: -12s; }
+    .orb-1 { width: 400px; height: 400px; background: radial-gradient(circle, #6366f1 0%, #8b5cf6 38%, transparent 70%); top: -120px; left: -120px; }
+    .orb-2 { width: 360px; height: 360px; background: radial-gradient(circle, #ec4899 0%, #8b5cf6 38%, transparent 70%); bottom: -90px; right: -90px; animation-delay: -6s; }
+    .orb-3 { width: 300px; height: 300px; background: radial-gradient(circle, #06b6d4 0%, #3b82f6 38%, transparent 70%); top: 40%; left: 55%; animation-delay: -12s; }
 
     @keyframes floatOrb {
       0% { transform: translate(0, 0) scale(1); }
@@ -64,8 +125,8 @@
     }
     .glass-panel {
       background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      backdrop-filter: blur(14px) saturate(160%);
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
       border: 1px solid rgba(226, 232, 240, 0.9);
       box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
     }
@@ -77,10 +138,10 @@
     .nav-button {
       position: relative;
       overflow: hidden;
-      transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+      transition: transform 0.25s var(--ease-out), box-shadow 0.25s var(--ease-out), border-color 0.25s ease, background-color 0.25s ease;
       text-align: left;
     }
-    .nav-button:hover { transform: translateY(-3px); }
+    @media (hover: hover) { .nav-button:hover { transform: translateY(-3px); } }
     .nav-button:active { transform: scale(0.98); }
 
     @keyframes slideUpFade {
@@ -121,10 +182,67 @@
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 9999px; }
+
+    /* ===== Optimization / polish layer ===== */
+    html.has-session #loginContainer { display: none; }              /* no login flash when a saved session is restored */
+    html.modal-open { overflow: hidden; }
+
+    /* One orchestrated entrance (replaces the load-event inline-style animation) */
+    @keyframes pageEnter { from { opacity: 0; transform: translateY(20px) scale(0.99); } to { opacity: 1; transform: none; } }
+    .page-enter { animation: pageEnter 0.6s var(--ease-out) backwards; }
+    #modulesGrid > :nth-child(2) { animation-delay: 0.04s; }
+    #modulesGrid > :nth-child(3) { animation-delay: 0.08s; }
+    #modulesGrid > :nth-child(4) { animation-delay: 0.12s; }
+    #modulesGrid > :nth-child(5) { animation-delay: 0.16s; }
+    #modulesGrid > :nth-child(6) { animation-delay: 0.2s; }
+    #modulesGrid > :nth-child(7) { animation-delay: 0.24s; }
+    .animate-card.is-ready { animation: none; }                      /* don't replay on every filter keystroke */
+
+    /* Responsive actions: modals open/close with intent, never taller than the screen */
+    @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(14px) scale(0.97); } to { opacity: 1; transform: none; } }
+    .modal-overlay { overscroll-behavior: contain; }
+    .modal-overlay.flex { animation: overlayIn 0.2s ease-out backwards; }
+    .modal-overlay.flex > div { animation: modalIn 0.28s var(--ease-out) backwards; max-height: calc(100vh - 2rem); max-height: calc(100dvh - 2rem); overflow-y: auto; overscroll-behavior: contain; }
+
+    @keyframes toastIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
+    #toastContainer > div { animation: toastIn 0.3s var(--ease-out) backwards; }
+
+    /* Login button: light sweep on hover (uses ::before; ::after is the loading spinner) */
+    .login-btn { position: relative; overflow: hidden; }
+    .login-btn::before { content: ''; position: absolute; inset: 0; pointer-events: none; transform: translateX(-120%); transition: transform 0.7s var(--ease-out); background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.28) 50%, transparent 65%); }
+    @media (hover: hover) { .login-btn:not(:disabled):hover::before { transform: translateX(120%); } }
+
+    /* Keyboard focus that is visible on every control */
+    :where(button, a, [tabindex]):focus-visible { outline: 2px solid #6366f1; outline-offset: 2px; }
+
+    /* Phones / Android WebView: safe areas, cheaper blur, one fewer animated layer */
+    @media (max-width: 639.98px) {
+      body { padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px)); }
+      nav.bottom-nav { padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px)); }
+      #toastContainer { bottom: calc(4rem + env(safe-area-inset-bottom, 0px)); }
+      .glass-panel { backdrop-filter: blur(8px) saturate(150%); -webkit-backdrop-filter: blur(8px) saturate(150%); }
+      .orb-3 { display: none; }
+    }
+    @media (max-width: 399.98px) { .brand-text { display: none; } }   /* under 400px the brand pill is just the TCC badge */
+    @media (max-width: 479.98px) {                                  /* compact header so it never wraps or clips on small phones */
+      .brand-sub { display: none; }
+      header { gap: 0.25rem; }
+      header .glass-panel.rounded-2xl:not(.w-10) { padding-left: 0.5rem; padding-right: 0.5rem; }
+      #userInfo { gap: 0.375rem; padding-left: 0.5rem; padding-right: 0.375rem; }
+      #userInfo .logout-btn { padding: 0.375rem 0.5rem; margin-left: 0; }
+    }
+
+    /* Accessibility: respect reduced-motion (progress spinners keep turning - they signal state, not decoration) */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+      .orb, .animate-ping, .animate-pulse { animation: none !important; }
+      .loading::after, .fa-spin { animation-duration: 1.2s !important; animation-iteration-count: infinite !important; }
+    }
   </style>
 </head>
 
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col min-h-screen justify-between relative selection:bg-indigo-500 selection:text-white pb-16 sm:pb-0">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-between relative selection:bg-indigo-500 selection:text-white">
 
   <!-- Background Ambient Orbs -->
   <div class="orb orb-1"></div>
@@ -132,7 +250,7 @@
   <div class="orb orb-3"></div>
 
   <!-- Toast Notification Container -->
-  <div id="toastContainer" class="fixed bottom-16 sm:bottom-5 right-4 sm:right-5 z-[2000] flex flex-col gap-2 max-w-sm w-full px-3 pointer-events-none"></div>
+  <div id="toastContainer" role="status" aria-live="polite" class="fixed bottom-16 sm:bottom-5 right-4 sm:right-5 z-[2000] flex flex-col gap-2 max-w-sm w-full px-3 pointer-events-none"></div>
 
   <header class="w-full max-w-7xl mx-auto px-3 sm:px-6 pt-3 sm:pt-4 z-30 flex items-center justify-between gap-2">
     <div class="flex items-center gap-2 sm:gap-2.5">
@@ -149,9 +267,9 @@
         <div class="w-7 h-7 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-extrabold text-xs shadow-sm">
           TCC
         </div>
-        <div>
-          <p class="text-xs font-extrabold tracking-tight leading-none text-slate-900 dark:text-white">Talent Connect</p>
-          <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Consultancy Command Center</p>
+        <div class="brand-text">
+          <p class="text-xs font-extrabold tracking-tight leading-none whitespace-nowrap text-slate-900 dark:text-white">Talent Connect</p>
+          <p class="brand-sub text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-tight">Consultancy Command Center</p>
         </div>
       </div>
     </div>
@@ -210,7 +328,7 @@
   </header>
 
   <main class="flex-1 flex items-center justify-center px-3 sm:px-6 py-4 sm:py-5 z-20">
-    <div class="container w-full max-w-7xl mx-auto transition-all duration-500">
+    <div class="container page-enter w-full max-w-7xl mx-auto">
 
       <!-- LOGIN SCREEN (#loginContainer) -->
       <div class="login-container max-w-md mx-auto glass-panel rounded-3xl p-5 sm:p-8 relative overflow-hidden" id="loginContainer">
@@ -360,6 +478,7 @@
               <input
                 type="text"
                 id="moduleSearchInput"
+                aria-label="Filter modules"
                 maxlength="50"
                 oninput="validateAndFilterModules(this)"
                 placeholder="Filter modules (e.g. entry, interview)..."
@@ -370,6 +489,7 @@
               <button
                 type="button"
                 id="clearFilterBtn"
+                aria-label="Clear filter"
                 onclick="clearModuleFilter()"
                 class="hidden absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300 items-center justify-center text-[10px]"
                 title="Clear filter"
@@ -795,7 +915,7 @@
     </div>
   </main>
 
-  <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
+  <nav aria-label="Quick actions" class="bottom-nav sm:hidden fixed bottom-0 left-0 right-0 z-40 glass-panel border-t border-slate-200 dark:border-slate-800 px-3 py-2 flex items-center justify-around">
     <button type="button" onclick="goHome()" class="flex flex-col items-center gap-0.5 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold">
       <i class="fas fa-house text-sm"></i>
       <span>Home</span>
@@ -815,14 +935,14 @@
   </nav>
 
   <!-- USER PROFILE MODAL -->
-  <div id="profileModal" class="fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
+  <div id="profileModal" role="dialog" aria-modal="true" aria-label="Recruiter profile" class="modal-overlay fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="glass-panel rounded-3xl max-w-md w-full p-6 sm:p-7 relative">
       <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
         <h3 class="font-display font-bold text-lg flex items-center gap-2 text-slate-900 dark:text-white">
           <i class="fas fa-id-badge text-indigo-500"></i>
           Active Recruiter Profile
         </h3>
-        <button type="button" onclick="toggleProfileModal(false)" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white">
+        <button type="button" onclick="toggleProfileModal(false)" aria-label="Close dialog" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white">
           <i class="fas fa-times"></i>
         </button>
       </div>
@@ -857,14 +977,14 @@
   </div>
 
   <!-- QUICK CTC & HIKE CALCULATOR MODAL -->
-  <div id="calculatorModal" class="fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
+  <div id="calculatorModal" role="dialog" aria-modal="true" aria-label="CTC and hike calculator" class="modal-overlay fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="glass-panel rounded-3xl max-w-md w-full p-6 sm:p-7 relative">
       <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
         <h3 class="font-display font-bold text-lg flex items-center gap-2 text-slate-900 dark:text-white">
           <i class="fas fa-calculator text-indigo-500"></i>
           Recruiter CTC & Hike Calculator
         </h3>
-        <button type="button" onclick="toggleCalculatorModal(false)" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white">
+        <button type="button" onclick="toggleCalculatorModal(false)" aria-label="Close dialog" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:text-slate-900 dark:hover:text-white">
           <i class="fas fa-times"></i>
         </button>
       </div>
@@ -917,14 +1037,14 @@
   </div>
 
   <!-- QUICK WHATSAPP DIRECT CHAT MODAL -->
-  <div id="quickWaModal" class="fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
+  <div id="quickWaModal" role="dialog" aria-modal="true" aria-label="Quick WhatsApp launcher" class="modal-overlay fixed inset-0 z-[1500] bg-slate-950/60 backdrop-blur-md hidden items-center justify-center p-4">
     <div class="glass-panel rounded-3xl max-w-md w-full p-6 sm:p-7 relative">
       <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-200 dark:border-slate-800">
         <h3 class="font-display font-bold text-lg flex items-center gap-2 text-slate-900 dark:text-white">
           <i class="fab fa-whatsapp text-emerald-500 text-xl"></i>
           Quick WhatsApp Launcher
         </h3>
-        <button type="button" onclick="toggleQuickWaModal(false)" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-500">
+        <button type="button" onclick="toggleQuickWaModal(false)" aria-label="Close dialog" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-500">
           <i class="fas fa-times"></i>
         </button>
       </div>
@@ -984,8 +1104,13 @@
   <script>
     const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+    });
 
+    const TCCSession = window.TCCSession;                         // defined in <head>
+    const SESSION_MAX_MINUTES = TCCSession.MAX_AGE_MS / 60000;    // 720 = the existing 12h limit
+    const containerEl = document.querySelector('.container');
     let failedLoginAttempts = 0;
     let lockoutUntilTimestamp = 0;
     let lockoutTimerInterval = null;
@@ -1013,6 +1138,7 @@
       textEl.textContent = String(message || '');
 
       toast.append(iconEl, textEl);
+      while (container.children.length >= 4) container.firstElementChild.remove();
       container.appendChild(toast);
 
       setTimeout(() => {
@@ -1145,14 +1271,18 @@
     function copyScratchpad() {
       const el = document.getElementById('quickScratchpad');
       if (!el || !el.value.trim()) return showToast('Scratchpad is empty', 'error');
-      el.select();
-      document.execCommand('copy');
-      showToast('Scratchpad notes copied to clipboard!', 'success');
+      const legacyCopy = () => { el.select(); try { document.execCommand('copy'); } catch (e) {} };
+      const done = () => showToast('Scratchpad notes copied to clipboard!', 'success');
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(el.value).then(done, () => { legacyCopy(); done(); });
+      } else { legacyCopy(); done(); }
     }
 
     function toggleTheme() {
       const isDark = document.documentElement.classList.toggle('dark');
-      sessionStorage.setItem('tccTheme', isDark ? 'dark' : 'light');
+      const value = isDark ? 'dark' : 'light';
+      sessionStorage.setItem('tccTheme', value);
+      try { localStorage.setItem('tccTheme', value); } catch (e) {}   // theme survives APK restarts
     }
 
     function togglePasswordVisibility() {
@@ -1163,12 +1293,24 @@
       icon.classList.replace(isPwd ? 'fa-eye' : 'fa-eye-slash', isPwd ? 'fa-eye-slash' : 'fa-eye');
     }
 
+    let lastFocusedBeforeModal = null;
     function setModalVisibility(modalId, show) {
       const modal = document.getElementById(modalId);
       if (!modal) return;
+      if (show) lastFocusedBeforeModal = document.activeElement;
       modal.classList.toggle('hidden', !show);
       modal.classList.toggle('flex', Boolean(show));
+      const anyOpen = Boolean(document.querySelector('.modal-overlay.flex'));
+      document.documentElement.classList.toggle('modal-open', anyOpen);   // lock background scroll
+      if (show) {
+        modal.querySelector('button')?.focus({ preventScroll: true });    // button, so no on-screen keyboard pops up
+      } else if (!anyOpen && lastFocusedBeforeModal && document.contains(lastFocusedBeforeModal)) {
+        lastFocusedBeforeModal.focus({ preventScroll: true });
+        lastFocusedBeforeModal = null;
+      }
     }
+    document.querySelectorAll('.modal-overlay').forEach(m =>
+      m.addEventListener('click', e => { if (e.target === m) setModalVisibility(m.id, false); }));
 
     function toggleProfileModal(show) {
       if (show) {
@@ -1265,7 +1407,10 @@
           return;
         }
         totalEligible++;
-        const keywords = (card.getAttribute('data-module-title') || '') + ' ' + card.innerText.toLowerCase();
+        if (card.dataset.kw === undefined) {   // cached once: avoids a forced layout (innerText) per card per keystroke
+          card.dataset.kw = ((card.getAttribute('data-module-title') || '') + ' ' + card.textContent).replace(/\s+/g, ' ').toLowerCase();
+        }
+        const keywords = card.dataset.kw;
         const matches = !q || keywords.includes(q);
         card.style.display = matches ? 'flex' : 'none';
         if (matches) visibleCount++;
@@ -1278,7 +1423,10 @@
       if (emptyBox) emptyBox.classList.toggle('hidden', visibleCount > 0);
     }
 
+    let metricsInFlight = false;
     async function refreshLiveWorkspaceMetrics() {
+      if (metricsInFlight) return;   // no overlapping duplicate requests
+      metricsInFlight = true;
       const spinner = document.getElementById('syncSpinnerIcon');
       if (spinner) spinner.classList.add('fa-spin');
 
@@ -1299,6 +1447,7 @@
       } catch (e) {
         // Silent fallback if table permissions or names vary
       } finally {
+        metricsInFlight = false;
         setTimeout(() => spinner?.classList.remove('fa-spin'), 400);
       }
     }
@@ -1339,27 +1488,59 @@
       refreshLiveWorkspaceMetrics();
     }
 
-    setInterval(() => {
+    // Clock + session timer: wakes only when a displayed value can change (<= 2x per minute, not every second).
+    let tickTimer = null;
+    function tick() {
+      clearTimeout(tickTimer);
       const clockEl = document.getElementById('liveClock');
-      if (clockEl) clockEl.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      if (clockEl) {
+        const t = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        if (clockEl.textContent !== t) clockEl.textContent = t;
+      }
 
+      let loginMs = NaN;
       const loginTimeStr = sessionStorage.getItem('loginTime');
       const timerEl = document.getElementById('sessionTimerDisplay');
       if (loginTimeStr && timerEl && window.isUserLoggedIn()) {
-        const mins = Math.max(0, Math.floor((Date.now() - new Date(loginTimeStr).getTime()) / 60000));
-        if (mins > 720) {
+        loginMs = new Date(loginTimeStr).getTime();
+        const mins = Math.max(0, Math.floor((Date.now() - loginMs) / 60000));
+        if (mins > SESSION_MAX_MINUTES) {
           logout();
           showToast('Session expired after 12 hours for security. Please login again.', 'info');
           return;
         }
-        timerEl.textContent = `Session Active (${mins}m)`;
+        const label = `Session Active (${mins}m)`;
+        if (timerEl.textContent !== label) timerEl.textContent = label;
       }
-    }, 1000);
+
+      const now = Date.now();
+      let delay = 60000 - (now % 60000);
+      if (!isNaN(loginMs)) delay = Math.min(delay, 60000 - ((((now - loginMs) % 60000) + 60000) % 60000));
+      tickTimer = setTimeout(tick, delay + 50);
+    }
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) tick(); });
+
+    function playFade() {
+      containerEl.classList.remove('page-enter', 'fade-transition');
+      void containerEl.offsetWidth;                                   // restart the animation every time
+      containerEl.classList.add('fade-transition');
+    }
+    containerEl.addEventListener('animationend', e => {
+      if (e.target === containerEl) containerEl.classList.remove('page-enter', 'fade-transition');
+    });
+    document.getElementById('modulesGrid').addEventListener('animationend', e => {
+      if (e.animationName === 'slideUpFade') e.target.classList.add('is-ready');
+    });
+
 
     function setWorkspaceView(loggedIn) {
+      const main = document.getElementById('mainContainer');
+      if (loggedIn && main.style.display === 'none') {
+        document.querySelectorAll('#modulesGrid .animate-card').forEach(c => c.classList.remove('is-ready'));
+      }
       document.getElementById('loginContainer').style.display = loggedIn ? 'none' : 'block';
-      document.getElementById('mainContainer').style.display = loggedIn ? 'block' : 'none';
-      document.getElementById('userInfo').style.display = loggedIn ? 'block' : 'none';
+      main.style.display = loggedIn ? 'block' : 'none';
+      document.getElementById('userInfo').style.display = loggedIn ? 'flex' : 'none';   // its items-center/gap classes need flex
     }
 
     function goHome() {
@@ -1369,7 +1550,7 @@
       setTimeout(() => {
         if (homeButton) homeButton.style.transform = '';
         if (window.isUserLoggedIn()) {
-          document.querySelector('.container').classList.add('fade-transition');
+          playFade();
           setTimeout(() => {
             setWorkspaceView(true);
             checkAdminAccess();
@@ -1414,6 +1595,18 @@
       }, 500);
     }
 
+    function writeSession(user, email, resolvedUserType) {
+      sessionStorage.setItem('isLoggedIn', 'true');
+      sessionStorage.setItem('userEmail', user.email || email);
+      sessionStorage.setItem('userName', user.name || '');
+      sessionStorage.setItem('userContact', user.contact || '');
+      sessionStorage.setItem('userDesignation', user.designation || '');
+      sessionStorage.setItem('userType', resolvedUserType);
+      sessionStorage.setItem('loginTime', new Date().toISOString());
+      sessionStorage.setItem('userRowIndex', user.id || '');
+      TCCSession.save();   // persisted copy so the APK restores the session on next launch
+    }
+
     async function handleLogin(event) {
       event.preventDefault();
 
@@ -1455,12 +1648,13 @@
         delete user.password;
         failedLoginAttempts = 0;
         const resolvedUserType = user.user_type || user.userType || 'User';
+        writeSession(user, email, resolvedUserType);
 
         loginText.textContent = 'Success!';
         loginBtn.classList.remove('loading');
 
         setTimeout(() => {
-          document.querySelector('.container').classList.add('fade-transition');
+          playFade();
 
           setTimeout(() => {
             setWorkspaceView(true);
@@ -1475,17 +1669,9 @@
             loginBtn.disabled = false;
             loginText.textContent = 'Login';
 
-            sessionStorage.setItem('isLoggedIn', 'true');
-            sessionStorage.setItem('userEmail', user.email || email);
-            sessionStorage.setItem('userName', user.name || '');
-            sessionStorage.setItem('userContact', user.contact || '');
-            sessionStorage.setItem('userDesignation', user.designation || '');
-            sessionStorage.setItem('userType', resolvedUserType);
-            sessionStorage.setItem('loginTime', new Date().toISOString());
-            sessionStorage.setItem('userRowIndex', user.id || '');
-
             checkAdminAccess();
             syncDashboardHeaderUI();
+            tick();
             showToast(`Welcome back, ${user.name || 'Recruiter'}!`, 'success');
           }, 400);
         }, 600);
@@ -1509,19 +1695,27 @@
     }
 
     function logout() {
-      document.querySelector('.container').classList.add('fade-transition');
+      TCCSession.clear();   // sessionStorage keys + scratchpad + persisted copy, immediately
+      playFade();
 
       setTimeout(() => {
         setWorkspaceView(false);
-        ['isLoggedIn', 'userEmail', 'userName', 'userContact', 'userDesignation', 'userType', 'loginTime', 'userRowIndex']
-          .forEach(key => sessionStorage.removeItem(key));
+        const pad = document.getElementById('quickScratchpad');
+        if (pad) pad.value = '';
+        const padCounter = document.getElementById('scratchpadCounter');
+        if (padCounter) padCounter.textContent = '0/300';
         showToast('Logged out safely', 'info');
       }, 400);
     }
 
+    // Logged out in another tab/window -> log out here too
+    window.addEventListener('storage', e => {
+      if (e.storageArea === window.localStorage && e.key === 'tccPersistedSession' && e.newValue === null && window.isUserLoggedIn()) logout();
+    });
+
     // Unified navigation handler preserving all module routes & role checks
     function navigateModule(targetUrl, selector, requireAdmin = false) {
-      const button = (typeof event !== 'undefined' && event?.currentTarget) ? event.currentTarget : document.querySelector(selector);
+      const button = (typeof event !== 'undefined' && event?.currentTarget instanceof HTMLElement) ? event.currentTarget : document.querySelector(selector);
       if (button) button.style.transform = 'scale(0.95)';
 
       setTimeout(() => {
@@ -1542,7 +1736,14 @@
     function navigateToAdminManage() { navigateModule('admin_manage.html', '#manageEmpLocationsBtn', true); }
 
     window.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const openModal = document.querySelector('.modal-overlay.flex');
+        if (openModal) setModalVisibility(openModal.id, false);
+        return;
+      }
+      if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
       if (!window.isUserLoggedIn()) return;
+      if (document.querySelector('.modal-overlay.flex')) return;
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
       const isAdmin = window.isAdminUser();
       if (e.key === '1') navigateToEntry();
@@ -1551,27 +1752,6 @@
       if (e.key === '4' && isAdmin) navigateToSourcedProfiles();
       if (e.key === '5' && isAdmin) navigateToWhatsapp();
       if (e.key === '6' && isAdmin) navigateToAdminManage();
-    });
-
-    window.addEventListener('load', function() {
-      document.documentElement.classList.toggle('dark', sessionStorage.getItem('tccTheme') === 'dark');
-
-      if (window.isUserLoggedIn()) {
-        setWorkspaceView(true);
-        document.getElementById('userName').textContent = sessionStorage.getItem('userName');
-        checkAdminAccess();
-        syncDashboardHeaderUI();
-      }
-
-      const container = document.querySelector('.container');
-      container.style.opacity = '0';
-      container.style.transform = 'translateY(20px) scale(0.99)';
-
-      setTimeout(() => {
-        container.style.transition = 'all 0.6s cubic-bezier(0.22, 1, 0.36, 1)';
-        container.style.opacity = '1';
-        container.style.transform = 'translateY(0) scale(1)';
-      }, 80);
     });
 
     window.getUserData = function() {
@@ -1594,6 +1774,21 @@
     window.isAdminUser = function() {
       return (sessionStorage.getItem('userType') || '').toLowerCase() === 'admin';
     };
+
+    (function initApp() {
+      try {
+        if (window.isUserLoggedIn()) {
+          setWorkspaceView(true);
+          document.getElementById('userName').textContent = sessionStorage.getItem('userName');
+          checkAdminAccess();
+          syncDashboardHeaderUI();
+        }
+        tick();
+        if (TCCSession.expired) showToast('Your saved session has expired. Please login again.', 'info');
+      } finally {
+        document.documentElement.classList.remove('has-session');
+      }
+    })();
   </script>
 </body>
 </html>
