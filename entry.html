@@ -2373,17 +2373,19 @@
       try {
         const response = await fetch(SCRIPT_URL, {
           method: 'POST',
-          mode: 'cors',
-          headers: { 'Content-Type': 'text/plain' },
+          redirect: 'follow', // Required for Google Apps Script 302 redirects
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action, ...data })
         });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const result = JSON.parse(await response.text());
-        if (!result.success) throw new Error(result.error || 'Unknown error');
-        return result;
+        const text = await response.text();
+        try {
+          return JSON.parse(text);
+        } catch {
+          return { success: false, error: 'Apps Script returned HTML instead of JSON (check deployment permissions).' };
+        }
       } catch (error) {
         console.error('Error calling Google Drive Script:', error);
-        return null;
+        return { success: false, error: error.message || 'Network/CORS blocked by Google Apps Script' };
       }
     }
 
