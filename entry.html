@@ -2781,7 +2781,7 @@
         if (files.length > 0) {
           const driveRes = await callGoogleScript('addCompany', { company: name, positions, files });
           if (!driveRes || !driveRes.success) {
-            throw new Error('Company saved, but Drive JD upload failed. Check Apps Script deployment.');
+            throw new Error('Drive upload failed: ' + (driveRes?.error || 'Unknown Apps Script error'));
           }
           showToast(`Company "${name}" & ${driveRes.uploaded} JD(s) uploaded to Drive!`, 'success');
         } else {
@@ -2826,7 +2826,7 @@
         if (files.length > 0) {
           const driveRes = await callGoogleScript('addPositions', { company, positions: newPositions, files });
           if (!driveRes || !driveRes.success) {
-            throw new Error('Positions saved, but Drive JD upload failed. Check Apps Script deployment.');
+            throw new Error('Drive upload failed: ' + (driveRes?.error || 'Unknown Apps Script error'));
           }
           showToast(`Added ${newPositions.length} position(s) & ${driveRes.uploaded} JD(s) to Drive!`, 'success');
         } else {
