@@ -2777,10 +2777,15 @@
 
         const files = Object.values(newCompanyFiles);
         if (files.length > 0) {
-          await callGoogleScript('addCompany', { company: name, positions, files });
+          const driveRes = await callGoogleScript('addCompany', { company: name, positions, files });
+          if (!driveRes || !driveRes.success) {
+            throw new Error('Company saved, but Drive JD upload failed. Check Apps Script deployment.');
+          }
+          showToast(`Company "${name}" & ${driveRes.uploaded} JD(s) uploaded to Drive!`, 'success');
+        } else {
+          showToast(`Company "${name}" saved to Supabase!`, 'success');
         }
 
-        showToast(`Company "${name}" saved to Supabase!`, 'success');
         await loadData();
         refreshManagementDropdowns();
 
@@ -2790,7 +2795,7 @@
         newCompanyFiles = {};
       } catch (err) {
         console.error('Error adding company:', err);
-        showToast('Error adding company: ' + err.message, 'error');
+        showToast(err.message, 'error');
       } finally {
         setManageLoading(false);
       }
@@ -2817,10 +2822,15 @@
 
         const files = Object.values(existingCompanyFiles);
         if (files.length > 0) {
-          await callGoogleScript('addPositions', { company, positions: newPositions, files });
+          const driveRes = await callGoogleScript('addPositions', { company, positions: newPositions, files });
+          if (!driveRes || !driveRes.success) {
+            throw new Error('Positions saved, but Drive JD upload failed. Check Apps Script deployment.');
+          }
+          showToast(`Added ${newPositions.length} position(s) & ${driveRes.uploaded} JD(s) to Drive!`, 'success');
+        } else {
+          showToast(`Added ${newPositions.length} position(s) to ${company}!`, 'success');
         }
 
-        showToast(`Added ${newPositions.length} position(s) to ${company}!`, 'success');
         await loadData();
         document.getElementById('existingCompanySelect').value = company;
         refreshPositionDropdown();
@@ -2831,12 +2841,12 @@
         existingCompanyFiles = {};
       } catch (err) {
         console.error('Error adding positions:', err);
-        showToast('Error adding positions: ' + err.message, 'error');
+        showToast(err.message, 'error');
       } finally {
         setManageLoading(false);
       }
     });
-
+    
     document.getElementById('deletePositionBtn').addEventListener('click', async () => {
       const company = document.getElementById('existingCompanySelect').value;
       const position = document.getElementById('existingPositionSelect').value;
