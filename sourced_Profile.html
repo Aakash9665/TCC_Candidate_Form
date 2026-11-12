@@ -1,0 +1,2348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <script>
+    /* Session + theme bootstrap. Runs before first paint: no login-screen flash, no theme flash.
+       Persists ONLY the profile fields the app already kept in sessionStorage (never the password,
+       never a token - this app has none). Same 12h limit the app already enforces. */
+    (function () {
+      var KEYS = ['isLoggedIn', 'userEmail', 'userName', 'userContact', 'userDesignation', 'userType', 'loginTime', 'userRowIndex'];
+      var STORE = 'tccPersistedSession';
+      var MAX_AGE_MS = 12 * 60 * 60 * 1000;
+      var api = window.TCCSession = { KEYS: KEYS, MAX_AGE_MS: MAX_AGE_MS, expired: false };
+
+      function ls() { try { return window.localStorage; } catch (e) { return null; } }
+      function ss() { try { return window.sessionStorage; } catch (e) { return null; } }
+      function clearPersisted() { try { var l = ls(); if (l) l.removeItem(STORE); } catch (e) {} }
+
+      api.clear = function () {
+        try { var s = ss(); if (s) KEYS.concat(['recruiterScratchpad']).forEach(function (k) { s.removeItem(k); }); } catch (e) {}
+        clearPersisted();
+      };
+      api.save = function () {
+        var s = ss(), l = ls();
+        if (!s || !l || s.getItem('isLoggedIn') !== 'true') return;
+        var snap = {};
+        KEYS.forEach(function (k) { snap[k] = s.getItem(k); });
+        try { l.setItem(STORE, JSON.stringify(snap)); } catch (e) {}
+      };
+
+      function restore() {
+        var s = ss(), l = ls();
+        if (!s || !l) return false;
+        try {
+          if (s.getItem('isLoggedIn') === 'true') return true;          // same-tab navigation: already signed in
+          var raw = l.getItem(STORE);
+          if (!raw) return false;
+          // Empty sessionStorage + same-origin referrer = the user just logged out on another page of this app.
+          if (location.origin !== 'null' && document.referrer.indexOf(location.origin) === 0) { clearPersisted(); return false; }
+          var snap = JSON.parse(raw);
+          var age = snap ? Date.now() - Date.parse(snap.loginTime) : NaN;
+          if (!snap || snap.isLoggedIn !== 'true' || isNaN(age) || age < -60000 || age > MAX_AGE_MS) {
+            clearPersisted(); api.expired = true; return false;
+          }
+          KEYS.forEach(function (k) { if (snap[k] != null) s.setItem(k, String(snap[k])); });
+          return true;
+        } catch (e) { return false; }
+      }
+
+      var root = document.documentElement;
+      if (restore()) root.classList.add('has-session');
+      try {
+        var t = (ss() && ss().getItem('tccTheme')) || (ls() && ls().getItem('tccTheme'));
+        root.classList.toggle('dark', t === 'dark');
+      } catch (e) {}
+    })();
+  </script>
+  <script>
+    /* Role flag set before first paint so admin-only UI (invoicing, fee amounts) never flashes for normal users. */
+    (function () {
+      var admin = false;
+      try { admin = (sessionStorage.getItem('userType') || '').toLowerCase() === 'admin'; } catch (e) {}
+      if (!admin) document.documentElement.classList.add('role-user');
+    })();
+  </script>
+  <title>TCC - Multi-Stage Recruitment Pipeline</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS Client SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- SortableJS for Touch & Drag/Drop -->
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js" defer></script>
+  <!-- jsPDF + AutoTable (official invoicing) are loaded on demand, admins only - see ensurePdfLibs() -->
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-gradient:
+        radial-gradient(circle at 12% 15%, rgba(59, 130, 246, 0.12) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(99, 102, 241, 0.10) 0%, transparent 45%),
+        radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.06) 0%, transparent 60%);
+    }
+    .dark {
+      --bg-gradient:
+        radial-gradient(circle at 12% 15%, rgba(59, 130, 246, 0.20) 0%, transparent 45%),
+        radial-gradient(circle at 88% 85%, rgba(99, 102, 241, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 50% 40%, rgba(16, 185, 129, 0.08) 0%, transparent 60%);
+    }
+    * { -webkit-tap-highlight-color: transparent; }
+    :root { color-scheme: light; --ease-out: cubic-bezier(0.22, 1, 0.36, 1); }
+    .dark { color-scheme: dark; }
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
+      background-image: var(--bg-gradient);
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      will-change: transform;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.30;
+      animation: floatOrb 18s ease-in-out infinite alternate;
+    }
+    .dark .orb { opacity: 0.40; }
+    .orb-1 { width: 390px; height: 390px; background: radial-gradient(circle, #3b82f6 0%, #6366f1 38%, transparent 70%); top: -110px; left: -110px; }
+    .orb-2 { width: 340px; height: 340px; background: radial-gradient(circle, #10b981 0%, #06b6d4 38%, transparent 70%); bottom: -80px; right: -80px; animation-delay: -7s; }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(24px, -28px) scale(1.06); }
+      100% { transform: translate(-18px, 20px) scale(0.95); }
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(14px) saturate(160%);
+      -webkit-backdrop-filter: blur(14px) saturate(160%);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 14px 34px -10px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+    }
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55);
+    }
+    .form-control-input {
+      width: 100%;
+      padding: 9px 13px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(148, 163, 184, 0.35);
+      background: #ffffff;
+      color: #0f172a;
+      font-size: 13px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+    .dark .form-control-input { background: rgba(30, 41, 59, 0.8); border-color: rgba(255, 255, 255, 0.12); color: #f8fafc; }
+    .form-control-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); }
+
+    .kanban-ghost {
+      opacity: 0.35;
+      background-color: rgba(59, 130, 246, 0.10) !important;
+      border: 2px dashed #3b82f6 !important;
+    }
+    .kanban-chosen {
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2) !important;
+      transform: scale(1.02);
+      cursor: grabbing;
+    }
+    .column-scroll {
+      max-height: calc(100vh - 295px);
+      max-height: calc(100dvh - 295px);
+      min-height: 290px;
+    }
+    .popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.65);
+      backdrop-filter: blur(6px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1500;
+      padding: 16px;
+      overflow-y: auto;
+    }
+    .popup-content {
+      width: 100%;
+      max-width: 500px;
+      border-radius: 24px;
+      padding: 24px;
+      position: relative;
+      max-height: 92vh;
+      max-height: 92dvh;
+      overflow-y: auto;
+      animation: modalSlideUp 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .popup-content.invoice-modal { max-width: 530px; }
+    @keyframes modalSlideUp {
+      from { opacity: 0; transform: translateY(18px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .inv-prefilled-grey { color: #94a3b8 !important; background: rgba(241, 245, 249, 0.85) !important; border-style: dashed !important; }
+    .dark .inv-prefilled-grey { color: #64748b !important; background: rgba(15, 23, 42, 0.65) !important; }
+    .inv-prefilled-grey:focus, .inv-prefilled-grey.user-edited { color: #0f172a !important; background: #ffffff !important; border-style: solid !important; }
+    .dark .inv-prefilled-grey:focus, .dark .inv-prefilled-grey.user-edited { color: #f8fafc !important; background: rgba(30, 41, 59, 0.9) !important; border-style: solid !important; }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 9999px; }
+
+    /* ===== Optimization / polish layer ===== */
+    html.modal-open { overflow: hidden; }
+    .popup-content:focus { outline: none; }
+    .column-scroll { overscroll-behavior: contain; }
+    main .overflow-x-auto { overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
+
+    /* ADMIN-ONLY: invoicing, invoiced stage and fee amounts are hidden for normal users (class set in <head> before paint) */
+    html.role-user .admin-only { display: none !important; }
+    @media (min-width: 1024px) {
+      html.role-user #kpiGrid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+      html.role-user .toolbar-search { grid-column: span 8 / span 8; }
+    }
+    html.role-user #modalHighlights { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    html.role-user #kanbanInner { min-width: 1200px; }
+
+    /* Dialogs and toasts respond with intent */
+    @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+    .popup-overlay[style*="flex"] { animation: overlayIn 0.2s ease-out backwards; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
+    #toastContainer > div { animation: toastIn 0.3s var(--ease-out) backwards; }
+
+    /* Responses to a person's action */
+    button:not(:disabled):active { transform: scale(0.97); }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    @media (hover: hover) { .candidate-card:not(.kanban-chosen):hover { transform: translateY(-2px); } }
+
+    /* Keyboard focus that is visible on every control */
+    :where(button, a, [tabindex]):focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+
+    /* Safe areas (notch / gesture bar) */
+    header.sticky { padding-top: max(0.625rem, env(safe-area-inset-top, 0px)); }
+
+    /* Phones / Android WebView */
+    @media (max-width: 639.98px) {
+      #toastContainer { bottom: calc(4rem + env(safe-area-inset-bottom, 0px)); }
+      .glass-card { backdrop-filter: blur(8px) saturate(150%); -webkit-backdrop-filter: blur(8px) saturate(150%); }
+    }
+
+    /* Accessibility: respect reduced-motion (progress spinners keep turning - they signal state, not decoration) */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+      .orb, .animate-ping, .animate-pulse { animation: none !important; }
+      .fa-spin { animation-duration: 1.2s !important; animation-iteration-count: infinite !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-blue-500 selection:text-white flex flex-col">
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" role="status" aria-live="polite" class="fixed bottom-16 sm:bottom-5 right-4 sm:right-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-3 pointer-events-none"></div>
+
+  <!-- STICKY TOP HEADER -->
+  <header class="sticky top-0 z-40 glass-card border-b border-slate-200/80 dark:border-slate-800/80 px-3 sm:px-6 py-2.5">
+    <div class="max-w-[1700px] mx-auto flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <button
+          class="w-10 h-10 rounded-2xl bg-blue-500/10 hover:bg-blue-600 text-blue-600 dark:text-blue-400 hover:text-white border border-blue-500/20 flex items-center justify-center transition cursor-pointer shrink-0"
+          onclick="window.location.href='index.html'"
+          title="Back to Workspace"
+        >
+          <i class="fas fa-house text-sm"></i>
+        </button>
+
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-display font-extrabold text-base sm:text-lg text-slate-900 dark:text-white leading-tight">
+              Recruitment Pipeline
+            </h1>
+            <span id="userTypeBadge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+              ATS Board
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
+            Click any card for full dossier &amp; actions • Interview column sorted chronologically for follow-up
+          </p>
+        </div>
+      </div>
+
+      <!-- Header Action Controls -->
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          onclick="loadPipelineFromSupabase()"
+          class="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-blue-500/10 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200 dark:border-slate-800 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
+          title="Sync Pipeline with Supabase"
+        >
+          <i class="fas fa-arrows-rotate text-xs" id="syncIcon"></i>
+          <span class="hidden md:inline">Sync</span>
+        </button>
+
+        <button
+          type="button"
+          onclick="openAddCandidateModal()"
+          class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-blue-600/20 transition cursor-pointer"
+        >
+          <i class="fas fa-user-plus text-xs"></i>
+          <span>Add Candidate</span>
+        </button>
+
+        <button
+          type="button"
+          onclick="toggleTheme()"
+          class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 cursor-pointer"
+          title="Toggle Theme"
+          aria-label="Toggle Theme"
+        >
+          <i class="fas fa-sun text-xs hidden dark:inline text-amber-400"></i>
+          <i class="fas fa-moon text-xs inline dark:hidden text-indigo-600"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN PIPELINE WORKSPACE -->
+  <main class="max-w-[1700px] w-full mx-auto px-3 sm:px-6 pt-4 flex-1 flex flex-col relative z-10">
+
+    <!-- KPI Summary Ribbon -->
+    <div id="kpiGrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 mb-3.5">
+      <div class="glass-card rounded-2xl p-3">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Total Active</span>
+        <p class="font-display text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mt-0.5" id="kpiTotalCandidates">0</p>
+      </div>
+      <div class="glass-card rounded-2xl p-3">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 block">Forwarded</span>
+        <p class="font-display text-lg sm:text-xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-0.5" id="kpiForwardedCount">0</p>
+      </div>
+      <div class="glass-card rounded-2xl p-3 border-amber-500/30">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 block">Interviews Lineup</span>
+        <div class="flex items-baseline gap-1.5 mt-0.5">
+          <p class="font-display text-lg sm:text-xl font-extrabold text-amber-600 dark:text-amber-400" id="kpiInterviewCount">0</p>
+          <span class="text-[10px] font-bold text-amber-700 dark:text-amber-300" id="kpiTodayInterviewCount">(0 Today)</span>
+        </div>
+      </div>
+      <div class="glass-card rounded-2xl p-3">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 block">Offers</span>
+        <p class="font-display text-lg sm:text-xl font-extrabold text-purple-600 dark:text-purple-400 mt-0.5" id="kpiOfferCount">0</p>
+      </div>
+      <div class="glass-card rounded-2xl p-3 border-emerald-500/30">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 block">Joined</span>
+        <p class="font-display text-lg sm:text-xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5" id="kpiJoinedCount">0</p>
+      </div>
+      <div class="admin-only glass-card rounded-2xl p-3 border-teal-500/30">
+        <span class="text-[10px] font-bold uppercase tracking-wider text-teal-600 dark:text-teal-400 block">Fee Pool (@8.33%)</span>
+        <p class="font-display text-lg sm:text-xl font-extrabold text-teal-600 dark:text-teal-400 mt-0.5" id="kpiCommissionAmount">₹0</p>
+      </div>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div class="glass-card rounded-2xl p-3 mb-3.5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5 items-center">
+        <div class="toolbar-search lg:col-span-5 relative">
+          <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input
+            type="text"
+            id="searchInput"
+            oninput="renderBoardDebounced()"
+            aria-label="Search candidates"
+            placeholder="Search candidate name, role, email, mobile..."
+            class="form-control-input pl-9 text-xs"
+          />
+        </div>
+        <div class="lg:col-span-3">
+          <select id="clientFilter" onchange="renderBoard()" class="form-control-input font-semibold text-xs">
+            <option value="ALL">All Client Companies</option>
+          </select>
+        </div>
+        <div class="admin-only lg:col-span-3">
+          <select id="recruiterFilter" onchange="renderBoard()" class="form-control-input font-semibold text-xs">
+            <option value="ALL">All Recruiters</option>
+          </select>
+        </div>
+        <div class="lg:col-span-1 flex justify-end">
+          <button
+            type="button"
+            onclick="resetFilters()"
+            class="w-full py-2 px-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold transition flex items-center justify-center gap-1 cursor-pointer"
+            title="Reset Filters"
+          >
+            <i class="fas fa-rotate-left text-[10px]"></i>
+            <span class="hidden sm:inline">Reset</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6-STAGE KANBAN BOARD CANVAS -->
+    <div class="flex-1 overflow-x-auto pb-6">
+      <div id="kanbanInner" class="inline-flex gap-3.5 min-w-[1450px] w-full items-start">
+
+        <!-- Stage 1: Sourced / Applied -->
+        <div class="flex-1 min-w-[235px] glass-card rounded-2xl flex flex-col overflow-hidden">
+          <div class="p-3 border-b border-slate-200/80 dark:border-slate-800 bg-slate-100/60 dark:bg-slate-900/60 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+              <h3 class="font-display font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300">1. Sourced</h3>
+            </div>
+            <span id="badge-sourced" class="text-[11px] font-mono font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="col-sourced" data-stage="sourced" class="kanban-column-body column-scroll p-2 space-y-2.5 overflow-y-auto flex-1"></div>
+        </div>
+
+        <!-- Stage 2: Forwarded to Client -->
+        <div class="flex-1 min-w-[235px] glass-card rounded-2xl flex flex-col overflow-hidden">
+          <div class="p-3 border-b border-slate-200/80 dark:border-slate-800 bg-indigo-500/10 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+              <h3 class="font-display font-bold text-xs uppercase tracking-wider text-indigo-800 dark:text-indigo-300">2. Forwarded to Client</h3>
+            </div>
+            <span id="badge-client_shared" class="text-[11px] font-mono font-bold bg-indigo-500/20 text-indigo-800 dark:text-indigo-200 px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="col-client_shared" data-stage="client_shared" class="kanban-column-body column-scroll p-2 space-y-2.5 overflow-y-auto flex-1"></div>
+        </div>
+
+        <!-- Stage 3: Client Interview (Sorted Chronologically: Today -> Next Day -> Future) -->
+        <div class="flex-1 min-w-[245px] glass-card rounded-2xl border border-amber-500/30 flex flex-col overflow-hidden">
+          <div class="p-3 border-b border-amber-500/30 bg-amber-500/10 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+              <h3 class="font-display font-bold text-xs uppercase tracking-wider text-amber-800 dark:text-amber-300">3. Interview (By Date)</h3>
+            </div>
+            <span id="badge-interview" class="text-[11px] font-mono font-bold bg-amber-500/20 text-amber-800 dark:text-amber-200 px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="col-interview" data-stage="interview" class="kanban-column-body column-scroll p-2 space-y-2.5 overflow-y-auto flex-1 bg-amber-500/5"></div>
+        </div>
+
+        <!-- Stage 4: Offer Extended -->
+        <div class="flex-1 min-w-[235px] glass-card rounded-2xl flex flex-col overflow-hidden">
+          <div class="p-3 border-b border-slate-200/80 dark:border-slate-800 bg-purple-500/10 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+              <h3 class="font-display font-bold text-xs uppercase tracking-wider text-purple-800 dark:text-purple-300">4. Offer Extended</h3>
+            </div>
+            <span id="badge-offer" class="text-[11px] font-mono font-bold bg-purple-500/20 text-purple-800 dark:text-purple-200 px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="col-offer" data-stage="offer" class="kanban-column-body column-scroll p-2 space-y-2.5 overflow-y-auto flex-1"></div>
+        </div>
+
+        <!-- Stage 5: Joined (Billing Ready) -->
+        <div class="flex-1 min-w-[245px] glass-card rounded-2xl border-2 border-emerald-500/40 flex flex-col overflow-hidden">
+          <div class="p-3 border-b border-emerald-500/25 bg-emerald-500/15 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+              <h3 class="font-display font-bold text-xs uppercase tracking-wider text-emerald-900 dark:text-emerald-300">5. Joined (Billing)</h3>
+            </div>
+            <span id="badge-joined" class="text-[11px] font-mono font-bold bg-emerald-500/25 text-emerald-900 dark:text-emerald-200 px-2.5 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="col-joined" data-stage="joined" class="kanban-column-body column-scroll p-2 space-y-2.5 overflow-y-auto flex-1 bg-emerald-500/5"></div>
+        </div>
+
+        <!-- Stage 6: Invoiced / Billed (admin only) -->
+        <div class="admin-only flex-1 min-w-[235px] glass-card rounded-2xl flex flex-col overflow-hidden">
+          <div class="p-3 border-b border-slate-200/80 dark:border-slate-800 bg-teal-500/10 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-teal-500"></span>
+              <h3 class="font-display font-bold text-xs uppercase tracking-wider text-teal-800 dark:text-teal-300">6. Invoiced</h3>
+            </div>
+            <span id="badge-invoiced" class="text-[11px] font-mono font-bold bg-teal-500/20 text-teal-800 dark:text-teal-200 px-2 py-0.5 rounded-full">0</span>
+          </div>
+          <div id="col-invoiced" data-stage="invoiced" class="kanban-column-body column-scroll p-2 space-y-2.5 overflow-y-auto flex-1"></div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== 1. FULL CANDIDATE DETAIL DOSSIER MODAL (#candidateDetailModal) ==================== -->
+  <div class="popup-overlay" id="candidateDetailModal" role="dialog" aria-modal="true">
+    <div class="popup-content glass-card max-w-lg">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 id="modalCandName" class="font-display font-extrabold text-base sm:text-lg text-slate-900 dark:text-white">Candidate Name</h3>
+            <span id="modalStageBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/25">Stage</span>
+          </div>
+          <p id="modalCandRole" class="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-0.5">Position</p>
+        </div>
+        <button type="button" onclick="closeDetailModal()" aria-label="Close dialog" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <!-- Highlights Strip -->
+        <div id="modalHighlights" class="grid grid-cols-3 gap-2 text-center">
+          <div class="p-2.5 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800">
+            <span class="text-[10px] text-slate-400 block">Expected CTC</span>
+            <strong id="modalCandCtc" class="text-xs font-extrabold text-slate-900 dark:text-white">₹0</strong>
+          </div>
+          <div class="admin-only p-2.5 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+            <span class="text-[10px] text-emerald-600 dark:text-emerald-400 block">Fee (@8.33%)</span>
+            <strong id="modalTccFee" class="text-xs font-extrabold text-emerald-700 dark:text-emerald-300">₹0</strong>
+          </div>
+          <div class="p-2.5 bg-amber-500/10 rounded-xl border border-amber-500/20">
+            <span class="text-[10px] text-amber-600 dark:text-amber-400 block">Current Stage</span>
+            <strong id="modalCandStageText" class="text-xs font-extrabold text-amber-700 dark:text-amber-300">-</strong>
+          </div>
+        </div>
+
+        <!-- Full Information Grid -->
+        <div class="space-y-1.5 p-3 rounded-2xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 text-[11px]">
+          <div class="flex justify-between py-0.5 border-b border-slate-200/60 dark:border-slate-800">
+            <span class="text-slate-500">Client Company:</span>
+            <strong id="modalCandCompany" class="text-slate-800 dark:text-slate-200 text-right">-</strong>
+          </div>
+          <div class="flex justify-between py-0.5 border-b border-slate-200/60 dark:border-slate-800">
+            <span class="text-slate-500">Recruiter In-Charge:</span>
+            <span id="modalCandRecruiter" class="font-semibold text-slate-800 dark:text-slate-200 text-right">-</span>
+          </div>
+          <div class="flex justify-between py-0.5 border-b border-slate-200/60 dark:border-slate-800">
+            <span class="text-slate-500">Current CTC:</span>
+            <span id="modalCandCurCtc" class="font-semibold text-slate-800 dark:text-slate-200 text-right">-</span>
+          </div>
+          <div class="flex justify-between py-0.5 border-b border-slate-200/60 dark:border-slate-800">
+            <span class="text-slate-500">Experience &amp; Notice Period:</span>
+            <span id="modalCandNotice" class="font-semibold text-amber-600 dark:text-amber-400 text-right">-</span>
+          </div>
+          <div class="flex justify-between py-0.5 border-b border-slate-200/60 dark:border-slate-800">
+            <span class="text-slate-500">Interview Schedule:</span>
+            <span id="modalCandInterviewSlot" class="font-bold text-purple-600 dark:text-purple-400 text-right">Not Scheduled</span>
+          </div>
+          <div class="flex justify-between py-0.5">
+            <span class="text-slate-500">Email &amp; Mobile:</span>
+            <span id="modalCandContact" class="font-mono text-slate-700 dark:text-slate-300 text-right break-all">-</span>
+          </div>
+        </div>
+
+        <!-- Recruiter Notes Editor -->
+        <div>
+          <label for="modalCandNotes" class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+            <i class="fas fa-comment-dots text-blue-500 mr-1"></i> Recruiter Notes &amp; Feedback
+          </label>
+          <textarea id="modalCandNotes" rows="2" class="form-control-input text-xs" placeholder="Add recruiter observations, interview notes, or candidate comments..."></textarea>
+        </div>
+
+        <!-- Context-Aware Dynamic Actions Row -->
+        <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex flex-wrap items-center gap-1.5" id="modalContextActionsContainer">
+            <!-- Populated dynamically based on candidate.stage -->
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <button
+              type="button"
+              onclick="promptDropCandidate(activeModalCandidateId)"
+              class="px-2.5 py-1.5 rounded-xl bg-rose-500/15 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+              title="Drop candidate from pipeline"
+            >
+              <i class="fas fa-user-xmark"></i>
+              <span>Drop</span>
+            </button>
+            <button
+              type="button"
+              id="saveNotesBtn"
+              onclick="saveCurrentCandidateNotes()"
+              class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-sm transition cursor-pointer"
+            >
+              <i class="fas fa-save mr-1"></i> Save
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 2. STAGE MOVE CONFIRMATION MODAL (#confirmMoveModal) ==================== -->
+  <div class="popup-overlay" id="confirmMoveModal" role="dialog" aria-modal="true">
+    <div class="popup-content glass-card max-w-sm text-center">
+      <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto mb-3 text-lg">
+        <i class="fas fa-circle-question"></i>
+      </div>
+      <h3 class="font-display font-extrabold text-base text-slate-900 dark:text-white mb-1">
+        Confirm Stage Move?
+      </h3>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-3.5">
+        Are you sure you want to advance this candidate's pipeline stage?
+      </p>
+
+      <div class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 mb-4 text-xs space-y-1 text-left">
+        <div class="font-bold text-slate-900 dark:text-white" id="confirmMoveCandName">-</div>
+        <div class="text-[11px] text-blue-600 dark:text-blue-400 font-semibold" id="confirmMoveCandMeta">-</div>
+        <div class="flex items-center justify-center gap-2 pt-2">
+          <span id="confirmMoveFromStage" class="px-2 py-0.5 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-[10px]">Old</span>
+          <i class="fas fa-arrow-right text-blue-500 text-xs"></i>
+          <span id="confirmMoveToStage" class="px-2 py-0.5 rounded-lg bg-blue-600 text-white font-bold text-[10px]">New</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          onclick="resolveStageMoveConfirmation(false)"
+          class="flex-1 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-700 dark:text-slate-300 font-bold text-xs transition cursor-pointer"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          id="confirmMoveAcceptBtn"
+          onclick="resolveStageMoveConfirmation(true)"
+          class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md shadow-blue-600/25 transition cursor-pointer"
+        >
+          Yes, Update
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 3. DROP CANDIDATE MODAL (#dropCandidateModal) ==================== -->
+  <div class="popup-overlay" id="dropCandidateModal" role="dialog" aria-modal="true">
+    <div class="popup-content glass-card max-w-sm">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <h3 class="font-display font-extrabold text-base text-rose-600 dark:text-rose-400 flex items-center gap-2">
+            <i class="fas fa-user-xmark"></i>
+            <span>Drop Candidate</span>
+          </h3>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">Candidate will be archived &amp; removed from active board</p>
+        </div>
+        <button type="button" onclick="closeDropModal()" aria-label="Close dialog" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 mb-3.5 text-xs">
+        <p class="font-bold text-slate-900 dark:text-white" id="dropCandName">-</p>
+        <p class="text-[11px] text-rose-600 dark:text-rose-400 font-semibold" id="dropCandMeta">-</p>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+            Reason for Dropping *
+          </label>
+          <select id="dropReasonSelect" class="form-control-input font-semibold">
+            <option value="Rejected">Rejected by Client (L1/L2/Final)</option>
+            <option value="Position On Hold">Position Put On Hold by Client</option>
+            <option value="Candidate On Hold">Candidate On Hold / Delayed</option>
+            <option value="Candidate Withdrew">Candidate Not Interested / Withdrew</option>
+            <option value="Not Joined">Offer Declined / Did Not Join</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+            Drop Remarks / Reason Details
+          </label>
+          <textarea id="dropRemarksInput" rows="2" placeholder="Specific rejection feedback or reason for hold..." class="form-control-input"></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
+        <button type="button" onclick="closeDropModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs">
+          Cancel
+        </button>
+        <button type="button" id="dropConfirmBtn" onclick="confirmExecuteDropCandidate()" class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md shadow-rose-600/20">
+          <i class="fas fa-trash-can mr-1"></i> Confirm &amp; Drop
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 4. SCHEDULE INTERVIEW MODAL (#scheduleModal) ==================== -->
+  <div class="popup-overlay" id="scheduleModal" role="dialog" aria-modal="true">
+    <div class="popup-content glass-card max-w-md">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <h3 class="font-display font-extrabold text-base text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fas fa-calendar-plus text-amber-500"></i>
+            <span>Schedule Interview</span>
+          </h3>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">Available from Forwarded to Client stage</p>
+        </div>
+        <button type="button" onclick="closeScheduleModal()" aria-label="Close dialog" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 mb-3.5 text-xs">
+        <p class="font-bold text-slate-900 dark:text-white" id="schCandName">-</p>
+        <p class="text-[11px] text-blue-600 dark:text-blue-400 font-semibold" id="schCandMeta">-</p>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+            Interview Date &amp; Time *
+          </label>
+          <input type="datetime-local" id="schDateTime" class="form-control-input font-medium" />
+        </div>
+
+        <div>
+          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+            Interview Mode *
+          </label>
+          <div class="flex gap-4 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+            <label class="flex items-center gap-1.5 font-semibold cursor-pointer">
+              <input type="radio" name="schMode" value="Online" checked onchange="toggleScheduleModeInputs()" class="accent-blue-600">
+              <i class="fas fa-video text-purple-500"></i> Online
+            </label>
+            <label class="flex items-center gap-1.5 font-semibold cursor-pointer">
+              <input type="radio" name="schMode" value="Physical" onchange="toggleScheduleModeInputs()" class="accent-blue-600">
+              <i class="fas fa-building text-amber-500"></i> Physical
+            </label>
+          </div>
+        </div>
+
+        <div id="schOnlineField">
+          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+            Meeting Link (Google Meet / Zoom)
+          </label>
+          <input type="url" id="schLink" placeholder="https://meet.google.com/..." class="form-control-input" />
+        </div>
+
+        <div id="schPhysicalField" style="display: none;">
+          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+            Client Office Location
+          </label>
+          <select id="schLocationSelect" class="form-control-input font-semibold">
+            <option value="">Select Location</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+            Notes / Panel Remarks
+          </label>
+          <textarea id="schNotes" rows="2" placeholder="Round details or instructions..." class="form-control-input"></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
+        <button type="button" onclick="closeScheduleModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs">
+          Cancel
+        </button>
+        <button type="button" id="schSubmitBtn" onclick="submitScheduleInterview()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20">
+          <i class="fas fa-calendar-check mr-1"></i> Save &amp; Advance to Interview
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 5. INTERVIEW OUTCOME STATUS MODAL (#statusModal) ==================== -->
+  <div class="popup-overlay" id="statusModal" role="dialog" aria-modal="true">
+    <div class="popup-content glass-card max-w-md">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <h3 class="font-display font-extrabold text-base text-slate-900 dark:text-white flex items-center gap-2">
+            <i class="fas fa-flag text-blue-500"></i>
+            <span>Update Interview Outcome</span>
+          </h3>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">Selecting Rejected or On Hold will drop candidate</p>
+        </div>
+        <button type="button" onclick="closeStatusModal()" aria-label="Close dialog" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 mb-3.5 text-xs">
+        <p class="font-bold text-slate-900 dark:text-white" id="stCandName">-</p>
+        <p class="text-[11px] text-blue-600 dark:text-blue-400 font-semibold" id="stCandMeta">-</p>
+      </div>
+
+      <div class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+            Stage Category *
+          </label>
+          <select id="stCategorySelect" onchange="updateFinalStatusDropdownOptions()" class="form-control-input font-semibold">
+            <option value="Selected">Selected (Advance Pipeline)</option>
+            <option value="Rejected">Rejected (Drop from Board)</option>
+            <option value="On Hold">On Hold (Drop from Board)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+            Final Status *
+          </label>
+          <select id="stFinalStatusSelect" class="form-control-input font-semibold"></select>
+        </div>
+
+        <div>
+          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+            Feedback / Remarks
+          </label>
+          <textarea id="stFeedbackNotes" rows="2" placeholder="Discussion summary, feedback..." class="form-control-input"></textarea>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between gap-2.5 mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
+        <button type="button" onclick="switchToRescheduleFromOutcome()" class="px-3 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500 text-amber-700 dark:text-amber-400 hover:text-white text-xs font-bold transition">
+          <i class="fas fa-calendar-plus mr-1"></i> Reschedule Slot
+        </button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeStatusModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs">
+            Cancel
+          </button>
+          <button type="button" id="stSubmitBtn" onclick="submitInterviewOutcome()" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs shadow-md shadow-blue-600/20">
+            <i class="fas fa-save mr-1"></i> Save Outcome
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 6. OFFICIAL INVOICE GENERATOR MODAL (#invoiceModal) ==================== -->
+  <div class="popup-overlay admin-only" id="invoiceModal" role="dialog" aria-modal="true">
+    <div class="popup-content invoice-modal glass-card">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="font-display font-extrabold text-base text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fas fa-file-invoice-dollar text-blue-600 dark:text-blue-400"></i>
+              <span>Generate Official TCC Invoice</span>
+            </h3>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">Joined</span>
+          </div>
+          <p class="text-[11px] text-slate-500 dark:text-slate-400">Calculates 8.33% fee and 10% TDS (Section 194J)</p>
+        </div>
+        <button type="button" onclick="closeInvoiceModal()" aria-label="Close dialog" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 mb-3.5 flex items-center justify-between gap-2 text-xs">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Candidate</span>
+          <strong id="invCandName" class="text-sm font-extrabold text-slate-900 dark:text-white">-</strong>
+          <span id="invCandRole" class="block text-[11px] font-semibold text-blue-600 dark:text-blue-400">-</span>
+        </div>
+        <div class="text-right">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Invoice Date</span>
+          <input type="text" id="invDateInput" value="19-Oct-2026" class="w-28 text-right font-mono font-bold text-xs px-2 py-1 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900" />
+        </div>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+            Billed-To Company Name &amp; Address
+          </label>
+          <select id="invCompanyAddressSelect" onchange="onInvoiceCompanyAddressChange()" class="form-control-input font-semibold mb-2"></select>
+          <div class="space-y-1.5 p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+            <input type="text" id="invCompanyNameInput" class="form-control-input font-bold text-xs py-1.5" placeholder="Company Name" />
+            <textarea id="invCompanyAddressInput" rows="2" class="form-control-input text-xs py-1" placeholder="Billing Address..."></textarea>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+              Invoice No (Editable)
+            </label>
+            <input type="text" id="invNumberInput" value="TC/INV/2026/042" oninput="this.classList.add('user-edited'); recalculateInvoiceSummary();" class="form-control-input font-mono font-bold inv-prefilled-grey" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+              Joining Date (DOJ)
+            </label>
+            <input type="text" id="invJoiningDateInput" placeholder="02-06-2025" oninput="recalculateInvoiceSummary()" class="form-control-input font-mono font-semibold" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+              Annual CTC (₹)
+            </label>
+            <input type="number" id="invCtcInput" step="5000" min="0" oninput="recalculateInvoiceSummary()" class="form-control-input font-mono font-bold" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1">
+              Fee Rate (% of CTC)
+            </label>
+            <input type="number" id="invFeePercentInput" value="8.33" step="0.01" min="0.1" max="100" oninput="recalculateInvoiceSummary()" class="form-control-input font-mono font-bold text-blue-600 dark:text-blue-400" />
+          </div>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1 text-xs">
+          <div class="flex justify-between text-slate-600 dark:text-slate-300">
+            <span>Service Fee (<span id="invSummaryRate">8.33</span>%):</span>
+            <span id="invSummaryGrossFee" class="font-bold text-slate-900 dark:text-white">₹0</span>
+          </div>
+          <div class="flex justify-between text-amber-600 dark:text-amber-400">
+            <span>Less: 10% TDS (194J):</span>
+            <span id="invSummaryTds" class="font-semibold">- ₹0</span>
+          </div>
+          <div class="pt-1.5 border-t border-slate-200 dark:border-slate-800 flex justify-between items-baseline font-extrabold">
+            <span class="text-slate-900 dark:text-white">Net Payable</span>
+            <span id="invSummaryNetPayable" class="text-base text-emerald-600 dark:text-emerald-400">₹0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5 mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
+        <button type="button" onclick="closeInvoiceModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs">
+          Cancel
+        </button>
+        <button type="button" onclick="downloadOfficialInvoicePdf()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 text-white font-bold text-xs shadow-md shadow-blue-600/20">
+          <i class="fas fa-file-pdf mr-1"></i> Download PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 7. ADD CANDIDATE MODAL (#addCandidateModal) ==================== -->
+  <div class="popup-overlay" id="addCandidateModal" role="dialog" aria-modal="true">
+    <div class="popup-content glass-card max-w-md">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
+        <h3 class="font-display font-extrabold text-base text-slate-900 dark:text-white flex items-center gap-2">
+          <i class="fas fa-user-plus text-blue-500"></i> Add Candidate to Board
+        </h3>
+        <button type="button" onclick="closeAddCandidateModal()" aria-label="Close dialog" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form id="newCandidateForm" onsubmit="handleNewCandidateSubmit(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">Full Name *</label>
+          <input type="text" id="addName" required placeholder="e.g. Rahul Sharma" class="form-control-input" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">Role *</label>
+            <input type="text" id="addRole" required placeholder="e.g. React Developer" class="form-control-input" />
+          </div>
+          <div>
+            <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">Client Company *</label>
+            <input type="text" id="addCompany" required placeholder="e.g. Angel Portal Pvt Ltd" class="form-control-input" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">Expected CTC *</label>
+            <input type="text" id="addCtc" required placeholder="e.g. 7.5 LPA" class="form-control-input" />
+          </div>
+          <div>
+            <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">Initial Stage</label>
+            <select id="addStage" class="form-control-input font-semibold">
+              <option value="sourced">1. Sourced</option>
+              <option value="client_shared">2. Forwarded to Client</option>
+              <option value="interview">3. Client Interview</option>
+              <option value="offer">4. Offer Extended</option>
+              <option value="joined">5. Joined</option>
+              <option value="invoiced">6. Invoiced</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">Email *</label>
+            <input type="email" id="addEmail" required placeholder="rahul@example.com" class="form-control-input" />
+          </div>
+          <div>
+            <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">Mobile (10 Digits) *</label>
+            <input type="tel" id="addPhone" required placeholder="9876543210" maxlength="10" class="form-control-input" />
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
+          <button type="button" onclick="closeAddCandidateModal()" class="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold">Cancel</button>
+          <button type="submit" id="addCandSubmitBtn" class="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-md shadow-blue-600/20">Add Candidate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // ==================== CONFIGURATION ====================
+    const SUPABASE_URL = 'https://sqwjbbpeqogmmlawicdw.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNxd2piYnBlcW9nbW1sYXdpY2R3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIwMDA1NTcsImV4cCI6MjEwNzU3NjU1N30.S1yvdC6siG0gYdESLj8gt65RTe9MI4TBNxHY0lCHxR0';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+    });
+
+    const REMITTANCE_CONFIG = {
+      email: "ruchi.mishra@talentconnectconsultancy.com",
+      phone: "+91 8600550467",
+      accountName: "TALENT CONNECT CONSULTANCY",
+      bankName: "CENTRAL BANK OF INDIA",
+      accountNo: "5827187120",
+      ifsc: "CBIN0280641",
+      branch: "VIRAR EAST",
+      panHolder: "Ruchi Aakash Mishra",
+      panNo: "BHHPT2097K",
+      signatory: "Ruchi Mishra",
+      regNo: "MH-17-0142203",
+      regOffice: "1918, Phase 1, Suraksha Smart City, Vasai East, Palghar 401 208."
+    };
+
+    const DEFAULT_CLIENT_ADDRESSES = [
+      {
+        company: "Angel Portal Private Limited",
+        label: "Angel Portal Private Limited — Goregaon East, Mumbai",
+        address: "716, Mastermind 5, Near Lake View III Apt, Royal Palms, Aarey Colony, Goregaon East, Mumbai - 400065."
+      },
+      {
+        company: "TechNova Solutions Pvt. Ltd.",
+        label: "TechNova Solutions Pvt. Ltd. — Goregaon East, Mumbai",
+        address: "TechNova Business Park, Goregaon East, Mumbai - 400063."
+      }
+    ];
+
+    const STAGES = [
+      { id: "sourced", label: "Sourced", dbStatus: "Pending", dbFinalStatus: "Submitted" },
+      { id: "client_shared", label: "Forwarded to Client", dbStatus: "Selected", dbFinalStatus: "Shortlisted" },
+      { id: "interview", label: "Client Interview", dbStatus: "Selected", dbFinalStatus: "L1 Selected" },
+      { id: "offer", label: "Offer Extended", dbStatus: "Selected", dbFinalStatus: "Final Select" },
+      { id: "joined", label: "Joined", dbStatus: "Selected", dbFinalStatus: "Joined" },
+      { id: "invoiced", label: "Invoiced", dbStatus: "Selected", dbFinalStatus: "Invoiced" }
+    ];
+
+    const TCCSession = window.TCCSession;   // defined in <head>
+    const isAdminUser = () => (sessionStorage.getItem('userType') || '').toLowerCase() === 'admin';
+    const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+    const renderBoardDebounced = debounce(() => renderBoard(), 120);
+    const byCandidate = (query, c) => (c.dbId ? query.eq('id', c.dbId) : query.eq('email', c.email));   // was repeated 6x
+
+    // jsPDF + AutoTable: only admins can invoice, so only load (once) when an admin needs them
+    let pdfLibsPromise = null;
+    function loadScriptOnce(src) {
+      return new Promise((resolve, reject) => {
+        const el = document.createElement('script');
+        el.src = src;
+        el.onload = resolve;
+        el.onerror = () => reject(new Error('Failed to load ' + src));
+        document.head.appendChild(el);
+      });
+    }
+    function ensurePdfLibs() {
+      if (window.jspdf && window.jspdf.jsPDF) return Promise.resolve();
+      if (!pdfLibsPromise) {
+        pdfLibsPromise = loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
+          .then(() => loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js'))
+          .catch(err => { pdfLibsPromise = null; throw err; });
+      }
+      return pdfLibsPromise;
+    }
+
+    // SEGREGATION: admin sees every profile; a normal user sees ONLY profiles where they are the recruiter.
+    function canViewRow(r, userData) {
+      if (!userData.isLoggedIn) return false;
+      if (userData.userType.toLowerCase() === 'admin') return true;
+      const me = userData.email.trim().toLowerCase();
+      if (!me) return false;
+      return [r.recruiter, r.recruiter_email].some(v => String(v || '').trim().toLowerCase() === me);
+    }
+
+    let loadInFlight = false;
+    let reloadQueued = false;
+    let candidates = [];
+    let locationRows = [];
+    let sortableInstances = [];
+    let pendingStageMove = null;
+    let activeModalCandidateId = null;
+    let currentScheduleCandidate = null;
+    let currentStatusCandidate = null;
+    let currentInvoiceCandidate = null;
+    let currentDropCandidateId = null;
+    let companyAddressList = [];
+
+    // ==================== UTILITIES ====================
+    function escapeHtml(unsafe) {
+      if (unsafe === null || unsafe === undefined) return "";
+      return String(unsafe).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function formatINR(val) {
+      return Math.round(Number(val) || 0).toLocaleString("en-IN");
+    }
+
+    function parseAnnualCtcToINR(rawCtc) {
+      if (typeof rawCtc === "number" && !isNaN(rawCtc)) return Math.round(rawCtc);
+      const str = String(rawCtc || "").trim().toLowerCase();
+      if (!str) return 0;
+      const numMatch = str.replace(/,/g, "").match(/(\d+(\.\d+)?)/);
+      if (!numMatch) return 0;
+      const val = parseFloat(numMatch[1]);
+      if (str.includes("lpa") || str.includes("lakh") || (val > 0 && val <= 150)) return Math.round(val * 100000);
+      if (str.includes("month") || str.includes("/mo")) return Math.round(val * 12);
+      return Math.round(val);
+    }
+
+    function formatLPA(annualInr, rawDisplay) {
+      if (rawDisplay && String(rawDisplay).toLowerCase().includes("lpa")) return String(rawDisplay);
+      if (!annualInr || annualInr <= 0) return "As Per Co.";
+      return `₹${(Number(annualInr) / 100000).toFixed(2)} LPA`;
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      const value = isDark ? 'dark' : 'light';
+      sessionStorage.setItem('tccTheme', value);
+      try { localStorage.setItem('tccTheme', value); } catch (e) {}   // theme survives APK restarts
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const colors = {
+        info: 'bg-slate-900 dark:bg-slate-800 text-white border-blue-500/40',
+        success: 'bg-emerald-600 text-white border-emerald-400',
+        error: 'bg-rose-600 text-white border-rose-400'
+      };
+      const icons = {
+        info: 'fa-circle-info text-blue-400',
+        success: 'fa-circle-check text-white',
+        error: 'fa-triangle-exclamation text-white'
+      };
+      toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl border shadow-xl text-xs sm:text-sm font-semibold transition-all duration-300 ${colors[type] || colors.info}`;
+      toast.innerHTML = `<i class="fas ${icons[type] || icons.info} shrink-0"></i><span class="flex-1">${escapeHtml(message)}</span>`;
+      while (container.children.length >= 4) container.firstElementChild.remove();
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3400);
+    }
+
+    function getUserData() {
+      return {
+        isLoggedIn: sessionStorage.getItem('isLoggedIn') === 'true',
+        email: sessionStorage.getItem('userEmail') || '',
+        name: sessionStorage.getItem('userName') || 'Recruiter',
+        userType: sessionStorage.getItem('userType') || 'User'
+      };
+    }
+
+    function resolveStageFromRow(row) {
+      const explicit = (row.pipeline_stage || '').toString().trim().toLowerCase();
+      if (explicit) {
+        const found = STAGES.find(s => s.id === explicit || s.label.toLowerCase() === explicit);
+        if (found) return found.id;
+      }
+      const fn = (row.final_status || '').toString().trim().toLowerCase();
+      const st = (row.status || '').toString().trim().toLowerCase();
+      const comment = (row.comment || '').toString().toLowerCase();
+
+      if (fn === 'invoiced' || comment.includes('[invoiced]')) return 'invoiced';
+      if (fn === 'joined' || st === 'joined') return 'joined';
+      if (fn.includes('final select') || fn.includes('offer')) return 'offer';
+      if (fn.includes('l1') || fn.includes('l2') || fn.includes('l3') || (row.interview_date && st === 'selected')) return 'interview';
+      if (fn.includes('shortlist') || st === 'selected') return 'client_shared';
+      return 'sourced';
+    }
+
+    // Returns date-time formatting and relative badge status for interview slots
+    function getInterviewTimelineMeta(dateStr) {
+      if (!dateStr) return null;
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return null;
+
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const slotDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+      const timeFormatted = d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+      const dateFormatted = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+
+      let badgeText = '';
+      let badgeClass = '';
+      let isToday = false;
+
+      if (slotDay.getTime() === today.getTime()) {
+        isToday = true;
+        badgeText = 'Today';
+        badgeClass = 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30';
+      } else if (slotDay.getTime() === tomorrow.getTime()) {
+        badgeText = 'Tomorrow';
+        badgeClass = 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-500/25';
+      } else if (d < now) {
+        badgeText = 'Overdue';
+        badgeClass = 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/25';
+      } else {
+        badgeText = dateFormatted;
+        badgeClass = 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300';
+      }
+
+      return {
+        formattedDate: `${dateFormatted}, ${timeFormatted}`,
+        badgeText,
+        badgeClass,
+        isToday,
+        timestamp: d.getTime()
+      };
+    }
+
+    // ==================== SUPABASE DATA SYNC ====================
+    async function loadPipelineFromSupabase() {
+      if (loadInFlight) { reloadQueued = true; return; }   // no overlapping duplicate requests
+      loadInFlight = true;
+      const syncIcon = document.getElementById('syncIcon');
+      if (syncIcon) syncIcon.classList.add('fa-spin');
+
+      try {
+        const [candRes, locRes] = await Promise.all([
+          supabaseClient.from('candidates').select('*').order('id', { ascending: false }),
+          supabaseClient.from('office_locations').select('*')
+        ]);
+
+        if (candRes.error) throw candRes.error;
+        if (!locRes.error && Array.isArray(locRes.data)) locationRows = locRes.data;
+
+        const userData = getUserData();
+
+        // Active candidates: exclude dropped candidates (Rejected or Position On Hold / Candidate On Hold)
+        const rows = (candRes.data || []).filter(r => {
+          const st = (r.status || '').toString().trim().toLowerCase();
+          const fn = (r.final_status || '').toString().trim().toLowerCase();
+          const comment = (r.comment || '').toString().toLowerCase();
+
+          // Drop filter: do not show rejected or hold in active board
+          if (st === 'rejected' || fn.includes('reject') || fn.includes('hold') || st.includes('hold') || comment.includes('[dropped]')) {
+            return false;
+          }
+
+          return canViewRow(r, userData);
+        });
+
+        candidates = rows.map(r => {
+          const recRaw = r.recruiter_name || r.recruiter || r.recruiter_email || 'Recruiter';
+          return {
+            id: String(r.id || r.email),
+            dbId: r.id,
+            email: r.email || '',
+            name: r.name || 'Candidate',
+            role: r.position || 'Open Role',
+            company: r.company || 'Client Company',
+            ctc: parseAnnualCtcToINR(r.expected_ctc || r.current_ctc),
+            expectedCtcRaw: r.expected_ctc || '',
+            currentCtcRaw: r.current_ctc || '-',
+            experience: r.experience || '-',
+            noticePeriod: r.notice_period || '-',
+            recruiter: recRaw.includes('@') ? recRaw.split('@')[0] : recRaw,
+            stage: resolveStageFromRow(r),
+            status: r.status || 'Pending',
+            final_status: r.final_status || 'Submitted',
+            interview_date: r.interview_date || '',
+            interview_mode: r.interview_mode || 'Online',
+            invite_link: r.invite_link || '',
+            phone: String(r.mobile || r.Mobile || r.phone || '').replace(/\D/g, '').slice(-10),
+            notes: r.comment || ''
+          };
+        });
+
+        if (!isAdminUser()) candidates = candidates.filter(c => c.stage !== 'invoiced');   // billing stage is admin-only
+        populateFilterDropdowns();
+        renderBoard();
+      } catch (err) {
+        console.error('Pipeline sync error:', err);
+        showToast('Sync error: ' + err.message, 'error');
+      } finally {
+        loadInFlight = false;
+        if (reloadQueued) { reloadQueued = false; loadPipelineFromSupabase(); }
+        if (syncIcon) syncIcon.classList.remove('fa-spin');
+      }
+    }
+
+    function populateFilterDropdowns() {
+      const clientSelect = document.getElementById('clientFilter');
+      const recSelect = document.getElementById('recruiterFilter');
+      const companies = [...new Set(candidates.map(c => c.company).filter(Boolean))].sort();
+      const recruiters = [...new Set(candidates.map(c => c.recruiter).filter(Boolean))].sort();
+
+      const prevComp = clientSelect.value;
+      const prevRec = recSelect.value;
+
+      clientSelect.innerHTML = '<option value="ALL">All Client Companies</option>';
+      companies.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c; opt.textContent = c;
+        clientSelect.appendChild(opt);
+      });
+      if (companies.includes(prevComp)) clientSelect.value = prevComp;
+
+      recSelect.innerHTML = '<option value="ALL">All Recruiters</option>';
+      recruiters.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r; opt.textContent = r;
+        recSelect.appendChild(opt);
+      });
+      if (recruiters.includes(prevRec)) recSelect.value = prevRec;
+    }
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('clientFilter').value = 'ALL';
+      document.getElementById('recruiterFilter').value = 'ALL';
+      renderBoard();
+      showToast('Filters cleared', 'info');
+    }
+
+    // ==================== BOARD RENDERING & INTERVIEW SORTING ====================
+    function renderBoard() {
+      const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+      const client = document.getElementById('clientFilter')?.value || 'ALL';
+      const recruiter = document.getElementById('recruiterFilter')?.value || 'ALL';
+
+      STAGES.forEach(st => {
+        const col = document.getElementById(`col-${st.id}`);
+        if (col) col.innerHTML = '';
+      });
+
+      const filtered = candidates.filter(c => {
+        const matchesSearch = !search ||
+          c.name.toLowerCase().includes(search) ||
+          c.role.toLowerCase().includes(search) ||
+          c.company.toLowerCase().includes(search) ||
+          c.phone.includes(search) ||
+          c.email.toLowerCase().includes(search);
+        const matchesClient = client === 'ALL' || c.company === client;
+        const matchesRecruiter = recruiter === 'ALL' || c.recruiter === recruiter;
+        return matchesSearch && matchesClient && matchesRecruiter;
+      });
+
+      const counts = { sourced: 0, client_shared: 0, interview: 0, offer: 0, joined: 0, invoiced: 0 };
+      let todayInterviewsCount = 0;
+
+      // Group candidates by stage
+      const stageBuckets = { sourced: [], client_shared: [], interview: [], offer: [], joined: [], invoiced: [] };
+
+      filtered.forEach(cand => {
+        const stage = stageBuckets[cand.stage] ? cand.stage : 'sourced';
+        counts[stage]++;
+        stageBuckets[stage].push(cand);
+      });
+
+      // REQUIREMENT 2: In Interview stage, sort candidates chronologically (Today -> Tomorrow -> Next Day -> Future)
+      stageBuckets['interview'].sort((a, b) => {
+        const timeA = a.interview_date ? new Date(a.interview_date).getTime() : Infinity;
+        const timeB = b.interview_date ? new Date(b.interview_date).getTime() : Infinity;
+        return timeA - timeB;
+      });
+
+      // Render each stage column
+      STAGES.forEach(st => {
+        const colEl = document.getElementById(`col-${st.id}`);
+        if (!colEl) return;
+        const list = stageBuckets[st.id] || [];
+
+        list.forEach(cand => {
+          if (st.id === 'interview' && cand.interview_date) {
+            const meta = getInterviewTimelineMeta(cand.interview_date);
+            if (meta?.isToday) todayInterviewsCount++;
+          }
+          colEl.appendChild(createCandidateCard(cand));
+        });
+      });
+
+      // Update Column Count Badges
+      STAGES.forEach(st => {
+        const badge = document.getElementById(`badge-${st.id}`);
+        if (badge) badge.textContent = counts[st.id] || 0;
+      });
+
+      // Update KPI strip
+      document.getElementById('kpiTotalCandidates').textContent = filtered.length;
+      document.getElementById('kpiForwardedCount').textContent = counts.client_shared;
+      document.getElementById('kpiInterviewCount').textContent = counts.interview;
+      document.getElementById('kpiTodayInterviewCount').textContent = `(${todayInterviewsCount} Today)`;
+      document.getElementById('kpiOfferCount').textContent = counts.offer;
+      document.getElementById('kpiJoinedCount').textContent = counts.joined;
+
+      const joinedBillable = filtered.filter(c => c.stage === 'joined');
+      const commissionPool = joinedBillable.reduce((sum, c) => sum + Math.round((c.ctc * 8.33) / 100), 0);
+      document.getElementById('kpiCommissionAmount').textContent = `₹${formatINR(commissionPool)}`;
+    }
+
+    // Creates Kanban card with context-aware buttons based on pipeline stage
+    function createCandidateCard(c) {
+      const card = document.createElement('div');
+      card.className = 'candidate-card bg-white dark:bg-slate-900 rounded-2xl p-3 border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-blue-500/40 transition cursor-pointer select-none';
+      card.setAttribute('data-id', c.id);
+
+      // REQUIREMENT 1: Clicking any card opens full detailed dossier
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('button') || e.target.closest('a') || e.target.closest('input')) return;
+        openDetailModal(c.id);
+      });
+
+      // STAGE-SPECIFIC CONTEXTUAL QUICK ACTION:
+      let actionButtonsHtml = '';
+      let interviewTimelineHtml = '';
+
+      if (c.stage === 'interview') {
+        const meta = getInterviewTimelineMeta(c.interview_date);
+        if (meta) {
+          interviewTimelineHtml = `
+            <div class="mt-2 p-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between text-[10px]">
+              <div class="font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1">
+                <i class="far fa-clock text-amber-500"></i>
+                <span>${escapeHtml(meta.formattedDate)}</span>
+              </div>
+              <span class="px-1.5 py-0.5 rounded font-extrabold text-[9px] uppercase ${meta.badgeClass}">
+                ${escapeHtml(meta.badgeText)}
+              </span>
+            </div>
+          `;
+        }
+
+        // Nested Outcome & Reschedule actions for Interview stage
+        actionButtonsHtml = `
+          <button type="button" onclick="event.stopPropagation(); openStatusModal('${c.id}')" class="px-2 py-1 rounded-lg bg-blue-500/15 hover:bg-blue-600 text-blue-700 dark:text-blue-400 hover:text-white text-[11px] font-bold transition flex items-center gap-1 cursor-pointer">
+            <i class="fas fa-flag text-[10px]"></i>
+            <span>Outcome</span>
+          </button>
+          <button type="button" onclick="event.stopPropagation(); openScheduleModal('${c.id}')" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-amber-500 text-slate-600 dark:text-slate-300 hover:text-white text-[11px] font-bold transition flex items-center gap-1 cursor-pointer" title="Reschedule Slot">
+            <i class="fas fa-calendar-alt text-[10px]"></i>
+            <span>Reschedule</span>
+          </button>
+        `;
+      } else if (c.stage === 'client_shared') {
+        // Nested Schedule Interview for Forwarded to Client stage
+        actionButtonsHtml = `
+          <button type="button" onclick="event.stopPropagation(); openScheduleModal('${c.id}')" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-700 dark:text-amber-400 hover:text-white text-[11px] font-bold transition flex items-center gap-1 cursor-pointer">
+            <i class="fas fa-calendar-plus text-[10px]"></i>
+            <span>Schedule Interview</span>
+          </button>
+        `;
+      } else if (c.stage === 'joined' && isAdminUser()) {
+        // Nested Invoice Generator for Joined stage (admin only)
+        actionButtonsHtml = `
+          <button type="button" onclick="event.stopPropagation(); openInvoiceModal('${c.id}')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold transition flex items-center gap-1 shadow-sm cursor-pointer">
+            <i class="fas fa-file-invoice-dollar text-[10px]"></i>
+            <span>Generate Invoice</span>
+          </button>
+        `;
+      } else if (c.stage === 'sourced') {
+        actionButtonsHtml = `
+          <button type="button" onclick="event.stopPropagation(); requestDirectAdvance('${c.id}', 'client_shared')" class="px-2.5 py-1 rounded-lg bg-indigo-500/15 hover:bg-indigo-600 text-indigo-700 dark:text-indigo-400 hover:text-white text-[11px] font-bold transition flex items-center gap-1 cursor-pointer">
+            <i class="fas fa-paper-plane text-[10px]"></i>
+            <span>Forward to Client</span>
+          </button>
+        `;
+      } else if (c.stage === 'offer') {
+        actionButtonsHtml = `
+          <button type="button" onclick="event.stopPropagation(); requestDirectAdvance('${c.id}', 'joined')" class="px-2.5 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white text-[11px] font-bold transition flex items-center gap-1 cursor-pointer">
+            <i class="fas fa-user-check text-[10px]"></i>
+            <span>Confirm Joined</span>
+          </button>
+        `;
+      } else if (c.stage === 'invoiced' && isAdminUser()) {
+        actionButtonsHtml = `
+          <button type="button" onclick="event.stopPropagation(); openInvoiceModal('${c.id}')" class="px-2.5 py-1 rounded-lg bg-teal-500/15 hover:bg-teal-600 text-teal-700 dark:text-teal-400 hover:text-white text-[11px] font-bold transition flex items-center gap-1 cursor-pointer">
+            <i class="fas fa-file-pdf text-[10px]"></i>
+            <span>Invoice PDF</span>
+          </button>
+        `;
+      }
+
+      card.innerHTML = `
+        <div class="flex items-center justify-between gap-1 mb-1">
+          <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 truncate max-w-[150px]">
+            ${escapeHtml(c.company)}
+          </span>
+          <span class="text-[10px] text-slate-400 font-semibold">${escapeHtml(c.recruiter)}</span>
+        </div>
+
+        <h4 class="font-display font-bold text-slate-900 dark:text-white text-xs leading-snug truncate" title="${escapeHtml(c.name)}">
+          ${escapeHtml(c.name)}
+        </h4>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400 font-semibold truncate">${escapeHtml(c.role)}</p>
+
+        <div class="mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
+          <span class="font-bold text-emerald-600 dark:text-emerald-400">${escapeHtml(formatLPA(c.ctc, c.expectedCtcRaw))}</span>
+          <span class="text-[10px] text-slate-400">NP: ${escapeHtml(c.noticePeriod)}</span>
+        </div>
+
+        ${interviewTimelineHtml}
+
+        <div class="mt-2.5 pt-1.5 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-1.5">
+          <div class="flex flex-wrap items-center gap-1">
+            ${actionButtonsHtml}
+          </div>
+          <button
+            type="button"
+            onclick="event.stopPropagation(); promptDropCandidate('${c.id}')"
+            class="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 text-slate-400 hover:text-white flex items-center justify-center text-xs transition cursor-pointer"
+            title="Drop candidate from pipeline"
+          >
+            <i class="fas fa-user-xmark"></i>
+          </button>
+        </div>
+      `;
+
+      return card;
+    }
+
+    // ==================== DRAG & DROP WITH CONFIRMATION ====================
+    function initDragAndDrop() {
+      sortableInstances.forEach(inst => inst.destroy());
+      sortableInstances = [];
+
+      STAGES.forEach(stage => {
+        const col = document.getElementById(`col-${stage.id}`);
+        if (!col) return;
+
+        const sortable = new Sortable(col, {
+          group: 'tcc-ats-pipeline',
+          animation: 180,
+          delay: 150, delayOnTouchOnly: true, touchStartThreshold: 6,   // touch: press-and-hold to drag, swipe to scroll
+          ghostClass: 'kanban-ghost',
+          chosenClass: 'kanban-chosen',
+          onEnd: function (evt) {
+            const candId = evt.item.getAttribute('data-id');
+            const newStage = evt.to.getAttribute('data-stage');
+            const oldStage = evt.from.getAttribute('data-stage');
+
+            if (candId && newStage && newStage !== oldStage) {
+              promptStageMoveConfirmation(candId, oldStage, newStage);
+            }
+          }
+        });
+        sortableInstances.push(sortable);
+      });
+    }
+
+    function requestDirectAdvance(candId, targetStage) {
+      const cand = candidates.find(c => c.id === candId);
+      if (!cand) return;
+      promptStageMoveConfirmation(candId, cand.stage, targetStage);
+    }
+
+    function promptStageMoveConfirmation(candId, oldStageId, newStageId) {
+      const cand = candidates.find(c => c.id === candId);
+      if (!cand) {
+        renderBoard();
+        return;
+      }
+
+      const oldStageObj = STAGES.find(s => s.id === oldStageId);
+      const newStageObj = STAGES.find(s => s.id === newStageId);
+
+      pendingStageMove = { candId, oldStage: oldStageId, newStage: newStageId };
+
+      document.getElementById('confirmMoveCandName').textContent = cand.name;
+      document.getElementById('confirmMoveCandMeta').textContent = `${cand.role} • ${cand.company}`;
+      document.getElementById('confirmMoveFromStage').textContent = oldStageObj ? oldStageObj.label : oldStageId;
+      document.getElementById('confirmMoveToStage').textContent = newStageObj ? newStageObj.label : newStageId;
+
+      document.getElementById('confirmMoveModal').style.display = 'flex';
+    }
+
+    async function resolveStageMoveConfirmation(confirmed) {
+      const modal = document.getElementById('confirmMoveModal');
+      const acceptBtn = document.getElementById('confirmMoveAcceptBtn');
+
+      if (!pendingStageMove) {
+        modal.style.display = 'none';
+        return;
+      }
+
+      const { candId, newStage } = pendingStageMove;
+
+      if (!confirmed) {
+        pendingStageMove = null;
+        modal.style.display = 'none';
+        renderBoard();
+        return;
+      }
+
+      if (acceptBtn) {
+        acceptBtn.disabled = true;
+        acceptBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Saving...';
+      }
+
+      await executeCandidateStageMove(candId, newStage);
+
+      if (acceptBtn) {
+        acceptBtn.disabled = false;
+        acceptBtn.innerHTML = 'Yes, Update';
+      }
+      pendingStageMove = null;
+      modal.style.display = 'none';
+    }
+
+    async function executeCandidateStageMove(candId, newStageId) {
+      const cand = candidates.find(c => c.id === candId);
+      if (!cand) return;
+      const stageObj = STAGES.find(s => s.id === newStageId);
+      if (!stageObj) return;
+      if (newStageId === 'invoiced' && !isAdminUser()) {
+        renderBoard();
+        return showToast('Only admins can move candidates to Invoiced.', 'error');
+      }
+
+      try {
+        let updatedComment = cand.notes || '';
+        if (newStageId === 'invoiced' && !updatedComment.toLowerCase().includes('[invoiced]')) {
+          updatedComment = `[Invoiced] ${updatedComment}`.trim();
+        }
+
+        const updatePayload = {
+          pipeline_stage: newStageId,
+          status: stageObj.dbStatus,
+          final_status: stageObj.dbFinalStatus,
+          comment: updatedComment,
+          updated_at: new Date().toISOString()
+        };
+
+        let query = supabaseClient.from('candidates').update(updatePayload);
+        query = byCandidate(query, cand);
+        const { error } = await query;
+        if (error) throw error;
+
+        cand.stage = newStageId;
+        cand.status = stageObj.dbStatus;
+        cand.final_status = stageObj.dbFinalStatus;
+        cand.notes = updatedComment;
+
+        renderBoard();
+        showToast(`Moved ${cand.name} to ${stageObj.label}!`, 'success');
+      } catch (err) {
+        console.error('Failed to update stage in Supabase:', err);
+        renderBoard();
+        showToast('Update failed: ' + err.message, 'error');
+      }
+    }
+
+    // ==================== REQUIREMENT 3: DROP CANDIDATE WORKFLOW ====================
+    function promptDropCandidate(candId) {
+      const cand = candidates.find(c => c.id === candId);
+      if (!cand) return;
+      currentDropCandidateId = candId;
+
+      document.getElementById('dropCandName').textContent = cand.name;
+      document.getElementById('dropCandMeta').textContent = `${cand.role} • ${cand.company}`;
+      document.getElementById('dropRemarksInput').value = '';
+
+      document.getElementById('dropCandidateModal').style.display = 'flex';
+    }
+
+    function closeDropModal() {
+      document.getElementById('dropCandidateModal').style.display = 'none';
+      currentDropCandidateId = null;
+    }
+
+    async function confirmExecuteDropCandidate() {
+      if (!currentDropCandidateId) return;
+      const cand = candidates.find(c => c.id === currentDropCandidateId);
+      if (!cand) return;
+
+      const reason = document.getElementById('dropReasonSelect').value;
+      const remarks = document.getElementById('dropRemarksInput').value.trim();
+      const dropBtn = document.getElementById('dropConfirmBtn');
+
+      dropBtn.disabled = true;
+      dropBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Dropping...';
+
+      try {
+        const fullComment = `[Dropped: ${reason}] ${remarks ? remarks + ' — ' : ''}${cand.notes || ''}`.trim();
+        const dropPayload = {
+          status: 'Rejected',
+          final_status: reason,
+          comment: fullComment,
+          updated_at: new Date().toISOString()
+        };
+
+        let query = supabaseClient.from('candidates').update(dropPayload);
+        query = byCandidate(query, cand);
+        const { error } = await query;
+        if (error) throw error;
+
+        // Remove immediately from active board
+        candidates = candidates.filter(c => c.id !== currentDropCandidateId);
+
+        showToast(`Candidate ${cand.name} dropped from pipeline (${reason})`, 'info');
+        closeDropModal();
+        closeDetailModal();
+        renderBoard();
+      } catch (err) {
+        showToast('Drop failed: ' + err.message, 'error');
+      } finally {
+        dropBtn.disabled = false;
+        dropBtn.innerHTML = '<i class="fas fa-trash-can mr-1"></i> Confirm &amp; Drop';
+      }
+    }
+
+    // ==================== REQUIREMENT 1: CANDIDATE DETAIL DOSSIER MODAL ====================
+    function openDetailModal(id) {
+      const c = candidates.find(item => item.id === id);
+      if (!c) return;
+
+      activeModalCandidateId = id;
+      const feeAmount = Math.round((c.ctc * 8.33) / 100);
+      const stageObj = STAGES.find(s => s.id === c.stage);
+
+      document.getElementById('modalCandName').textContent = c.name;
+      document.getElementById('modalCandRole').textContent = c.role;
+      document.getElementById('modalStageBadge').textContent = stageObj ? stageObj.label : c.stage;
+      document.getElementById('modalCandCompany').textContent = c.company;
+      document.getElementById('modalCandCtc').textContent = formatLPA(c.ctc, c.expectedCtcRaw);
+      document.getElementById('modalTccFee').textContent = `₹${formatINR(feeAmount)}`;
+      document.getElementById('modalCandStageText').textContent = stageObj ? stageObj.label : c.stage;
+      document.getElementById('modalCandRecruiter').textContent = c.recruiter;
+      document.getElementById('modalCandCurCtc').textContent = c.currentCtcRaw || '-';
+      document.getElementById('modalCandNotice').textContent = `${c.experience || '-'} • NP: ${c.noticePeriod || '-'}`;
+
+      if (c.interview_date) {
+        const meta = getInterviewTimelineMeta(c.interview_date);
+        document.getElementById('modalCandInterviewSlot').textContent = `${meta ? meta.formattedDate : c.interview_date} (${c.interview_mode || 'Online'})`;
+      } else {
+        document.getElementById('modalCandInterviewSlot').textContent = 'Not Scheduled';
+      }
+
+      document.getElementById('modalCandContact').textContent = `${c.phone ? '+91 ' + c.phone : '-'} | ${c.email || '-'}`;
+      document.getElementById('modalCandNotes').value = c.notes || '';
+
+      // Populate stage-specific action buttons inside the Detail modal
+      const actionsContainer = document.getElementById('modalContextActionsContainer');
+      actionsContainer.innerHTML = '';
+
+      if (c.stage === 'client_shared') {
+        actionsContainer.innerHTML += `
+          <button type="button" onclick="closeDetailModal(); openScheduleModal('${c.id}')" class="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500 text-amber-700 dark:text-amber-400 hover:text-white font-bold text-xs flex items-center gap-1.5 transition">
+            <i class="fas fa-calendar-plus"></i> Schedule Interview
+          </button>
+        `;
+      } else if (c.stage === 'interview') {
+        actionsContainer.innerHTML += `
+          <button type="button" onclick="closeDetailModal(); openStatusModal('${c.id}')" class="px-3 py-1.5 rounded-xl bg-blue-500/15 hover:bg-blue-600 text-blue-700 dark:text-blue-400 hover:text-white font-bold text-xs flex items-center gap-1.5 transition">
+            <i class="fas fa-flag"></i> Outcome Status
+          </button>
+          <button type="button" onclick="closeDetailModal(); openScheduleModal('${c.id}')" class="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-amber-500 text-slate-700 dark:text-slate-300 hover:text-white font-bold text-xs flex items-center gap-1.5 transition">
+            <i class="fas fa-calendar-alt"></i> Reschedule
+          </button>
+        `;
+      } else if ((c.stage === 'joined' || c.stage === 'invoiced') && isAdminUser()) {
+        actionsContainer.innerHTML += `
+          <button type="button" onclick="closeDetailModal(); openInvoiceModal('${c.id}')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition">
+            <i class="fas fa-file-invoice-dollar"></i> Generate Invoice
+          </button>
+        `;
+      }
+
+      if (c.phone) {
+        actionsContainer.innerHTML += `
+          <a href="https://wa.me/91${c.phone}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center gap-1">
+            <i class="fab fa-whatsapp"></i> WA
+          </a>
+        `;
+      }
+
+      document.getElementById('candidateDetailModal').style.display = 'flex';
+    }
+
+    function closeDetailModal() {
+      activeModalCandidateId = null;
+      document.getElementById('candidateDetailModal').style.display = 'none';
+    }
+
+    async function saveCurrentCandidateNotes() {
+      if (!activeModalCandidateId) return;
+      const cand = candidates.find(c => c.id === activeModalCandidateId);
+      if (!cand) return;
+
+      const newNotes = document.getElementById('modalCandNotes').value.trim();
+      const saveBtn = document.getElementById('saveNotesBtn');
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Saving...';
+
+      try {
+        let query = supabaseClient.from('candidates').update({ comment: newNotes });
+        query = byCandidate(query, cand);
+        const { error } = await query;
+        if (error) throw error;
+
+        cand.notes = newNotes;
+        showToast('Notes saved to Supabase!', 'success');
+        closeDetailModal();
+        renderBoard();
+      } catch (err) {
+        showToast('Failed to save notes: ' + err.message, 'error');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-save mr-1"></i> Save';
+      }
+    }
+
+    // ==================== NESTED WORKFLOW: SCHEDULE INTERVIEW ====================
+    function openScheduleModal(candId) {
+      const cand = candidates.find(c => c.id === candId);
+      if (!cand) return;
+      currentScheduleCandidate = cand;
+
+      document.getElementById('schCandName').textContent = cand.name;
+      document.getElementById('schCandMeta').textContent = `${cand.role} @ ${cand.company}`;
+
+      const dtInput = document.getElementById('schDateTime');
+      if (cand.interview_date) {
+        const d = new Date(cand.interview_date);
+        if (!isNaN(d.getTime())) {
+          const pad = n => String(n).padStart(2, '0');
+          dtInput.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+      } else {
+        dtInput.value = '';
+      }
+
+      document.getElementById('schLink').value = cand.invite_link || '';
+      document.getElementById('schNotes').value = cand.notes || '';
+
+      const locSelect = document.getElementById('schLocationSelect');
+      locSelect.innerHTML = '<option value="">Select Location</option>';
+      const compLower = cand.company.toLowerCase();
+      const matched = locationRows.filter(r => (r.Company_code || r.company_code || '').toLowerCase() === compLower);
+      matched.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.office_locations || m.Location || '';
+        opt.textContent = `${m.office_locations || 'Branch'} — ${m.Address || ''}`;
+        locSelect.appendChild(opt);
+      });
+
+      toggleScheduleModeInputs();
+      document.getElementById('scheduleModal').style.display = 'flex';
+    }
+
+    function closeScheduleModal() {
+      document.getElementById('scheduleModal').style.display = 'none';
+      currentScheduleCandidate = null;
+    }
+
+    function toggleScheduleModeInputs() {
+      const isOnline = document.querySelector('input[name="schMode"]:checked')?.value === 'Online';
+      document.getElementById('schOnlineField').style.display = isOnline ? 'block' : 'none';
+      document.getElementById('schPhysicalField').style.display = isOnline ? 'none' : 'block';
+    }
+
+    async function submitScheduleInterview() {
+      if (!currentScheduleCandidate) return;
+      const dtVal = document.getElementById('schDateTime').value;
+      if (!dtVal) return showToast('Please select interview Date & Time.', 'error');
+
+      const mode = document.querySelector('input[name="schMode"]:checked')?.value || 'Online';
+      const link = document.getElementById('schLink').value.trim();
+      const notes = document.getElementById('schNotes').value.trim();
+      const btn = document.getElementById('schSubmitBtn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Scheduling...';
+
+      try {
+        const isoDate = new Date(dtVal).toISOString();
+        const updatePayload = {
+          interview_date: isoDate,
+          interview_mode: mode,
+          invite_link: mode === 'Online' ? link : '',
+          comment: notes,
+          pipeline_stage: 'interview', // Advances to Interview stage automatically
+          status: 'Selected',
+          final_status: 'L1 Selected',
+          updated_at: new Date().toISOString()
+        };
+
+        let query = supabaseClient.from('candidates').update(updatePayload);
+        query = byCandidate(query, currentScheduleCandidate);
+        const { error } = await query;
+        if (error) throw error;
+
+        currentScheduleCandidate.interview_date = isoDate;
+        currentScheduleCandidate.interview_mode = mode;
+        currentScheduleCandidate.invite_link = link;
+        currentScheduleCandidate.notes = notes;
+        currentScheduleCandidate.stage = 'interview';
+        currentScheduleCandidate.status = 'Selected';
+        currentScheduleCandidate.final_status = 'L1 Selected';
+
+        showToast(`Interview scheduled! Advanced ${currentScheduleCandidate.name} to Client Interview.`, 'success');
+        closeScheduleModal();
+        renderBoard();
+      } catch (err) {
+        showToast('Schedule failed: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-calendar-check mr-1"></i> Save &amp; Advance to Interview';
+      }
+    }
+
+    // ==================== NESTED WORKFLOW: OUTCOME STATUS ====================
+    function openStatusModal(candId) {
+      const cand = candidates.find(c => c.id === candId);
+      if (!cand) return;
+      currentStatusCandidate = cand;
+
+      document.getElementById('stCandName').textContent = cand.name;
+      document.getElementById('stCandMeta').textContent = `${cand.role} @ ${cand.company}`;
+      document.getElementById('stCategorySelect').value = cand.status === 'Rejected' ? 'Rejected' : 'Selected';
+      document.getElementById('stFeedbackNotes').value = cand.notes || '';
+
+      updateFinalStatusDropdownOptions();
+      document.getElementById('statusModal').style.display = 'flex';
+    }
+
+    function closeStatusModal() {
+      document.getElementById('statusModal').style.display = 'none';
+      currentStatusCandidate = null;
+    }
+
+    function updateFinalStatusDropdownOptions() {
+      const category = document.getElementById('stCategorySelect').value;
+      const fnSelect = document.getElementById('stFinalStatusSelect');
+      const options = {
+        "Selected": ["Shortlisted", "L1 Selected", "L2 Selected", "L3 Selected", "Final Select", "Joined"],
+        "Rejected": ["Not Shortlisted", "L1 Reject", "L2 Reject", "L3 Reject", "Not Joined"],
+        "On Hold": ["Position On Hold", "Candidate On Hold"]
+      };
+      fnSelect.innerHTML = '';
+      (options[category] || []).forEach(opt => {
+        const el = document.createElement('option');
+        el.value = opt; el.textContent = opt;
+        fnSelect.appendChild(el);
+      });
+      if (currentStatusCandidate?.final_status && (options[category] || []).includes(currentStatusCandidate.final_status)) {
+        fnSelect.value = currentStatusCandidate.final_status;
+      }
+    }
+
+    function switchToRescheduleFromOutcome() {
+      if (!currentStatusCandidate) return;
+      const candId = currentStatusCandidate.id;
+      closeStatusModal();
+      openScheduleModal(candId);
+    }
+
+    async function submitInterviewOutcome() {
+      if (!currentStatusCandidate) return;
+      const category = document.getElementById('stCategorySelect').value;
+      const finalStatus = document.getElementById('stFinalStatusSelect').value;
+      const notes = document.getElementById('stFeedbackNotes').value.trim();
+      const btn = document.getElementById('stSubmitBtn');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Saving...';
+
+      try {
+        // REQUIREMENT 3: If Rejected or On Hold selected -> drop from active card view
+        if (category === 'Rejected' || category === 'On Hold') {
+          const dropPayload = {
+            status: category,
+            final_status: finalStatus,
+            comment: `[Outcome: ${category} - ${finalStatus}] ${notes}`.trim(),
+            updated_at: new Date().toISOString()
+          };
+          let query = supabaseClient.from('candidates').update(dropPayload);
+          query = byCandidate(query, currentStatusCandidate);
+          const { error } = await query;
+          if (error) throw error;
+
+          candidates = candidates.filter(c => c.id !== currentStatusCandidate.id);
+          showToast(`Candidate ${currentStatusCandidate.name} dropped from board (${category} - ${finalStatus})`, 'info');
+        } else {
+          // Selected outcome -> advance to joined or offer
+          let newStage = currentStatusCandidate.stage;
+          if (finalStatus === 'Joined') newStage = 'joined';
+          else if (finalStatus === 'Final Select') newStage = 'offer';
+
+          const updatePayload = {
+            status: category,
+            final_status: finalStatus,
+            comment: notes,
+            pipeline_stage: newStage,
+            updated_at: new Date().toISOString()
+          };
+
+          let query = supabaseClient.from('candidates').update(updatePayload);
+          query = byCandidate(query, currentStatusCandidate);
+          const { error } = await query;
+          if (error) throw error;
+
+          currentStatusCandidate.status = category;
+          currentStatusCandidate.final_status = finalStatus;
+          currentStatusCandidate.notes = notes;
+          currentStatusCandidate.stage = newStage;
+          showToast(`Outcome saved! (${category} - ${finalStatus})`, 'success');
+        }
+
+        closeStatusModal();
+        renderBoard();
+      } catch (err) {
+        showToast('Outcome save failed: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-save mr-1"></i> Save Outcome';
+      }
+    }
+
+    // ==================== NESTED WORKFLOW: INVOICE GENERATOR ====================
+    function openInvoiceModal(candId) {
+      if (!isAdminUser()) return showToast('Invoices are available to admins only.', 'error');
+      const cand = candidates.find(c => c.id === candId);
+      if (!cand) return;
+      ensurePdfLibs().catch(() => {});   // prefetch so Download PDF is instant
+      currentInvoiceCandidate = cand;
+
+      document.getElementById('invCandName').textContent = cand.name;
+      document.getElementById('invCandRole').textContent = `${cand.role} • ${cand.company}`;
+
+      const todayStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-');
+      document.getElementById('invDateInput').value = todayStr;
+      document.getElementById('invJoiningDateInput').value = cand.doj || todayStr;
+      document.getElementById('invCtcInput').value = cand.ctc || 504000;
+      document.getElementById('invFeePercentInput').value = '8.33';
+
+      const invNoEl = document.getElementById('invNumberInput');
+      invNoEl.value = `TC/INV/${new Date().getFullYear()}/${String(cand.dbId || 42).padStart(3, '0')}`;
+      invNoEl.classList.remove('user-edited');
+
+      companyAddressList = [...DEFAULT_CLIENT_ADDRESSES];
+      locationRows.forEach(r => {
+        const comp = (r.Company_code || r.Company_Code || '').trim();
+        const addr = (r.Address || '').trim();
+        if (comp && addr && !companyAddressList.some(c => c.company.toLowerCase() === comp.toLowerCase())) {
+          companyAddressList.push({ company: comp, label: `${comp} — ${addr.slice(0, 40)}...`, address: addr });
+        }
+      });
+
+      const select = document.getElementById('invCompanyAddressSelect');
+      select.innerHTML = companyAddressList.map((item, idx) => `<option value="${idx}">${escapeHtml(item.label || item.company)}</option>`).join('');
+      const matchedIdx = companyAddressList.findIndex(c => c.company.toLowerCase() === cand.company.toLowerCase());
+      select.value = matchedIdx >= 0 ? String(matchedIdx) : '0';
+      onInvoiceCompanyAddressChange();
+
+      recalculateInvoiceSummary();
+      document.getElementById('invoiceModal').style.display = 'flex';
+    }
+
+    function closeInvoiceModal() {
+      document.getElementById('invoiceModal').style.display = 'none';
+      currentInvoiceCandidate = null;
+    }
+
+    function onInvoiceCompanyAddressChange() {
+      const select = document.getElementById('invCompanyAddressSelect');
+      const item = companyAddressList[parseInt(select.value, 10)] || companyAddressList[0];
+      if (item) {
+        document.getElementById('invCompanyNameInput').value = item.company;
+        document.getElementById('invCompanyAddressInput').value = item.address;
+      }
+    }
+
+    function recalculateInvoiceSummary() {
+      const ctc = Math.max(0, Number(document.getElementById('invCtcInput').value) || 0);
+      const feeRate = Math.max(0.1, parseFloat(document.getElementById('invFeePercentInput').value) || 8.33);
+
+      const grossFee = Math.round((ctc * feeRate) / 100);
+      const tds = Math.round(grossFee * 0.10);
+      const net = grossFee - tds;
+
+      document.getElementById('invSummaryRate').textContent = String(feeRate);
+      document.getElementById('invSummaryGrossFee').textContent = `₹${formatINR(grossFee)}`;
+      document.getElementById('invSummaryTds').textContent = `- ₹${formatINR(tds)}`;
+      document.getElementById('invSummaryNetPayable').textContent = `₹${formatINR(net)}`;
+    }
+
+    async function downloadOfficialInvoicePdf() {
+      if (!isAdminUser()) return showToast('Invoices are available to admins only.', 'error');
+      try { await ensurePdfLibs(); } catch (e) { return showToast('jsPDF library failed to load.', 'error'); }
+      try {
+        const { jsPDF } = window.jspdf;
+        if (!jsPDF) return showToast('jsPDF library failed to load.', 'error');
+        if (!currentInvoiceCandidate) return;
+
+        const compName = document.getElementById('invCompanyNameInput').value.trim();
+        const compAddress = document.getElementById('invCompanyAddressInput').value.trim();
+        const invNo = document.getElementById('invNumberInput').value.trim();
+        const invDate = document.getElementById('invDateInput').value.trim();
+        const doj = document.getElementById('invJoiningDateInput').value.trim();
+        const ctc = Math.max(0, Number(document.getElementById('invCtcInput').value) || 0);
+        const feeRate = parseFloat(document.getElementById('invFeePercentInput').value) || 8.33;
+
+        const totalFee = Math.round((ctc * feeRate) / 100);
+        const tds = Math.round(totalFee * 0.10);
+        const net = totalFee - tds;
+
+        const doc = new jsPDF();
+
+        // Header Branding
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(22);
+        doc.setTextColor(15, 23, 42);
+        doc.text("TCC", 14, 18);
+
+        doc.setFontSize(12);
+        doc.text("TALENT CONNECT CONSULTANCY", 32, 16);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(100, 116, 139);
+        doc.text("CONNECTING TALENT, EMPOWERING FUTURES.", 32, 22);
+
+        doc.setFontSize(8.5);
+        doc.text(`Email: ${REMITTANCE_CONFIG.email} | Phone: ${REMITTANCE_CONFIG.phone}`, 14, 30);
+        doc.setDrawColor(203, 213, 225);
+        doc.line(14, 34, 196, 34);
+
+        // Invoice Meta
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.setTextColor(15, 23, 42);
+        doc.text("INVOICE", 14, 44);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9.5);
+        doc.text(`Invoice No: ${invNo}`, 135, 42);
+        doc.text(`Invoice Date: ${invDate}`, 135, 48);
+        doc.text(`Total Service Fee: Rs. ${formatINR(totalFee)}`, 135, 54);
+
+        // Billed To
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.text("To:", 14, 62);
+        doc.text(compName, 14, 68);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(71, 85, 105);
+        doc.text(doc.splitTextToSize(compAddress, 175), 14, 74);
+
+        // Line Item
+        doc.autoTable({
+          startY: 84,
+          head: [["S. No.", "Candidate Name & Position", "DOJ", `Service Fee ${feeRate}% of CTC (INR)`]],
+          body: [[1, `${currentInvoiceCandidate.name} (${currentInvoiceCandidate.role})`, doj, formatINR(totalFee)]],
+          theme: "grid",
+          headStyles: { fillColor: [30, 41, 59], textColor: 255, fontStyle: "bold" },
+          columnStyles: {
+            0: { cellWidth: 15, halign: "center" },
+            2: { cellWidth: 35, halign: "center" },
+            3: { cellWidth: 50, halign: "right", fontStyle: "bold" }
+          },
+          styles: { fontSize: 9.5, cellPadding: 4 }
+        });
+
+        // Tax
+        const taxY = doc.lastAutoTable.finalY + 8;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.setTextColor(15, 23, 42);
+        doc.text("Tax Details:", 14, taxY);
+
+        doc.autoTable({
+          startY: taxY + 4,
+          body: [
+            ["Total Payable", `Rs. ${formatINR(totalFee)}`],
+            ["Less: TDS @10% (194J)", `- Rs. ${formatINR(tds)}`],
+            ["Net Payable", `Rs. ${formatINR(net)}`]
+          ],
+          theme: "plain",
+          columnStyles: { 0: { fontStyle: "bold", cellWidth: 60 }, 1: { halign: "right", fontStyle: "bold" } },
+          styles: { fontSize: 9.5, cellPadding: 2 }
+        });
+
+        // Bank Details
+        const bankY = doc.lastAutoTable.finalY + 8;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.text("Bank Details:", 14, bankY);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.text(`Account Name: ${REMITTANCE_CONFIG.accountName}`, 14, bankY + 6);
+        doc.text(`Bank Name: ${REMITTANCE_CONFIG.bankName}`, 14, bankY + 12);
+        doc.text(`Account Number: ${REMITTANCE_CONFIG.accountNo}`, 14, bankY + 18);
+        doc.text(`IFSC Code: ${REMITTANCE_CONFIG.ifsc} | Branch: ${REMITTANCE_CONFIG.branch}`, 14, bankY + 24);
+
+        // TDS Clause
+        const clauseY = bankY + 32;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9.5);
+        doc.text("TDS Clause:", 14, clauseY);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8.5);
+        doc.text("Kindly deduct TDS @10% under section 194J on the service fee amount and issue Form 16A in the name of:", 14, clauseY + 5);
+        doc.text(`Name: ${REMITTANCE_CONFIG.panHolder} | PAN: ${REMITTANCE_CONFIG.panNo} | Business Name: Talent Connect Consultancy`, 14, clauseY + 10);
+
+        // Signatory
+        const sigY = clauseY + 24;
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.text("Authorized Signatory", 150, sigY);
+        doc.text(REMITTANCE_CONFIG.signatory, 150, sigY + 6);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8.5);
+        doc.text("Talent Connect Consultancy", 150, sigY + 11);
+
+        doc.save(`${invNo.replace(/\//g, "_")}_Invoice.pdf`);
+        showToast(`Invoice PDF downloaded for ${currentInvoiceCandidate.name}!`, 'success');
+        closeInvoiceModal();
+      } catch (err) {
+        showToast('PDF error: ' + err.message, 'error');
+      }
+    }
+
+    // ==================== ADD CANDIDATE MODAL ====================
+    function openAddCandidateModal() {
+      document.getElementById('newCandidateForm').reset();
+      document.getElementById('addCandidateModal').style.display = 'flex';
+    }
+
+    function closeAddCandidateModal() {
+      document.getElementById('addCandidateModal').style.display = 'none';
+    }
+
+    async function handleNewCandidateSubmit(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('addCandSubmitBtn');
+      const name = document.getElementById('addName').value.trim();
+      const role = document.getElementById('addRole').value.trim();
+      const company = document.getElementById('addCompany').value.trim();
+      const ctcRaw = document.getElementById('addCtc').value.trim();
+      const stageId = document.getElementById('addStage').value;
+      const email = document.getElementById('addEmail').value.trim();
+      const phone = document.getElementById('addPhone').value.replace(/\D/g, '').slice(-10);
+
+      if (stageId === 'invoiced' && !isAdminUser()) return showToast('Only admins can add candidates at the Invoiced stage.', 'error');
+      const stageObj = STAGES.find(s => s.id === stageId) || STAGES[0];
+      const userData = getUserData();
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Saving...';
+
+      try {
+        const payload = {
+          name,
+          position: role,
+          company,
+          expected_ctc: ctcRaw,
+          current_ctc: '-',
+          experience: '-',
+          notice_period: '30 Days',
+          email,
+          mobile: phone,
+          recruiter: userData.email || userData.name,
+          recruiter_name: userData.name,
+          pipeline_stage: stageId,
+          status: stageObj.dbStatus,
+          final_status: stageObj.dbFinalStatus
+        };
+
+        const { error } = await supabaseClient.from('candidates').insert([payload]);
+        if (error) throw error;
+
+        showToast(`Added ${name} to ${stageObj.label}!`, 'success');
+        closeAddCandidateModal();
+        await loadPipelineFromSupabase();
+      } catch (err) {
+        showToast('Failed to add candidate: ' + err.message, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Add Candidate';
+      }
+    }
+
+    // ==================== INITIALIZATION ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      const userData = getUserData();
+      if (!userData.isLoggedIn) {   // previously an anonymous visitor saw every candidate
+        showToast('Please login first. Redirecting...', 'error');
+        setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+        return;
+      }
+      if (userData.userType) {
+        document.getElementById('userTypeBadge').textContent = userData.userType.toUpperCase();
+      }
+      if (!isAdminUser()) document.querySelector('#addStage option[value="invoiced"]')?.remove();
+      initDragAndDrop();
+      loadPipelineFromSupabase();
+    });
+
+    // ---- Dialog behaviour: Esc closes the top-most dialog, background scroll lock, focus in / back out ----
+    const MODAL_CLOSERS = {
+      candidateDetailModal: () => closeDetailModal(),
+      confirmMoveModal: () => resolveStageMoveConfirmation(false),
+      dropCandidateModal: () => closeDropModal(),
+      scheduleModal: () => closeScheduleModal(),
+      statusModal: () => closeStatusModal(),
+      invoiceModal: () => closeInvoiceModal(),
+      addCandidateModal: () => closeAddCandidateModal()
+    };
+    const openOverlays = () => [...document.querySelectorAll('.popup-overlay')].filter(m => m.style.display === 'flex');
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      const open = openOverlays();
+      const top = open[open.length - 1];
+      if (top && MODAL_CLOSERS[top.id]) MODAL_CLOSERS[top.id]();
+    });
+    let lastFocusBeforeDialog = null;
+    const overlayObserver = new MutationObserver((records) => {
+      records.forEach(rec => {
+        const el = rec.target;
+        const isOpen = el.style.display === 'flex';
+        if (isOpen && !el.dataset.open) {
+          el.dataset.open = '1';
+          lastFocusBeforeDialog = document.activeElement;
+          const content = el.querySelector('.popup-content');
+          if (content) { content.setAttribute('tabindex', '-1'); content.focus({ preventScroll: true }); }
+        } else if (!isOpen && el.dataset.open) {
+          delete el.dataset.open;
+        }
+      });
+      const anyOpen = openOverlays().length > 0;
+      document.documentElement.classList.toggle('modal-open', anyOpen);
+      if (!anyOpen && lastFocusBeforeDialog && document.contains(lastFocusBeforeDialog)) {
+        lastFocusBeforeDialog.focus({ preventScroll: true });
+        lastFocusBeforeDialog = null;
+      }
+    });
+    document.querySelectorAll('.popup-overlay').forEach(m => overlayObserver.observe(m, { attributes: true, attributeFilter: ['style'] }));
+
+    // Logged out in another tab/window (index.html clears the persisted session) -> leave this page too
+    window.addEventListener('storage', (e) => {
+      if (e.storageArea === window.localStorage && e.key === 'tccPersistedSession' && e.newValue === null && sessionStorage.getItem('isLoggedIn') === 'true') {
+        TCCSession.clear();
+        window.location.href = 'index.html';
+      }
+    });
+  </script>
+</body>
+</html>
