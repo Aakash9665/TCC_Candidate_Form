@@ -9,9 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <script>
-    /* Session + theme bootstrap. Runs before first paint: no login-screen flash, no theme flash.
-       Persists ONLY the profile fields the app already kept in sessionStorage (never the password,
-       never a token - this app has none). Same 12h limit the app already enforces. */
+    /* Session + theme bootstrap. Runs before first paint: no login-screen flash, no theme flash. */
     (function () {
       var KEYS = ['isLoggedIn', 'userEmail', 'userName', 'userContact', 'userDesignation', 'userType', 'loginTime', 'userRowIndex'];
       var STORE = 'tccPersistedSession';
@@ -38,10 +36,9 @@
         var s = ss(), l = ls();
         if (!s || !l) return false;
         try {
-          if (s.getItem('isLoggedIn') === 'true') return true;          // same-tab navigation: already signed in
+          if (s.getItem('isLoggedIn') === 'true') return true;
           var raw = l.getItem(STORE);
           if (!raw) return false;
-          // Empty sessionStorage + same-origin referrer = the user just logged out on another page of this app.
           if (location.origin !== 'null' && document.referrer.indexOf(location.origin) === 0) { clearPersisted(); return false; }
           var snap = JSON.parse(raw);
           var age = snap ? Date.now() - Date.parse(snap.loginTime) : NaN;
@@ -77,7 +74,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <!-- SortableJS for Touch & Drag/Drop -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js" defer></script>
-  <!-- jsPDF + AutoTable (official invoicing) are loaded on demand, admins only - see ensurePdfLibs() -->
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
   <!-- Font Awesome -->
@@ -214,17 +210,50 @@
     .inv-prefilled-grey:focus, .inv-prefilled-grey.user-edited { color: #0f172a !important; background: #ffffff !important; border-style: solid !important; }
     .dark .inv-prefilled-grey:focus, .dark .inv-prefilled-grey.user-edited { color: #f8fafc !important; background: rgba(30, 41, 59, 0.9) !important; border-style: solid !important; }
 
+    /* Floating WhatsApp Action Pill (#waFloatWrapper) */
+    #waFloatWrapper {
+      position: fixed;
+      right: 20px;
+      bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      display: none;
+      align-items: center;
+      gap: 6px;
+      z-index: 2200;
+      animation: modalSlideUp 0.3s var(--ease-out);
+    }
+    #waFloatWrapper.show {
+      display: inline-flex;
+    }
+    #waFloatBtn {
+      text-decoration: none;
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      color: #fff;
+      padding: 13px 20px;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 13px;
+      box-shadow: 0 15px 35px -5px rgba(37, 211, 102, 0.5);
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    #waFloatBtn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 18px 40px -5px rgba(37, 211, 102, 0.65);
+    }
+
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 9999px; }
 
-    /* ===== Optimization / polish layer ===== */
+    /* Optimization / polish layer */
     html.modal-open { overflow: hidden; }
     .popup-content:focus { outline: none; }
     .column-scroll { overscroll-behavior: contain; }
     main .overflow-x-auto { overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
 
-    /* ADMIN-ONLY: invoicing, invoiced stage and fee amounts are hidden for normal users (class set in <head> before paint) */
+    /* ADMIN-ONLY: invoicing, invoiced stage and fee amounts are hidden for normal users */
     html.role-user .admin-only { display: none !important; }
     @media (min-width: 1024px) {
       html.role-user #kpiGrid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
@@ -233,30 +262,26 @@
     html.role-user #modalHighlights { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     html.role-user #kanbanInner { min-width: 1200px; }
 
-    /* Dialogs and toasts respond with intent */
     @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
     .popup-overlay[style*="flex"] { animation: overlayIn 0.2s ease-out backwards; }
     @keyframes toastIn { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
     #toastContainer > div { animation: toastIn 0.3s var(--ease-out) backwards; }
 
-    /* Responses to a person's action */
     button:not(:disabled):active { transform: scale(0.97); }
     button:disabled { opacity: 0.6; cursor: not-allowed; }
     @media (hover: hover) { .candidate-card:not(.kanban-chosen):hover { transform: translateY(-2px); } }
 
-    /* Keyboard focus that is visible on every control */
     :where(button, a, [tabindex]):focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
 
-    /* Safe areas (notch / gesture bar) */
     header.sticky { padding-top: max(0.625rem, env(safe-area-inset-top, 0px)); }
 
-    /* Phones / Android WebView */
     @media (max-width: 639.98px) {
-      #toastContainer { bottom: calc(4rem + env(safe-area-inset-bottom, 0px)); }
+      #toastContainer { bottom: calc(4.5rem + env(safe-area-inset-bottom, 0px)); }
+      #waFloatWrapper { right: 12px; left: 12px; justify-content: center; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
+      #waFloatBtn { flex: 1; justify-content: center; }
       .glass-card { backdrop-filter: blur(8px) saturate(150%); -webkit-backdrop-filter: blur(8px) saturate(150%); }
     }
 
-    /* Accessibility: respect reduced-motion (progress spinners keep turning - they signal state, not decoration) */
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
       .orb, .animate-ping, .animate-pulse { animation: none !important; }
@@ -271,6 +296,23 @@
 
   <!-- Toast Container -->
   <div id="toastContainer" role="status" aria-live="polite" class="fixed bottom-16 sm:bottom-5 right-4 sm:right-5 z-[2500] flex flex-col gap-2.5 max-w-sm w-full px-3 pointer-events-none"></div>
+
+  <!-- Persistent Floating WhatsApp Notification Button (Appears after Scheduling or Rescheduling) -->
+  <div id="waFloatWrapper">
+    <a id="waFloatBtn" href="#" target="_blank" rel="noopener noreferrer" onclick="dismissFloatingWhatsApp()">
+      <i class="fab fa-whatsapp text-lg"></i>
+      <span id="waButtonText">Send WhatsApp Invite</span>
+    </a>
+    <button
+      type="button"
+      onclick="dismissFloatingWhatsApp()"
+      aria-label="Dismiss WhatsApp Button"
+      title="Dismiss"
+      class="w-9 h-9 rounded-full bg-slate-900/90 hover:bg-slate-800 text-white border border-slate-700 flex items-center justify-center shadow-lg cursor-pointer"
+    >
+      <i class="fas fa-times text-xs"></i>
+    </button>
+  </div>
 
   <!-- STICKY TOP HEADER -->
   <header class="sticky top-0 z-40 glass-card border-b border-slate-200/80 dark:border-slate-800/80 px-3 sm:px-6 py-2.5">
@@ -294,7 +336,7 @@
             </span>
           </div>
           <p class="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:block">
-            Click any card for full dossier &amp; actions • Interview column sorted chronologically for follow-up
+            Click any card for full dossier &amp; actions • Interview column sorted chronologically with WhatsApp location alerts
           </p>
         </div>
       </div>
@@ -435,7 +477,7 @@
         </div>
 
         <!-- Stage 3: Client Interview (Sorted Chronologically: Today -> Next Day -> Future) -->
-        <div class="flex-1 min-w-[245px] glass-card rounded-2xl border border-amber-500/30 flex flex-col overflow-hidden">
+        <div class="flex-1 min-w-[255px] glass-card rounded-2xl border border-amber-500/30 flex flex-col overflow-hidden">
           <div class="p-3 border-b border-amber-500/30 bg-amber-500/10 flex items-center justify-between">
             <div class="flex items-center gap-1.5">
               <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
@@ -503,7 +545,6 @@
       </div>
 
       <div class="space-y-3.5 text-xs">
-        <!-- Highlights Strip -->
         <div id="modalHighlights" class="grid grid-cols-3 gap-2 text-center">
           <div class="p-2.5 bg-slate-100 dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800">
             <span class="text-[10px] text-slate-400 block">Expected CTC</span>
@@ -519,7 +560,6 @@
           </div>
         </div>
 
-        <!-- Full Information Grid -->
         <div class="space-y-1.5 p-3 rounded-2xl bg-slate-100/70 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 text-[11px]">
           <div class="flex justify-between py-0.5 border-b border-slate-200/60 dark:border-slate-800">
             <span class="text-slate-500">Client Company:</span>
@@ -547,7 +587,6 @@
           </div>
         </div>
 
-        <!-- Recruiter Notes Editor -->
         <div>
           <label for="modalCandNotes" class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
             <i class="fas fa-comment-dots text-blue-500 mr-1"></i> Recruiter Notes &amp; Feedback
@@ -555,11 +594,8 @@
           <textarea id="modalCandNotes" rows="2" class="form-control-input text-xs" placeholder="Add recruiter observations, interview notes, or candidate comments..."></textarea>
         </div>
 
-        <!-- Context-Aware Dynamic Actions Row -->
         <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
-          <div class="flex flex-wrap items-center gap-1.5" id="modalContextActionsContainer">
-            <!-- Populated dynamically based on candidate.stage -->
-          </div>
+          <div class="flex flex-wrap items-center gap-1.5" id="modalContextActionsContainer"></div>
 
           <div class="flex items-center gap-1.5">
             <button
@@ -682,40 +718,41 @@
     </div>
   </div>
 
-  <!-- ==================== 4. SCHEDULE INTERVIEW MODAL (#scheduleModal) ==================== -->
+  <!-- ==================== 4. SCHEDULE / RESCHEDULE INTERVIEW MODAL (#scheduleModal) ==================== -->
   <div class="popup-overlay" id="scheduleModal" role="dialog" aria-modal="true">
     <div class="popup-content glass-card max-w-md">
       <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <h3 class="font-display font-extrabold text-base text-slate-900 dark:text-white flex items-center gap-2">
+          <h3 id="schModalTitle" class="font-display font-extrabold text-base text-slate-900 dark:text-white flex items-center gap-2">
             <i class="fas fa-calendar-plus text-amber-500"></i>
             <span>Schedule Interview</span>
           </h3>
-          <p class="text-[11px] text-slate-500 dark:text-slate-400">Available from Forwarded to Client stage</p>
+          <p id="schModalSubtitle" class="text-[11px] text-slate-500 dark:text-slate-400">Set slot, interview location/link &amp; notify candidate via WhatsApp</p>
         </div>
         <button type="button" onclick="closeScheduleModal()" aria-label="Close dialog" class="w-8 h-8 rounded-xl bg-slate-200/70 dark:bg-slate-800 text-slate-500 hover:text-slate-900 dark:hover:text-white flex items-center justify-center">
           <i class="fas fa-times"></i>
         </button>
       </div>
 
-      <div class="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 mb-3.5 text-xs">
-        <p class="font-bold text-slate-900 dark:text-white" id="schCandName">-</p>
-        <p class="text-[11px] text-blue-600 dark:text-blue-400 font-semibold" id="schCandMeta">-</p>
+      <div class="p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20 mb-3.5 text-xs flex items-center justify-between gap-2">
+        <div>
+          <p class="font-bold text-slate-900 dark:text-white" id="schCandName">-</p>
+          <p class="text-[11px] text-blue-600 dark:text-blue-400 font-semibold" id="schCandMeta">-</p>
+        </div>
+        <span id="schCandPhoneBadge" class="text-[10px] font-mono font-bold px-2 py-1 rounded-lg bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">-</span>
       </div>
 
       <div class="space-y-3 text-xs">
         <div>
-          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+          <label for="schDateTime" class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
             Interview Date &amp; Time *
           </label>
           <input type="datetime-local" id="schDateTime" class="form-control-input font-medium" />
         </div>
 
-        <div>
-          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-            Interview Mode *
-          </label>
-          <div class="flex gap-4 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+        <div class="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          <div class="flex items-center gap-3.5">
+            <span class="font-bold text-slate-600 dark:text-slate-300">Mode:</span>
             <label class="flex items-center gap-1.5 font-semibold cursor-pointer">
               <input type="radio" name="schMode" value="Online" checked onchange="toggleScheduleModeInputs()" class="accent-blue-600">
               <i class="fas fa-video text-purple-500"></i> Online
@@ -725,29 +762,40 @@
               <i class="fas fa-building text-amber-500"></i> Physical
             </label>
           </div>
+
+          <label class="flex items-center gap-1.5 font-bold text-emerald-700 dark:text-emerald-400 cursor-pointer select-none">
+            <input type="checkbox" id="schPrepareWhatsapp" checked class="w-4 h-4 accent-emerald-600 rounded">
+            <i class="fab fa-whatsapp text-sm"></i>
+            <span>WhatsApp</span>
+          </label>
         </div>
 
         <div id="schOnlineField">
-          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-            Meeting Link (Google Meet / Zoom)
+          <label for="schLink" class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+            Meeting Link (Google Meet / Zoom / Teams)
           </label>
           <input type="url" id="schLink" placeholder="https://meet.google.com/..." class="form-control-input" />
         </div>
 
         <div id="schPhysicalField" style="display: none;">
-          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-            Client Office Location
-          </label>
-          <select id="schLocationSelect" class="form-control-input font-semibold">
+          <div class="flex items-center justify-between mb-1">
+            <label for="schLocationSelect" class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              Client Office Location *
+            </label>
+            <span class="text-[10px] font-semibold text-amber-600 dark:text-amber-400">Included in WhatsApp</span>
+          </div>
+          <select id="schLocationSelect" onchange="updateScheduleLocationPreview()" class="form-control-input font-semibold">
             <option value="">Select Location</option>
           </select>
+          <!-- Live Office Location, HR SPOC & Map Preview -->
+          <div id="schLocationPreview" class="hidden mt-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-[11px] text-slate-700 dark:text-slate-300 space-y-0.5"></div>
         </div>
 
         <div>
-          <label class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+          <label for="schNotes" class="block font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
             Notes / Panel Remarks
           </label>
-          <textarea id="schNotes" rows="2" placeholder="Round details or instructions..." class="form-control-input"></textarea>
+          <textarea id="schNotes" rows="2" placeholder="Round details, floor instructions, or reschedule remarks..." class="form-control-input"></textarea>
         </div>
       </div>
 
@@ -756,7 +804,46 @@
           Cancel
         </button>
         <button type="button" id="schSubmitBtn" onclick="submitScheduleInterview()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-md shadow-emerald-600/20">
-          <i class="fas fa-calendar-check mr-1"></i> Save &amp; Advance to Interview
+          <i class="fas fa-calendar-check mr-1"></i> <span id="schSubmitBtnText">Save &amp; Prepare WhatsApp</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 4B. WHATSAPP NOTIFICATION READY MODAL (#waReadyModal) ==================== -->
+  <div class="popup-overlay" id="waReadyModal" role="dialog" aria-modal="true">
+    <div class="popup-content glass-card max-w-md text-center">
+      <div class="w-14 h-14 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto mb-3 text-2xl">
+        <i class="fab fa-whatsapp"></i>
+      </div>
+      <h3 id="waReadyTitle" class="font-display font-extrabold text-lg text-slate-900 dark:text-white mb-1">
+        Interview Scheduled!
+      </h3>
+      <p id="waReadySubtitle" class="text-xs text-slate-500 dark:text-slate-400 mb-3">
+        Saved to Supabase. Click below to send the WhatsApp notification with full interview &amp; location details to the candidate.
+      </p>
+
+      <!-- Live Preview of the WhatsApp Message -->
+      <div id="waReadyMessagePreview" class="p-3 rounded-2xl bg-[#e7ffdb] dark:bg-emerald-950/60 border border-emerald-500/25 text-slate-800 dark:text-slate-200 text-[11px] text-left leading-relaxed whitespace-pre-line font-sans max-h-48 overflow-y-auto mb-4 shadow-inner"></div>
+
+      <div class="flex flex-col sm:flex-row gap-2.5">
+        <a
+          id="waReadySendBtn"
+          href="#"
+          target="_blank"
+          rel="noopener noreferrer"
+          onclick="closeWaReadyModal()"
+          class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2"
+        >
+          <i class="fab fa-whatsapp text-base"></i>
+          <span id="waReadySendBtnText">Send WhatsApp to Candidate</span>
+        </a>
+        <button
+          type="button"
+          onclick="closeWaReadyModal()"
+          class="py-3 px-4 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs sm:text-sm"
+        >
+          Close
         </button>
       </div>
     </div>
@@ -1038,13 +1125,12 @@
       { id: "invoiced", label: "Invoiced", dbStatus: "Selected", dbFinalStatus: "Invoiced" }
     ];
 
-    const TCCSession = window.TCCSession;   // defined in <head>
+    const TCCSession = window.TCCSession;
     const isAdminUser = () => (sessionStorage.getItem('userType') || '').toLowerCase() === 'admin';
     const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
     const renderBoardDebounced = debounce(() => renderBoard(), 120);
-    const byCandidate = (query, c) => (c.dbId ? query.eq('id', c.dbId) : query.eq('email', c.email));   // was repeated 6x
+    const byCandidate = (query, c) => (c.dbId ? query.eq('id', c.dbId) : query.eq('email', c.email));
 
-    // jsPDF + AutoTable: only admins can invoice, so only load (once) when an admin needs them
     let pdfLibsPromise = null;
     function loadScriptOnce(src) {
       return new Promise((resolve, reject) => {
@@ -1065,7 +1151,6 @@
       return pdfLibsPromise;
     }
 
-    // SEGREGATION: admin sees every profile; a normal user sees ONLY profiles where they are the recruiter.
     function canViewRow(r, userData) {
       if (!userData.isLoggedIn) return false;
       if (userData.userType.toLowerCase() === 'admin') return true;
@@ -1078,10 +1163,12 @@
     let reloadQueued = false;
     let candidates = [];
     let locationRows = [];
+    let currentScheduleLocations = [];
     let sortableInstances = [];
     let pendingStageMove = null;
     let activeModalCandidateId = null;
     let currentScheduleCandidate = null;
+    let isCurrentScheduleReschedule = false;
     let currentStatusCandidate = null;
     let currentInvoiceCandidate = null;
     let currentDropCandidateId = null;
@@ -1091,6 +1178,18 @@
     function escapeHtml(unsafe) {
       if (unsafe === null || unsafe === undefined) return "";
       return String(unsafe).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+
+    function getVal(obj, ...keys) {
+      if (!obj) return "";
+      for (const k of keys) {
+        if (obj[k] != null && obj[k] !== "") return obj[k];
+      }
+      return "";
+    }
+
+    function onlyDigits(s) {
+      return (s || "").toString().replace(/\D/g, "");
     }
 
     function formatINR(val) {
@@ -1115,11 +1214,25 @@
       return `₹${(Number(annualInr) / 100000).toFixed(2)} LPA`;
     }
 
+    function formatInterviewDateTimeFull(dt) {
+      if (!dt) return "N/A";
+      const d = new Date(dt);
+      if (isNaN(d.getTime())) return dt;
+      return d.toLocaleDateString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+
     function toggleTheme() {
       const isDark = document.documentElement.classList.toggle('dark');
       const value = isDark ? 'dark' : 'light';
       sessionStorage.setItem('tccTheme', value);
-      try { localStorage.setItem('tccTheme', value); } catch (e) {}   // theme survives APK restarts
+      try { localStorage.setItem('tccTheme', value); } catch (e) {}
     }
 
     function showToast(message, type = 'success') {
@@ -1174,7 +1287,6 @@
       return 'sourced';
     }
 
-    // Returns date-time formatting and relative badge status for interview slots
     function getInterviewTimelineMeta(dateStr) {
       if (!dateStr) return null;
       const d = new Date(dateStr);
@@ -1217,9 +1329,154 @@
       };
     }
 
+    // ==================== WHATSAPP INTERVIEW & LOCATION NOTIFICATION BUILDER ====================
+    function findLocationObjectForCandidate(candidate) {
+      if (!candidate || !locationRows.length) return null;
+      const compLower = (candidate.company || '').trim().toLowerCase();
+      const savedLocLower = (candidate.interview_location || '').trim().toLowerCase();
+
+      if (savedLocLower) {
+        const exactMatch = locationRows.find(r => {
+          const locName = (getVal(r, 'office_locations', 'Office_Locations', 'Location') || '').toString().trim().toLowerCase();
+          return locName === savedLocLower;
+        });
+        if (exactMatch) return exactMatch;
+      }
+
+      const compMatches = locationRows.filter(r => {
+        const code = (getVal(r, 'Company_code', 'Company_Code', 'company_code', 'Company_Name', 'company_name') || '').toString().trim().toLowerCase();
+        return code === compLower;
+      });
+      return compMatches.length === 1 ? compMatches[0] : null;
+    }
+
+    function buildInterviewWhatsAppPayload(candidate, options = {}) {
+      if (!candidate) return null;
+      const digitsOnly = onlyDigits(candidate.phone).slice(-10);
+      if (digitsOnly.length !== 10) return null;
+
+      const userData = getUserData();
+      const recruiterName = userData.name || (userData.email || '').split('@')[0] || 'Recruiter';
+      const dateTimeStr = options.dateTimeStr || candidate.interview_date;
+      const mode = (options.mode || candidate.interview_mode || 'Online').trim();
+      const modeUpper = mode.toUpperCase();
+      const isReschedule = Boolean(options.isReschedule);
+      const inviteLink = (options.inviteLink !== undefined ? options.inviteLink : candidate.invite_link || '').trim();
+      const locationObj = options.locationObj || (modeUpper === 'PHYSICAL' ? findLocationObjectForCandidate(candidate) : null);
+      const locationLabel = (options.locationLabel || candidate.interview_location || '').trim();
+
+      const formattedDT = formatInterviewDateTimeFull(dateTimeStr);
+
+      let msg = isReschedule
+        ? `*Hi ${candidate.name || 'Candidate'}*,\n\nYour interview for the *${candidate.role || 'Open'}* role at *${candidate.company || 'our client'}* has been *RESCHEDULED*.\n\n*Updated Interview Details:*\n`
+        : `*Hi ${candidate.name || 'Candidate'}*,\n\nWe are pleased to schedule your interview for the *${candidate.role || 'Open'}* role at *${candidate.company || 'our client'}*.\n\n*Interview Details:*\n`;
+
+      msg += `📅 *Date & Time:* ${formattedDT}\n` +
+             `💼 *Mode:* ${modeUpper}\n\n`;
+
+      if (modeUpper === 'PHYSICAL') {
+        if (locationObj) {
+          const compName = getVal(locationObj, 'Company_Name', 'company_name') || candidate.company || '';
+          const branchName = getVal(locationObj, 'office_locations', 'Office_Locations', 'Location') || locationLabel || '';
+          const spocName = getVal(locationObj, 'Spoc_Name', 'spoc_name');
+          const spocNum = onlyDigits(getVal(locationObj, 'Spoc_Number', 'spoc_number')).slice(-10);
+          const address = getVal(locationObj, 'Address', 'address');
+          const gmap = getVal(locationObj, 'Google_Map', 'google_map');
+
+          msg += `*Interview Location & SPOC Details:*\n` +
+                 `🏢 *Company:* ${compName}${branchName ? ' (' + branchName + ')' : ''}\n` +
+                 (spocName ? `👤 *HR / Contact Person:* ${spocName}\n` : '') +
+                 (spocNum ? `📞 *HR Contact:* +91 ${spocNum}\n` : '') +
+                 (address ? `📍 *Address:* ${address}\n` : '') +
+                 (gmap ? `🗺️ *Google Map:* ${gmap}\n` : '') +
+                 `\n*Note:*\n✅ Please carry your updated resume\n⏰ Kindly reach 10-15 mins prior to the scheduled time\n`;
+        } else if (locationLabel) {
+          msg += `📍 *Office Location:* ${locationLabel}\n\n` +
+                 `*Note:*\n✅ Please carry your updated resume\n⏰ Kindly reach 10-15 mins prior to the scheduled time\n`;
+        } else {
+          msg += `🏢 *Location:* ${candidate.company || 'Client Office'}\n\n` +
+                 `*Note:*\n✅ Please carry your updated resume\n⏰ Be on time\n`;
+        }
+      } else {
+        if (inviteLink) {
+          msg += `🔗 *Meeting Link:* ${inviteLink}\n\n`;
+        }
+        msg += `*Kindly note: Join 5-10 mins before the interview starts.*\n`;
+      }
+
+      msg += isReschedule
+        ? `\n*_Kindly acknowledge this message and confirm your availability for the rescheduled slot._*\n`
+        : `\n*_Kindly acknowledge this message and confirm your availability._*\n`;
+
+      msg += `\n*Regards,*\n*${recruiterName}*\n*Talent Connect Consultancy*`;
+
+      return {
+        url: `https://wa.me/91${digitsOnly}?text=${encodeURIComponent(msg)}`,
+        message: msg,
+        phone: digitsOnly
+      };
+    }
+
+    function activateWhatsAppNotificationUI(candidate, payload, isReschedule) {
+      if (!payload || !payload.url) {
+        showToast('Saved! Note: Candidate has no valid 10-digit mobile number for WhatsApp.', 'info');
+        return;
+      }
+
+      // 1. Update & show persistent Floating WhatsApp Pill (#waFloatWrapper)
+      const wrapper = document.getElementById('waFloatWrapper');
+      const floatBtn = document.getElementById('waFloatBtn');
+      const floatText = document.getElementById('waButtonText');
+      if (wrapper && floatBtn && floatText) {
+        floatBtn.href = payload.url;
+        floatText.textContent = isReschedule
+          ? `Send Reschedule WA to ${candidate.name}`
+          : `Send Interview WA to ${candidate.name}`;
+        wrapper.classList.add('show');
+      }
+
+      // 2. Open immediate WhatsApp Ready Modal with full message preview & one-click button
+      document.getElementById('waReadyTitle').textContent = isReschedule
+        ? 'Interview Rescheduled!'
+        : 'Interview Scheduled!';
+      document.getElementById('waReadySubtitle').textContent = isReschedule
+        ? `Updated slot saved. Click below to send the reschedule confirmation & location details to ${candidate.name}.`
+        : `Saved to Supabase. Click below to send the interview invitation & location details to ${candidate.name}.`;
+      document.getElementById('waReadyMessagePreview').textContent = payload.message;
+
+      const sendBtn = document.getElementById('waReadySendBtn');
+      const sendBtnText = document.getElementById('waReadySendBtnText');
+      if (sendBtn && sendBtnText) {
+        sendBtn.href = payload.url;
+        sendBtnText.textContent = isReschedule
+          ? `Send Reschedule WhatsApp to ${candidate.name}`
+          : `Send Interview WhatsApp to ${candidate.name}`;
+      }
+
+      document.getElementById('waReadyModal').style.display = 'flex';
+    }
+
+    function closeWaReadyModal() {
+      document.getElementById('waReadyModal').style.display = 'none';
+    }
+
+    function dismissFloatingWhatsApp() {
+      document.getElementById('waFloatWrapper')?.classList.remove('show');
+    }
+
+    function sendDirectInterviewWhatsApp(candId, isReschedule = false) {
+      const cand = candidates.find(c => c.id === candId);
+      if (!cand) return;
+      const payload = buildInterviewWhatsAppPayload(cand, { isReschedule });
+      if (!payload) {
+        return showToast('Valid 10-digit mobile number not found for this candidate.', 'error');
+      }
+      window.open(payload.url, '_blank', 'noopener,noreferrer');
+    }
+
     // ==================== SUPABASE DATA SYNC ====================
     async function loadPipelineFromSupabase() {
-      if (loadInFlight) { reloadQueued = true; return; }   // no overlapping duplicate requests
+      if (loadInFlight) { reloadQueued = true; return; }
       loadInFlight = true;
       const syncIcon = document.getElementById('syncIcon');
       if (syncIcon) syncIcon.classList.add('fa-spin');
@@ -1235,13 +1492,11 @@
 
         const userData = getUserData();
 
-        // Active candidates: exclude dropped candidates (Rejected or Position On Hold / Candidate On Hold)
         const rows = (candRes.data || []).filter(r => {
           const st = (r.status || '').toString().trim().toLowerCase();
           const fn = (r.final_status || '').toString().trim().toLowerCase();
           const comment = (r.comment || '').toString().toLowerCase();
 
-          // Drop filter: do not show rejected or hold in active board
           if (st === 'rejected' || fn.includes('reject') || fn.includes('hold') || st.includes('hold') || comment.includes('[dropped]')) {
             return false;
           }
@@ -1269,13 +1524,14 @@
             final_status: r.final_status || 'Submitted',
             interview_date: r.interview_date || '',
             interview_mode: r.interview_mode || 'Online',
+            interview_location: r.interview_location || '',
             invite_link: r.invite_link || '',
             phone: String(r.mobile || r.Mobile || r.phone || '').replace(/\D/g, '').slice(-10),
             notes: r.comment || ''
           };
         });
 
-        if (!isAdminUser()) candidates = candidates.filter(c => c.stage !== 'invoiced');   // billing stage is admin-only
+        if (!isAdminUser()) candidates = candidates.filter(c => c.stage !== 'invoiced');
         populateFilterDropdowns();
         renderBoard();
       } catch (err) {
@@ -1348,7 +1604,6 @@
       const counts = { sourced: 0, client_shared: 0, interview: 0, offer: 0, joined: 0, invoiced: 0 };
       let todayInterviewsCount = 0;
 
-      // Group candidates by stage
       const stageBuckets = { sourced: [], client_shared: [], interview: [], offer: [], joined: [], invoiced: [] };
 
       filtered.forEach(cand => {
@@ -1357,14 +1612,12 @@
         stageBuckets[stage].push(cand);
       });
 
-      // REQUIREMENT 2: In Interview stage, sort candidates chronologically (Today -> Tomorrow -> Next Day -> Future)
       stageBuckets['interview'].sort((a, b) => {
         const timeA = a.interview_date ? new Date(a.interview_date).getTime() : Infinity;
         const timeB = b.interview_date ? new Date(b.interview_date).getTime() : Infinity;
         return timeA - timeB;
       });
 
-      // Render each stage column
       STAGES.forEach(st => {
         const colEl = document.getElementById(`col-${st.id}`);
         if (!colEl) return;
@@ -1379,13 +1632,11 @@
         });
       });
 
-      // Update Column Count Badges
       STAGES.forEach(st => {
         const badge = document.getElementById(`badge-${st.id}`);
         if (badge) badge.textContent = counts[st.id] || 0;
       });
 
-      // Update KPI strip
       document.getElementById('kpiTotalCandidates').textContent = filtered.length;
       document.getElementById('kpiForwardedCount').textContent = counts.client_shared;
       document.getElementById('kpiInterviewCount').textContent = counts.interview;
@@ -1398,59 +1649,62 @@
       document.getElementById('kpiCommissionAmount').textContent = `₹${formatINR(commissionPool)}`;
     }
 
-    // Creates Kanban card with context-aware buttons based on pipeline stage
     function createCandidateCard(c) {
       const card = document.createElement('div');
       card.className = 'candidate-card bg-white dark:bg-slate-900 rounded-2xl p-3 border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-blue-500/40 transition cursor-pointer select-none';
       card.setAttribute('data-id', c.id);
 
-      // REQUIREMENT 1: Clicking any card opens full detailed dossier
       card.addEventListener('click', (e) => {
         if (e.target.closest('button') || e.target.closest('a') || e.target.closest('input')) return;
         openDetailModal(c.id);
       });
 
-      // STAGE-SPECIFIC CONTEXTUAL QUICK ACTION:
       let actionButtonsHtml = '';
       let interviewTimelineHtml = '';
 
       if (c.stage === 'interview') {
         const meta = getInterviewTimelineMeta(c.interview_date);
+        const modeIcon = (c.interview_mode || '').toLowerCase() === 'physical'
+          ? '<i class="fas fa-building text-emerald-600 dark:text-emerald-400"></i>'
+          : '<i class="fas fa-video text-purple-600 dark:text-purple-400"></i>';
+
         if (meta) {
           interviewTimelineHtml = `
             <div class="mt-2 p-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between text-[10px]">
-              <div class="font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1">
-                <i class="far fa-clock text-amber-500"></i>
+              <div class="font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1 truncate">
+                ${modeIcon}
                 <span>${escapeHtml(meta.formattedDate)}</span>
               </div>
-              <span class="px-1.5 py-0.5 rounded font-extrabold text-[9px] uppercase ${meta.badgeClass}">
+              <span class="px-1.5 py-0.5 rounded font-extrabold text-[9px] uppercase shrink-0 ${meta.badgeClass}">
                 ${escapeHtml(meta.badgeText)}
               </span>
             </div>
           `;
         }
 
-        // Nested Outcome & Reschedule actions for Interview stage
         actionButtonsHtml = `
-          <button type="button" onclick="event.stopPropagation(); openStatusModal('${c.id}')" class="px-2 py-1 rounded-lg bg-blue-500/15 hover:bg-blue-600 text-blue-700 dark:text-blue-400 hover:text-white text-[11px] font-bold transition flex items-center gap-1 cursor-pointer">
-            <i class="fas fa-flag text-[10px]"></i>
+          <button type="button" onclick="event.stopPropagation(); openStatusModal('${c.id}')" class="px-2 py-1 rounded-lg bg-blue-500/15 hover:bg-blue-600 text-blue-700 dark:text-blue-400 hover:text-white text-[10.5px] font-bold transition flex items-center gap-1 cursor-pointer">
+            <i class="fas fa-flag text-[9px]"></i>
             <span>Outcome</span>
           </button>
-          <button type="button" onclick="event.stopPropagation(); openScheduleModal('${c.id}')" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-amber-500 text-slate-600 dark:text-slate-300 hover:text-white text-[11px] font-bold transition flex items-center gap-1 cursor-pointer" title="Reschedule Slot">
-            <i class="fas fa-calendar-alt text-[10px]"></i>
+          <button type="button" onclick="event.stopPropagation(); openScheduleModal('${c.id}', true)" class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-amber-500 text-slate-600 dark:text-slate-300 hover:text-white text-[10.5px] font-bold transition flex items-center gap-1 cursor-pointer" title="Reschedule Slot & Notify">
+            <i class="fas fa-calendar-alt text-[9px]"></i>
             <span>Reschedule</span>
           </button>
+          ${c.phone ? `
+            <button type="button" onclick="event.stopPropagation(); sendDirectInterviewWhatsApp('${c.id}', false)" class="px-2 py-1 rounded-lg bg-emerald-500/15 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white text-[10.5px] font-bold transition flex items-center gap-1 cursor-pointer" title="Send Interview Location / Link on WhatsApp">
+              <i class="fab fa-whatsapp text-xs"></i>
+            </button>
+          ` : ''}
         `;
       } else if (c.stage === 'client_shared') {
-        // Nested Schedule Interview for Forwarded to Client stage
         actionButtonsHtml = `
-          <button type="button" onclick="event.stopPropagation(); openScheduleModal('${c.id}')" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-700 dark:text-amber-400 hover:text-white text-[11px] font-bold transition flex items-center gap-1 cursor-pointer">
+          <button type="button" onclick="event.stopPropagation(); openScheduleModal('${c.id}', false)" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500 text-amber-700 dark:text-amber-400 hover:text-white text-[11px] font-bold transition flex items-center gap-1 cursor-pointer">
             <i class="fas fa-calendar-plus text-[10px]"></i>
             <span>Schedule Interview</span>
           </button>
         `;
       } else if (c.stage === 'joined' && isAdminUser()) {
-        // Nested Invoice Generator for Joined stage (admin only)
         actionButtonsHtml = `
           <button type="button" onclick="event.stopPropagation(); openInvoiceModal('${c.id}')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold transition flex items-center gap-1 shadow-sm cursor-pointer">
             <i class="fas fa-file-invoice-dollar text-[10px]"></i>
@@ -1500,14 +1754,14 @@
 
         ${interviewTimelineHtml}
 
-        <div class="mt-2.5 pt-1.5 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-1.5">
+        <div class="mt-2.5 pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
           <div class="flex flex-wrap items-center gap-1">
             ${actionButtonsHtml}
           </div>
           <button
             type="button"
             onclick="event.stopPropagation(); promptDropCandidate('${c.id}')"
-            class="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 text-slate-400 hover:text-white flex items-center justify-center text-xs transition cursor-pointer"
+            class="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-rose-500 text-slate-400 hover:text-white flex items-center justify-center text-xs transition cursor-pointer shrink-0"
             title="Drop candidate from pipeline"
           >
             <i class="fas fa-user-xmark"></i>
@@ -1530,7 +1784,7 @@
         const sortable = new Sortable(col, {
           group: 'tcc-ats-pipeline',
           animation: 180,
-          delay: 150, delayOnTouchOnly: true, touchStartThreshold: 6,   // touch: press-and-hold to drag, swipe to scroll
+          delay: 150, delayOnTouchOnly: true, touchStartThreshold: 6,
           ghostClass: 'kanban-ghost',
           chosenClass: 'kanban-chosen',
           onEnd: function (evt) {
@@ -1642,6 +1896,11 @@
 
         renderBoard();
         showToast(`Moved ${cand.name} to ${stageObj.label}!`, 'success');
+
+        // If dragged directly into Client Interview, prompt to set slot & send WhatsApp notification
+        if (newStageId === 'interview') {
+          openScheduleModal(candId, Boolean(cand.interview_date));
+        }
       } catch (err) {
         console.error('Failed to update stage in Supabase:', err);
         renderBoard();
@@ -1649,7 +1908,7 @@
       }
     }
 
-    // ==================== REQUIREMENT 3: DROP CANDIDATE WORKFLOW ====================
+    // ==================== DROP CANDIDATE WORKFLOW ====================
     function promptDropCandidate(candId) {
       const cand = candidates.find(c => c.id === candId);
       if (!cand) return;
@@ -1693,7 +1952,6 @@
         const { error } = await query;
         if (error) throw error;
 
-        // Remove immediately from active board
         candidates = candidates.filter(c => c.id !== currentDropCandidateId);
 
         showToast(`Candidate ${cand.name} dropped from pipeline (${reason})`, 'info');
@@ -1708,7 +1966,7 @@
       }
     }
 
-    // ==================== REQUIREMENT 1: CANDIDATE DETAIL DOSSIER MODAL ====================
+    // ==================== CANDIDATE DETAIL DOSSIER MODAL ====================
     function openDetailModal(id) {
       const c = candidates.find(item => item.id === id);
       if (!c) return;
@@ -1730,7 +1988,10 @@
 
       if (c.interview_date) {
         const meta = getInterviewTimelineMeta(c.interview_date);
-        document.getElementById('modalCandInterviewSlot').textContent = `${meta ? meta.formattedDate : c.interview_date} (${c.interview_mode || 'Online'})`;
+        const locDetail = (c.interview_mode || '').toLowerCase() === 'physical' && c.interview_location
+          ? ` • ${c.interview_location}`
+          : '';
+        document.getElementById('modalCandInterviewSlot').textContent = `${meta ? meta.formattedDate : c.interview_date} (${c.interview_mode || 'Online'}${locDetail})`;
       } else {
         document.getElementById('modalCandInterviewSlot').textContent = 'Not Scheduled';
       }
@@ -1738,13 +1999,12 @@
       document.getElementById('modalCandContact').textContent = `${c.phone ? '+91 ' + c.phone : '-'} | ${c.email || '-'}`;
       document.getElementById('modalCandNotes').value = c.notes || '';
 
-      // Populate stage-specific action buttons inside the Detail modal
       const actionsContainer = document.getElementById('modalContextActionsContainer');
       actionsContainer.innerHTML = '';
 
       if (c.stage === 'client_shared') {
         actionsContainer.innerHTML += `
-          <button type="button" onclick="closeDetailModal(); openScheduleModal('${c.id}')" class="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500 text-amber-700 dark:text-amber-400 hover:text-white font-bold text-xs flex items-center gap-1.5 transition">
+          <button type="button" onclick="closeDetailModal(); openScheduleModal('${c.id}', false)" class="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500 text-amber-700 dark:text-amber-400 hover:text-white font-bold text-xs flex items-center gap-1.5 transition">
             <i class="fas fa-calendar-plus"></i> Schedule Interview
           </button>
         `;
@@ -1753,10 +2013,17 @@
           <button type="button" onclick="closeDetailModal(); openStatusModal('${c.id}')" class="px-3 py-1.5 rounded-xl bg-blue-500/15 hover:bg-blue-600 text-blue-700 dark:text-blue-400 hover:text-white font-bold text-xs flex items-center gap-1.5 transition">
             <i class="fas fa-flag"></i> Outcome Status
           </button>
-          <button type="button" onclick="closeDetailModal(); openScheduleModal('${c.id}')" class="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-amber-500 text-slate-700 dark:text-slate-300 hover:text-white font-bold text-xs flex items-center gap-1.5 transition">
+          <button type="button" onclick="closeDetailModal(); openScheduleModal('${c.id}', true)" class="px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-amber-500 text-slate-700 dark:text-slate-300 hover:text-white font-bold text-xs flex items-center gap-1.5 transition">
             <i class="fas fa-calendar-alt"></i> Reschedule
           </button>
         `;
+        if (c.phone && c.interview_date) {
+          actionsContainer.innerHTML += `
+            <button type="button" onclick="sendDirectInterviewWhatsApp('${c.id}', false)" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-600 text-emerald-700 dark:text-emerald-400 hover:text-white font-bold text-xs flex items-center gap-1.5 transition">
+              <i class="fab fa-whatsapp"></i> Send Location/Invite
+            </button>
+          `;
+        }
       } else if ((c.stage === 'joined' || c.stage === 'invoiced') && isAdminUser()) {
         actionsContainer.innerHTML += `
           <button type="button" onclick="closeDetailModal(); openInvoiceModal('${c.id}')" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition">
@@ -1765,7 +2032,7 @@
         `;
       }
 
-      if (c.phone) {
+      if (c.phone && c.stage !== 'interview') {
         actionsContainer.innerHTML += `
           <a href="https://wa.me/91${c.phone}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-bold text-xs flex items-center gap-1">
             <i class="fab fa-whatsapp"></i> WA
@@ -1809,14 +2076,31 @@
       }
     }
 
-    // ==================== NESTED WORKFLOW: SCHEDULE INTERVIEW ====================
-    function openScheduleModal(candId) {
+    // ==================== SCHEDULE & RESCHEDULE INTERVIEW + WHATSAPP LOCATION ====================
+    function openScheduleModal(candId, forceReschedule = false) {
       const cand = candidates.find(c => c.id === candId);
       if (!cand) return;
       currentScheduleCandidate = cand;
+      isCurrentScheduleReschedule = Boolean(forceReschedule || cand.stage === 'interview' || cand.interview_date);
+
+      const titleEl = document.getElementById('schModalTitle');
+      const subEl = document.getElementById('schModalSubtitle');
+      const btnTextEl = document.getElementById('schSubmitBtnText');
+
+      if (isCurrentScheduleReschedule) {
+        titleEl.innerHTML = '<i class="fas fa-calendar-alt text-amber-500"></i> <span>Reschedule Interview</span>';
+        subEl.textContent = 'Update date/time, mode & location, then send WhatsApp reschedule confirmation';
+        btnTextEl.textContent = 'Reschedule & Prepare WhatsApp';
+      } else {
+        titleEl.innerHTML = '<i class="fas fa-calendar-plus text-amber-500"></i> <span>Schedule Interview</span>';
+        subEl.textContent = 'Set interview slot, mode & office location, then send WhatsApp invitation';
+        btnTextEl.textContent = 'Save & Prepare WhatsApp';
+      }
 
       document.getElementById('schCandName').textContent = cand.name;
       document.getElementById('schCandMeta').textContent = `${cand.role} @ ${cand.company}`;
+      document.getElementById('schCandPhoneBadge').textContent = cand.phone ? `+91 ${cand.phone}` : 'No Mobile';
+      document.getElementById('schPrepareWhatsapp').checked = true;
 
       const dtInput = document.getElementById('schDateTime');
       if (cand.interview_date) {
@@ -1829,21 +2113,52 @@
         dtInput.value = '';
       }
 
+      // Set existing mode radio
+      const existingMode = (cand.interview_mode || 'Online').toLowerCase() === 'physical' ? 'Physical' : 'Online';
+      document.querySelectorAll('input[name="schMode"]').forEach(r => {
+        r.checked = r.value === existingMode;
+      });
+
       document.getElementById('schLink').value = cand.invite_link || '';
       document.getElementById('schNotes').value = cand.notes || '';
 
+      // Populate office locations from Supabase (matches company first, falls back to all locations if none match)
       const locSelect = document.getElementById('schLocationSelect');
-      locSelect.innerHTML = '<option value="">Select Location</option>';
-      const compLower = cand.company.toLowerCase();
-      const matched = locationRows.filter(r => (r.Company_code || r.company_code || '').toLowerCase() === compLower);
-      matched.forEach(m => {
+      locSelect.innerHTML = '<option value="">Select Office Location</option>';
+      const compLower = cand.company.trim().toLowerCase();
+      let matched = locationRows.filter(r => {
+        const code = (getVal(r, 'Company_code', 'Company_Code', 'company_code', 'Company_Name', 'company_name') || '').toString().trim().toLowerCase();
+        return code === compLower;
+      });
+      if (!matched.length && locationRows.length) {
+        matched = locationRows;
+      }
+
+      currentScheduleLocations = matched;
+      matched.forEach((m, idx) => {
+        const locName = (getVal(m, 'office_locations', 'Office_Locations', 'Location') || `Branch ${idx + 1}`).toString().trim();
+        const compName = (getVal(m, 'Company_Name', 'company_name') || '').toString().trim();
         const opt = document.createElement('option');
-        opt.value = m.office_locations || m.Location || '';
-        opt.textContent = `${m.office_locations || 'Branch'} — ${m.Address || ''}`;
+        opt.value = String(idx);
+        opt.textContent = compName && compName.toLowerCase() !== locName.toLowerCase()
+          ? `${compName} — ${locName}`
+          : locName;
         locSelect.appendChild(opt);
       });
 
+      // Pre-select existing location if saved
+      if (cand.interview_location) {
+        const savedIdx = currentScheduleLocations.findIndex(m => {
+          const name = (getVal(m, 'office_locations', 'Office_Locations', 'Location') || '').toString().trim().toLowerCase();
+          return name === cand.interview_location.trim().toLowerCase();
+        });
+        if (savedIdx >= 0) locSelect.value = String(savedIdx);
+      } else if (currentScheduleLocations.length === 1) {
+        locSelect.value = '0';
+      }
+
       toggleScheduleModeInputs();
+      updateScheduleLocationPreview();
       document.getElementById('scheduleModal').style.display = 'flex';
     }
 
@@ -1856,6 +2171,33 @@
       const isOnline = document.querySelector('input[name="schMode"]:checked')?.value === 'Online';
       document.getElementById('schOnlineField').style.display = isOnline ? 'block' : 'none';
       document.getElementById('schPhysicalField').style.display = isOnline ? 'none' : 'block';
+      if (!isOnline) updateScheduleLocationPreview();
+    }
+
+    function updateScheduleLocationPreview() {
+      const locSelect = document.getElementById('schLocationSelect');
+      const preview = document.getElementById('schLocationPreview');
+      if (!locSelect || !preview) return;
+
+      const idx = parseInt(locSelect.value, 10);
+      const loc = !isNaN(idx) ? currentScheduleLocations[idx] : null;
+      if (!loc) {
+        preview.classList.add('hidden');
+        preview.innerHTML = '';
+        return;
+      }
+
+      const spocName = getVal(loc, 'Spoc_Name', 'spoc_name') || '-';
+      const spocNum = getVal(loc, 'Spoc_Number', 'spoc_number') || '-';
+      const address = getVal(loc, 'Address', 'address') || '-';
+      const gmap = getVal(loc, 'Google_Map', 'google_map');
+
+      preview.innerHTML = `
+        <p class="font-bold text-slate-900 dark:text-white"><i class="fas fa-user-tie text-amber-600 mr-1"></i> HR SPOC: ${escapeHtml(spocName)} (${escapeHtml(spocNum)})</p>
+        <p class="text-[10px] text-slate-600 dark:text-slate-300"><i class="fas fa-location-dot text-rose-500 mr-1"></i> ${escapeHtml(address)}</p>
+        ${gmap ? `<p class="text-[10px] text-blue-600 dark:text-blue-400 truncate"><i class="fas fa-map-pin mr-1"></i> ${escapeHtml(gmap)}</p>` : ''}
+      `;
+      preview.classList.remove('hidden');
     }
 
     async function submitScheduleInterview() {
@@ -1866,49 +2208,100 @@
       const mode = document.querySelector('input[name="schMode"]:checked')?.value || 'Online';
       const link = document.getElementById('schLink').value.trim();
       const notes = document.getElementById('schNotes').value.trim();
-      const btn = document.getElementById('schSubmitBtn');
+      const shouldPrepareWa = document.getElementById('schPrepareWhatsapp')?.checked;
+      const locSelect = document.getElementById('schLocationSelect');
 
+      let selectedLocationObj = null;
+      let selectedLocationName = '';
+
+      if (mode === 'Physical') {
+        const idx = parseInt(locSelect.value, 10);
+        selectedLocationObj = !isNaN(idx) ? currentScheduleLocations[idx] : null;
+        if (!selectedLocationObj && currentScheduleLocations.length > 0) {
+          return showToast('Please select the client office location for the physical interview.', 'error');
+        }
+        selectedLocationName = selectedLocationObj
+          ? (getVal(selectedLocationObj, 'office_locations', 'Office_Locations', 'Location') || '').toString().trim()
+          : '';
+      }
+
+      const btn = document.getElementById('schSubmitBtn');
+      const btnTextEl = document.getElementById('schSubmitBtnText');
+      const prevBtnLabel = btnTextEl.textContent;
       btn.disabled = true;
-      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Scheduling...';
+      btnTextEl.textContent = 'Saving...';
+
+      const targetCandidate = { ...currentScheduleCandidate };
+      const wasReschedule = isCurrentScheduleReschedule;
 
       try {
         const isoDate = new Date(dtVal).toISOString();
         const updatePayload = {
           interview_date: isoDate,
           interview_mode: mode,
+          interview_location: mode === 'Physical' ? selectedLocationName : '',
           invite_link: mode === 'Online' ? link : '',
           comment: notes,
-          pipeline_stage: 'interview', // Advances to Interview stage automatically
+          pipeline_stage: 'interview',
           status: 'Selected',
           final_status: 'L1 Selected',
           updated_at: new Date().toISOString()
         };
 
         let query = supabaseClient.from('candidates').update(updatePayload);
-        query = byCandidate(query, currentScheduleCandidate);
-        const { error } = await query;
+        query = byCandidate(query, targetCandidate);
+        let { error } = await query;
+
+        // Schema guard in case 'interview_location' column is not yet created in Supabase
+        if (error && error.message && error.message.includes("Could not find the 'interview_location' column")) {
+          delete updatePayload.interview_location;
+          let retryQuery = supabaseClient.from('candidates').update(updatePayload);
+          retryQuery = byCandidate(retryQuery, targetCandidate);
+          const retryRes = await retryQuery;
+          error = retryRes.error;
+        }
+
         if (error) throw error;
 
         currentScheduleCandidate.interview_date = isoDate;
         currentScheduleCandidate.interview_mode = mode;
-        currentScheduleCandidate.invite_link = link;
+        currentScheduleCandidate.interview_location = mode === 'Physical' ? selectedLocationName : '';
+        currentScheduleCandidate.invite_link = mode === 'Online' ? link : '';
         currentScheduleCandidate.notes = notes;
         currentScheduleCandidate.stage = 'interview';
         currentScheduleCandidate.status = 'Selected';
         currentScheduleCandidate.final_status = 'L1 Selected';
 
-        showToast(`Interview scheduled! Advanced ${currentScheduleCandidate.name} to Client Interview.`, 'success');
         closeScheduleModal();
         renderBoard();
+
+        if (shouldPrepareWa) {
+          const waPayload = buildInterviewWhatsAppPayload(currentScheduleCandidate, {
+            dateTimeStr: isoDate,
+            mode,
+            locationObj: selectedLocationObj,
+            locationLabel: selectedLocationName,
+            inviteLink: link,
+            isReschedule: wasReschedule
+          });
+          activateWhatsAppNotificationUI(currentScheduleCandidate, waPayload, wasReschedule);
+        } else {
+          showToast(
+            wasReschedule
+              ? `Interview rescheduled for ${targetCandidate.name}!`
+              : `Interview scheduled for ${targetCandidate.name}!`,
+            'success'
+          );
+        }
       } catch (err) {
         showToast('Schedule failed: ' + err.message, 'error');
       } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-calendar-check mr-1"></i> Save &amp; Advance to Interview';
+        btnTextEl.textContent = prevBtnLabel;
       }
     }
 
-    // ==================== NESTED WORKFLOW: OUTCOME STATUS ====================
+    // ==================== OUTCOME STATUS ====================
     function openStatusModal(candId) {
       const cand = candidates.find(c => c.id === candId);
       if (!cand) return;
@@ -1951,7 +2344,7 @@
       if (!currentStatusCandidate) return;
       const candId = currentStatusCandidate.id;
       closeStatusModal();
-      openScheduleModal(candId);
+      openScheduleModal(candId, true);
     }
 
     async function submitInterviewOutcome() {
@@ -1965,7 +2358,6 @@
       btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Saving...';
 
       try {
-        // REQUIREMENT 3: If Rejected or On Hold selected -> drop from active card view
         if (category === 'Rejected' || category === 'On Hold') {
           const dropPayload = {
             status: category,
@@ -1981,7 +2373,6 @@
           candidates = candidates.filter(c => c.id !== currentStatusCandidate.id);
           showToast(`Candidate ${currentStatusCandidate.name} dropped from board (${category} - ${finalStatus})`, 'info');
         } else {
-          // Selected outcome -> advance to joined or offer
           let newStage = currentStatusCandidate.stage;
           if (finalStatus === 'Joined') newStage = 'joined';
           else if (finalStatus === 'Final Select') newStage = 'offer';
@@ -2016,12 +2407,12 @@
       }
     }
 
-    // ==================== NESTED WORKFLOW: INVOICE GENERATOR ====================
+    // ==================== INVOICE GENERATOR ====================
     function openInvoiceModal(candId) {
       if (!isAdminUser()) return showToast('Invoices are available to admins only.', 'error');
       const cand = candidates.find(c => c.id === candId);
       if (!cand) return;
-      ensurePdfLibs().catch(() => {});   // prefetch so Download PDF is instant
+      ensurePdfLibs().catch(() => {});
       currentInvoiceCandidate = cand;
 
       document.getElementById('invCandName').textContent = cand.name;
@@ -2106,7 +2497,6 @@
 
         const doc = new jsPDF();
 
-        // Header Branding
         doc.setFont("helvetica", "bold");
         doc.setFontSize(22);
         doc.setTextColor(15, 23, 42);
@@ -2124,7 +2514,6 @@
         doc.setDrawColor(203, 213, 225);
         doc.line(14, 34, 196, 34);
 
-        // Invoice Meta
         doc.setFont("helvetica", "bold");
         doc.setFontSize(14);
         doc.setTextColor(15, 23, 42);
@@ -2136,7 +2525,6 @@
         doc.text(`Invoice Date: ${invDate}`, 135, 48);
         doc.text(`Total Service Fee: Rs. ${formatINR(totalFee)}`, 135, 54);
 
-        // Billed To
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
         doc.text("To:", 14, 62);
@@ -2146,7 +2534,6 @@
         doc.setTextColor(71, 85, 105);
         doc.text(doc.splitTextToSize(compAddress, 175), 14, 74);
 
-        // Line Item
         doc.autoTable({
           startY: 84,
           head: [["S. No.", "Candidate Name & Position", "DOJ", `Service Fee ${feeRate}% of CTC (INR)`]],
@@ -2161,7 +2548,6 @@
           styles: { fontSize: 9.5, cellPadding: 4 }
         });
 
-        // Tax
         const taxY = doc.lastAutoTable.finalY + 8;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
@@ -2180,7 +2566,6 @@
           styles: { fontSize: 9.5, cellPadding: 2 }
         });
 
-        // Bank Details
         const bankY = doc.lastAutoTable.finalY + 8;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
@@ -2192,7 +2577,6 @@
         doc.text(`Account Number: ${REMITTANCE_CONFIG.accountNo}`, 14, bankY + 18);
         doc.text(`IFSC Code: ${REMITTANCE_CONFIG.ifsc} | Branch: ${REMITTANCE_CONFIG.branch}`, 14, bankY + 24);
 
-        // TDS Clause
         const clauseY = bankY + 32;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(9.5);
@@ -2202,7 +2586,6 @@
         doc.text("Kindly deduct TDS @10% under section 194J on the service fee amount and issue Form 16A in the name of:", 14, clauseY + 5);
         doc.text(`Name: ${REMITTANCE_CONFIG.panHolder} | PAN: ${REMITTANCE_CONFIG.panNo} | Business Name: Talent Connect Consultancy`, 14, clauseY + 10);
 
-        // Signatory
         const sigY = clauseY + 24;
         doc.setFont("helvetica", "bold");
         doc.setFontSize(10);
@@ -2283,7 +2666,7 @@
     // ==================== INITIALIZATION ====================
     window.addEventListener('DOMContentLoaded', () => {
       const userData = getUserData();
-      if (!userData.isLoggedIn) {   // previously an anonymous visitor saw every candidate
+      if (!userData.isLoggedIn) {
         showToast('Please login first. Redirecting...', 'error');
         setTimeout(() => { window.location.href = 'index.html'; }, 1000);
         return;
@@ -2296,12 +2679,13 @@
       loadPipelineFromSupabase();
     });
 
-    // ---- Dialog behaviour: Esc closes the top-most dialog, background scroll lock, focus in / back out ----
+    // Dialog accessibility: Esc closes top-most modal, background scroll lock, focus management
     const MODAL_CLOSERS = {
       candidateDetailModal: () => closeDetailModal(),
       confirmMoveModal: () => resolveStageMoveConfirmation(false),
       dropCandidateModal: () => closeDropModal(),
       scheduleModal: () => closeScheduleModal(),
+      waReadyModal: () => closeWaReadyModal(),
       statusModal: () => closeStatusModal(),
       invoiceModal: () => closeInvoiceModal(),
       addCandidateModal: () => closeAddCandidateModal()
@@ -2336,7 +2720,6 @@
     });
     document.querySelectorAll('.popup-overlay').forEach(m => overlayObserver.observe(m, { attributes: true, attributeFilter: ['style'] }));
 
-    // Logged out in another tab/window (index.html clears the persisted session) -> leave this page too
     window.addEventListener('storage', (e) => {
       if (e.storageArea === window.localStorage && e.key === 'tccPersistedSession' && e.newValue === null && sessionStorage.getItem('isLoggedIn') === 'true') {
         TCCSession.clear();
